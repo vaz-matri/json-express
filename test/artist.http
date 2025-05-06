@@ -2,7 +2,7 @@
 @contentType = application/json
 
 # make sure there is no empty space
-@id = 1746545286618
+@id = 1746547893740
 
 ### GET / - Get all artists
 GET {{baseUrl}}/ HTTP/1.1

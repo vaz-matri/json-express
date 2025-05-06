@@ -1,61 +1,35 @@
 import { Router } from 'express'
+import { addArtist, deleteArtist, getAllArtists, getArtistById, updateArtist } from '../services/artist.js'
 
 const artistRouter = Router()
 
-const createArtist = (name) => {
-    return { id: `${Date.now()}`, name }
-}
-
-const artists = [
-    createArtist('Eminem')
-]
-
 artistRouter.get('/', async (req, res) => {
+    const artists = getAllArtists()
+
     res.json(artists)
 })
 
 artistRouter.get('/:id', async (req, res) => {
-    debugger
     const id = req.params.id
 
-    const artist = artists.find(artist => artist.id === id)
-    if (!artist) {
-        return res.status(404).send({ message: 'Artist not found' })
-    }
+    const artist = getArtistById(id)
 
     res.json(artist)
 })
 
 artistRouter.post('/', async (req, res) => {
-    const { name } = req.body
+    const createReq = req.body
 
-    if (!name) {
-        return res.status(400).send({ message: 'Name is required' })
-    }
+    const artist = addArtist(createReq) //:TODO handle error
 
-    const artist = createArtist(name)
-    artists.push(artist)
-
-    res.json(artist)
+    res.status(201).json(artist)
 })
 
 artistRouter.patch('/:id', async (req, res) => {
     const { id } = req.params
-    const { name } = req.body
+    const updateReq = req.body
 
-    if (!name) {
-        return res.status(400).send({ message: 'Name is required' })
-    }
-
-    const artistIndex = artists.findIndex(artist => artist.id === id)
-    if (artistIndex === -1) {
-        return res.status(404).send({ message: 'Artist not found' })
-    }
-
-    const artist = artists[artistIndex]
-    artist.name = name
-
-    artists[artistIndex] = artist
+    const artist = updateArtist(id, updateReq) //:TODO handle error
 
     res.json(artist)
 })
@@ -63,14 +37,7 @@ artistRouter.patch('/:id', async (req, res) => {
 artistRouter.delete('/:id', async (req, res) => {
     const { id } = req.params
 
-    const artistIndex = artists.findIndex(artist => artist.id === id)
-    if (artistIndex === -1) {
-        return res.status(404).send({ message: 'Artist not found' })
-    }
-
-    const artist = artists[artistIndex]
-
-    artists.splice(artistIndex, 1)
+    const artist = deleteArtist(id) //:TODO handle error
 
     res.json(artist)
 })
