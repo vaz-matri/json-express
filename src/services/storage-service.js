@@ -1,9 +1,5 @@
 import AppError from '../utils/app-error.js'
-
-const store = {
-    artists: [],
-    albums: []
-}
+import store from '../db/in-memory.js'
 
 export const getAllItems = (key) => {
     return store[key]
@@ -63,5 +59,3 @@ const findById = (key, id) => {
 
     return { item, index }
 }
-
-addItem('artists', { name: 'Eminem' }) //:TODO remove it later
