@@ -4,15 +4,15 @@
 # make sure there is no empty space
 @id = 1746547893740
 
-### GET / - Get all artists
+### Get all artists
 GET {{baseUrl}}/ HTTP/1.1
 Accept: {{contentType}}
 
-### GET /:id - Get artist by ID
+### Get artist by ID
 GET {{baseUrl}}/{{id}} HTTP/1.1
 Accept: {{contentType}}
 
-### POST / - Create new artist
+### Create new artist
 POST {{baseUrl}}/ HTTP/1.1
 Content-Type: {{contentType}}
 
@@ -20,7 +20,7 @@ Content-Type: {{contentType}}
   "name": "Drake"
 }
 
-### PATCH /:id - Update artist
+### Update artist
 PATCH {{baseUrl}}/{{id}} HTTP/1.1
 Content-Type: {{contentType}}
 
@@ -28,5 +28,5 @@ Content-Type: {{contentType}}
   "name": "Marshall Bruce Mathers III"
 }
 
-### DELETE /:id - Delete artist
+### Delete artist
 DELETE {{baseUrl}}/{{id}} HTTP/1.1

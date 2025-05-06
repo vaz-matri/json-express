@@ -1,3 +1,5 @@
+import AppError from '../utils/app-error.js'
+
 const artists = [] // { id, name }
 
 export const getAllArtists = () => {
@@ -43,7 +45,7 @@ const validateReq = (dtoReq) => {
     const { name } = dtoReq
 
     if (!name) {
-        return null //:TODO throw 400 error
+        throw new AppError('name is required', 400)
     }
 
     return { name }
@@ -53,7 +55,7 @@ const findById = (id) => {
     const artistIndex = artists.findIndex((artist) => artist.id === id)
 
     if (artistIndex === -1) {
-        return null //:TODO throw 404 error
+        throw new AppError('id not found', 404)
     }
 
     const artist = artists[artistIndex]

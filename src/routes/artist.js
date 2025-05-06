@@ -20,26 +20,37 @@ artistRouter.get('/:id', async (req, res) => {
 artistRouter.post('/', async (req, res) => {
     const createReq = req.body
 
-    const artist = addArtist(createReq) //:TODO handle error
+    try {
+        const artist = addArtist(createReq)
 
-    res.status(201).json(artist)
+        res.status(201).json(artist)
+    } catch (appError) {
+        res.status(appError.statusCode).send({ message: appError.message })
+    }
 })
 
 artistRouter.patch('/:id', async (req, res) => {
     const { id } = req.params
     const updateReq = req.body
 
-    const artist = updateArtist(id, updateReq) //:TODO handle error
+    try {
+        const artist = updateArtist(id, updateReq)
 
-    res.json(artist)
+        res.json(artist)
+    } catch (appError) {
+        res.status(appError.statusCode).send({ message: appError.message })
+    }
 })
 
 artistRouter.delete('/:id', async (req, res) => {
     const { id } = req.params
+    try {
+        const artist = deleteArtist(id)
+        res.json(artist)
 
-    const artist = deleteArtist(id) //:TODO handle error
-
-    res.json(artist)
+    } catch (appError) {
+        res.status(appError.statusCode).send({ message: appError.message })
+    }
 })
 
 export default artistRouter
