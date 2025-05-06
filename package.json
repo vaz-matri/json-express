@@ -4,9 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/server.js",
+    "serve": "node src/server.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "vazmat",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "express": "5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "3.1.10"
+  }
 }
