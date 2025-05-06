@@ -2,7 +2,7 @@ const baseUrl = 'http://localhost:3000/'
 
 let id = ''
 
-const getAllArtist = async (route) => {
+const getAllRoute = async (route) => {
     try {
         const res = await fetch(baseUrl + route)
         const data = await res.json()
@@ -15,7 +15,7 @@ const getAllArtist = async (route) => {
     }
 }
 
-const getArtistById = async (route) => {
+const getByIdRoute = async (route) => {
     try {
         const res = await fetch(baseUrl + route + id)
         const data = await res.json()
@@ -26,7 +26,7 @@ const getArtistById = async (route) => {
     }
 }
 
-const createArtist = async (route, body) => {
+const createRoute = async (route, body) => {
     try {
         const res = await fetch(baseUrl + route, {
             method: 'POST',
@@ -43,7 +43,7 @@ const createArtist = async (route, body) => {
     }
 }
 
-const updateArtist = async (route, body) => {
+const updateRoute = async (route, body) => {
     try {
         const res = await fetch(baseUrl + route + id, {
             method: 'PATCH',
@@ -60,7 +60,7 @@ const updateArtist = async (route, body) => {
     }
 }
 
-const deleteArtist = async (route) => {
+const deleteRoute = async (route) => {
     try {
         const res = await fetch(baseUrl + route + id, {
             method: 'DELETE',
@@ -79,13 +79,12 @@ const deleteArtist = async (route) => {
 const testRoute = async ({ route, createReq = {}, updateReq = {} }) => {
     console.log(`---------${route.replace('/', '')}---------`)
 
-    await createArtist(route, createReq)
-    await getAllArtist(route)
-    await getArtistById(route)
-    await updateArtist(route, updateReq)
-    await getAllArtist(route)
-    await deleteArtist(route)
-    await getAllArtist(route)
+    await createRoute(route, createReq)
+    await getAllRoute(route)
+    await getByIdRoute(route)
+    await updateRoute(route, updateReq)
+    await deleteRoute(route)
+    await getAllRoute(route)
 
     console.log()
     console.log()
@@ -95,13 +94,13 @@ const main = async () => {
     const routes = {
         artists: {
             route: 'artists/',
-            createReq: { name: 'Drake' },
+            createReq: { name: 'Eminem', dob: '17-10-1972' },
             updateReq: { name: 'Marshall Bruce Mathers III' }
         },
         albums: {
             route: 'albums/',
-            createReq: { name: 'The Marshall Mathers LP' },
-            updateReq: { name: 'Encore' }
+            createReq: { name: 'The Marshall Mathers LP', releaseDate: '23-05-2000' },
+            updateReq: { name: 'Encore', releaseDate: '12-11-2004' }
         }
     }
 
