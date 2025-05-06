@@ -1,66 +1,67 @@
 import AppError from '../utils/app-error.js'
 
-const artists = [] // { id, name }
-
-export const getAllArtists = () => {
-    return artists
+const store = {
+    artists: [],
+    albums: []
 }
 
-export const getArtistById = (id) => {
-    const { artist } = findById(id)
-
-    return artist
+export const getAllItems = (key) => {
+    return store[key]
 }
 
-export const addArtist = (createReq) => {
-    const { name } = validateReq(createReq)
+export const getItemById = (key, id) => {
+    const { item } = findById(key, id)
 
-    const artist = { id: `${Date.now()}`, name }
-    artists.push(artist)
-
-    return artist
+    return item
 }
 
-export const updateArtist = (id, updateReq) => {
-    const { name } = validateReq(updateReq)
+export const addItem = (key, createReq) => {
+    validateReq(createReq)
 
-    const { artist, artistIndex } = findById(id)
+    const item = { id: `${Date.now()}`, ...createReq }
+    store[key].push(item)
 
-    artist.name = name
-
-    artists[artistIndex] = artist
-
-    return artist
+    return item
 }
 
-export const deleteArtist = (id) => {
-    const { artist, artistIndex } = findById(id)
+export const updateItem = (key, id, updateReq) => {
+    validateReq(updateReq)
 
-    artists.splice(artistIndex, 1)
+    let { item, index } = findById(key, id)
 
-    return artist
+    item = { ...item, ...updateReq }
+
+    store[key][index] = item
+
+    return item
+}
+
+export const deleteItem = (key, id) => {
+    const { item, index } = findById(key, id)
+
+    store[key].splice(index, 1)
+
+    return item
 }
 
 const validateReq = (dtoReq) => {
-    const { name } = dtoReq
-
-    if (!name) {
-        throw new AppError('name is required', 400)
+    if (!Object.keys(dtoReq).length) { //:TODO validate using joi
+        throw new AppError('empty request body', 400)
     }
 
-    return { name }
+    return dtoReq
 }
 
-const findById = (id) => {
-    const artistIndex = artists.findIndex((artist) => artist.id === id)
+const findById = (key, id) => {
+    const index = store[key].findIndex((item) => item.id === id)
 
-    if (artistIndex === -1) {
+    if (index === -1) {
         throw new AppError('id not found', 404)
     }
 
-    const artist = artists[artistIndex]
+    const item = store[key][index]
 
-    return { artist, artistIndex }
+    return { item, index }
 }
 
-addArtist({ name: 'Eminem' }) //:TODO remove it later
+addItem('artists', { name: 'Eminem' }) //:TODO remove it later

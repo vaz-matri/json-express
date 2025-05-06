@@ -1,10 +1,12 @@
 import { Router } from 'express'
-import { addArtist, deleteArtist, getAllArtists, getArtistById, updateArtist } from '../services/artist.js'
+import { addItem, deleteItem, getAllItems, getItemById, updateItem } from '../services/artist.js'
 
 const artistRouter = Router()
 
+const key = 'artists'
+
 artistRouter.get('/', async (req, res) => {
-    const artists = getAllArtists()
+    const artists = getAllItems(key)
 
     res.json(artists)
 })
@@ -12,7 +14,7 @@ artistRouter.get('/', async (req, res) => {
 artistRouter.get('/:id', async (req, res) => {
     const id = req.params.id
 
-    const artist = getArtistById(id)
+    const artist = getItemById(key, id)
 
     res.json(artist)
 })
@@ -21,7 +23,7 @@ artistRouter.post('/', async (req, res) => {
     const createReq = req.body
 
     try {
-        const artist = addArtist(createReq)
+        const artist = addItem(key, createReq)
 
         res.status(201).json(artist)
     } catch (appError) {
@@ -34,7 +36,7 @@ artistRouter.patch('/:id', async (req, res) => {
     const updateReq = req.body
 
     try {
-        const artist = updateArtist(id, updateReq)
+        const artist = updateItem(key, id, updateReq)
 
         res.json(artist)
     } catch (appError) {
@@ -44,8 +46,9 @@ artistRouter.patch('/:id', async (req, res) => {
 
 artistRouter.delete('/:id', async (req, res) => {
     const { id } = req.params
+
     try {
-        const artist = deleteArtist(id)
+        const artist = deleteItem(key, id)
         res.json(artist)
 
     } catch (appError) {
