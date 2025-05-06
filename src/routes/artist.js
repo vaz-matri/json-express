@@ -1,59 +1,59 @@
 import { Router } from 'express'
 import { addItem, deleteItem, getAllItems, getItemById, updateItem } from '../services/storage-service.js'
 
-const artistRouter = Router()
-
 const key = 'artists'
 
-artistRouter.get('/', async (req, res) => {
-    const artists = getAllItems(key)
+const router = Router()
 
-    res.json(artists)
+router.get('/', async (req, res) => {
+    const items = getAllItems(key)
+
+    res.json(items)
 })
 
-artistRouter.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
     const id = req.params.id
 
-    const artist = getItemById(key, id)
+    const item = getItemById(key, id)
 
-    res.json(artist)
+    res.json(item)
 })
 
-artistRouter.post('/', async (req, res) => {
+router.post('/', async (req, res) => {
     const createReq = req.body
 
     try {
-        const artist = addItem(key, createReq)
+        const item = addItem(key, createReq)
 
-        res.status(201).json(artist)
+        res.status(201).json(item)
     } catch (appError) {
         res.status(appError.statusCode).send({ message: appError.message })
     }
 })
 
-artistRouter.patch('/:id', async (req, res) => {
+router.patch('/:id', async (req, res) => {
     const { id } = req.params
     const updateReq = req.body
 
     try {
-        const artist = updateItem(key, id, updateReq)
+        const item = updateItem(key, id, updateReq)
 
-        res.json(artist)
+        res.json(item)
     } catch (appError) {
         res.status(appError.statusCode).send({ message: appError.message })
     }
 })
 
-artistRouter.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     const { id } = req.params
 
     try {
-        const artist = deleteItem(key, id)
-        res.json(artist)
+        const item = deleteItem(key, id)
+        res.json(item)
 
     } catch (appError) {
         res.status(appError.statusCode).send({ message: appError.message })
     }
 })
 
-export default artistRouter
+export default router
