@@ -1,17 +1,17 @@
 import { Router } from 'express'
 import { addItem, deleteItem, getAllItems, getItemById, updateItem } from '../services/storage-service.js'
 
-const artistRouter = Router()
+const albumRouter = Router()
 
-const key = 'artists'
+const key = 'albums'
 
-artistRouter.get('/', async (req, res) => {
+albumRouter.get('/', async (req, res) => {
     const artists = getAllItems(key)
 
     res.json(artists)
 })
 
-artistRouter.get('/:id', async (req, res) => {
+albumRouter.get('/:id', async (req, res) => {
     const id = req.params.id
 
     const artist = getItemById(key, id)
@@ -19,7 +19,7 @@ artistRouter.get('/:id', async (req, res) => {
     res.json(artist)
 })
 
-artistRouter.post('/', async (req, res) => {
+albumRouter.post('/', async (req, res) => {
     const createReq = req.body
 
     try {
@@ -31,7 +31,7 @@ artistRouter.post('/', async (req, res) => {
     }
 })
 
-artistRouter.patch('/:id', async (req, res) => {
+albumRouter.patch('/:id', async (req, res) => {
     const { id } = req.params
     const updateReq = req.body
 
@@ -44,7 +44,7 @@ artistRouter.patch('/:id', async (req, res) => {
     }
 })
 
-artistRouter.delete('/:id', async (req, res) => {
+albumRouter.delete('/:id', async (req, res) => {
     const { id } = req.params
 
     try {
@@ -56,4 +56,4 @@ artistRouter.delete('/:id', async (req, res) => {
     }
 })
 
-export default artistRouter
+export default albumRouter
