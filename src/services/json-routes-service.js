@@ -22,4 +22,9 @@ const prepare = async () => {
 
 await prepare()
 
+if (!Object.keys(jsonRoutes).length) {
+    console.log('No json files found to serve')
+    process.exit(1)
+}
+
 export default jsonRoutes
