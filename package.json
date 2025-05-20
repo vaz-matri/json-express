@@ -1,13 +1,13 @@
 {
-  "name": "json-express",
-  "version": "1.0.0",
+  "name": "@json-express/core",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch src src/server.js",
     "serve": "node src/server.js"
   },
-  "keywords": [],
+  "keywords": ["json", "server", "express"],
   "author": "vazmat",
   "license": "ISC",
   "type": "module",
@@ -16,5 +16,16 @@
   },
   "devDependencies": {
     "nodemon": "3.1.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vaz-matri/json-express.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vaz-matri/json-express/issues"
+  },
+  "homepage": "https://jsonexpress.com/",
+  "publishConfig": {
+    "access": "public"
   }
 }
