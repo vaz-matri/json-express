@@ -11,4 +11,4 @@ $ json-server
 ```
 
 #### next task
- - filter json files before serving
+ - [x] filter json files before serving

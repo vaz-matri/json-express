@@ -8,6 +8,8 @@ const jsonRoutes = {}
 
 const prepare = async () => {
     for (const filename of files) {
+        if (!filename.includes('.json')) return
+
         const filePath = join(dirname, filename)
 
         const fileContent = readFileSync(filePath, 'utf8')
