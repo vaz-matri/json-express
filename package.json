@@ -27,5 +27,8 @@
   "homepage": "https://jsonexpress.com/",
   "publishConfig": {
     "access": "public"
+  },
+  "bin": {
+    "json-express": "./bin/exec.js"
   }
 }

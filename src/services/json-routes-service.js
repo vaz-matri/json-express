@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'fs'
 import { join } from 'path'
 
-const dirname = join(process.cwd(), 'example') //:TODO remove example
+const dirname = join(process.cwd())
 const files = readdirSync(dirname)
 
 const jsonRoutes = {}
