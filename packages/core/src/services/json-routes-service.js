@@ -8,7 +8,7 @@ const jsonRoutes = {}
 
 const prepare = async () => {
     for (const filename of files) {
-        if (!filename.includes('.json')) return
+        if (!filename.includes('.json') || filename.includes('package') || filename.includes('-lock')) return
 
         const filePath = join(dirname, filename)
 
