@@ -1,6 +1,6 @@
 {
   "name": "@json-express/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A simple json server which serves all json files",
   "scripts": {
     "dev": "nodemon --watch src src/server.js",
@@ -34,6 +34,10 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "bin/",
+    "src/"
+  ],
   "bin": {
     "json-express": "./bin/exec.js"
   }
