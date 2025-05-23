@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  packages/core:
     dependencies:
       express:
         specifier: 5.1.0
