@@ -1,5 +1,7 @@
 ### testing
 ```
-$ cd example
-$ json-server
+$ cd core
+$ pnpm link --global
+$ pnpm remove --global @json-express/core
 ```
+
