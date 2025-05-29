@@ -8,7 +8,7 @@ A lightweight, fast JSON server for rapid API prototyping and development. Get a
 - **Full REST API** - GET, POST, PATCH, DELETE operations
 - **Lightweight** - Minimal dependencies, maximum performance
 - **CORS Enabled** - Coming soon
-<br><br>
+
 
 ## 🚀 Quick Start
 
@@ -20,35 +20,64 @@ npm install -g @json-express/core
 ### Usage
 ```bash
 # Navigate to your project directory
-cd my-project
+$ cd my-project
 
 # Create a sample JSON file (albums.json)
-echo '[{"name": "Encore", "releaseDate": "12-11-2004"}]' > albums.json
+$ echo '[{"name": "Encore", "releaseDate": "12-11-2004"}]' > albums.json
 
 # Start the server
-json-server
+$ json-server
 ```
 
 ### Local Installation (Project-specific)
 ```bash
 # Navigate to your project directory
-cd my-project
+$ cd my-project
 
 # Install locally in your project
-npm install @json-express/core
+$ npm install @json-express/core
 
 # Create your JSON files
-echo '[{"name": "Encore", "releaseDate": "12-11-2004"}]' > albums.json
+$ echo '[{"name": "Encore", "releaseDate": "12-11-2004"}]' > albums.json
 
 # Start the server using npx
-npx json-express
+$ npx json-express
 ```
 
 ### Stopping the Server
 To stop the JSON Express server, use:
 - **Mac/Linux**: `Ctrl + C`
 - **Windows**: `Ctrl + C`
-<br><br>
+
+## ⚙️ Configuration
+
+JSON Express favors convention over configuration, but when you need customization, simply create a `config.json` file in the same directory as your JSON data files.
+
+### Creating a Configuration File
+
+```bash
+# Create config.json in your project directory
+echo '{"PORT": "8080"}' > config.json
+```
+
+### Available Configuration Options
+
+```json
+{
+  "PORT": "8080"
+}
+```
+
+**Note**: More configuration properties are coming soon!
+
+### Example Project Structure
+```
+my-project/
+├── config.json     # Optional configuration
+├── albums.json     # Your data files
+├── artists.json    # Your data files
+└── ...
+```
 
 ## 📚 API Endpoints
 
@@ -61,7 +90,6 @@ POST   /albums         # Create a new album
 PATCH  /albums/:id     # Partially update album with id 
 DELETE /albums/:id     # Delete album with id 
 ```
-<br><br>
 
 ## 📁 Sample JSON Structure
 
@@ -112,25 +140,12 @@ And an `artists.json` file:
     "recordLabel": "Republic Records",
     "website": "https://www.taylorswift.com"
   },
-  {
-    "name": "Ed Sheeran",
-    "realName": "Edward Christopher Sheeran",
-    "dob": "17-02-1991",
-    "genre": "Pop Rock",
-    "country": "United Kingdom",
-    "debutYear": 2011,
-    "isActive": true,
-    "recordLabel": "Atlantic Records",
-    "website": "https://www.edsheeran.com"
-  }
 ]
 ```
-<br><br>
 
 ## 📄 License
 
 ISC License - see the [LICENSE](LICENSE) file for details.
-<br><br>
 
 ## 🐛 Issues
 
