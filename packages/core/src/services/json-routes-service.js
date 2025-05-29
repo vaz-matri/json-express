@@ -4,7 +4,13 @@ import { join } from 'path'
 const dirname = join(process.cwd())
 const files = readdirSync(dirname)
 
-const jsonRoutes = {}
+const defaultConfig = {
+    PORT: 3000
+}
+
+const jsonRoutes = {
+    config: defaultConfig
+}
 
 const prepare = async () => {
     for (const filename of files) {
@@ -13,8 +19,12 @@ const prepare = async () => {
         const filePath = join(dirname, filename)
 
         const fileContent = readFileSync(filePath, 'utf8')
-        const file = JSON.parse(fileContent)
+        let file = JSON.parse(fileContent)
         const path = filename.replace('.json', '')
+
+        if (path === 'config') {
+            file = { ...defaultConfig, ...file }
+        }
 
         jsonRoutes[path] = file
     }
