@@ -1,6 +1,6 @@
 {
   "name": "@json-express/core",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A simple json server which serves all json files",
   "scripts": {
     "dev": "nodemon --watch src src/server.js",
@@ -10,7 +10,11 @@
     "json",
     "server",
     "express",
-    "cli"
+    "cli",
+    "json-express",
+    "json-server",
+    "jsonserver",
+    "jsonexpress"
   ],
   "author": "vazmat",
   "license": "ISC",
