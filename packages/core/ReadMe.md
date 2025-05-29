@@ -64,7 +64,7 @@ echo '{"PORT": "8080"}' > config.json
 
 ```json
 {
-  "PORT": "8080"
+  "PORT": 8080
 }
 ```
 

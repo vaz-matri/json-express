@@ -1,6 +1,6 @@
 {
   "name": "@json-express/core",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A simple json server which serves all json files",
   "scripts": {
     "dev": "nodemon --watch src src/server.js",
@@ -20,7 +20,8 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "express": "5.1.0"
+    "express": "5.1.0",
+    "get-port": "^7.1.0"
   },
   "devDependencies": {
     "nodemon": "3.1.10"
