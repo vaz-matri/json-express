@@ -1,7 +1,8 @@
 import { Router } from 'express'
 import { addItem, deleteItem, getAllItems, getItemById, updateItem } from '../services/storage-service.js'
+import { validateCreateReq } from '../services/validation-service.js'
 
-const createRoute = (key) => {
+const createRoute = (key, config) => {
     const router = Router()
 
     router.get('/', async (req, res) => {
@@ -19,7 +20,11 @@ const createRoute = (key) => {
     })
 
     router.post('/', async (req, res) => {
-        const createReq = req.body
+        const { value: createReq, error } = validateCreateReq(config.schema, req.body)
+
+        if (error) {
+            return res.status(400).json({ message: error.message })
+        }
 
         try {
             const item = addItem(key, createReq)

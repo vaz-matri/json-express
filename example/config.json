@@ -1,3 +1,17 @@
 {
-  "PORT": 8080
+  "PORT": 8080,
+  "routes": {
+    "albums": {
+      "schema": {
+        "name": {
+          "type": "string",
+          "required": true
+        },
+        "releaseDate": {
+          "type": "string",
+          "required": true
+        }
+      }
+    }
+  }
 }

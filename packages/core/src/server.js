@@ -10,8 +10,9 @@ const startServer = async () => {
     app.use(express.json())
 
     const { config, ...jsonRoutes } = jsonFiles
+    const { routes: routesConfig } = config
 
-    routes(app, jsonRoutes)
+    routes(app, jsonRoutes, routesConfig)
 
     const portSequence = Array.from({ length: 100 }, (_, i) => config.PORT + i)
     const PORT = await getPort({ port: portSequence })
