@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { addItem, deleteItem, getAllItems, getItemById, updateItem } from '../services/storage-service.js'
-import { validateCreateReq, validateUpdateReq } from '../services/validation-service.js'
+import { addItem, deleteItem, getAllItems, getItemById, searchItems, updateItem } from '../services/storage-service.js'
+import { validateCreateReq, validateSearchReq, validateUpdateReq } from '../services/validation-service.js'
 
 const createRoute = (key, config) => {
     const router = Router()
@@ -17,6 +17,22 @@ const createRoute = (key, config) => {
         const item = getItemById(key, id)
 
         res.json(item)
+    })
+
+    router.post('/search', async (req, res) => {
+        const { value: searchReq, error } = validateSearchReq(config.schema, req.body)
+
+        if (error) {
+            return res.status(400).json({ message: error.message })
+        }
+
+        try {
+            const items = searchItems(key, searchReq)
+
+            res.json(items)
+        } catch (appError) {
+            res.status(appError.statusCode).send({ message: appError.message })
+        }
     })
 
     router.post('/', async (req, res) => {

@@ -4,6 +4,7 @@
 ### Added
 - Schema validation added to `config.json`
 - Validation support added to create and update api
+- Search API 
 
 ### Changed
 - Updated `dev` setup to run example

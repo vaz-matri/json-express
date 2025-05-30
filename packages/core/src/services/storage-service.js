@@ -11,9 +11,17 @@ export const getItemById = (key, id) => {
     return item
 }
 
-export const addItem = (key, createReq) => {
-    validateReq(createReq)
+export const searchItems = (key, searchReq) => {
+    return store[key].filter((item) => {
+        return Object.keys(searchReq).every(searchKey => {
+            const searchValue = searchReq[searchKey]
 
+            return searchValue === item[searchKey]
+        })
+    })
+}
+
+export const addItem = (key, createReq) => {
     const item = { id: `${Date.now()}`, ...createReq }
     store[key].push(item)
 
@@ -21,8 +29,6 @@ export const addItem = (key, createReq) => {
 }
 
 export const updateItem = (key, id, updateReq) => {
-    validateReq(updateReq)
-
     let { item, index } = findById(key, id)
 
     item = { ...item, ...updateReq }
@@ -38,14 +44,6 @@ export const deleteItem = (key, id) => {
     store[key].splice(index, 1)
 
     return item
-}
-
-const validateReq = (dtoReq) => {
-    if (!Object.keys(dtoReq).length) { //:TODO validate using joi
-        throw new AppError('empty request body', 400)
-    }
-
-    return dtoReq
 }
 
 const findById = (key, id) => {

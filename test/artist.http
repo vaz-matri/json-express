@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:3000/artists
+@baseUrl = http://localhost:8080/albums
 @contentType = application/json
 
 # make sure there is no empty space
@@ -11,6 +11,16 @@ Accept: {{contentType}}
 ### Get artist by ID
 GET {{baseUrl}}/{{id}} HTTP/1.1
 Accept: {{contentType}}
+
+//:TODO update to artists
+### Search albums
+POST {{baseUrl}}/search HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Encore",
+  "releaseDate": "12-11-2004"
+}
 
 ### Create new artist
 POST {{baseUrl}}/ HTTP/1.1

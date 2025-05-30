@@ -4,7 +4,7 @@
   "description": "A simple json server which serves all json files",
   "scripts": {
     "dev": "nodemon --exec 'cd ../../example && json-express'",
-    "serve": "node src/server.js"
+    "serve": "cd ../../example && json-express"
   },
   "keywords": [
     "json",
