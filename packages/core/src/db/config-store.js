@@ -1,5 +1,6 @@
 let configStore = {
-    port: 3000
+    port: 3000,
+    'schema.validation': 'optional' // optional | strict
 }
 
 export const updateCofigStore = (store) => {

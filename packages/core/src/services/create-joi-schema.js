@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import { getConfig } from '../db/config-store.js'
 
 const createJoiSchema = (jsonSchema = {}) => {
     const joiFields = {}
@@ -20,7 +21,9 @@ const createJoiSchema = (jsonSchema = {}) => {
         joiFields[fieldName] = joiValidator
     }
 
-    return Joi.object(joiFields).unknown(true) //:TODO handle from config
+    const allowUnknown = getConfig('schema.validation')
+
+    return Joi.object(joiFields).unknown(allowUnknown !== 'strict')
 }
 
 export default createJoiSchema
