@@ -5,3 +5,14 @@ export const validateCreateReq = (jsonSchema, createReq) => {
 
     return schema.validate(createReq)
 }
+
+export const validateUpdateReq = (jsonSchema, updateReq) => {
+    const optionalSchema = {}
+    Object.keys(jsonSchema).forEach((keys) => {
+        optionalSchema[keys] = { ...jsonSchema[keys], required: false }
+    })
+
+    const schema = createJoiSchema(optionalSchema)
+
+    return schema.validate(updateReq)
+}

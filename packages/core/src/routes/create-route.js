@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { addItem, deleteItem, getAllItems, getItemById, updateItem } from '../services/storage-service.js'
-import { validateCreateReq } from '../services/validation-service.js'
+import { validateCreateReq, validateUpdateReq } from '../services/validation-service.js'
 
 const createRoute = (key, config) => {
     const router = Router()
@@ -37,7 +37,11 @@ const createRoute = (key, config) => {
 
     router.patch('/:id', async (req, res) => {
         const { id } = req.params
-        const updateReq = req.body
+
+        const { value: updateReq, error } = validateUpdateReq(config.schema, req.body)
+        if (error) {
+            return res.status(400).json({ message: error.message })
+        }
 
         try {
             const item = updateItem(key, id, updateReq)
