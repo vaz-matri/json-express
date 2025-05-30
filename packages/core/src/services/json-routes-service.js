@@ -1,16 +1,11 @@
 import { readdirSync, readFileSync } from 'fs'
 import { join } from 'path'
+import { updateCofigStore } from '../db/config-store.js'
 
 const dirname = join(process.cwd())
 const files = readdirSync(dirname)
 
-const defaultConfig = {
-    PORT: 3000
-}
-
-const jsonRoutes = {
-    config: defaultConfig
-}
+const jsonFiles = {}
 
 const prepare = async () => {
     for (const filename of files) {
@@ -22,19 +17,19 @@ const prepare = async () => {
         let file = JSON.parse(fileContent)
         const path = filename.replace('.json', '')
 
-        if (path === 'config') {
-            file = { ...defaultConfig, ...file }
-        }
-
-        jsonRoutes[path] = file
+        jsonFiles[path] = file
     }
 }
 
 await prepare()
 
-if (!Object.keys(jsonRoutes).length) {
+if (!Object.keys(jsonFiles).length) {
     console.log('No json files found to serve')
     process.exit(1)
 }
+
+const { config = {}, ...jsonRoutes } = jsonFiles
+
+updateCofigStore(config)
 
 export default jsonRoutes

@@ -1,6 +1,6 @@
 import createJoiSchema from './create-joi-schema.js'
 
-const getOptionalSchema = (jsonSchema) => {
+const getOptionalSchema = (jsonSchema = {}) => {
     const optionalSchema = {}
     Object.keys(jsonSchema).forEach((key) => {
         optionalSchema[key] = { ...jsonSchema[key], required: false }
