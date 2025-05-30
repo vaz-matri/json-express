@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { addItem, deleteItem, getAllItems, getItemById, searchItems, updateItem } from '../services/storage-service.js'
 import { validateCreateReq, validateSearchReq, validateUpdateReq } from '../services/validation-service.js'
 
-const createRoute = (key, config) => {
+const createRoute = (key, config = {}) => {
     const router = Router()
 
     router.get('/', async (req, res) => {

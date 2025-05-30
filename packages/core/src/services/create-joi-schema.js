@@ -1,6 +1,6 @@
 import Joi from 'joi'
 
-const createJoiSchema = (jsonSchema) => {
+const createJoiSchema = (jsonSchema = {}) => {
     const joiFields = {}
 
     for (const [fieldName, fieldConfig] of Object.entries(jsonSchema)) {
@@ -20,7 +20,7 @@ const createJoiSchema = (jsonSchema) => {
         joiFields[fieldName] = joiValidator
     }
 
-    return Joi.object(joiFields)
+    return Joi.object(joiFields).unknown(true) //:TODO handle from config
 }
 
 export default createJoiSchema
