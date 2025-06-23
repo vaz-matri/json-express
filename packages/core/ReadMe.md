@@ -2,6 +2,8 @@
 
 A lightweight, fast JSON server for rapid API prototyping and development. Get a full REST API with zero coding in seconds.
 
+**🌐 Homepage** [jsonexpress.com](https://jsonexpress.com)
+
 ## ✨ Features
 
 - **Zero Configuration** - Just point to your JSON files and go
@@ -9,24 +11,11 @@ A lightweight, fast JSON server for rapid API prototyping and development. Get a
 - **Lightweight** - Minimal dependencies, maximum performance
 - **CORS Enabled** - Coming soon
 
-
-## 🚀 Quick Start
+## 📦 Installation
 
 ### Global Installation
 ```bash
 npm install -g @json-express/core
-```
-
-### Usage
-```bash
-# Navigate to your project directory
-$ cd my-project
-
-# Create a sample JSON file (albums.json)
-$ echo '[{"name": "Encore", "releaseDate": "12-11-2004"}]' > albums.json
-
-# Start the server
-$ json-server
 ```
 
 ### Local Installation (Project-specific)
@@ -36,18 +25,75 @@ $ cd my-project
 
 # Install locally in your project
 $ npm install @json-express/core
+```
 
-# Create your JSON files
-$ echo '[{"name": "Encore", "releaseDate": "12-11-2004"}]' > albums.json
+## 📁 Setup Your JSON Files
 
-# Start the server using npx
+Navigate to your project directory. If you already have JSON files, you can use those directly, or create your own
+
+Here are some examples
+
+```bash
+# Navigate to your project directory
+$ cd my-project
+
+# Create an albums.json file
+$ echo '[{"name": "Encore", "releaseDate": "12-11-2004"}, {"name": "The Marshall Mathers LP", "releaseDate": "23-05-2000"}]' > albums.json
+
+# Create an artists.json file
+$ echo '[{"name": "Eminem", "realName": "Marshall Bruce Mathers III", "dob": "17-10-1972", "genre": "Hip Hop", "country": "United States", "debutYear": 1996}, {"name": "Taylor Swift", "realName": "Taylor Alison Swift", "dob": "13-12-1989", "genre": "Pop", "country": "United States", "debutYear": 2006}]' > artists.json
+```
+
+ID will be added automatically!
+
+## 🚀 Running the Server
+
+### If you installed globally
+```bash
+$ json-server
+```
+
+### If you installed locally
+```bash
 $ npx json-express
 ```
 
-### Stopping the Server
-To stop the JSON Express server, use:
-- **Mac/Linux**: `Ctrl + C`
-- **Windows**: `Ctrl + C`
+## 📚 API Endpoints
+
+Based on your JSON structure, JSON Express automatically creates RESTful endpoints:
+
+```
+GET    /albums         # Get all albums
+GET    /albums/:id     # Get album with id
+POST   /albums         # Create a new album
+PATCH  /albums/:id     # Partially update album with id 
+DELETE /albums/:id     # Delete album with id 
+```
+
+## 🧪 Testing Your API
+
+You can test your API endpoints using curl
+
+```bash
+# Get all albums
+$ curl http://localhost:3000/albums
+
+# Get a specific album by ID
+$ curl http://localhost:3000/albums/1
+
+# Create a new album
+$ curl -X POST http://localhost:3000/albums \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Recovery", "releaseDate": "21-06-2010"}'
+
+# Update an album
+$ curl -X PATCH http://localhost:3000/albums/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Encore (Updated)"}'
+
+# Delete an album
+$ curl -X DELETE http://localhost:3000/albums/1
+```
 
 ## ⚙️ Configuration
 
@@ -79,73 +125,13 @@ my-project/
 └── ...
 ```
 
-## 📚 API Endpoints
+## 🛑 Stopping the Server
 
-Based on your JSON structure, JSON Express automatically creates RESTful endpoints:
-
-```
-GET    /albums         # Get all albums
-GET    /albums/:id     # Get album with id
-POST   /albums         # Create a new album
-PATCH  /albums/:id     # Partially update album with id 
-DELETE /albums/:id     # Delete album with id 
-```
-
-## 📁 Sample JSON Structure
-
-Create as many JSON files with any number of fields as you like. ID will be added automatically!
-
-Here's an `albums.json` file with some data:
-
-```json
-[
-  {
-    "name": "Encore",
-    "releaseDate": "12-11-2004"
-  },
-  {
-    "name": "The Marshall Mathers LP",
-    "releaseDate": "23-05-2000"
-  },
-  {
-    "name": "The Slim Shady LP",
-    "releaseDate": "23-02-1999"
-  }
-]
-```
-
-And an `artists.json` file:
-
-```json
-[
-  {
-    "name": "Eminem",
-    "realName": "Marshall Bruce Mathers III",
-    "dob": "17-10-1972",
-    "genre": "Hip Hop",
-    "country": "United States",
-    "debutYear": 1996,
-    "isActive": true,
-    "recordLabel": "Aftermath Entertainment",
-    "website": "https://www.eminem.com"
-  },
-  {
-    "name": "Taylor Swift",
-    "realName": "Taylor Alison Swift",
-    "dob": "13-12-1989",
-    "genre": "Pop",
-    "country": "United States",
-    "debutYear": 2006,
-    "isActive": true,
-    "recordLabel": "Republic Records",
-    "website": "https://www.taylorswift.com"
-  },
-]
-```
+To stop the JSON Express server, use `Ctrl + C` in your terminal.
 
 ## 📄 License
 
-ISC License - see the [LICENSE](LICENSE) file for details.
+ISC License
 
 ## 🐛 Issues
 

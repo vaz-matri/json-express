@@ -12,7 +12,6 @@ Accept: {{contentType}}
 GET {{baseUrl}}/{{id}} HTTP/1.1
 Accept: {{contentType}}
 
-//:TODO update to artists
 ### Search artists
 POST {{baseUrl}}/search HTTP/1.1
 Content-Type: {{contentType}}
