@@ -9,7 +9,7 @@ A lightweight, fast JSON server for rapid API prototyping and development. Get a
 - **Zero Configuration** - Just point to your JSON files and go
 - **Full REST API** - GET, POST, PATCH, DELETE operations
 - **Lightweight** - Minimal dependencies, maximum performance
-- **CORS Enabled** - Coming soon
+- **CORS Enabled** - Cross-origin requests supported out of the box
 
 ## 📦 Installation
 

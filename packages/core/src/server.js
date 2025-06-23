@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import getPort from 'get-port'
 import routes from './routes/index.js'
 import jsonRoutes from './services/json-routes-service.js'
@@ -9,6 +10,7 @@ const startServer = async () => {
     const app = express()
 
     app.use(express.json())
+    app.use(cors())
 
     routes(app, jsonRoutes)
 
