@@ -1,4 +1,5 @@
 import express from 'express'
+import passport from 'passport'
 import cors from 'cors'
 import getPort from 'get-port'
 import routes from './routes/index.js'
@@ -11,6 +12,7 @@ const startServer = async () => {
 
     app.use(express.json())
     app.use(cors())
+    app.use(passport.initialize())
 
     routes(app, jsonRoutes)
 

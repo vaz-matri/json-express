@@ -1,6 +1,6 @@
 {
   "name": "@json-express/core",
-  "version": "0.1.6",
+  "version": "0.1.7-alpha.0",
   "description": "A simple json server which serves all json files",
   "scripts": {
     "dev": "nodemon --exec 'cd ../../example && json-express'",
@@ -23,7 +23,10 @@
     "cors": "^2.8.5",
     "express": "5.1.0",
     "get-port": "^7.1.0",
-    "joi": "^17.13.3"
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1"
   },
   "devDependencies": {
     "nodemon": "3.1.10"
