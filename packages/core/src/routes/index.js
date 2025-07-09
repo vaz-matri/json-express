@@ -1,3 +1,4 @@
+import passport from 'passport'
 import createRoute from './create-route.js'
 import { addCollection } from '../db/in-memory.js'
 import { getConfig } from '../db/config-store.js'
@@ -15,6 +16,25 @@ function generateToken(user) {
     }
 
     return jwt.sign(payload, JWT_SECRET)
+}
+
+// Express middleware to authenticate JWT
+function authenticateJWT(req, res, next) {
+    passport.authenticate('jwt', { session: false }, (err, user, info) => {
+        if (err) {
+            return res.status(500).json({ error: 'Authentication error' })
+        }
+
+        if (!user) {
+            return res.status(401).json({
+                error: 'Unauthorized',
+                message: info ? info.message : 'Invalid token'
+            })
+        }
+
+        req.user = user
+        next()
+    })(req, res, next)
 }
 
 const init = (app, jsonRoutes) => {
@@ -68,6 +88,14 @@ const init = (app, jsonRoutes) => {
         //         message: 'Invalid credentials'
         //     })
         // }
+    })
+
+    // Protected route using JWT authentication
+    app.get('/profiles', authenticateJWT, (req, res) => {
+        res.json({
+            message: 'This is a protected route',
+            user: req.user
+        })
     })
 }
 
