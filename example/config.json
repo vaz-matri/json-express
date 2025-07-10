@@ -3,6 +3,7 @@
   "schema.validation": "strict",
   "routes": {
     "albums": {
+      "auth": true,
       "schema": {
         "name": {
           "type": "string",

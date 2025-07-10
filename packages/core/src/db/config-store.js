@@ -3,7 +3,7 @@ let configStore = {
     'schema.validation': 'optional' // optional | strict
 }
 
-export const updateCofigStore = (store) => {
+export const updateConfigStore = (store) => {
     configStore = { ...configStore, ...store }
 }
 

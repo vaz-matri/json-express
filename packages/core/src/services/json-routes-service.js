@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'fs'
 import { join } from 'path'
-import { updateCofigStore } from '../db/config-store.js'
+import { updateConfigStore } from '../db/config-store.js'
 
 const dirname = join(process.cwd())
 const files = readdirSync(dirname)
@@ -30,6 +30,6 @@ if (!Object.keys(jsonFiles).length) {
 
 const { config = {}, ...jsonRoutes } = jsonFiles
 
-updateCofigStore(config)
+updateConfigStore(config)
 
 export default jsonRoutes
