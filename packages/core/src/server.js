@@ -7,6 +7,7 @@ import routes from './routes/index.js'
 import jsonRoutes from './services/json-routes-service.js'
 import logJsonRoutes from './services/logger-service.js'
 import { getConfig } from './db/config-store.js'
+import { initGoogleAuth, googleAuthRoutes } from './auth/google-auth.js'
 
 const JwtStrategy = passportJwt.Strategy
 const ExtractJwt = passportJwt.ExtractJwt
@@ -45,9 +46,15 @@ const startServer = async () => {
         }
     }))
 
+    // Initialize Google OAuth
+    initGoogleAuth()
+
     app.use(express.json())
     app.use(cors())
     app.use(passport.initialize())
+
+    // Setup Google OAuth routes
+    googleAuthRoutes(app)
 
     routes(app, jsonRoutes)
 

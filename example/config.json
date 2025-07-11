@@ -1,6 +1,12 @@
 {
   "port": 8080,
   "schema.validation": "strict",
+  "auth": {
+    "google": {
+      "client.id": "",
+      "client.secret": ""
+    }
+  },
   "routes": {
     "albums": {
       "auth": true,
