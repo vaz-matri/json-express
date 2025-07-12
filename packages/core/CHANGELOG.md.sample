@@ -1,0 +1,204 @@
+# Release Notes
+
+## [2.1.0] - 2025-07-12
+
+### Added
+- New `validateInput()` function for enhanced data validation
+- Support for custom configuration files via `--config` flag
+- TypeScript declaration files for better IDE support
+- New CLI command `generate-docs` for automatic documentation generation
+
+### Changed
+- Updated minimum Node.js version requirement to 18.0.0
+- Improved error messages with more descriptive context
+- Refactored internal API structure for better maintainability
+- Enhanced performance for large file processing (30% faster)
+
+### Fixed
+- Resolved memory leak in file watcher functionality
+- Fixed incorrect handling of nested configuration objects
+- Corrected path resolution issues on Windows systems
+- Fixed race condition in concurrent operations
+
+### Deprecated
+- `oldMethod()` function is deprecated, use `newMethod()` instead
+- Legacy configuration format support will be removed in v3.0.0
+
+### Security
+- Updated dependencies to address security vulnerabilities
+- Implemented input sanitization for user-provided data
+
+## [2.0.1] - 2025-06-15
+
+### Fixed
+- Critical bug in authentication middleware causing login failures
+- Resolved compatibility issues with npm v10
+- Fixed incorrect TypeScript types for callback functions
+
+## [2.0.0] - 2025-05-20
+
+### Breaking Changes
+- Removed support for Node.js versions below 16.0.0
+- Changed default export structure (see migration guide)
+- Renamed `initialize()` to `init()` for consistency
+- Modified return type of `processData()` from object to Promise
+
+### Added
+- Full TypeScript rewrite with comprehensive type definitions
+- New plugin system for extensibility
+- Built-in caching mechanism for improved performance
+- Comprehensive test suite with 95% coverage
+
+### Changed
+- Migrated from CommonJS to ES modules
+- Updated all dependencies to latest stable versions
+- Improved documentation with interactive examples
+- Enhanced CLI with better help text and error handling
+
+### Migration Guide
+To upgrade from v1.x to v2.0.0:
+
+1. Update Node.js to version 16 or higher
+2. Change import statements:
+   ```js
+   // Old
+   const package = require('your-package');
+   
+   // New
+   import { init, processData } from 'your-package';
+   ```
+3. Update method calls:
+   ```js
+   // Old
+   package.initialize(options);
+   
+   // New
+   init(options);
+   ```
+
+## [1.5.2] - 2025-04-10
+
+### Fixed
+- Fixed regression in v1.5.1 that caused build failures
+- Resolved dependency version conflicts
+- Corrected documentation links
+
+## [1.5.1] - 2025-04-05
+
+### Changed
+- Minor performance improvements in core algorithms
+- Updated README with clearer installation instructions
+
+### Fixed
+- Fixed edge case in error handling for invalid inputs
+- Resolved timing issues in test suite
+
+## [1.5.0] - 2025-03-22
+
+### Added
+- New `--verbose` flag for detailed logging
+- Support for configuration via environment variables
+- Automatic retry mechanism for failed operations
+- New helper functions for common use cases
+
+### Changed
+- Improved startup time by 40% through lazy loading
+- Enhanced error messages with suggested solutions
+- Updated dependencies for better security
+
+### Fixed
+- Fixed intermittent failures in async operations
+- Resolved issues with special characters in file paths
+- Corrected behavior when running in Docker containers
+
+## [1.4.0] - 2025-02-15
+
+### Added
+- Initial support for custom plugins
+- New `watch` mode for continuous monitoring
+- Built-in logging with configurable levels
+
+### Changed
+- Refactored configuration handling for better flexibility
+- Improved documentation structure and examples
+
+### Fixed
+- Fixed compatibility issues with certain npm versions
+- Resolved path handling problems on different operating systems
+
+## [1.3.0] - 2025-01-10
+
+### Added
+- Support for multiple output formats (JSON, YAML, XML)
+- New command-line interface with interactive prompts
+- Configurable timeout settings
+
+### Changed
+- Improved performance for large datasets
+- Better error handling and user feedback
+
+### Fixed
+- Fixed memory usage issues with large files
+- Resolved dependency conflicts
+
+## [1.2.0] - 2024-12-05
+
+### Added
+- Support for custom templates
+- New validation rules for input data
+- Comprehensive API documentation
+
+### Changed
+- Updated core dependencies to latest versions
+- Improved code organization and maintainability
+
+### Fixed
+- Fixed rare crash when processing malformed input
+- Resolved issues with concurrent file access
+
+## [1.1.0] - 2024-11-01
+
+### Added
+- Support for Node.js 20.x
+- New configuration options for advanced users
+- Improved error reporting
+
+### Changed
+- Enhanced performance optimizations
+- Better handling of edge cases
+
+### Fixed
+- Fixed issues with file permissions on Unix systems
+- Resolved compatibility problems with older Node.js versions
+
+## [1.0.0] - 2024-10-01
+
+### Added
+- Initial stable release
+- Core functionality for data processing
+- Basic CLI interface
+- Comprehensive test coverage
+- Documentation and examples
+
+---
+
+## Release Schedule
+
+We follow semantic versioning (SemVer) for all releases:
+- **Major versions** (x.0.0): Breaking changes, new major features
+- **Minor versions** (x.y.0): New features, backward compatible
+- **Patch versions** (x.y.z): Bug fixes, backward compatible
+
+## Support Policy
+
+- **Current major version**: Full support with new features and bug fixes
+- **Previous major version**: Security updates and critical bug fixes only
+- **Older versions**: No longer supported
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to contribute to this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

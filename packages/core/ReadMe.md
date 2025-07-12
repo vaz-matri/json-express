@@ -8,9 +8,11 @@ A lightweight, fast JSON server for rapid API prototyping and development. Get a
 
 - **Zero Configuration** - Just point to your JSON files and go
 - **Full REST API** - GET, POST, PATCH, DELETE operations
+- **HTTPS Support** - Secure API with automatic SSL certificate generation
 - **Authentication Support** - Secure specific routes with built-in auth
 - **Schema Validation** - Validate incoming data with custom schemas
 - **Search API** - Built-in search functionality across your data
+- **Health Check Endpoints** - Monitor your server health
 - **Lightweight** - Minimal dependencies, maximum performance
 - **CORS Enabled** - Cross-origin requests supported out of the box
 
@@ -61,6 +63,36 @@ $ json-express
 $ npx json-express
 ```
 
+### 🔒 HTTPS Setup
+
+To run your server with HTTPS, configure the protocol in your `config.json` file:
+
+```json
+{
+  "protocol": "https",
+  "PORT": 8080
+}
+```
+
+**First-time HTTPS setup requires elevated permissions** for SSL certificate generation:
+
+- **Windows**: Run as Administrator
+- **macOS**: Enter user password when prompted
+- **Linux**: Run with sudo
+
+```bash
+# Windows (run as Administrator)
+$ json-express
+
+# macOS (enter password when prompted)
+$ json-express
+
+# Linux (run with sudo)
+$ sudo json-express
+```
+
+After the initial certificate creation, you can run the server with normal permissions. The certificates are automatically managed and only need to be created once.
+
 ## 📚 API Endpoints
 
 Based on your JSON structure, JSON Express automatically creates RESTful endpoints:
@@ -74,16 +106,35 @@ DELETE /albums/:id     # Delete album with id
 GET    /search         # Search across all data
 ```
 
+## 🏥 Health Check Endpoints
+
+JSON Express includes built-in health check endpoints to monitor your server:
+
+```bash
+# Basic health check (HTTP/HTTPS)
+$ curl http://localhost:8080/health
+$ curl https://localhost:8080/health
+
+# Trusted endpoints (HTTPS only)
+$ curl https://localhost:8080/api/trusted
+$ curl https://localhost:8080/api/trusted-data
+```
+
+**Note**: The `/api/trusted` and `/api/trusted-data` endpoints are only available when using HTTPS protocol.
+
 ## 🔍 Search API
 
 JSON Express includes a built-in search endpoint that allows you to search across your data:
 
 ```bash
-# Search across all your data
+# Search across all your data (HTTP)
 $ curl http://localhost:8080/search?q=eminem
 
+# Search with HTTPS
+$ curl https://localhost:8080/search?q=eminem
+
 # Search with authentication (if search is protected)
-$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:8080/search?q=eminem
+$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" https://localhost:8080/search?q=eminem
 ```
 
 ## 🔐 Authentication
@@ -97,6 +148,7 @@ Create or update your `config.json` file to include route-specific authenticatio
 ```json
 {
   "PORT": 8080,
+  "protocol": "https",
   "routes": {
     "albums": {
       "auth": true
@@ -112,8 +164,13 @@ In this example, the `/albums` endpoints require authentication, while `/artists
 To access protected routes, you first need to obtain a JWT token by logging in:
 
 ```bash
-# Login with any username and password to get JWT token
+# Login with any username and password to get JWT token (HTTP)
 $ curl -X POST http://localhost:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "password"}'
+
+# Login with HTTPS
+$ curl -X POST https://localhost:8080/login \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "password"}'
 ```
@@ -133,16 +190,16 @@ When a route has authentication enabled, you'll need to include the JWT token in
 
 ```bash
 # Example: Access protected albums endpoint
-$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:8080/albums
+$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" https://localhost:8080/albums
 
 # Example: Create a new album on protected route
-$ curl -X POST http://localhost:8080/albums \
+$ curl -X POST https://localhost:8080/albums \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{"name": "Recovery", "releaseDate": "21-06-2010"}'
 
 # Example: Access public artists endpoint (no token required)
-$ curl http://localhost:8080/artists
+$ curl https://localhost:8080/artists
 ```
 
 **Note**: Replace `YOUR_JWT_TOKEN` with the actual JWT token received from the login endpoint.
@@ -154,13 +211,13 @@ You can test your API endpoints using curl
 ### Public Routes (No Authentication)
 ```bash
 # Get all artists (public route)
-$ curl http://localhost:8080/artists
+$ curl https://localhost:8080/artists
 
 # Get all albums (this will fail - albums is protected)
-$ curl http://localhost:8080/albums
+$ curl https://localhost:8080/albums
 
 # Create a new artist (public route)
-$ curl -X POST http://localhost:8080/artists \
+$ curl -X POST https://localhost:8080/artists \
   -H "Content-Type: application/json" \
   -d '{"name": "Drake", "realName": "Aubrey Drake Graham", "dob": "24-10-1986"}'
 ```
@@ -168,18 +225,28 @@ $ curl -X POST http://localhost:8080/artists \
 ### Protected Routes (With JWT Authentication)
 ```bash
 # First, get a JWT token by logging in
-$ curl -X POST http://localhost:8080/login \
+$ curl -X POST https://localhost:8080/login \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "password"}'
 
 # Use the JWT token to access protected albums
-$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:8080/albums
+$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" https://localhost:8080/albums
 
 # Create a new album on protected route
-$ curl -X POST http://localhost:8080/albums \
+$ curl -X POST https://localhost:8080/albums \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{"name": "Recovery", "releaseDate": "21-06-2010"}'
+```
+
+### Health Check Testing
+```bash
+# Test basic health endpoint
+$ curl https://localhost:8080/health
+
+# Test trusted endpoints (HTTPS only)
+$ curl https://localhost:8080/api/trusted
+$ curl https://localhost:8080/api/trusted-data
 ```
 
 ## ⚙️ Configuration
@@ -190,14 +257,15 @@ JSON Express favors convention over configuration, but when you need customizati
 
 ```bash
 # Create config.json in your project directory
-echo '{"PORT": 8080}' > config.json
+echo '{"PORT": 8080, "protocol": "https"}' > config.json
 ```
 
-### Basic Configuration
+### Simple Configuration ( All fields are optional )
 
 ```json
 {
-  "PORT": 8080
+  "PORT": 8080,
+  "protocol": "https"
 }
 ```
 
@@ -208,6 +276,7 @@ For more advanced features like authentication and schema validation, you can ex
 ```json
 {
   "PORT": 8080,
+  "protocol": "https",
   "schema.validation": "strict",
   "routes": {
     "albums": {
@@ -231,6 +300,7 @@ For more advanced features like authentication and schema validation, you can ex
 
 **Basic Properties:**
 - **PORT** - Server port (default: 3000)
+- **protocol** - Server protocol ("http" or "https", default: "http")
 - **schema.validation** - Enable strict schema validation ("strict" or "loose")
 
 **Route-Specific Properties:**
@@ -243,13 +313,13 @@ When schema validation is enabled, JSON Express will validate incoming POST and 
 
 ```bash
 # This will succeed (matches schema)
-$ curl -X POST http://localhost:8080/albums \
+$ curl -X POST https://localhost:8080/albums \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{"name": "Recovery", "releaseDate": "21-06-2010"}'
 
 # This will fail (missing required field)
-$ curl -X POST http://localhost:8080/albums \
+$ curl -X POST https://localhost:8080/albums \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{"name": "Recovery"}'
@@ -269,6 +339,7 @@ my-project/
 ```json
 {
   "PORT": 8080,
+  "protocol": "https",
   "routes": {
     "albums": {
       "auth": true
