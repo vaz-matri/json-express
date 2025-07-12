@@ -356,7 +356,7 @@ To stop the JSON Express server, use `Ctrl + C` in your terminal.
 
 ## 📄 License
 
-ISC License
+[ISC License](LICENSE)
 
 ## 🐛 Issues
 
