@@ -1,5 +1,6 @@
 let configStore = {
     port: 3000,
+    protocol: 'http',
     'schema.validation': 'optional' // optional | strict
 }
 

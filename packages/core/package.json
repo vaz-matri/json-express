@@ -1,12 +1,20 @@
 {
   "name": "@json-express/core",
   "version": "0.1.9-alpha.0",
-  "description": "A lightweight JSON server with JWT authentication for rapid API prototyping",
+  "description": "Zero-config JSON server with REST API, JWT authentication, schema validation & search. Perfect for rapid prototyping and API mocking.",
   "scripts": {
     "dev": "nodemon --exec 'cd ../../example && json-express'",
     "serve": "cd ../../example && json-express"
   },
   "keywords": [
+    "json-server",
+    "rest-api",
+    "api-server",
+    "mock-server",
+    "fake-api",
+    "prototyping",
+    "rapid-development",
+    "zero-config",
     "json",
     "server",
     "express",
@@ -16,29 +24,44 @@
     "mock",
     "mockserver",
     "prototype",
-    "prototyping",
     "development",
     "dev-server",
-    "json-server",
     "json-express",
     "jsonserver",
     "jsonexpress",
     "jwt",
     "auth",
     "authentication",
+    "schema-validation",
+    "data-validation",
+    "search-api",
     "cors",
     "cli",
     "tool",
-    "fake-api",
     "mock-api",
-    "rapid-development",
-    "zero-config"
+    "api-mocking",
+    "backend-mock",
+    "frontend-development",
+    "full-stack",
+    "nodejs",
+    "express-server",
+    "lightweight",
+    "fast",
+    "simple"
   ],
-  "author": "vazmat",
+  "author": {
+    "name": "vazmat",
+    "url": "https://github.com/vaz-matri"
+  },
   "license": "ISC",
   "type": "module",
+  "preferGlobal": true,
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "cors": "^2.8.5",
+    "devcert": "^1.2.2",
     "express": "5.1.0",
     "get-port": "^7.1.0",
     "joi": "^17.13.3",
@@ -59,14 +82,31 @@
     "url": "https://github.com/vaz-matri/json-express/issues"
   },
   "homepage": "https://jsonexpress.com/",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/vaz-matri"
+  },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "files": [
     "bin/",
-    "src/"
+    "src/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "bin": {
     "json-express": "./bin/exec.js"
-  }
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
 }

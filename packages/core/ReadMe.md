@@ -9,6 +9,8 @@ A lightweight, fast JSON server for rapid API prototyping and development. Get a
 - **Zero Configuration** - Just point to your JSON files and go
 - **Full REST API** - GET, POST, PATCH, DELETE operations
 - **Authentication Support** - Secure specific routes with built-in auth
+- **Schema Validation** - Validate incoming data with custom schemas
+- **Search API** - Built-in search functionality across your data
 - **Lightweight** - Minimal dependencies, maximum performance
 - **CORS Enabled** - Cross-origin requests supported out of the box
 
@@ -69,6 +71,19 @@ GET    /albums/:id     # Get album with id
 POST   /albums         # Create a new album
 PATCH  /albums/:id     # Partially update album with id 
 DELETE /albums/:id     # Delete album with id 
+GET    /search         # Search across all data
+```
+
+## 🔍 Search API
+
+JSON Express includes a built-in search endpoint that allows you to search across your data:
+
+```bash
+# Search across all your data
+$ curl http://localhost:8080/search?q=eminem
+
+# Search with authentication (if search is protected)
+$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:8080/search?q=eminem
 ```
 
 ## 🔐 Authentication
@@ -178,14 +193,35 @@ JSON Express favors convention over configuration, but when you need customizati
 echo '{"PORT": 8080}' > config.json
 ```
 
-### Available Configuration Options
+### Basic Configuration
+
+```json
+{
+  "PORT": 8080
+}
+```
+
+### Advanced Configuration
+
+For more advanced features like authentication and schema validation, you can extend your configuration:
 
 ```json
 {
   "PORT": 8080,
+  "schema.validation": "strict",
   "routes": {
-    "<route_name>": {
-      "auth": true
+    "albums": {
+      "auth": true,
+      "schema": {
+        "name": {
+          "type": "string",
+          "required": true
+        },
+        "releaseDate": {
+          "type": "string",
+          "required": true
+        }
+      }
     }
   }
 }
@@ -193,11 +229,31 @@ echo '{"PORT": 8080}' > config.json
 
 ### Configuration Properties
 
+**Basic Properties:**
 - **PORT** - Server port (default: 3000)
-- **routes** - Route-specific configurations
-    - **auth** - Enable authentication for specific routes (default: false)
+- **schema.validation** - Enable strict schema validation ("strict" or "loose")
 
-**Note**: More configuration properties are coming soon!
+**Route-Specific Properties:**
+- **auth** - Enable authentication for specific routes (default: false)
+- **schema** - Define validation schema for incoming data
+
+### Schema Validation
+
+When schema validation is enabled, JSON Express will validate incoming POST and PATCH requests against your defined schema:
+
+```bash
+# This will succeed (matches schema)
+$ curl -X POST http://localhost:8080/albums \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"name": "Recovery", "releaseDate": "21-06-2010"}'
+
+# This will fail (missing required field)
+$ curl -X POST http://localhost:8080/albums \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"name": "Recovery"}'
+```
 
 ### Example Project Structure
 ```

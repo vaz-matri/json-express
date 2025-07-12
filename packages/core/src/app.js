@@ -2,12 +2,12 @@ import express from 'express'
 import passport from 'passport'
 import passportJwt from 'passport-jwt'
 import cors from 'cors'
-import getPort from 'get-port'
 import routes from './routes/index.js'
 import jsonRoutes from './services/json-routes-service.js'
-import logJsonRoutes from './services/logger-service.js'
-import { getConfig } from './db/config-store.js'
-import { initGoogleAuth, googleAuthRoutes } from './auth/google-auth.js'
+import { googleAuthRoutes, initGoogleAuth } from './auth/google-auth.js'
+import serverRoute from './routes/server-route.js'
+import { preparePortNumber } from './services/port-service.js'
+import createServer from './server/index.js'
 
 const JwtStrategy = passportJwt.Strategy
 const ExtractJwt = passportJwt.ExtractJwt
@@ -26,6 +26,8 @@ const jwtOptions = {
 
 const startServer = async () => {
     const app = express()
+
+    await preparePortNumber()
 
     passport.use(new JwtStrategy(jwtOptions, async (payload, done) => {
         try {
@@ -51,6 +53,7 @@ const startServer = async () => {
 
     app.use(express.json())
     app.use(cors())
+    app.use(serverRoute)
     app.use(passport.initialize())
 
     // Setup Google OAuth routes
@@ -58,20 +61,9 @@ const startServer = async () => {
 
     routes(app, jsonRoutes)
 
-    let configPort = getConfig('port')
-    const portSequence = Array.from({ length: 100 }, (_, i) => configPort + i)
-    const port = await getPort({ port: portSequence })
+    const server = createServer()
+    await server(app)
 
-    app.listen(port, () => {
-        console.log()
-        if (port !== configPort) {
-            console.log(`⚠️  Port ${configPort} was busy, using ${port} instead`)
-        }
-        console.log(`🚀 Server running on port ${port}`)
-        console.log()
-
-        logJsonRoutes(jsonRoutes, port)
-    })
 }
 
 export default startServer
