@@ -1,6 +1,6 @@
 {
   "name": "@json-express/core",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0-alpha.1",
   "description": "Zero-config JSON server with REST API, JWT authentication, HTTPS support, schema validation & search. Perfect for rapid prototyping, API mocking, and development.",
   "scripts": {
     "dev": "nodemon --exec 'cd ../../example && json-express'",
@@ -47,13 +47,15 @@
     "cors": "^2.8.5",
     "devcert": "^1.2.2",
     "express": "5.1.0",
+    "express-session": "^1.18.1",
     "get-port": "^7.1.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "lodash.get": "^4.4.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "passport-jwt": "^4.0.1"
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
     "nodemon": "3.1.10"

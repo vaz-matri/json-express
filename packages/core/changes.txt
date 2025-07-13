@@ -1,17 +1,9 @@
-added - devcert to tech stack
+added - express-session, passport-local to tech stack
 
 config.json
-new configuration  "protocol": "https", default "http"
+
 
 description
-users can now have access to secure api
-when running for the first time for windows run as admin, for mac - enter user password, for linux run as sude to create certificates
-once created ( only once ) you can run normally
 
-added server health check apis
 
-HTTP GET: '/health'
-
-HTTPS GET: '/health'
-HTTPS GET: '/api/trusted'
-HTTPS GET: '/api/trusted-data' with any body
+routes

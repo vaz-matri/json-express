@@ -1,6 +1,6 @@
 {
   "port": 8080,
-  "protocol": "https",
+  "protocol": "http",
   "schema.validation": "strict",
   "auth": {
     "google": {

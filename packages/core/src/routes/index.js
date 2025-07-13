@@ -18,6 +18,13 @@ function generateToken(user) {
     return jwt.sign(payload, JWT_SECRET)
 }
 
+function isAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next()
+    }
+    res.redirect('/login')
+}
+
 // Express middleware to authenticate JWT
 function authenticateJWT(req, res, next) {
     passport.authenticate('jwt', { session: false }, (err, user, info) => {
