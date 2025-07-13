@@ -4,6 +4,8 @@ config.json
 
 
 description
-
+now users can login with and the server will have the logged in session
 
 routes
+/login-session - planing to change
+/profile
