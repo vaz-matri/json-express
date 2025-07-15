@@ -47,11 +47,18 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
     devDependencies:
+      '@faker-js/faker':
+        specifier: ^9.9.0
+        version: 9.9.0
       nodemon:
         specifier: 3.1.10
         version: 3.1.10
 
 packages:
+
+  '@faker-js/faker@9.9.0':
+    resolution: {integrity: sha512-OEl393iCOoo/z8bMezRlJu+GlRGlsKbUAN7jKB6LhnKoqKve5DXRpalbItIIcwnCjs1k/FOPjFzcA6Qn+H+YbA==}
+    engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
   '@hapi/hoek@9.3.0':
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
@@ -709,6 +716,8 @@ packages:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
 snapshots:
+
+  '@faker-js/faker@9.9.0': {}
 
   '@hapi/hoek@9.3.0': {}
 
