@@ -1,11 +1,7 @@
-added - express-session, passport-local, @faker-js/faker to tech stack
+# added
 
-cofig.json - no changes
+# cofig.json
 
-description
-now users can login with and the server will have the logged in session
-bcz of faker, now you don't need to have your json file to quickly start mock server
+# description
 
-routes
-/login-session - planing to change
-/profile
+# routes

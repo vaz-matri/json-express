@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-07-16
+
+### Added
+- Session-based authentication support using express-session and passport-local
+- User login with persistent session management
+- Mock data generation using Faker.js - server can now run without JSON files
+- New authentication endpoints:
+    - `POST /login-session` - Session-based login (WIP)
+    - `GET /profile` - User profile endpoint
+- Automatic mock data generation when no JSON files are provided
+
+### Changed
+- Authentication system now supports both JWT tokens and session-based login
+- Server can start without requiring JSON files thanks to Faker.js integration
+
+### Dependencies
+- Added `express-session` for session management
+- Added `passport-local` for local authentication strategy
+- Added `@faker-js/faker` for mock data generation
+
 ## [0.1.9] - 2025-07-12
 
 ### Added
@@ -12,15 +32,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Protocol configuration via `"protocol": "https"` in config.json (defaults to "http")
 - Automatic SSL certificate creation for secure API access
 - Server health check endpoints:
-   - `GET /health` (available for both HTTP and HTTPS)
-   - `GET /api/trusted` (HTTPS only)
-   - `GET /api/trusted-data` (HTTPS only, accepts any body)
+    - `GET /health` (available for both HTTP and HTTPS)
+    - `GET /api/trusted` (HTTPS only)
+    - `GET /api/trusted-data` (HTTPS only, accepts any body)
 
 ### Changed
 - First-time setup requires elevated permissions for certificate generation:
-   - Windows: Run as Administrator
-   - macOS: Enter user password when prompted
-   - Linux: Run with sudo
+    - Windows: Run as Administrator
+    - macOS: Enter user password when prompted
+    - Linux: Run with sudo
 - After initial certificate creation, server can run with normal permissions
 
 ### Dependencies
@@ -110,6 +130,8 @@ When using HTTPS protocol for the first time, elevated permissions are required 
 After initial setup, the server can run with normal permissions.
 
 ### Authentication Usage
+
+#### JWT Authentication
 1. Login to get JWT token:
    ```bash
    curl -X POST http://localhost:3000/login \
@@ -123,9 +145,26 @@ After initial setup, the server can run with normal permissions.
      http://localhost:3000/protected-route
    ```
 
+#### Session-based Authentication
+1. Login with session:
+   ```bash
+   curl -X POST http://localhost:3000/login-session \
+     -H "Content-Type: application/json" \
+     -d '{"username": "any", "password": "any"}' \
+     -c cookies.txt
+   ```
+
+2. Access profile with session:
+   ```bash
+   curl -b cookies.txt http://localhost:3000/profile
+   ```
+
 ### Health Check Endpoints
 - `GET /health` - Basic health check (HTTP/HTTPS)
 - `GET /api/trusted` - Trusted endpoint (HTTPS only)
 - `GET /api/trusted-data` - Trusted data endpoint (HTTPS only, accepts any request body)
+
+### Mock Data Generation
+The server now includes Faker.js integration, allowing you to start a mock server without providing JSON files. The server will automatically generate realistic mock data for testing purposes.
 
 For detailed configuration options including route authentication and schema validation, see the [README](README.md) or [Documentation](docs/).

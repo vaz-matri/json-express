@@ -1,6 +1,6 @@
 {
   "name": "@json-express/core",
-  "version": "0.2.0-alpha.1",
+  "version": "0.2.0",
   "description": "Zero-config JSON server with REST API, JWT authentication, HTTPS support, schema validation & search. Perfect for rapid prototyping, API mocking, and development.",
   "scripts": {
     "dev": "nodemon --exec 'cd ../../example && json-express'",
@@ -14,6 +14,9 @@
     "json-server",
     "json-express",
     "express-server",
+    "mock server",
+    "fake server",
+    "dummy server",
     "mock-server",
     "json-mock",
     "express-mock",

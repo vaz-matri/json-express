@@ -1,67 +1,69 @@
 # JSON Express
 
-A lightweight, fast JSON server for rapid API prototyping and development. Get a full REST API with zero coding in seconds.
-
+A feature-rich, fast JSON mock server for rapid API prototyping and development. Get a full REST API with zero coding in seconds.
 **🌐 Homepage** [jsonexpress.com](https://jsonexpress.com)
 
 ## ✨ Features
 
-- **Zero Configuration** - Just point to your JSON files and go
-- **Full REST API** - GET, POST, PATCH, DELETE operations
+- **Zero Configuration** - Just install and start your mock server
+- **Authentication Support** - Secure specific routes with JWT and session-based auth
 - **HTTPS Support** - Secure API with automatic SSL certificate generation
-- **Authentication Support** - Secure specific routes with built-in auth
+- **Full REST API** - GET, POST, PATCH, DELETE operations
 - **Schema Validation** - Validate incoming data with custom schemas
 - **Search API** - Built-in search functionality across your data
 - **Health Check Endpoints** - Monitor your server health
-- **Lightweight** - Minimal dependencies, maximum performance
 - **CORS Enabled** - Cross-origin requests supported out of the box
 
-## 📦 Installation
+## 🚀 Quick Start
 
-### Global Installation
+Get up and running in seconds:
+
 ```bash
-npm install -g @json-express/core
+# Install globally
+$ npm install -g @json-express/core
+
+# Start the server
+$ json-express
 ```
 
-### Local Installation (Project-specific)
+That's it! Your JSON files are now served as a REST API. JSON Express uses **@faker-js/faker** under the hood to create realistic test data, making it perfect for prototyping and development.
+
+## 📦 Project-Specific Installation
+
+This is an alternative method of installation. Install JSON Express directly in your project for better dependency management:
+
 ```bash
 # Navigate to your project directory
-$ cd my-project
+$ cd project
 
-# Install locally in your project
+# Install in your project
 $ npm install @json-express/core
+
+# Run with npx
+$ npx json-express
 ```
 
-## 📁 Setup Your JSON Files
+## 📁 Using Your Own JSON Files
 
-Navigate to your project directory. If you already have JSON files, you can use those directly, or create your own
+If you prefer to use your own JSON files instead of the generated fake data, you can create them in your project directory.
 
-Here are some examples
+Here are some examples of how to create your own JSON files:
 
 ```bash
 # Navigate to your project directory
-$ cd my-project
+$ cd project
 
 # Create an albums.json file
 $ echo '[{"name": "Encore", "releaseDate": "12-11-2004"}, {"name": "The Marshall Mathers LP", "releaseDate": "23-05-2000"}]' > albums.json
 
 # Create an artists.json file
 $ echo '[{"name": "Eminem", "realName": "Marshall Bruce Mathers III", "dob": "17-10-1972", "genre": "Hip Hop", "country": "United States", "debutYear": 1996}, {"name": "Taylor Swift", "realName": "Taylor Alison Swift", "dob": "13-12-1989", "genre": "Pop", "country": "United States", "debutYear": 2006}]' > artists.json
-```
 
-ID will be added automatically!
-
-## 🚀 Running the Server
-
-### If you installed globally
-```bash
+# Start server
 $ json-express
 ```
 
-### If you installed locally
-```bash
-$ npx json-express
-```
+ID will be added automatically!
 
 ### 🔒 HTTPS Setup
 
@@ -80,16 +82,6 @@ To run your server with HTTPS, configure the protocol in your `config.json` file
 - **macOS**: Enter user password when prompted
 - **Linux**: Run with sudo
 
-```bash
-# Windows (run as Administrator)
-$ json-express
-
-# macOS (enter password when prompted)
-$ json-express
-
-# Linux (run with sudo)
-$ sudo json-express
-```
 
 After the initial certificate creation, you can run the server with normal permissions. The certificates are automatically managed and only need to be created once.
 
@@ -122,7 +114,7 @@ $ curl https://localhost:8080/api/trusted-data
 
 **Note**: The `/api/trusted` and `/api/trusted-data` endpoints are only available when using HTTPS protocol.
 
-## 🔍 Search API
+## 🔍 Search API (WIP)
 
 JSON Express includes a built-in search endpoint that allows you to search across your data:
 
@@ -260,15 +252,6 @@ JSON Express favors convention over configuration, but when you need customizati
 echo '{"PORT": 8080, "protocol": "https"}' > config.json
 ```
 
-### Simple Configuration ( All fields are optional )
-
-```json
-{
-  "PORT": 8080,
-  "protocol": "https"
-}
-```
-
 ### Advanced Configuration
 
 For more advanced features like authentication and schema validation, you can extend your configuration:
@@ -279,14 +262,10 @@ For more advanced features like authentication and schema validation, you can ex
   "protocol": "https",
   "schema.validation": "strict",
   "routes": {
-    "albums": {
+    "<route_name>": {
       "auth": true,
       "schema": {
-        "name": {
-          "type": "string",
-          "required": true
-        },
-        "releaseDate": {
+        "<field_name>": {
           "type": "string",
           "required": true
         }
@@ -298,14 +277,14 @@ For more advanced features like authentication and schema validation, you can ex
 
 ### Configuration Properties
 
-**Basic Properties:**
-- **PORT** - Server port (default: 3000)
-- **protocol** - Server protocol ("http" or "https", default: "http")
-- **schema.validation** - Enable strict schema validation ("strict" or "loose")
+| Property | Type | Default  | Description                                              |
+|----------|------|----------|----------------------------------------------------------|
+| **PORT** | number | 3000     | Server port                                              |
+| **protocol** | string | http     | Server protocol (http or https)                          |
+| **auth** | boolean | false    | Enable authentication for specific routes                |
+| **schema.validation** | string | optional | Enable strict schema validation ("strict" or "optional") |
 
-**Route-Specific Properties:**
-- **auth** - Enable authentication for specific routes (default: false)
-- **schema** - Define validation schema for incoming data
+For a complete configuration example with mixed authentication settings, see [config.json](../../example/config.json).
 
 ### Schema Validation
 
@@ -324,31 +303,6 @@ $ curl -X POST https://localhost:8080/albums \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{"name": "Recovery"}'
 ```
-
-### Example Project Structure
-```
-my-project/
-├── config.json     # Optional configuration
-├── albums.json     # Your data files
-├── artists.json    # Your data files
-└── ...
-```
-
-### Example Configuration with Mixed Authentication
-
-```json
-{
-  "PORT": 8080,
-  "protocol": "https",
-  "routes": {
-    "albums": {
-      "auth": true
-    }
-  }
-}
-```
-
-In this example, the `/albums` endpoints require authentication, while `/artists` endpoints remain public (no configuration needed for public routes).
 
 ## 🛑 Stopping the Server
 
