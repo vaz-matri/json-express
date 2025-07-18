@@ -7,4 +7,4 @@
 # routes
 
 # bug fix
-fixed server not starting - bcz faker was a dev dependency
+
