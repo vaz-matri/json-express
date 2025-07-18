@@ -1,0 +1,1598 @@
+{
+  "users": [
+    {
+      "userId": "828dae2c-f872-4c84-a1a7-65e897120f4e",
+      "username": "Hugh_Bartoletti40",
+      "email": "Ignacio40@gmail.com",
+      "avatar": "https://avatars.githubusercontent.com/u/43482376",
+      "password": "nMn3JEOdWArnUjb",
+      "birthdate": "1974-09-04T14:35:09.642Z",
+      "registeredAt": "2024-09-20T17:12:07.201Z"
+    },
+    {
+      "userId": "49795477-991f-4fe0-b0bc-6e85e6b9e36a",
+      "username": "Kobe72",
+      "email": "Rigoberto90@hotmail.com",
+      "avatar": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/512/72.jpg",
+      "password": "tDromsfMa_3KRI3",
+      "birthdate": "1949-10-22T11:55:18.149Z",
+      "registeredAt": "2024-10-19T01:54:34.931Z"
+    },
+    {
+      "userId": "4b7a69d3-b813-4d53-8431-84702c546e6f",
+      "username": "Annabelle_Ankunding27",
+      "email": "Dasia88@hotmail.com",
+      "avatar": "https://avatars.githubusercontent.com/u/97575914",
+      "password": "YcDKI_sOtZu0sFt",
+      "birthdate": "1989-06-28T13:42:31.972Z",
+      "registeredAt": "2024-11-16T12:54:35.771Z"
+    },
+    {
+      "userId": "9d994375-15cc-4047-a631-82f46bd34a2e",
+      "username": "Gilda_Ritchie",
+      "email": "Mazie41@gmail.com",
+      "avatar": "https://avatars.githubusercontent.com/u/21001235",
+      "password": "Su6zxhiqpb8nC8x",
+      "birthdate": "1977-01-16T02:12:53.951Z",
+      "registeredAt": "2025-04-12T19:19:20.431Z"
+    },
+    {
+      "userId": "bbea93d2-99dc-4de9-8efb-6a3c74f2dffb",
+      "username": "Alek99",
+      "email": "Felipe.Hoppe56@hotmail.com",
+      "avatar": "https://avatars.githubusercontent.com/u/55025027",
+      "password": "wFet3DxtNL6PgYl",
+      "birthdate": "1997-02-03T02:22:37.419Z",
+      "registeredAt": "2025-06-06T16:49:32.440Z"
+    },
+    {
+      "userId": "2407ef2b-7ef4-42f5-a207-c0b0fa075388",
+      "username": "Penelope.Corkery12",
+      "email": "Tia_Nicolas81@yahoo.com",
+      "avatar": "https://avatars.githubusercontent.com/u/53760005",
+      "password": "GsgXWy0TLNv6wrY",
+      "birthdate": "1957-10-14T02:39:43.833Z",
+      "registeredAt": "2024-08-20T03:32:15.107Z"
+    },
+    {
+      "userId": "c56858a1-2c38-4a47-b6ca-8c0d8f0d92d9",
+      "username": "Shanel_Muller",
+      "email": "Yvonne_Kautzer4@hotmail.com",
+      "avatar": "https://avatars.githubusercontent.com/u/54456708",
+      "password": "isKuKX1gvo_ONKo",
+      "birthdate": "1994-02-06T18:44:23.013Z",
+      "registeredAt": "2025-03-30T18:58:49.570Z"
+    },
+    {
+      "userId": "2a3c3d1d-1f94-40c9-b550-f6a1562bc06b",
+      "username": "Greta_Abernathy88",
+      "email": "Kellen_Waters85@gmail.com",
+      "avatar": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/female/512/83.jpg",
+      "password": "Wu_cdLUkya9Lb19",
+      "birthdate": "1983-09-22T12:00:24.264Z",
+      "registeredAt": "2024-10-15T23:57:58.635Z"
+    },
+    {
+      "userId": "78e93532-58a5-4060-8a3f-70c459766e93",
+      "username": "Heaven22",
+      "email": "Dan13@yahoo.com",
+      "avatar": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/512/38.jpg",
+      "password": "lQNWO9PDcwx5nkJ",
+      "birthdate": "2006-10-14T09:03:16.836Z",
+      "registeredAt": "2025-05-18T05:25:43.752Z"
+    },
+    {
+      "userId": "753941b0-b6cd-48aa-843c-0a02e6c20d20",
+      "username": "Edythe.Kirlin",
+      "email": "Rickey.Runolfsdottir48@yahoo.com",
+      "avatar": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/female/512/51.jpg",
+      "password": "v21G33BPxU_Dalw",
+      "birthdate": "1977-07-31T12:07:03.441Z",
+      "registeredAt": "2024-10-02T21:37:45.147Z"
+    }
+  ],
+  "music": [
+    {
+      "album": "En Tus Planes",
+      "artist": "Johnny Mercer",
+      "genre": "Baladas y Boleros",
+      "songName": "Billie Jean"
+    },
+    {
+      "album": "Christina Aguilera",
+      "artist": "The Righteous Brothers",
+      "genre": "Rock",
+      "songName": "Que sera sera (Whatever will be will be)"
+    },
+    {
+      "album": "Disclaimer I / II",
+      "artist": "Young Dolph",
+      "genre": "Pop Latino",
+      "songName": "Walk Like an Egyptian"
+    },
+    {
+      "album": "By The Way",
+      "artist": "Cavetown",
+      "genre": "Disney",
+      "songName": "In the Ghetto"
+    },
+    {
+      "album": "Forajido EP 1",
+      "artist": "Rema",
+      "genre": "J-Pop",
+      "songName": "Like a Rolling Stone"
+    },
+    {
+      "album": "True Colors",
+      "artist": "D-Block Europe",
+      "genre": "Dirty South",
+      "songName": "We've Only Just Begun"
+    },
+    {
+      "album": "What Is Love?",
+      "artist": "Farruko",
+      "genre": "Honky Tonk",
+      "songName": "Honky Tonk Woman"
+    },
+    {
+      "album": "Thrill Of The Chase",
+      "artist": "Sia",
+      "genre": "Worldbeat",
+      "songName": "Hurt So Good"
+    },
+    {
+      "album": "Hellboy",
+      "artist": "Boney M.",
+      "genre": "Outlaw Country",
+      "songName": "Lonely Boy"
+    },
+    {
+      "album": "Busyhead",
+      "artist": "The Box Tops",
+      "genre": "Polka",
+      "songName": "Breaking Up is Hard to Do"
+    },
+    {
+      "album": "What A Time To Be Alive",
+      "artist": "Captain & Tennille",
+      "genre": "Ethio-jazz",
+      "songName": "Ebony & Ivory"
+    },
+    {
+      "album": "The Sun's Tirade",
+      "artist": "Kane Brown",
+      "genre": "Jazz",
+      "songName": "Good Lovin'"
+    },
+    {
+      "album": "Mr. Misunderstood",
+      "artist": "Anton Karas",
+      "genre": "Romance",
+      "songName": "We Are Young"
+    },
+    {
+      "album": "Total Xanarchy",
+      "artist": "Wale",
+      "genre": "Hardcore Rap",
+      "songName": "(I've Got a Gal In) Kalamazoo"
+    },
+    {
+      "album": "Los Favoritos 2",
+      "artist": "DAY6",
+      "genre": "Baroque",
+      "songName": "A Tree in the Meadow"
+    },
+    {
+      "album": "All Or Nothing",
+      "artist": "Amii Stewart",
+      "genre": "Steampunk",
+      "songName": "Tossing & Turning"
+    },
+    {
+      "album": "Hasta La Raíz",
+      "artist": "Godsmack",
+      "genre": "Progressive House",
+      "songName": "Rag Doll"
+    },
+    {
+      "album": "LM5",
+      "artist": "Cavetown",
+      "genre": "Techno",
+      "songName": "Knock On Wood"
+    },
+    {
+      "album": "Expectations",
+      "artist": "Jean Knight",
+      "genre": "Environmental",
+      "songName": "Under the Boardwalk"
+    },
+    {
+      "album": "Tourist History",
+      "artist": "Young Miko",
+      "genre": "Urban",
+      "songName": "Sleepy Lagoon"
+    },
+    {
+      "album": "Chocolate Factory",
+      "artist": "Roger Miller",
+      "genre": "West Coast Rap",
+      "songName": "West End Girls"
+    },
+    {
+      "album": "Favourite Worst Nightmare",
+      "artist": "Fall Out Boy",
+      "genre": "Big Band",
+      "songName": "Un-Break My Heart"
+    },
+    {
+      "album": "Lady Wood",
+      "artist": "Gryffin",
+      "genre": "Impressionist",
+      "songName": "Crazy"
+    },
+    {
+      "album": "Kid Krow",
+      "artist": "Peso Pluma",
+      "genre": "Mawwal",
+      "songName": "American Pie"
+    },
+    {
+      "album": "Providence",
+      "artist": "Gigi D'Agostino",
+      "genre": "Emo",
+      "songName": "Cheek to Cheek"
+    },
+    {
+      "album": "Oh, What A Life",
+      "artist": "Ray Stevens",
+      "genre": "Chanukah",
+      "songName": "Mr Tambourine Man"
+    },
+    {
+      "album": "Cozy Tapes Vol. 2: Too Cozy",
+      "artist": "Gotye",
+      "genre": "Bebop",
+      "songName": "You Belong With Me"
+    },
+    {
+      "album": "Frozen II",
+      "artist": "Thomas Rhett",
+      "genre": "Stage And Screen",
+      "songName": "Maggie May"
+    },
+    {
+      "album": "Songs In The Key Of Life",
+      "artist": "Nina Simone",
+      "genre": "Shoegaze",
+      "songName": "Near You"
+    },
+    {
+      "album": "Montevallo",
+      "artist": "Lil Baby",
+      "genre": "Electronica",
+      "songName": "Help!"
+    },
+    {
+      "album": "Good Evening",
+      "artist": "Kimbra",
+      "genre": "Mandopop",
+      "songName": "Cry"
+    },
+    {
+      "album": "Blue Neighbourhood",
+      "artist": "Frank Sinatra",
+      "genre": "R&B",
+      "songName": "Baby Got Back"
+    },
+    {
+      "album": "Pretty Girls Like Trap Music",
+      "artist": "Rizky Febian",
+      "genre": "Gospel",
+      "songName": "Someday"
+    },
+    {
+      "album": "The Marshall Mathers LP",
+      "artist": "Peso Pluma",
+      "genre": "Piano",
+      "songName": "I Will Survive"
+    },
+    {
+      "album": "Testing",
+      "artist": "America",
+      "genre": "Hardcore Rap",
+      "songName": "Daydream Believer"
+    },
+    {
+      "album": "The Predator",
+      "artist": "Strawberry Alarm Clock",
+      "genre": "Outlaw Country",
+      "songName": "Pony Time"
+    },
+    {
+      "album": "Hombres G (Devuélveme A Mi Chica)",
+      "artist": "Motley Crue",
+      "genre": "Power Pop",
+      "songName": "Nature Boy"
+    },
+    {
+      "album": "Tron: Legacy",
+      "artist": "Sam Hunt",
+      "genre": "Electronica",
+      "songName": "Maggie May"
+    },
+    {
+      "album": "DS2",
+      "artist": "Gene Autry",
+      "genre": "Drinking Songs",
+      "songName": "Chattanoogie Shoe-Shine Boy"
+    },
+    {
+      "album": "In Rainbows",
+      "artist": "Harry James",
+      "genre": "Progressive Rock",
+      "songName": "All You Need is Love"
+    },
+    {
+      "album": "YBN: The Mixtape",
+      "artist": "Lisa Loeb",
+      "genre": "Rock",
+      "songName": "Can't Get Enough of Your Love, Babe"
+    },
+    {
+      "album": "By The Way",
+      "artist": "Chic",
+      "genre": "Soundtrack",
+      "songName": "Hanging by a Moment"
+    },
+    {
+      "album": "Motivan2",
+      "artist": "Weezer",
+      "genre": "Space Rock",
+      "songName": "Unchained Melody"
+    },
+    {
+      "album": "Lo Que Andábamos Buscando",
+      "artist": "American Quartet",
+      "genre": "Outlaw Country",
+      "songName": "Nothing's Gonna Stop Us Now"
+    },
+    {
+      "album": "Edna",
+      "artist": "Lupe Fiasco",
+      "genre": "Second Line",
+      "songName": "I Kissed A Girl"
+    },
+    {
+      "album": "Arcane League Of Legends",
+      "artist": "Rick Astley",
+      "genre": "Renaissance",
+      "songName": "Whole Lotta Love"
+    },
+    {
+      "album": "Agent Provocateur",
+      "artist": "Young Dolph",
+      "genre": "Shoegaze",
+      "songName": "Another Day in Paradise"
+    },
+    {
+      "album": "California Sunrise",
+      "artist": "The Ink Spots",
+      "genre": "Trip Hop",
+      "songName": "All I Have to Do is Dream"
+    },
+    {
+      "album": "The River",
+      "artist": "Lainey Wilson",
+      "genre": "House",
+      "songName": "Over There"
+    },
+    {
+      "album": "En Tus Planes",
+      "artist": "James Arthur",
+      "genre": "Old School Rap",
+      "songName": "Every Little Thing She Does is Magic"
+    },
+    {
+      "album": "I Never Loved A Man The Way I Love You",
+      "artist": "Whitney Houston",
+      "genre": "Musique Concrète",
+      "songName": "Cracklin' Rosie"
+    },
+    {
+      "album": "Pet Sounds",
+      "artist": "The Kingston Trio",
+      "genre": "New Wave",
+      "songName": "All Night Long (All Night)"
+    },
+    {
+      "album": "Nimmerland",
+      "artist": "Alina Baraz",
+      "genre": "Meditation",
+      "songName": "Lady Marmalade (Voulez-Vous Coucher Aver Moi Ce Soir?)"
+    },
+    {
+      "album": "Chama Meu Nome",
+      "artist": "Foo Fighters",
+      "genre": "Cool Jazz",
+      "songName": "Ain't No Mountain High Enough"
+    },
+    {
+      "album": "Electric Ladyland",
+      "artist": "Andy Grammer",
+      "genre": "Anime",
+      "songName": "12th Street Rag"
+    },
+    {
+      "album": "Regulate… G Funk Era",
+      "artist": "The Flamingos",
+      "genre": "Renaissance",
+      "songName": "Sweet Dreams (Are Made of This)"
+    },
+    {
+      "album": "Section.80",
+      "artist": "The Crew-Cuts",
+      "genre": "March",
+      "songName": "I Think I Love You"
+    },
+    {
+      "album": "Que Bendición",
+      "artist": "Green Day",
+      "genre": "SKA",
+      "songName": "Pick Up the Pieces"
+    },
+    {
+      "album": "A Million Ways To Murder",
+      "artist": "Vanessa Carlton",
+      "genre": "Classical",
+      "songName": "Jumpin' Jack Flash"
+    },
+    {
+      "album": "The Melodic Blue",
+      "artist": "Luis R Conriquez",
+      "genre": "Alt-Rock",
+      "songName": "On the Atchison, Topeka & the Santa Fe"
+    },
+    {
+      "album": "The Documentary",
+      "artist": "Ray Stevens",
+      "genre": "Electronic",
+      "songName": "This Love"
+    },
+    {
+      "album": "Commando",
+      "artist": "Frank Sinatra",
+      "genre": "Samba",
+      "songName": "Your Cheatin' Heart"
+    },
+    {
+      "album": "As She Pleases",
+      "artist": "Loud Luxury",
+      "genre": "Christian",
+      "songName": "Give Me Everything"
+    },
+    {
+      "album": "JackBoys",
+      "artist": "Red Velvet",
+      "genre": "Medieval",
+      "songName": "La Bamba"
+    },
+    {
+      "album": "Piece By Piece",
+      "artist": "Al Dexter & his Troopers",
+      "genre": "Regional Mexicano",
+      "songName": "Rapture"
+    },
+    {
+      "album": "Santana World",
+      "artist": "Nickelback",
+      "genre": "Hardcore Punk",
+      "songName": "Working My Way Back to You"
+    },
+    {
+      "album": "How To Save A Life",
+      "artist": "Michael McDonald",
+      "genre": "Klezmer",
+      "songName": "Take On Me"
+    },
+    {
+      "album": "A Gangsta's Pain",
+      "artist": "Yuuri",
+      "genre": "West Coast Rap",
+      "songName": "Rehab"
+    },
+    {
+      "album": "Me And My Gang",
+      "artist": "Sezen Aksu",
+      "genre": "Christmas",
+      "songName": "Memories Are Made of This"
+    },
+    {
+      "album": "No Time To Die",
+      "artist": "Johnnie Taylor",
+      "genre": "Folk",
+      "songName": "Greatest Love of All"
+    },
+    {
+      "album": "Revenge",
+      "artist": "Deee-Lite",
+      "genre": "Kayokyoku",
+      "songName": "Roses Are Red"
+    },
+    {
+      "album": "Bluebird Days",
+      "artist": "Mora",
+      "genre": "Avant-Punk",
+      "songName": "At the Hop"
+    },
+    {
+      "album": "Reise, Reise",
+      "artist": "Miley Cyrus",
+      "genre": "Space Rock",
+      "songName": "Delicado"
+    },
+    {
+      "album": "Full Moon Fever",
+      "artist": "Ms. Lauryn Hill",
+      "genre": "R&B",
+      "songName": "Jump"
+    },
+    {
+      "album": "Sin Bandera",
+      "artist": "Los Del Rio",
+      "genre": "Motown",
+      "songName": "Please Mr Postman"
+    },
+    {
+      "album": "Leftoverture",
+      "artist": "The Script",
+      "genre": "German Folk",
+      "songName": "These Boots Are Made For Walking"
+    },
+    {
+      "album": "Whitney",
+      "artist": "Wale",
+      "genre": "Opera",
+      "songName": "Singing The Blues"
+    },
+    {
+      "album": "The Story Of Us",
+      "artist": "Johnnie Taylor",
+      "genre": "Detroit Techno",
+      "songName": "All You Need is Love"
+    },
+    {
+      "album": "La Melodia De La Calle",
+      "artist": "Champs",
+      "genre": "Drill",
+      "songName": "Ain't No Mountain High Enough"
+    },
+    {
+      "album": "Sueños",
+      "artist": "OutKast",
+      "genre": "Indie",
+      "songName": "Boulevard of Broken Dreams"
+    },
+    {
+      "album": "Gloria",
+      "artist": "Nicki Minaj",
+      "genre": "East Coast Rap",
+      "songName": "Sweet Caroline (Good Times Never Seemed So Good)"
+    },
+    {
+      "album": "Barbie The Album",
+      "artist": "Tyler Hubbard",
+      "genre": "Cantopop",
+      "songName": "We Are the World"
+    },
+    {
+      "album": "Graceland",
+      "artist": "Margaret Whiting",
+      "genre": "Acid House",
+      "songName": "Down Hearted Blues"
+    },
+    {
+      "album": "Aretha Now",
+      "artist": "Dionne Warwick",
+      "genre": "Nordic",
+      "songName": "Nothin' on You"
+    },
+    {
+      "album": "Every Kingdom",
+      "artist": "The Detroit Spinners",
+      "genre": "Pop Film",
+      "songName": "Rock With You"
+    },
+    {
+      "album": "Different World",
+      "artist": "Sfera Ebbasta",
+      "genre": "Salsa",
+      "songName": "Moonlight Cocktail"
+    },
+    {
+      "album": "Dharma",
+      "artist": "Ethel Waters",
+      "genre": "Heavy Metal",
+      "songName": "Tha Crossroads"
+    },
+    {
+      "album": "Jamie",
+      "artist": "Sean Paul",
+      "genre": "East Coast Rap",
+      "songName": "Need You Now"
+    },
+    {
+      "album": "Cottonwood",
+      "artist": "Johnny Mercer",
+      "genre": "Soft Rock",
+      "songName": "Bye, Bye, Bye"
+    },
+    {
+      "album": "Agent Provocateur",
+      "artist": "Kanye West",
+      "genre": "Kitsch",
+      "songName": "Bad, Bad Leroy Brown"
+    },
+    {
+      "album": "The Forever Story",
+      "artist": "BoyWithUke",
+      "genre": "Old School Rap",
+      "songName": "Peg o' My Heart"
+    },
+    {
+      "album": "Billy Talent II",
+      "artist": "Megadeth",
+      "genre": "French Pop",
+      "songName": "That'll Be the Day"
+    },
+    {
+      "album": "American Teen",
+      "artist": "Pouya",
+      "genre": "Renaissance",
+      "songName": "Bad Romance"
+    },
+    {
+      "album": "Come Around Sundown",
+      "artist": "The Temptations",
+      "genre": "Boogaloo",
+      "songName": "Thriller"
+    },
+    {
+      "album": "Segundo Romance",
+      "artist": "Dennis Lloyd",
+      "genre": "Boogaloo",
+      "songName": "When You Wish Upon a Star"
+    },
+    {
+      "album": "My Moment",
+      "artist": "Jimi Hendrix",
+      "genre": "Disney",
+      "songName": "Only The Lonely (Know The Way I Feel)"
+    },
+    {
+      "album": "Daydream",
+      "artist": "Bibi Blocksberg",
+      "genre": "Chicano",
+      "songName": "Check On It"
+    },
+    {
+      "album": "Artist 2.0",
+      "artist": "T-Pain",
+      "genre": "Karaoke",
+      "songName": "Groove is in the Heart"
+    },
+    {
+      "album": "How To Save A Life",
+      "artist": "Michael Bublé",
+      "genre": "Trip Hop",
+      "songName": "Sugar Shack"
+    },
+    {
+      "album": "Californication",
+      "artist": "Survivor",
+      "genre": "Folk",
+      "songName": "Weak"
+    }
+  ],
+  "book": [
+    {
+      "title": "Tess of the d'Urbervilles",
+      "author": "George Grossmith",
+      "genre": "Drama",
+      "series": "Thursday Next Series",
+      "publisher": "Marshall Cavendish",
+      "format": "Hardcover",
+      "isbn": "978-1-56736-325-8"
+    },
+    {
+      "title": "The Master and Margarita",
+      "author": "Sun Tzu",
+      "genre": "Classic",
+      "series": "A Song of Ice and Fire",
+      "publisher": "Bloodaxe Books",
+      "format": "Ebook",
+      "isbn": "978-0-664-86195-7"
+    },
+    {
+      "title": "Walden",
+      "author": "Bernard Shaw",
+      "genre": "Religion",
+      "series": "Dune",
+      "publisher": "Zondervan",
+      "format": "Hardcover",
+      "isbn": "978-1-85798-418-7"
+    },
+    {
+      "title": "Under the Volcano",
+      "author": "Karl Marx",
+      "genre": "Children's Literature",
+      "series": "A Song of Ice and Fire",
+      "publisher": "Ignatius Press",
+      "format": "Hardcover",
+      "isbn": "978-1-396-11851-7"
+    },
+    {
+      "title": "The Divine Comedy",
+      "author": "Alexander Pope",
+      "genre": "Graphic Novel",
+      "series": "The Hitchhiker's Guide to the Galaxy",
+      "publisher": "Shire Books",
+      "format": "Hardcover",
+      "isbn": "978-0-333-42904-4"
+    },
+    {
+      "title": "The Count of Monte Cristo",
+      "author": "Shivaram Parashuram Bhide",
+      "genre": "Comedy",
+      "series": "War and Peace",
+      "publisher": "Hodder Headline",
+      "format": "Ebook",
+      "isbn": "978-0-912686-47-9"
+    },
+    {
+      "title": "The Enchanted April",
+      "author": "Anton Chekhov",
+      "genre": "Graphic Novel",
+      "series": "The Eighth Life",
+      "publisher": "Ziff Davis Media",
+      "format": "Hardcover",
+      "isbn": "978-1-246-99782-8"
+    },
+    {
+      "title": "The Diary of a Young Girl",
+      "author": "Louise Maude",
+      "genre": "Fantasy",
+      "series": "Discworld",
+      "publisher": "Papadakis Publisher",
+      "format": "Audiobook",
+      "isbn": "978-0-05-973148-3"
+    },
+    {
+      "title": "Beloved",
+      "author": "James Ellroy",
+      "genre": "Psychology",
+      "series": "The Inheritance Cycle",
+      "publisher": "Koren Publishers Jerusalem",
+      "format": "Audiobook",
+      "isbn": "978-0-7347-4266-7"
+    },
+    {
+      "title": "Bible",
+      "author": "Neil Gaiman",
+      "genre": "Historical Fiction",
+      "series": "The Dark Tower",
+      "publisher": "Open Court Publishing Company",
+      "format": "Paperback",
+      "isbn": "978-1-142-50732-9"
+    },
+    {
+      "title": "The Lion, the Witch, and the Wardrobe",
+      "author": "Edgar Rice Burroughs",
+      "genre": "Memoir",
+      "series": "The Infinity Cycle",
+      "publisher": "Kensington Books",
+      "format": "Ebook",
+      "isbn": "978-1-239-89175-1"
+    },
+    {
+      "title": "Tropic of Cancer",
+      "author": "Bernard Shaw",
+      "genre": "Horror",
+      "series": "A Song of Ice and Fire",
+      "publisher": "Charles Scribner's Sons",
+      "format": "Ebook",
+      "isbn": "978-0-364-70556-8"
+    },
+    {
+      "title": "His Dark Materials",
+      "author": "Henrik Ibsen",
+      "genre": "Romance",
+      "series": "His Dark Materials",
+      "publisher": "Del Rey Books",
+      "format": "Hardcover",
+      "isbn": "978-1-223-61550-9"
+    },
+    {
+      "title": "American Pastoral",
+      "author": "Alan Moore and Dave Gibbons",
+      "genre": "Psychology",
+      "series": "Thursday Next Series",
+      "publisher": "Gaspereau Press",
+      "format": "Hardcover",
+      "isbn": "978-0-86006-023-9"
+    },
+    {
+      "title": "The Way We Live Now",
+      "author": "George Orwell",
+      "genre": "Religion",
+      "series": "Harry Potter",
+      "publisher": "Hodder Headline",
+      "format": "Paperback",
+      "isbn": "978-1-223-07964-6"
+    },
+    {
+      "title": "Charlotte's Web",
+      "author": "Michael Chabon",
+      "genre": "Classic",
+      "series": "The Maze Runner",
+      "publisher": "E. P. Dutton",
+      "format": "Ebook",
+      "isbn": "978-1-326-52836-2"
+    },
+    {
+      "title": "The Enchanted April",
+      "author": "Bernard Shaw",
+      "genre": "Biography",
+      "series": "Harry Potter",
+      "publisher": "Athabasca University Press",
+      "format": "Hardcover",
+      "isbn": "978-0-7090-6118-2"
+    },
+    {
+      "title": "The Idiot",
+      "author": "Ken Kesey",
+      "genre": "Romance",
+      "series": "Jane Austen Murder Mysteries",
+      "publisher": "Harcourt Assessment",
+      "format": "Audiobook",
+      "isbn": "978-1-949335-61-3"
+    },
+    {
+      "title": "A Room with a View",
+      "author": "Bram Stoker",
+      "genre": "Drama",
+      "series": "The Hitchhiker's Guide to the Galaxy",
+      "publisher": "Godwit Press",
+      "format": "Audiobook",
+      "isbn": "978-0-592-58335-8"
+    },
+    {
+      "title": "Atonement",
+      "author": "Samuel Butler",
+      "genre": "Mythology",
+      "series": "The Chronicles of Narnia",
+      "publisher": "Carlton Books",
+      "format": "Ebook",
+      "isbn": "978-1-394-15730-3"
+    },
+    {
+      "title": "A Passage to India",
+      "author": "Jacob Grimm",
+      "genre": "Romance",
+      "series": "The Inheritance Cycle",
+      "publisher": "John Blake Publishing",
+      "format": "Audiobook",
+      "isbn": "978-0-7368-4816-9"
+    },
+    {
+      "title": "The Maltese Falcon",
+      "author": "Suzanne Collins",
+      "genre": "Biography",
+      "series": "The Maze Runner",
+      "publisher": "Book Works",
+      "format": "Audiobook",
+      "isbn": "978-0-589-72192-3"
+    },
+    {
+      "title": "Tess of the d'Urbervilles",
+      "author": "W.K. Marriott",
+      "genre": "Drama",
+      "series": "The Bartimaeus Trilogy",
+      "publisher": "Breslov Research Institute",
+      "format": "Paperback",
+      "isbn": "978-1-200-09471-6"
+    },
+    {
+      "title": "The Rainbow",
+      "author": "John Ormsby",
+      "genre": "Memoir",
+      "series": "The Red Rising Saga",
+      "publisher": "Viking Press",
+      "format": "Paperback",
+      "isbn": "978-0-7379-2195-3"
+    },
+    {
+      "title": "Tinker, Tailor, Soldier, Spy",
+      "author": "John Green",
+      "genre": "Psychology",
+      "series": "Sherlock Holmes",
+      "publisher": "Brill",
+      "format": "Hardcover",
+      "isbn": "978-0-9560177-9-6"
+    },
+    {
+      "title": "Adventures of Huckleberry Finn",
+      "author": "George Orwell",
+      "genre": "Science Fiction",
+      "series": "A Song of Ice and Fire",
+      "publisher": "Daedalus Publishing",
+      "format": "Ebook",
+      "isbn": "978-1-85907-555-5"
+    },
+    {
+      "title": "Second Treatise of Government",
+      "author": "Mikhail Bulgakov",
+      "genre": "Comedy",
+      "series": "The Eighth Life",
+      "publisher": "University of Michigan Press",
+      "format": "Ebook",
+      "isbn": "978-0-204-97703-2"
+    },
+    {
+      "title": "The Stand",
+      "author": "L.M. Montgomery",
+      "genre": "Philosophy",
+      "series": "The Chronicles of Narnia",
+      "publisher": "Mapin Publishing",
+      "format": "Ebook",
+      "isbn": "978-1-5099-4263-3"
+    },
+    {
+      "title": "Oscar and Lucinda",
+      "author": "Virgil",
+      "genre": "Graphic Novel",
+      "series": "Sherlock Holmes",
+      "publisher": "Random House",
+      "format": "Hardcover",
+      "isbn": "978-1-59930-005-4"
+    },
+    {
+      "title": "The Time Machine",
+      "author": "J.M. Barrie",
+      "genre": "Comedy",
+      "series": "The Maze Runner",
+      "publisher": "Applewood Books",
+      "format": "Ebook",
+      "isbn": "978-0-330-66662-6"
+    },
+    {
+      "title": "The Works of Edgar Allan Poe",
+      "author": "Arthur Conan Doyle",
+      "genre": "Classic",
+      "series": "The Dark Tower",
+      "publisher": "Martinus Nijhoff Publishers",
+      "format": "Hardcover",
+      "isbn": "978-0-12-544814-7"
+    },
+    {
+      "title": "Scoop",
+      "author": "L. Frank Baum",
+      "genre": "Business",
+      "series": "Jane Austen Murder Mysteries",
+      "publisher": "Koren Publishers Jerusalem",
+      "format": "Audiobook",
+      "isbn": "978-1-4355-6257-8"
+    },
+    {
+      "title": "If on a Winter's Night a Traveler",
+      "author": "John Dos Passos",
+      "genre": "Children's Literature",
+      "series": "The Dresden Files",
+      "publisher": "HMSO",
+      "format": "Ebook",
+      "isbn": "978-1-4929-4166-8"
+    },
+    {
+      "title": "Stories of Anton Chekhov",
+      "author": "Alexandre Dumas",
+      "genre": "Young Adult",
+      "series": "Percy Jackson",
+      "publisher": "Firebrand Books",
+      "format": "Ebook",
+      "isbn": "978-1-57223-360-7"
+    },
+    {
+      "title": "Hamlet",
+      "author": "D.H. Lawrence",
+      "genre": "Adventure",
+      "series": "The Maze Runner",
+      "publisher": "Medknow Publications",
+      "format": "Hardcover",
+      "isbn": "978-1-5019-1268-9"
+    },
+    {
+      "title": "The Waste Land",
+      "author": "E.M. Forster",
+      "genre": "Mythology",
+      "series": "Anna Karenina",
+      "publisher": "Banner of Truth Trust",
+      "format": "Paperback",
+      "isbn": "978-1-101-14147-2"
+    },
+    {
+      "title": "Men Without Women",
+      "author": "F. Scott Fitzgerald",
+      "genre": "Classic",
+      "series": "Hercule Poirot",
+      "publisher": "Dedalus Books",
+      "format": "Paperback",
+      "isbn": "978-1-386-12063-6"
+    },
+    {
+      "title": "Catch-22",
+      "author": "David Widger",
+      "genre": "Comic",
+      "series": "The Bartimaeus Trilogy",
+      "publisher": "Zondervan",
+      "format": "Audiobook",
+      "isbn": "978-0-580-74080-0"
+    },
+    {
+      "title": "Jane Eyre",
+      "author": "Samuel Richardson",
+      "genre": "Fantasy",
+      "series": "The Bartimaeus Trilogy",
+      "publisher": "Manor House Publishing",
+      "format": "Audiobook",
+      "isbn": "978-1-335-42603-1"
+    },
+    {
+      "title": "Fahrenheit 451",
+      "author": "George Grossmith",
+      "genre": "Science Fiction",
+      "series": "The Wheel of Time",
+      "publisher": "Oberon Books",
+      "format": "Hardcover",
+      "isbn": "978-0-8332-7009-2"
+    },
+    {
+      "title": "The Grapes of Wrath",
+      "author": "Alan Moore and Dave Gibbons",
+      "genre": "Graphic Novel",
+      "series": "Sherlock Holmes",
+      "publisher": "Parragon",
+      "format": "Audiobook",
+      "isbn": "978-0-7615-4424-1"
+    },
+    {
+      "title": "Charlie and the Chocolate Factory",
+      "author": "Henry Miller",
+      "genre": "Drama",
+      "series": "Twilight",
+      "publisher": "New English Library",
+      "format": "Hardcover",
+      "isbn": "978-0-9837815-4-7"
+    },
+    {
+      "title": "The Hound of the Baskervilles",
+      "author": "George Saunders",
+      "genre": "Science Fiction",
+      "series": "Little Women",
+      "publisher": "Emerald Group Publishing",
+      "format": "Ebook",
+      "isbn": "978-0-417-51062-0"
+    },
+    {
+      "title": "Emma",
+      "author": "Kazuo Ishiguro",
+      "genre": "Classic",
+      "series": "The Arc of a Scythe",
+      "publisher": "Churchill Livingstone",
+      "format": "Ebook",
+      "isbn": "978-1-042-04188-6"
+    },
+    {
+      "title": "The Grapes of Wrath",
+      "author": "Henry James",
+      "genre": "Mystery",
+      "series": "The Foundation Series",
+      "publisher": "Burns & Oates",
+      "format": "Hardcover",
+      "isbn": "978-1-119-50951-6"
+    },
+    {
+      "title": "Hamlet",
+      "author": "Judy Blume",
+      "genre": "Graphic Novel",
+      "series": "Harry Potter",
+      "publisher": "Basic Books",
+      "format": "Paperback",
+      "isbn": "978-1-55689-754-2"
+    },
+    {
+      "title": "Oscar and Lucinda",
+      "author": "Joseph Conrad",
+      "genre": "Romance",
+      "series": "Thursday Next Series",
+      "publisher": "J. M. Dent",
+      "format": "Paperback",
+      "isbn": "978-0-276-80828-9"
+    },
+    {
+      "title": "Great Expectations",
+      "author": "Vatsyayana",
+      "genre": "Fantasy",
+      "series": "His Dark Materials",
+      "publisher": "Pavilion Books",
+      "format": "Audiobook",
+      "isbn": "978-1-84928-656-5"
+    },
+    {
+      "title": "The Trial",
+      "author": "Mikhail Bulgakov",
+      "genre": "Thriller",
+      "series": "Outlander",
+      "publisher": "Left Book Club",
+      "format": "Hardcover",
+      "isbn": "978-0-7755-0362-3"
+    },
+    {
+      "title": "Mrs. Dalloway",
+      "author": "Dashiell Hammett",
+      "genre": "Adventure",
+      "series": "Percy Jackson",
+      "publisher": "Chronicle Books",
+      "format": "Paperback",
+      "isbn": "978-1-01-031210-9"
+    },
+    {
+      "title": "The Pickwick Papers",
+      "author": "P.G. Wodehouse",
+      "genre": "Mystery",
+      "series": "The Chronicles of Narnia",
+      "publisher": "Kensington Books",
+      "format": "Audiobook",
+      "isbn": "978-0-13-098463-0"
+    },
+    {
+      "title": "For Whom the Bell Tolls",
+      "author": "John Kennedy Toole",
+      "genre": "Fantasy",
+      "series": "Jane Austen Murder Mysteries",
+      "publisher": "Macmillan Publishers",
+      "format": "Audiobook",
+      "isbn": "978-0-503-66941-6"
+    },
+    {
+      "title": "The Waste Land",
+      "author": "Michael Chabon",
+      "genre": "Drama",
+      "series": "The Bartimaeus Trilogy",
+      "publisher": "Etruscan Press",
+      "format": "Hardcover",
+      "isbn": "978-0-387-30306-2"
+    },
+    {
+      "title": "Anna Karenina",
+      "author": "Richard Wagner",
+      "genre": "Comic",
+      "series": "The Red Rising Saga",
+      "publisher": "Hogarth Press",
+      "format": "Paperback",
+      "isbn": "978-0-18-339993-1"
+    },
+    {
+      "title": "The Heart is a Lonely Hunter",
+      "author": "H.G. Wells",
+      "genre": "Philosophy",
+      "series": "The Dark Tower",
+      "publisher": "Del Rey Books",
+      "format": "Audiobook",
+      "isbn": "978-0-16-430798-6"
+    },
+    {
+      "title": "Pale Fire",
+      "author": "Muriel Spark",
+      "genre": "Horror",
+      "series": "The Hunger Games",
+      "publisher": "UCL Press",
+      "format": "Ebook",
+      "isbn": "978-1-60080-242-3"
+    },
+    {
+      "title": "Bleak House",
+      "author": "Jack London",
+      "genre": "Thriller",
+      "series": "Little Women",
+      "publisher": "Farrar, Straus & Giroux",
+      "format": "Audiobook",
+      "isbn": "978-0-524-23912-4"
+    },
+    {
+      "title": "The Time Machine",
+      "author": "Stephen Hawking",
+      "genre": "Young Adult",
+      "series": "Harry Potter",
+      "publisher": "Paulist Press",
+      "format": "Hardcover",
+      "isbn": "978-0-15-539021-8"
+    },
+    {
+      "title": "Midnight's Children",
+      "author": "William Gibson",
+      "genre": "Biography",
+      "series": "The Hunger Games",
+      "publisher": "Gaspereau Press",
+      "format": "Ebook",
+      "isbn": "978-0-7841-3693-5"
+    },
+    {
+      "title": "Animal Farm",
+      "author": "Benjamin Jowett",
+      "genre": "Children's Literature",
+      "series": "The Hunger Games",
+      "publisher": "University of Minnesota Press",
+      "format": "Paperback",
+      "isbn": "978-1-4349-4065-0"
+    },
+    {
+      "title": "The Works of Edgar Allan Poe",
+      "author": "Frank T. Merrill",
+      "genre": "Comedy",
+      "series": "Colonel Race",
+      "publisher": "New English Library",
+      "format": "Paperback",
+      "isbn": "978-1-223-31542-3"
+    },
+    {
+      "title": "Faust",
+      "author": "Henry Miller",
+      "genre": "Business",
+      "series": "Hercule Poirot",
+      "publisher": "Adis International",
+      "format": "Ebook",
+      "isbn": "978-0-7021-2561-4"
+    },
+    {
+      "title": "The Hobbit",
+      "author": "Wilkie Collins",
+      "genre": "Children's Literature",
+      "series": "The Border Trilogy",
+      "publisher": "Fearless Books",
+      "format": "Paperback",
+      "isbn": "978-1-4353-4235-4"
+    },
+    {
+      "title": "Pale Fire",
+      "author": "Carson McCallers",
+      "genre": "Horror",
+      "series": "His Dark Materials",
+      "publisher": "No Starch Press",
+      "format": "Hardcover",
+      "isbn": "978-1-877659-90-4"
+    },
+    {
+      "title": "Hitting the line",
+      "author": "John Bunyan",
+      "genre": "Detective",
+      "series": "The Dresden Files",
+      "publisher": "Open University Press",
+      "format": "Ebook",
+      "isbn": "978-1-9810-9331-1"
+    },
+    {
+      "title": "To the Lighthouse",
+      "author": "Wilkie Collins",
+      "genre": "Western",
+      "series": "The Maze Runner",
+      "publisher": "Fearless Books",
+      "format": "Paperback",
+      "isbn": "978-0-03-743579-2"
+    },
+    {
+      "title": "Madame Bovary",
+      "author": "Miguel de Cervantes",
+      "genre": "Horror",
+      "series": "Harry Potter",
+      "publisher": "Voyager Books",
+      "format": "Hardcover",
+      "isbn": "978-0-01-945073-7"
+    },
+    {
+      "title": "The Odyssey",
+      "author": "E.M. Forster",
+      "genre": "Detective",
+      "series": "The Border Trilogy",
+      "publisher": "Blackstaff Press",
+      "format": "Paperback",
+      "isbn": "978-1-188-18440-9"
+    },
+    {
+      "title": "Lucky Jim",
+      "author": "Frances Hodgson Burnett",
+      "genre": "Young Adult",
+      "series": "A Song of Ice and Fire",
+      "publisher": "Penguin Books",
+      "format": "Hardcover",
+      "isbn": "978-1-000-64406-7"
+    },
+    {
+      "title": "Les Miserables",
+      "author": "Shivaram Parashuram Bhide",
+      "genre": "Psychology",
+      "series": "The Wheel of Time",
+      "publisher": "Brimstone Press",
+      "format": "Ebook",
+      "isbn": "978-1-4122-6773-1"
+    },
+    {
+      "title": "Notes from the Underground",
+      "author": "John Kennedy Toole",
+      "genre": "Psychology",
+      "series": "The Foundation Series",
+      "publisher": "Eel Pie Publishing",
+      "format": "Ebook",
+      "isbn": "978-1-166-62360-9"
+    },
+    {
+      "title": "Money",
+      "author": "William Golding",
+      "genre": "Young Adult",
+      "series": "The Border Trilogy",
+      "publisher": "Mark Batty Publisher",
+      "format": "Audiobook",
+      "isbn": "978-0-11-142194-9"
+    },
+    {
+      "title": "Beyond Good and Evil",
+      "author": "Mark Twain",
+      "genre": "Adventure",
+      "series": "The Wheel of Time",
+      "publisher": "Vintage Books",
+      "format": "Ebook",
+      "isbn": "978-1-7094-5066-2"
+    },
+    {
+      "title": "The Brief Wondrous Life of Oscar Wao",
+      "author": "Graham Greene",
+      "genre": "Comic",
+      "series": "Twilight",
+      "publisher": "Victor Gollancz Ltd",
+      "format": "Hardcover",
+      "isbn": "978-0-423-63261-3"
+    },
+    {
+      "title": "A Confederacy of Dunces",
+      "author": "J.R.R. Tolkien",
+      "genre": "Mythology",
+      "series": "Percy Jackson",
+      "publisher": "Candlewick Press",
+      "format": "Audiobook",
+      "isbn": "978-0-614-89410-3"
+    },
+    {
+      "title": "Walden",
+      "author": "Richard Wagner",
+      "genre": "Thriller",
+      "series": "Anna Karenina",
+      "publisher": "Shire Books",
+      "format": "Audiobook",
+      "isbn": "978-0-7622-1553-9"
+    },
+    {
+      "title": "U.S.A. Trilogy",
+      "author": "H.P. Lovecraft",
+      "genre": "Business",
+      "series": "Anna Karenina",
+      "publisher": "Blackie and Son Limited",
+      "format": "Ebook",
+      "isbn": "978-1-84429-880-8"
+    },
+    {
+      "title": "Treasure Island",
+      "author": "John Green",
+      "genre": "Young Adult",
+      "series": "War and Peace",
+      "publisher": "Brill",
+      "format": "Ebook",
+      "isbn": "978-1-4449-7642-7"
+    },
+    {
+      "title": "Tinker, Tailor, Soldier, Spy",
+      "author": "Nathaniel Hawthorne",
+      "genre": "Poetry",
+      "series": "Outlander",
+      "publisher": "Voyager Books",
+      "format": "Audiobook",
+      "isbn": "978-0-7732-0819-3"
+    },
+    {
+      "title": "The Magic Mountain",
+      "author": "Karl Marx",
+      "genre": "Religion",
+      "series": "The Dresden Files",
+      "publisher": "Berkley Books",
+      "format": "Audiobook",
+      "isbn": "978-1-269-18919-4"
+    },
+    {
+      "title": "Crime and Punishment",
+      "author": "Philip Roth",
+      "genre": "Comic",
+      "series": "The Southern Reach",
+      "publisher": "Bloodaxe Books",
+      "format": "Paperback",
+      "isbn": "978-1-5030-2268-3"
+    },
+    {
+      "title": "The Good Soldier",
+      "author": "Nathanael West",
+      "genre": "Mythology",
+      "series": "The Infinity Cycle",
+      "publisher": "Fairview Press",
+      "format": "Hardcover",
+      "isbn": "978-0-16-317890-7"
+    },
+    {
+      "title": "Little Women",
+      "author": "Dan Brown",
+      "genre": "Poetry",
+      "series": "The Hitchhiker's Guide to the Galaxy",
+      "publisher": "Golden Cockerel Press",
+      "format": "Hardcover",
+      "isbn": "978-1-0804-0602-9"
+    },
+    {
+      "title": "The Wind in the Willows",
+      "author": "Anton Chekhov",
+      "genre": "Detective",
+      "series": "The Wheel of Time",
+      "publisher": "New Directions Publishing",
+      "format": "Paperback",
+      "isbn": "978-0-583-17086-4"
+    },
+    {
+      "title": "East of Eden",
+      "author": "Muriel Spark",
+      "genre": "Poetry",
+      "series": "Hercule Poirot",
+      "publisher": "Bloomsbury Publishing Plc",
+      "format": "Hardcover",
+      "isbn": "978-1-78967-324-1"
+    },
+    {
+      "title": "The Complete Works of Edgar Allen Poe",
+      "author": "Nathanael West",
+      "genre": "Horror",
+      "series": "The Hitchhiker's Guide to the Galaxy",
+      "publisher": "Berkley Books",
+      "format": "Paperback",
+      "isbn": "978-0-283-44622-1"
+    },
+    {
+      "title": "Underworld",
+      "author": "Evelyn Waugh",
+      "genre": "Detective",
+      "series": "The Bartimaeus Trilogy",
+      "publisher": "SAGE Publications",
+      "format": "Audiobook",
+      "isbn": "978-0-360-71321-5"
+    },
+    {
+      "title": "The Corrections",
+      "author": "Thomas Mann",
+      "genre": "Philosophy",
+      "series": "Thursday Next Series",
+      "publisher": "Nonesuch Press",
+      "format": "Paperback",
+      "isbn": "978-0-408-43292-4"
+    },
+    {
+      "title": "Stories of Anton Chekhov",
+      "author": "John Dos Passos",
+      "genre": "Detective",
+      "series": "The Maze Runner",
+      "publisher": "Holt McDougal",
+      "format": "Paperback",
+      "isbn": "978-1-101-62700-6"
+    },
+    {
+      "title": "The Idiot",
+      "author": "Elizabeth Cleghorn Gaskell",
+      "genre": "Mystery",
+      "series": "Sherlock Holmes",
+      "publisher": "Atlas Press",
+      "format": "Hardcover",
+      "isbn": "978-1-78133-414-0"
+    },
+    {
+      "title": "Lord Jim",
+      "author": "E.M. Forster",
+      "genre": "Biography",
+      "series": "A Song of Ice and Fire",
+      "publisher": "Adis International",
+      "format": "Audiobook",
+      "isbn": "978-0-462-90213-5"
+    },
+    {
+      "title": "A Modest Proposal",
+      "author": "T. Smollett",
+      "genre": "Horror",
+      "series": "The Arc of a Scythe",
+      "publisher": "Verso Books",
+      "format": "Paperback",
+      "isbn": "978-0-14-135599-3"
+    },
+    {
+      "title": "The Good Soldier",
+      "author": "L.M. Montgomery",
+      "genre": "Adventure",
+      "series": "The Inheritance Cycle",
+      "publisher": "Mark Batty Publisher",
+      "format": "Paperback",
+      "isbn": "978-1-930775-44-2"
+    },
+    {
+      "title": "Notes from the Underground",
+      "author": "Roald Dahl",
+      "genre": "Religion",
+      "series": "The Prison Healer",
+      "publisher": "Left Book Club",
+      "format": "Paperback",
+      "isbn": "978-0-9542281-6-3"
+    },
+    {
+      "title": "Gulliver's Travels",
+      "author": "Marilynne Robinson",
+      "genre": "Children's Literature",
+      "series": "Discworld",
+      "publisher": "Anova Books",
+      "format": "Ebook",
+      "isbn": "978-1-042-69068-8"
+    },
+    {
+      "title": "Neuromancer",
+      "author": "Charlotte Perkins Gilman",
+      "genre": "Comic",
+      "series": "The Border Trilogy",
+      "publisher": "Tammi",
+      "format": "Ebook",
+      "isbn": "978-0-272-81843-5"
+    },
+    {
+      "title": "Peter Pan",
+      "author": "William Faulkner",
+      "genre": "Comic",
+      "series": "The Red Rising Saga",
+      "publisher": "Bowes & Bowes",
+      "format": "Paperback",
+      "isbn": "978-0-263-54942-3"
+    },
+    {
+      "title": "The Prime of Miss Jean Brodie",
+      "author": "John Camden Hotten",
+      "genre": "Comedy",
+      "series": "The Red Rising Saga",
+      "publisher": "Boydell & Brewer",
+      "format": "Paperback",
+      "isbn": "978-0-467-68318-3"
+    },
+    {
+      "title": "The Master and Margarita",
+      "author": "Boris Pasternak",
+      "genre": "Graphic Novel",
+      "series": "Outlander",
+      "publisher": "Burns & Oates",
+      "format": "Audiobook",
+      "isbn": "978-1-225-98254-8"
+    },
+    {
+      "title": "The Yellow Wallpaper",
+      "author": "Ken Kesey",
+      "genre": "Adventure",
+      "series": "The Infinity Cycle",
+      "publisher": "Brimstone Press",
+      "format": "Hardcover",
+      "isbn": "978-1-896169-56-9"
+    }
+  ]
+}

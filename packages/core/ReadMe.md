@@ -1,6 +1,7 @@
 # JSON Express
 
 A feature-rich, fast JSON mock server for rapid API prototyping and development. Get a full REST API with zero coding in seconds.
+
 **🌐 Homepage** [jsonexpress.com](https://jsonexpress.com)
 
 ## ✨ Features
@@ -65,7 +66,7 @@ $ json-express
 
 ID will be added automatically!
 
-### 🔒 HTTPS Setup
+## 🔒 HTTPS Setup
 
 To run your server with HTTPS, configure the protocol in your `config.json` file:
 
@@ -98,7 +99,7 @@ DELETE /albums/:id     # Delete album with id
 GET    /search         # Search across all data
 ```
 
-## 🏥 Health Check Endpoints
+### 🏥 Health Check Endpoints
 
 JSON Express includes built-in health check endpoints to monitor your server:
 
@@ -114,7 +115,7 @@ $ curl https://localhost:8080/api/trusted-data
 
 **Note**: The `/api/trusted` and `/api/trusted-data` endpoints are only available when using HTTPS protocol.
 
-## 🔍 Search API (WIP)
+### 🔍 Search API (WIP)
 
 JSON Express includes a built-in search endpoint that allows you to search across your data:
 

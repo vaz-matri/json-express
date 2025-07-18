@@ -1,56 +1,65 @@
 import { readdirSync, readFileSync } from 'fs'
 import { join } from 'path'
 import { updateConfigStore } from '../db/config-store.js'
-import {  faker } from '@faker-js/faker'
+import defaultData from '../db/data/default-data.json' with { type: 'json' }
 
 const dirname = join(process.cwd())
 const files = readdirSync(dirname)
 
-const jsonFiles = {}
+let jsonFiles = {}
 
-const prepareDefaultJson = () => {
-    function createRandomUser() {
-        return {
-            userId: faker.string.uuid(),
-            username: faker.internet.username(),
-            email: faker.internet.email(),
-            avatar: faker.image.avatar(),
-            password: faker.internet.password(),
-            birthdate: faker.date.birthdate(),
-            registeredAt: faker.date.past(),
+const prepareDefaultJson = async () => {
+    try {
+        const fakerModule = await import('@faker-js/faker')
+
+        const { faker } = fakerModule
+
+        function createRandomUser() {
+            return {
+                userId: faker.string.uuid(),
+                username: faker.internet.username(),
+                email: faker.internet.email(),
+                avatar: faker.image.avatar(),
+                password: faker.internet.password(),
+                birthdate: faker.date.birthdate(),
+                registeredAt: faker.date.past(),
+            }
         }
-    }
 
-    function createMusic() {
-        return {
-            album: faker.music.album(),
-            artist: faker.music.artist(),
-            genre: faker.music.genre(),
-            songName: faker.music.songName(),
+        function createMusic() {
+            return {
+                album: faker.music.album(),
+                artist: faker.music.artist(),
+                genre: faker.music.genre(),
+                songName: faker.music.songName(),
+            }
         }
-    }
 
-    function createBook() {
-        return {
-            title: faker.book.title(),
-            author: faker.book.author(),
-            genre: faker.book.genre(),
-            series: faker.book.series(),
-            publisher: faker.book.publisher(),
-            format: faker.book.format(),
-            isbn: faker.commerce.isbn()
+        function createBook() {
+            return {
+                title: faker.book.title(),
+                author: faker.book.author(),
+                genre: faker.book.genre(),
+                series: faker.book.series(),
+                publisher: faker.book.publisher(),
+                format: faker.book.format(),
+                isbn: faker.commerce.isbn()
+            }
         }
-    }
 
-    jsonFiles.users = faker.helpers.multiple(createRandomUser, { count: 10 })
-    jsonFiles.music = faker.helpers.multiple(createMusic, { count: 100 })
-    jsonFiles.book = faker.helpers.multiple(createBook, { count: 100 })
+        jsonFiles.users = faker.helpers.multiple(createRandomUser, { count: 10 })
+        jsonFiles.music = faker.helpers.multiple(createMusic, { count: 100 })
+        jsonFiles.book = faker.helpers.multiple(createBook, { count: 100 })
+
+    } catch (error) {
+        jsonFiles = defaultData
+    }
 }
 
 const prepare = async () => {
     for (const filename of files) {
         if (!filename.includes('.json') || filename.includes('package') || filename.includes('-lock')) {
-            prepareDefaultJson()
+            await prepareDefaultJson()
 
             return
         }
