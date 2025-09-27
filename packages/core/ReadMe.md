@@ -1,19 +1,22 @@
-# JSON Express
+# <img src="logo/logo_long_desc.svg" alt="JSON Express">
 
-A feature-rich, fast JSON mock server for rapid API prototyping and development. Get a full REST API with zero coding in seconds.
+Skip the backend bottleneck and go from prototype to MVP launch faster. 
+JSON Express converts your json files into a complete server with MVP-ready APIs, 
+enterprise-grade security and validation - providing the practical infrastructure 
+you need until your dedicated backend is ready.
 
-**🌐 Homepage** [jsonexpress.com](https://jsonexpress.com)
+visit [jsonexpress.com](https://jsonexpress.com)
 
 ## ✨ Features
 
-- **Zero Configuration** - Just install and start your mock server
-- **Authentication Support** - Secure specific routes with JWT and session-based auth
-- **HTTPS Support** - Secure API with automatic SSL certificate generation
-- **Full REST API** - GET, POST, PATCH, DELETE operations
-- **Schema Validation** - Validate incoming data with custom schemas
-- **Search API** - Built-in search functionality across your data
-- **Health Check Endpoints** - Monitor your server health
-- **CORS Enabled** - Cross-origin requests supported out of the box
+- [Full REST API](#-api-endpoints) - GET, POST, PATCH, DELETE operations
+- [Health Check Endpoints](#-api-endpoints) - Monitor your server health
+- [Search API](#-search-api-wip) - Built-in search functionality across your data
+- [HTTPS Support](#-https-setup) - Secure API with automatic SSL certificate generation
+- [Schema Validation](#-schema-validation) - Validate incoming data with custom schemas
+- [Authentication Support](#-authentication) - Secure specific routes with JWT and session-based auth
+
+🔮 [See what's coming next in our Roadmap](#-roadmap)
 
 ## 🚀 Quick Start
 
@@ -27,9 +30,9 @@ $ npm install -g @json-express/core
 $ json-express
 ```
 
-That's it! Your JSON files are now served as a REST API. JSON Express uses **@faker-js/faker** under the hood to create realistic test data, making it perfect for prototyping and development.
+That's it! Your json files are now served as a REST API. JSON Express uses [faker](https://www.npmjs.com/package/@faker-js/faker) under the hood to create realistic test data, making it perfect for prototyping and development.
 
-## 📦 Project-Specific Installation
+### Project-Specific Installation
 
 This is an alternative method of installation. Install JSON Express directly in your project for better dependency management:
 
@@ -42,16 +45,26 @@ $ npm install @json-express/core
 
 # Run with npx
 $ npx json-express
+
+# or Run as script 
+  ## in package.json
+  "scripts": {
+    "serve": "json-express"
+  }
+  
+  ## run script
+  $ npm run serve
+
 ```
 
-## 📁 Using Your Own JSON Files
+### Using Your Own JSON Files
 
-If you prefer to use your own JSON files instead of the generated fake data, you can create them in your project directory.
+If you prefer to use your own json files instead of the generated fake data, you can create them in your project directory.
 
 Here are some examples of how to create your own JSON files:
 
 ```bash
-# Navigate to your project directory
+# Navigate to your backend project directory
 $ cd project
 
 # Create an albums.json file
@@ -66,29 +79,13 @@ $ json-express
 
 ID will be added automatically!
 
-## 🔒 HTTPS Setup
+### Stopping the Server
 
-To run your server with HTTPS, configure the protocol in your `config.json` file:
-
-```json
-{
-  "protocol": "https",
-  "PORT": 8080
-}
-```
-
-**First-time HTTPS setup requires elevated permissions** for SSL certificate generation:
-
-- **Windows**: Run as Administrator
-- **macOS**: Enter user password when prompted
-- **Linux**: Run with sudo
-
-
-After the initial certificate creation, you can run the server with normal permissions. The certificates are automatically managed and only need to be created once.
+To stop the JSON Express server, use `Ctrl + C` in your terminal.
 
 ## 📚 API Endpoints
 
-Based on your JSON structure, JSON Express automatically creates RESTful endpoints:
+Based on your json structure, JSON Express automatically creates RESTful endpoints:
 
 ```
 GET    /albums         # Get all albums
@@ -96,43 +93,136 @@ GET    /albums/:id     # Get album with id
 POST   /albums         # Create a new album
 PATCH  /albums/:id     # Partially update album with id 
 DELETE /albums/:id     # Delete album with id 
+
 GET    /search         # Search across all data
+GET    /health         # Health check endpoint
 ```
 
-### 🏥 Health Check Endpoints
+### Testing API endpoints
 
-JSON Express includes built-in health check endpoints to monitor your server:
+You can test your API endpoints using curl:
 
 ```bash
-# Basic health check (HTTP/HTTPS)
-$ curl http://localhost:8080/health
-$ curl https://localhost:8080/health
+# Get all artists
+$ curl http://localhost:3000/artists
 
-# Trusted endpoints (HTTPS only)
-$ curl https://localhost:8080/api/trusted
-$ curl https://localhost:8080/api/trusted-data
+# Get all albums
+$ curl http://localhost:3000/albums
+
+# Get a specific artist by ID
+$ curl http://localhost:3000/artists/1
+
+# Create a new artist
+$ curl -X POST http://localhost:3000/artists \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Drake", "realName": "Aubrey Drake Graham", "dob": "24-10-1986"}'
+
+# Create a new album
+$ curl -X POST http://localhost:3000/albums \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Recovery", "releaseDate": "21-06-2010"}'
+
+# Update an album
+$ curl -X PATCH http://localhost:3000/albums/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Recovery (Deluxe Edition)"}'
+
+# Delete an album
+$ curl -X DELETE http://localhost:3000/albums/1
+
+# Test health check endpoint
+$ curl http://localhost:3000/health
 ```
 
-**Note**: The `/api/trusted` and `/api/trusted-data` endpoints are only available when using HTTPS protocol.
-
-### 🔍 Search API (WIP)
+## 🔍 Search API (WIP)
 
 JSON Express includes a built-in search endpoint that allows you to search across your data:
 
 ```bash
-# Search across all your data (HTTP)
-$ curl http://localhost:8080/search?q=eminem
+# Basic search (HTTP)
+$ curl http://localhost:3000/search?q=eminem
+```
 
-# Search with HTTPS
-$ curl https://localhost:8080/search?q=eminem
+---
 
-# Search with authentication (if search is protected)
-$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" https://localhost:8080/search?q=eminem
+**Note**: The sections below require configuration via a `config.json` file. While JSON Express works perfectly with **zero configuration** for basic REST APIs, advanced features need some setup. For complete configuration options, see the [Configuration](#-configuration) section at the end of this document.
+
+---
+
+## 🔒 HTTPS Setup
+
+To run your server with HTTPS, configure the protocol in your `config.json` file:
+
+```json
+{
+  "protocol": "https"
+}
+```
+JSON Express uses [devcert](https://www.npmjs.com/package/devcert) under the hood to generate certificates
+
+**First-time HTTPS setup requires elevated permissions** for SSL certificate generation:
+
+- **Windows**: Run as Administrator
+- **macOS**: Enter user password when prompted
+- **Linux**: Run with `sudo`
+
+After the initial certificate creation, you can run the server with normal permissions. The certificates are automatically managed and only need to be created once.
+
+### Testing HTTPS endpoints
+
+```bash
+# Basic endpoint with HTTPS
+$ curl https://localhost:8080/albums
+
+# Test HTTPS-specific trusted endpoints (not available in HTTP)
+$ curl https://localhost:8080/api/trusted
+$ curl https://localhost:8080/api/trusted-data
+```
+
+## 📋 Schema Validation
+
+When schema validation is enabled in your configuration, JSON Express will validate incoming requests against your defined schema and uses [joi](https://www.npmjs.com/package/joi) under the hood
+
+
+Configure your `config.json` file:
+
+```json
+{
+  "schema.validation": "strict",
+  
+  "routes": {
+    "<route_name>": {
+      "schema": {
+        "<field_name>": {
+          "type": "string",
+          "required": true
+        }
+      }
+    }
+  }
+}
+```
+
+**Note:** More validations are coming soon
+
+### Testing schema validated endpoints
+
+```bash
+# Example: This will succeed (matches schema requirements)
+$ curl -X POST https://localhost:8080/albums \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Recovery", "releaseDate": "21-06-2010"}'
+
+# Example: This will fail with validation error (missing required field)
+$ curl -X POST https://localhost:8080/albums \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Recovery"}'
+# Response: {"error": "Validation failed", "message": "releaseDate is required"}
 ```
 
 ## 🔐 Authentication
 
-JSON Express supports JWT-based route-level authentication. You can secure specific routes by configuring them in your `config.json` file.
+JSON Express supports JWT-based route-level authentication and uses [passport](https://www.npmjs.com/package/passport) under the hood. You can secure specific routes by configuring them in your `config.json` file.
 
 ### Setting Up Authenticated Routes
 
@@ -140,8 +230,6 @@ Create or update your `config.json` file to include route-specific authenticatio
 
 ```json
 {
-  "PORT": 8080,
-  "protocol": "https",
   "routes": {
     "albums": {
       "auth": true
@@ -151,6 +239,19 @@ Create or update your `config.json` file to include route-specific authenticatio
 ```
 
 In this example, the `/albums` endpoints require authentication, while `/artists` endpoints remain public (no configuration needed for public routes).
+
+#### Testing Public Routes (No Authentication Required)
+
+With the above configuration, you can still access public routes without authentication:
+
+```bash
+# This works - artists is public
+$ curl https://localhost:8080/artists
+
+# This fails - albums is protected (shows auth requirement)
+$ curl https://localhost:8080/albums
+# Response: {"error": "Unauthorized", "message": "JWT token required"}
+```
 
 ### Getting a JWT Token
 
@@ -185,61 +286,31 @@ When a route has authentication enabled, you'll need to include the JWT token in
 # Example: Access protected albums endpoint
 $ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" https://localhost:8080/albums
 
-# Example: Create a new album on protected route
-$ curl -X POST https://localhost:8080/albums \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -d '{"name": "Recovery", "releaseDate": "21-06-2010"}'
-
-# Example: Access public artists endpoint (no token required)
-$ curl https://localhost:8080/artists
+# Example: Without token - fails with auth error
+$ curl https://localhost:8080/albums
+# Response: {"error": "Unauthorized", "message": "JWT token required"}
 ```
 
 **Note**: Replace `YOUR_JWT_TOKEN` with the actual JWT token received from the login endpoint.
 
-## 🧪 Testing Your API
+### Testing authenticated API endpoints
 
-You can test your API endpoints using curl
-
-### Public Routes (No Authentication)
 ```bash
-# Get all artists (public route)
-$ curl https://localhost:8080/artists
-
-# Get all albums (this will fail - albums is protected)
-$ curl https://localhost:8080/albums
-
-# Create a new artist (public route)
-$ curl -X POST https://localhost:8080/artists \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Drake", "realName": "Aubrey Drake Graham", "dob": "24-10-1986"}'
-```
-
-### Protected Routes (With JWT Authentication)
-```bash
-# First, get a JWT token by logging in
+# Get JWT token first
 $ curl -X POST https://localhost:8080/login \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "password"}'
+# Response: {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
 
-# Use the JWT token to access protected albums
-$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" https://localhost:8080/albums
+# Test authentication behavior - these show the difference
+$ curl https://localhost:8080/albums
+# Fails: {"error": "Unauthorized"}
 
-# Create a new album on protected route
-$ curl -X POST https://localhost:8080/albums \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -d '{"name": "Recovery", "releaseDate": "21-06-2010"}'
-```
+$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" https://localhost:8080/albums  
+# Works: Returns album data
 
-### Health Check Testing
-```bash
-# Test basic health endpoint
-$ curl https://localhost:8080/health
-
-# Test trusted endpoints (HTTPS only)
-$ curl https://localhost:8080/api/trusted
-$ curl https://localhost:8080/api/trusted-data
+# Test protected search (if search route is configured with auth)
+$ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" https://localhost:8080/search?q=term
 ```
 
 ## ⚙️ Configuration
@@ -287,31 +358,16 @@ For more advanced features like authentication and schema validation, you can ex
 
 For a complete configuration example with mixed authentication settings, see [config.json](../../example/config.json).
 
-### Schema Validation
+## 🔮 Roadmap
 
-When schema validation is enabled, JSON Express will validate incoming POST and PATCH requests against your defined schema:
-
-```bash
-# This will succeed (matches schema)
-$ curl -X POST https://localhost:8080/albums \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -d '{"name": "Recovery", "releaseDate": "21-06-2010"}'
-
-# This will fail (missing required field)
-$ curl -X POST https://localhost:8080/albums \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -d '{"name": "Recovery"}'
-```
-
-## 🛑 Stopping the Server
-
-To stop the JSON Express server, use `Ctrl + C` in your terminal.
+- **GraphQL API** - Query your data with GraphQL alongside REST
+- **RPC Support** - Remote procedure calls for advanced API patterns
+- **Google Sign-In** - OAuth authentication with Google accounts
+- **Database Storage** - Persist data in databases alongside file storage
 
 ## 📄 License
 
-[ISC License](LICENSE)
+[MIT License](LICENSE)
 
 ## 🐛 Issues
 
