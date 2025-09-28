@@ -3,5 +3,8 @@
   "private": true,
   "scripts": {
     "publish:core": "pnpm --filter @json-express/core publish"
+  },
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
   }
 }
