@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>JSON Express Example</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <script>
+        const renderUsers = (users) => {
+            const renderUser = (user, tbody) => {
+                const tr = document.createElement('tr')
+
+                const username_td = document.createElement('td')
+                const email_td = document.createElement('td')
+
+                username_td.innerText = user.username
+                email_td.innerText = user.email
+
+                tr.appendChild(username_td)
+                tr.appendChild(email_td)
+
+                tbody.appendChild(tr)
+            }
+
+            const tbody = document.getElementById('users')
+
+            users.forEach(user => renderUser(user, tbody))
+        }
+
+        fetch('http://localhost:3000/users')
+            .then(res => res.json())
+            .then(users => {
+                console.log(users)
+
+                renderUsers(users)
+            })
+    </script>
+</head>
+<body>
+<div class="instructions">
+    <h3>How to run server</h3>
+    <code>cd example/front-end</code>
+    <code>npm run server</code>
+</div>
+
+<div class="users-container">
+    <h2>Users from <span style="color: #000000;">JSON</span><span style="color: #6366F1;">express</span></h2>
+    <table>
+        <tbody id="users">
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

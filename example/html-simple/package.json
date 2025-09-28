@@ -1,0 +1,11 @@
+{
+  "name": "front-end",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "server": "json-express"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
