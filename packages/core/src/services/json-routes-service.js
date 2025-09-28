@@ -1,10 +1,12 @@
 import { readdirSync, readFileSync } from 'fs'
-import { join } from 'path'
+import { extname, join } from 'path'
 import { updateConfigStore } from '../db/config-store.js'
 import defaultData from '../db/data/default-data.json' with { type: 'json' }
 
 const dirname = join(process.cwd())
-const files = readdirSync(dirname)
+const files = readdirSync(dirname, { withFileTypes: true })
+    .filter(dirent => dirent.isFile() && extname(dirent.name).toLowerCase() === '.json')
+    .map(dirent => dirent.name)
 
 let jsonFiles = {}
 
@@ -59,9 +61,7 @@ const prepareDefaultJson = async () => {
 const prepare = async () => {
     for (const filename of files) {
         if (!filename.includes('.json') || filename.includes('package') || filename.includes('-lock')) {
-            await prepareDefaultJson()
-
-            return
+            continue
         }
 
         const filePath = join(dirname, filename)
@@ -81,8 +81,10 @@ if (!Object.keys(jsonFiles).length) {
     process.exit(1)
 }
 
-const { config = {}, ...jsonRoutes } = jsonFiles
+let { config = {}, ...jsonRoutes } = jsonFiles
 
 updateConfigStore(config)
+
+if (!Object.keys(jsonRoutes).length) jsonRoutes = await prepareDefaultJson()
 
 export default jsonRoutes
