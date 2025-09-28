@@ -1,0 +1,10 @@
+{
+  "name": "@json-express/example-json-config",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "json-express"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

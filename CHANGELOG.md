@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `html-simple` example added
 - `json-simple` example added
+- `json-config` example added
 
 ## Fixed
 - Directory reading improved
@@ -24,9 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - ReadMe updated
-    - Logo added
-    - Organized topics
-    - Examples updated
+  - Logo added
+  - Organized topics
+  - Examples updated
 
 ## [0.2.1] - 2025-07-18
 

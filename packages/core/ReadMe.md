@@ -356,7 +356,7 @@ For more advanced features like authentication and schema validation, you can ex
 | **auth** | boolean | false    | Enable authentication for specific routes                |
 | **schema.validation** | string | optional | Enable strict schema validation ("strict" or "optional") |
 
-For a complete configuration example with mixed authentication settings, see [config.json](../../example/config.json).
+For a complete configuration example with mixed authentication settings, see [config.json](../../example/json-config/config.json).
 
 ## 🔮 Roadmap
 
