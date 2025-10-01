@@ -1,6 +1,6 @@
 {
   "name": "@json-express/core",
-  "version": "0.2.3-alpha",
+  "version": "0.2.3",
   "description": "Convert JSON to express server",
   "scripts": {
     "dev": "nodemon bin/exec.js",
