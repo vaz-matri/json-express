@@ -24,7 +24,7 @@
     "name": "vazmat",
     "url": "https://github.com/vaz-matri"
   },
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
   "preferGlobal": true,
   "engines": {
