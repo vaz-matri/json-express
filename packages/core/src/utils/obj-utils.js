@@ -1,18 +1,7 @@
 function hasRef(obj) {
-    return obj && typeof obj === 'object' && 'ref' in obj && 'id' in obj
+    return obj && typeof obj === 'object' && 'ref' in obj
+        // && 'id' in obj // id optional
 }
-
-// export function getRefs(obj) {
-//     const details = {}
-//
-//     for (const [key, value] of Object.entries(obj)) {
-//         if (hasRef(value)) {
-//             details[key] = { ref: value.ref, id: value.id }
-//         }
-//     }
-//
-//     return details
-// }
 
 export function getRefs(obj) {
     const details = {}
@@ -29,7 +18,3 @@ export function getRefs(obj) {
 
     return details
 }
-
-// const details = getRefIdFieldDetails(album)
-// console.log(details)
-// { artist: { ref: 'artists', id: 'artist-001' } }

@@ -2,6 +2,9 @@
   {
     "id": "artist-001",
     "name": "Eminem",
-    "dob": "17-10-1972"
+    "dob": "17-10-1972",
+    "albums": {
+      "ref": "albums"
+    }
   }
 ]

@@ -12,21 +12,24 @@ export const getAllItems = (key) => {
         refFields.forEach(refField => {
 
             const refObjArr = []
-            refs[refField].forEach(({ id: refId, ref }) => {
-                // const { id: refId, ref } = refs[refField]
-
+            refs[refField].forEach(({ id: refId, ref }) => { // refId can be null
                 const refItems = store[ref]
 
-                const refObj = refItems.find(item => item.id === refId)
-                refObjArr.push(refObj)
+                if (refId) {
+                    const refObj = refItems.find(item => item.id === refId)
+                    refObjArr.push(refObj)
+                } else {
+                    const relevantItems = refItems.filter(refItem => {
+                        const backRefs = getRefs(refItem)
+                        return Object.values(backRefs).some(refArr =>
+                            refArr.some(({ id: backRefId, ref: backRef }) =>
+                                backRef === key && backRefId === item.id
+                            )
+                        )
+                    })
+                    refObjArr.push(...relevantItems)
+                }
             })
-            // console.log('log refs', refs[refField])
-            // const refs
-            //     const { id: refId, ref } = refs[refField]
-            //
-            //     const refItems = store[ref]
-            //
-            // item[refField] = refItems.find(item => item.id === refId)
             item[refField] = refObjArr
         })
 
