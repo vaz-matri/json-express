@@ -12,7 +12,7 @@ let jsonFiles = {}
 
 const prepareDefaultJson = async () => {
     try {
-        const fakerModule = await import('@faker-js/faker')
+        const fakerModule = await import('@faker-js/faker') //:TODO make it peer dependency
 
         const { faker } = fakerModule
 

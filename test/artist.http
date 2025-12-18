@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:8080/artists
+@baseUrl = http://localhost:3000/artists
 @contentType = application/json
 
 # make sure there is no empty space

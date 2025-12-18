@@ -1,0 +1,7 @@
+{
+  "name": "@json-express/example-json-simple",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "json-express"
+  }
+}

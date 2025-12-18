@@ -1,8 +1,39 @@
 import AppError from '../utils/app-error.js'
 import store from '../db/in-memory.js'
+import { getRefs } from '../utils/obj-utils.js'
 
 export const getAllItems = (key) => {
-    return store[key]
+    const items = store[key]
+
+    items.map(item => {
+        const refs = getRefs(item)
+
+        const refFields = Object.keys(refs)
+        refFields.forEach(refField => {
+
+            const refObjArr = []
+            refs[refField].forEach(({ id: refId, ref }) => {
+                // const { id: refId, ref } = refs[refField]
+
+                const refItems = store[ref]
+
+                const refObj = refItems.find(item => item.id === refId)
+                refObjArr.push(refObj)
+            })
+            // console.log('log refs', refs[refField])
+            // const refs
+            //     const { id: refId, ref } = refs[refField]
+            //
+            //     const refItems = store[ref]
+            //
+            // item[refField] = refItems.find(item => item.id === refId)
+            item[refField] = refObjArr
+        })
+
+        return item
+    })
+
+    return items
 }
 
 export const getItemById = (key, id) => {

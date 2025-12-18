@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Encore",
+    "releaseDate": "12-11-2004",
+    "artist": [
+      {
+        "ref": "artists",
+        "id": "artist-001"
+      }
+    ]
+  }
+]
