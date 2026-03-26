@@ -8,7 +8,9 @@
     "serve": "cd ../../example && json-express",
     "link": "pnpm link --global",
     "unlink": "pnpm rm --global @json-express/core",
-    "check": "pnpm list --global --depth=0"
+    "check": "pnpm list --global --depth=0",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "json",
@@ -49,7 +51,9 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.9.0",
-    "nodemon": "3.1.10"
+    "nodemon": "3.1.10",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.2"
   },
   "repository": {
     "type": "git",
