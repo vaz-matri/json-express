@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "nodemon bin/exec.js",
     "dev:eg": "nodemon --exec 'cd ../../example/json-adv && json-express'",
-    "serve": "cd ../../example && json-express"
+    "serve": "cd ../../example && json-express",
+    "link": "pnpm link --global",
+    "unlink": "pnpm rm --global @json-express/core",
+    "check": "pnpm list --global --depth=0"
   },
   "keywords": [
     "json",
