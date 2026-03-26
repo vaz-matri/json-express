@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import passport from 'passport'
 import get from 'lodash.get'
-import { addItem, deleteItem, getAllItems, getItemById, searchItems, updateItem } from '../services/storage-service.js'
+import * as defaultAdapter from '../services/storage-service.js'
+import { getActiveDataAdapter } from '../plugin-manager/index.js'
+
 import { validateCreateReq, validateSearchReq, validateUpdateReq } from '../services/validation-service.js'
 import { getConfig } from '../db/config-store.js'
 
@@ -37,7 +39,8 @@ const createRoute = (key, config = {}) => {
     const router = Router()
 
     router.get('/', getAuthenticateJWT(key), async (req, res) => {
-        const items = getAllItems(key)
+        const adapter = getActiveDataAdapter()?.adapter || defaultAdapter;
+        const items = await adapter.getAllItems(key)
 
         res.json(items)
     })
@@ -45,7 +48,8 @@ const createRoute = (key, config = {}) => {
     router.get('/:id', getAuthenticateJWT(key), async (req, res) => {
         const id = req.params.id
 
-        const item = getItemById(key, id)
+        const adapter = getActiveDataAdapter()?.adapter || defaultAdapter;
+        const item = await adapter.getItemById(key, id)
 
         res.json(item)
     })
@@ -58,11 +62,12 @@ const createRoute = (key, config = {}) => {
         }
 
         try {
-            const items = searchItems(key, searchReq)
+            const adapter = getActiveDataAdapter()?.adapter || defaultAdapter;
+            const items = await adapter.searchItems(key, searchReq)
 
             res.json(items)
         } catch (appError) {
-            res.status(appError.statusCode).send({ message: appError.message })
+            res.status(appError.statusCode || 500).send({ message: appError.message })
         }
     })
 
@@ -74,11 +79,12 @@ const createRoute = (key, config = {}) => {
         }
 
         try {
-            const item = addItem(key, createReq)
+            const adapter = getActiveDataAdapter()?.adapter || defaultAdapter;
+            const item = await adapter.addItem(key, createReq)
 
             res.status(201).json(item)
         } catch (appError) {
-            res.status(appError.statusCode).send({ message: appError.message })
+            res.status(appError.statusCode || 500).send({ message: appError.message })
         }
     })
 
@@ -91,11 +97,12 @@ const createRoute = (key, config = {}) => {
         }
 
         try {
-            const item = updateItem(key, id, updateReq)
+            const adapter = getActiveDataAdapter()?.adapter || defaultAdapter;
+            const item = await adapter.updateItem(key, id, updateReq)
 
             res.json(item)
         } catch (appError) {
-            res.status(appError.statusCode).send({ message: appError.message })
+            res.status(appError.statusCode || 500).send({ message: appError.message })
         }
     })
 
@@ -103,11 +110,12 @@ const createRoute = (key, config = {}) => {
         const { id } = req.params
 
         try {
-            const item = deleteItem(key, id)
+            const adapter = getActiveDataAdapter()?.adapter || defaultAdapter;
+            const item = await adapter.deleteItem(key, id)
             res.json(item)
 
         } catch (appError) {
-            res.status(appError.statusCode).send({ message: appError.message })
+            res.status(appError.statusCode || 500).send({ message: appError.message })
         }
     })
 

@@ -15,3 +15,7 @@ export const getConfig = (key) => {
 export const upsertConfig = (key, config) => {
     configStore[key] = config
 }
+
+export const getAllConfig = () => {
+    return configStore
+}

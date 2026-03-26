@@ -6,8 +6,13 @@ import serverRoute from './routes/server-route.js'
 import { preparePortNumber } from './services/port-service.js'
 import createServer from './server/index.js'
 import setupAuth from './auth/index.js'
+import { initPlugins, validatePluginConfigs } from './plugin-manager/index.js'
+import { getAllConfig } from './db/config-store.js'
 
 const startServer = async () => {
+    await initPlugins()
+    validatePluginConfigs(getAllConfig())
+
     const app = express()
 
     await preparePortNumber()

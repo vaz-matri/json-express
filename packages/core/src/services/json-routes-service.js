@@ -11,52 +11,9 @@ const files = readdirSync(dirname, { withFileTypes: true })
 let jsonFiles = {}
 
 const prepareDefaultJson = async () => {
-    try {
-        const fakerModule = await import('@faker-js/faker') //:TODO make it peer dependency
-
-        const { faker } = fakerModule
-
-        function createRandomUser() {
-            return {
-                userId: faker.string.uuid(),
-                username: faker.internet.username(),
-                email: faker.internet.email(),
-                avatar: faker.image.avatar(),
-                password: faker.internet.password(),
-                birthdate: faker.date.birthdate(),
-                registeredAt: faker.date.past(),
-            }
-        }
-
-        function createMusic() {
-            return {
-                album: faker.music.album(),
-                artist: faker.music.artist(),
-                genre: faker.music.genre(),
-                songName: faker.music.songName(),
-            }
-        }
-
-        function createBook() {
-            return {
-                title: faker.book.title(),
-                author: faker.book.author(),
-                genre: faker.book.genre(),
-                series: faker.book.series(),
-                publisher: faker.book.publisher(),
-                format: faker.book.format(),
-                isbn: faker.commerce.isbn()
-            }
-        }
-
-        jsonFiles.users = faker.helpers.multiple(createRandomUser, { count: 10 })
-        jsonFiles.music = faker.helpers.multiple(createMusic, { count: 100 })
-        jsonFiles.book = faker.helpers.multiple(createBook, { count: 100 })
-
-    } catch (error) {
-        jsonFiles = defaultData
-    }
+    jsonFiles = defaultData
 }
+
 
 const prepare = async () => {
     for (const filename of files) {
@@ -85,6 +42,10 @@ let { config = {}, ...jsonRoutes } = jsonFiles
 
 updateConfigStore(config)
 
-if (!Object.keys(jsonRoutes).length) jsonRoutes = await prepareDefaultJson()
+if (!Object.keys(jsonRoutes).length) {
+    await prepareDefaultJson();
+    // DefaultData has a nested default payload usually, merging it safely
+    jsonRoutes = jsonFiles;
+}
 
 export default jsonRoutes
