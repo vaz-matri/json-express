@@ -9,4 +9,7 @@ plan.txt
 
 # files
 .DS_Store
-CONTEXT.md
+
+# context-builder
+context*
+llm-context*

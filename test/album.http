@@ -1,6 +1,0 @@
-@baseUrl = http://localhost:3000/albums
-@contentType = application/json
-
-### Get all albums
-GET {{baseUrl}}/ HTTP/1.1
-Accept: {{contentType}}
