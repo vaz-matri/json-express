@@ -2,9 +2,16 @@
   "name": "json-express",
   "private": true,
   "scripts": {
-    "publish:core": "pnpm --filter @json-express/core publish"
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r --parallel run dev",
+    "test": "vitest run",
+    "publish:all": "pnpm -r publish --access public"
   },
   "devDependencies": {
-    "@json-express/core": "workspace:^"
+    "@json-express/core": "workspace:^",
+    "@types/node": "^25.5.0",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
   }
 }
