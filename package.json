@@ -10,7 +10,7 @@
   "devDependencies": {
     "@json-express/core": "workspace:^",
     "@types/node": "^25.5.0",
-    "tsup": "^8.5.1",
+    "tsdown": "^0.21.7",
     "typescript": "^6.0.2",
     "vitest": "^4.1.2"
   }

@@ -1,0 +1,12 @@
+content/
+example/
+logo
+LICENSE
+*.md
+
+TODO
+- how about core/src/index.ts file
+- fix pnpm i, pnpm -r run build
+- update philosophy and progress document
+- replace tests
+- fix all ide errors

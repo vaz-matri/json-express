@@ -1,0 +1,19 @@
+{
+  "name": "@json-express/cli",
+  "version": "2.0.0-alpha.0",
+  "description": "The command line interface for JSON Express",
+  "type": "module",
+  "bin": {
+    "json-express": "./bin/exec.js"
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {
+    "@json-express/core": "workspace:*",
+    "@json-express/adapter-memory": "workspace:*",
+    "@json-express/api-rest": "workspace:*",
+    "@json-express/transport-express": "workspace:*"
+  }
+}
