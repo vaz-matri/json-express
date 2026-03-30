@@ -5,22 +5,25 @@
 </picture>
 
 Skip the backend bottleneck and go from prototype to MVP launch faster.
-**JSON Express v2.0** has evolved into a highly modular, pluggable Meta-Framework. It instantly converts your JSON files into a complete server, providing the practical infrastructure you need until your dedicated backend is ready.
+**JSON Express v2.0** is a highly modular, pluggable Meta-Framework. It instantly converts your JSON files into a complete server, providing the practical infrastructure you need until your dedicated backend is ready.
 
-visit [jsonexpress.com](https://jsonexpress.com)
+visit[jsonexpress.com](https://jsonexpress.com)
 
 ## ✨ Features
-
-- **Zero-Config REST API** - Instantly generates GET, POST, PATCH, and DELETE operations.
+- **Zero-Config REST API** - Instantly generates GET, POST, PATCH, and DELETE operations based on your files.
 - **Relational Data** - Automatically resolves linked data across collections using `id` and `ref`.
-- **Agnostic Microkernel** - Pluggable architecture! Swap out the Database, Server (Transport), or API Paradigm without rewriting your logic.
-- **TypeScript First** - Built with strict contracts to ensure enterprise-grade stability.
+- **Agnostic Microkernel** - Pluggable architecture! Swap out the Database, Server (Transport), or API Paradigm without rewriting your business logic.
+- **Auto-Discovery** - Install a plugin and the CLI automatically detects and wires it up. No boilerplate needed.
+- **Twelve-Factor Configuration** - Cascading environment variables and smart configurations built for enterprise.
 
-🔮[See what's coming next in our Roadmap](#-roadmap) (Including Auth, Validation, and GraphQL!)
+---
 
-## 🚀 Quick Start
+## 🚀 Installation & Quick Start
 
-Get up and running in seconds without installing anything globally:
+You can run JSON Express globally for instant prototyping, or install it locally to customize your stack.
+
+### Option A: The Global Quick-Start (Zero Config)
+Get up and running in seconds without installing anything in your project.
 
 ```bash
 # 1. Create a directory for your data
@@ -33,86 +36,77 @@ $ echo '[{"id": "1", "name": "The Marshall Mathers LP", "artist": "Eminem"}]' > 
 $ npx @json-express/cli
 ```
 
-That's it! Your `albums.json` file is now served as a fully functional REST API.
-
-### Project-Specific Installation
-
-If you want to install JSON Express directly in your project for better dependency management:
+### Option B: Local Installation (For Customization)
+If you want to override default plugins, manage dependencies, or use advanced configurations:
 
 ```bash
-# Install the CLI in your project
+# Install the CLI as a dev dependency
 $ npm install @json-express/cli -D
 
 # Add a script to your package.json
-# "scripts": { "serve": "json-express" }
+# "scripts": { "dev": "json-express" }
 
 # Start the server
-$ npm run serve
+$ npm run dev
 ```
 
-## 📚 API Endpoints
+---
 
-Based on your JSON file names (e.g., `albums.json`), JSON Express automatically creates standardized RESTful endpoints:
+## 🧠 How It Works Behind the Scenes
 
-```
-GET    /albums         # Get all albums (Supports query params for filtering)
-GET    /albums/:id     # Get album by ID
-POST   /albums         # Create a new album (auto-generates ID)
-PATCH  /albums/:id     # Partially update album by ID
-DELETE /albums/:id     # Delete album by ID
-```
+JSON Express v2 is built on a "Headless Microkernel" architecture. The `@json-express/core` package contains **zero** HTTP or database logic. It acts purely as an orchestrator using an Inversion of Control (IoC) container.
 
-### Testing API endpoints
+When you start the CLI, the Kernel boots in phases:
+1. **Configuration:** Loads environment variables and config files.
+2. **Auto-Discovery:** Scans your `package.json` to see which plugins you have installed.
+3. **Registration:** Binds the Database, API Generator, and Server Transport layers together.
+4. **Boot:** The Database parses your data, the API Generator builds the routes, and the Transport server starts listening!
 
-You can test your API endpoints using `curl` or tools like Postman:
+### The Default Stack ("Batteries Included")
+If you run the CLI without installing any custom plugins, it automatically falls back to its highly-capable default stack:
+- **Server:** [`@json-express/transport-express`](./packages/transport-express)
+- **API:** [`@json-express/api-rest`](./packages/api-rest)
+- **Database:** [`@json-express/adapter-memory`](./packages/adapter-memory)
+- **Config:** [`@json-express/config-env`](./packages/config-env)
 
+### 🔄 How to Override Defaults
+To change the framework's behavior, **you just install the plugin you want.** The CLI's Auto-Discovery engine handles the rest!
+
+*Example: Swapping Express for Fastify*
 ```bash
-# Get all albums
-$ curl http://localhost:3000/albums
-
-# Search/Filter albums (e.g., ?artist=Eminem)
-$ curl http://localhost:3000/albums?artist=Eminem
-
-# Create a new album
-$ curl -X POST http://localhost:3000/albums \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Recovery", "artist": "Eminem"}'
-
-# Update an album
-$ curl -X PATCH http://localhost:3000/albums/1 \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Recovery (Deluxe Edition)"}'
-
-# Delete an album
-$ curl -X DELETE http://localhost:3000/albums/1
+# Install the fastify transport plugin
+npm install @json-express/transport-fastify
 ```
+The next time you run `npx json-express`, the CLI detects Fastify, silently unloads the default Express plugin, and boots your server using Fastify. No code changes required!
 
-## ⚙️ Configuration
+*(If you install two conflicting plugins, the interactive CLI will pause and ask you which one you prefer!)*
 
-JSON Express favors convention over configuration. To customize the server, simply create a `config.json` file in the same directory as your JSON data files.
+---
 
-```json
-{
-  "port": 8080
-}
-```
-*(More configuration options for plugins will be available as the v2.0 ecosystem expands!)*
+## 🧩 The Ecosystem (Mix & Match)
 
-## 🔮 Roadmap (Upcoming v2 Features)
+### 🛠️ Core & Tooling
+* **[`@json-express/core`](./packages/core)** - The headless Microkernel and IoC container.
+* **[`@json-express/cli`](./packages/cli)** - The command-line runner and auto-discovery engine.
 
-We are currently porting advanced features from v1 to our new v2.0 plugin architecture. Expect these soon:
+### 🌐 Transports (Server Layer)
+* **[`@json-express/transport-express`](./packages/transport-express)** *(Default)* - Express.js server.
+* *(Upcoming)* `@json-express/transport-fastify` - High-performance Fastify server.
+* *(Upcoming)* `@json-express/transport-h3` - Lightweight, edge-ready h3 server.
 
-- **Middleware Layer** - Hook into the request lifecycle for Auth, Validation, and Logging.
-- **Authentication Plugin** - JWT and session-based auth to secure specific routes.
-- **Schema Validation Plugin** - Validate incoming data with custom schemas (Joi/Zod).
-- **GraphQL API Generator** - Query your data with GraphQL alongside (or instead of) REST.
-- **Fastify & h3 Transports** - Swap out Express for faster, modern server engines.
-- **Database Adapters** - Persist data in MongoDB or PostgreSQL instead of memory.
-- **HTTPS Setup** - Automatic local SSL certificate generation.
-- **Global Search & Health API** - Built-in `/search` and `/health` endpoints.
+### 🔌 API Paradigms
+* **[`@json-express/api-rest`](./packages/api-rest)** *(Default)* - Standardized RESTful routes (`GET`, `POST`, `PATCH`, `DELETE`).
+* *(Upcoming)* `@json-express/api-graphql` - Generates a GraphQL schema and resolvers.
 
-## 📄 License[MIT License](LICENSE)
+### 🗄️ Adapters (Database Layer)
+* **[`@json-express/adapter-memory`](./packages/adapter-memory)** *(Default)* - Fast, in-memory local JSON file storage.
+* *(Upcoming)* `@json-express/adapter-mongodb` - Persists your data to MongoDB.
 
-## 🐛 Issues
+### ⚙️ Configuration Providers
+* **[`@json-express/config-env`](./packages/config-env)** *(Default)* - Lightweight parser for cascading `.env` files.
+* **[`@json-express/config`](./packages/config)** - Advanced parser for YAML, deep JSON, and functional JS/TS files.
 
-Found a bug or have a feature request? Please[open an issue](https://github.com/vaz-matri/json-express/issues).
+---
+
+## 📄 License
+[MIT License](LICENSE)
