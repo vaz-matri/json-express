@@ -10,3 +10,6 @@ TODO
 - update philosophy and progress document
 - replace tests
 - fix all ide errors
+
+Ready to move on to Phase 5: The Middleware Pipeline
+This is where we add the ability to intercept these requests (which we will immediately use to build the Authentication and Schema Validation plugins).

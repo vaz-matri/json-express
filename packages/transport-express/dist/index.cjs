@@ -27,13 +27,16 @@ express = __toESM(express);
 var ExpressTransport = class {
 	app;
 	server = null;
-	constructor() {
+	config;
+	constructor({ configProvider } = {}) {
 		this.app = (0, express.default)();
+		this.config = configProvider;
 		this.app.use(express.default.json());
+		if (this.config?.get("transport.express.logger", false)) this.app.use((req, res, next) => {
+			console.log(`[Express] ${req.method} ${req.originalUrl}`);
+			next();
+		});
 	}
-	/**
-	* Translates a generic RouteDefinition into an Express route
-	*/
 	registerRoute(route) {
 		const method = route.method.toLowerCase();
 		this.app[method](route.path, async (req, res) => {
@@ -55,9 +58,6 @@ var ExpressTransport = class {
 			}
 		});
 	}
-	/**
-	* Starts the Express server
-	*/
 	start(port) {
 		return new Promise((resolve) => {
 			this.server = this.app.listen(port, () => {
@@ -66,9 +66,6 @@ var ExpressTransport = class {
 			});
 		});
 	}
-	/**
-	* Stops the Express server safely
-	*/
 	stop() {
 		return new Promise((resolve, reject) => {
 			if (this.server) this.server.close((err) => {

@@ -98,12 +98,15 @@ const startServer = async () => {
 	}
 	const kernel = new _json_express_core.JsonExpressKernel();
 	kernel.registerConfigProvider(configProvider);
-	const db = await loadPluginInstance(activeAdapter);
+	const db = await loadPluginInstance(activeAdapter, [{ configProvider }]);
 	if (typeof db.loadData === "function") db.loadData(initialData);
 	kernel.registerDatabase(db);
-	const api = await loadPluginInstance(activeApi, [{ database: db }]);
+	const api = await loadPluginInstance(activeApi, [{
+		database: db,
+		configProvider
+	}]);
 	kernel.registerApiGenerator(api);
-	const transport = await loadPluginInstance(activeTransport);
+	const transport = await loadPluginInstance(activeTransport, [{ configProvider }]);
 	kernel.registerTransport(transport);
 	const port = configProvider.get("port", 3e3);
 	await kernel.boot(collections, port);

@@ -1,8 +1,14 @@
-import { IDatabaseAdapter } from "@json-express/core";
+import { IConfigProvider, IDatabaseAdapter } from "@json-express/core";
 
 //#region src/index.d.ts
 declare class MemoryDatabaseAdapter implements IDatabaseAdapter {
   private store;
+  private config?;
+  constructor({
+    configProvider
+  }?: {
+    configProvider?: IConfigProvider;
+  });
   /**
    * Helper method to load the initial JSON data into memory
    */

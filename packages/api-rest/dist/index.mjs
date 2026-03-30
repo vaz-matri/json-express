@@ -1,30 +1,18 @@
 //#region src/index.ts
 var RestApiGenerator = class {
 	db;
-	/**
-	* Awilix will automatically inject the active database adapter here.
-	* It could be Mongo, Postgres, or the local Memory adapter — this class
-	* doesn't need to know, as long as IDatabaseAdapter is fulfilled.
-	*/
-	constructor({ database }) {
+	config;
+	constructor({ database, configProvider }) {
 		this.db = database;
+		this.config = configProvider;
 	}
-	/**
-	* Iterates over all discovered collections and generates standard
-	* RESTful RouteDefinitions (GET, POST, PATCH, DELETE) for each.
-	*
-	* For a collection named "albums", this produces:
-	*   GET    /albums          → db.getAll / db.search (if query params present)
-	*   GET    /albums/:id      → db.getById
-	*   POST   /albums          → db.create
-	*   PATCH  /albums/:id      → db.update
-	*   DELETE /albums/:id      → db.delete
-	*/
 	generate(collections) {
 		const routes = [];
+		const rawPrefix = this.config?.get("api.rest.prefix", "") ?? "";
+		const prefix = rawPrefix.endsWith("/") ? rawPrefix.slice(0, -1) : rawPrefix;
 		for (const collection of collections) {
-			const basePath = `/${collection}`;
-			const itemPath = `/${collection}/:id`;
+			const basePath = `${prefix}/${collection}`;
+			const itemPath = `${prefix}/${collection}/:id`;
 			routes.push({
 				method: "GET",
 				path: basePath,

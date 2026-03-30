@@ -118,18 +118,20 @@ export const startServer = async () => {
     kernel.registerConfigProvider(configProvider);
 
     // 5. Instantiate, Configure & Register Plugins
-    const db = await loadPluginInstance(activeAdapter);
+    // ✅ Pass configProvider to the Adapter
+    const db = await loadPluginInstance(activeAdapter, [{ configProvider }]);
 
-    // Only local JSON memory adapters need explicit data loading
     if (typeof db.loadData === 'function') {
         db.loadData(initialData);
     }
     kernel.registerDatabase(db);
 
-    const api = await loadPluginInstance(activeApi, [{ database: db }]);
+    // ✅ Pass database AND configProvider to the API Generator
+    const api = await loadPluginInstance(activeApi, [{ database: db, configProvider }]);
     kernel.registerApiGenerator(api);
 
-    const transport = await loadPluginInstance(activeTransport);
+    // ✅ Pass configProvider to the Transport Server
+    const transport = await loadPluginInstance(activeTransport,[{ configProvider }]);
     kernel.registerTransport(transport);
 
     // 6. Boot the system!

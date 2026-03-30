@@ -1,8 +1,13 @@
-import type { IDatabaseAdapter } from '@json-express/core';
+import type { IDatabaseAdapter, IConfigProvider } from '@json-express/core';
 
 export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     // Our in-memory store representing the parsed JSON files
     private store: Record<string, any[]> = {};
+    private config?: IConfigProvider;
+
+    constructor({ configProvider }: { configProvider?: IConfigProvider } = {}) {
+        this.config = configProvider;
+    }
 
     /**
      * Helper method to load the initial JSON data into memory

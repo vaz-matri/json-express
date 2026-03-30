@@ -1,6 +1,10 @@
 //#region src/index.ts
 var MemoryDatabaseAdapter = class {
 	store = {};
+	config;
+	constructor({ configProvider } = {}) {
+		this.config = configProvider;
+	}
 	/**
 	* Helper method to load the initial JSON data into memory
 	*/
