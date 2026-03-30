@@ -11,9 +11,14 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "@json-express/core": "workspace:*",
     "@json-express/adapter-memory": "workspace:*",
     "@json-express/api-rest": "workspace:*",
-    "@json-express/transport-express": "workspace:*"
+    "@json-express/config-env": "workspace:*",
+    "@json-express/core": "workspace:*",
+    "@json-express/transport-express": "workspace:*",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.4.9"
   }
 }

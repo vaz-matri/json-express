@@ -1,8 +1,10 @@
-import { readdirSync, readFileSync } from 'fs';
+import { readdirSync, readFileSync, existsSync, appendFileSync } from 'fs';
 import { extname, join } from 'path';
+import prompts from 'prompts';
 import { JsonExpressKernel } from '@json-express/core';
+import { EnvConfigProvider } from '@json-express/config-env';
 
-// Import our default official plugins
+// Fallback "Batteries-Included" Defaults
 import { MemoryDatabaseAdapter } from '@json-express/adapter-memory';
 import { RestApiGenerator } from '@json-express/api-rest';
 import { ExpressTransport } from '@json-express/transport-express';
@@ -10,29 +12,96 @@ import { ExpressTransport } from '@json-express/transport-express';
 export const startServer = async () => {
     const cwd = process.cwd();
 
-    // 1. Scan for JSON files
+    // 1. Initialize Configuration Phase
+    const configProvider = new EnvConfigProvider(cwd);
+
+    // 2. Auto-Discovery Engine (Strict Execution Boundary: Local package.json)
+    const pkgPath = join(cwd, 'package.json');
+    let installedDeps: string[] =[];
+
+    if (existsSync(pkgPath)) {
+        const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+        installedDeps = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies })
+            .filter(dep => dep.startsWith('@json-express/') || dep.includes('json-express-'));
+    }
+
+    const availableTransports = installedDeps.filter(d => d.includes('transport-'));
+    const availableAdapters = installedDeps.filter(d => d.includes('adapter-'));
+    const availableApis = installedDeps.filter(d => d.includes('api-'));
+
+    // --- Interactive Conflict Resolution Helper ---
+    const resolvePlugin = async (category: string, available: string[], defaultPlugin: string) => {
+        // 1. Check if user already explicitly defined a preference in .env
+        const userPreference = configProvider.get<string>(category);
+        if (userPreference && available.includes(userPreference)) return userPreference;
+
+        // 2. If exactly one custom plugin is installed, silently override the default!
+        if (available.length === 1) return available[0];
+
+        // 3. If multiple plugins exist, pause and prompt the user (Fail Fast safely)
+        if (available.length > 1) {
+            console.log(`\n⚠️  Conflict Detected: Multiple ${category} layers found!`);
+            const response = await prompts({
+                type: 'select',
+                name: 'choice',
+                message: `Which plugin would you like to use for the ${category} layer?`,
+                choices: available.map(a => ({ title: a, value: a }))
+            });
+
+            const choice = response.choice;
+
+            // Auto-write the preference to their .env file so it doesn't prompt them again
+            appendFileSync(join(cwd, '.env'), `\nJEX_${category.toUpperCase()}=${choice}\n`);
+            console.log(`✅ Saved preference to .env\n`);
+
+            return choice;
+        }
+
+        // 4. Fallback to bundled defaults
+        return defaultPlugin;
+    };
+
+    const activeAdapter = await resolvePlugin('adapter', availableAdapters, '@json-express/adapter-memory');
+    const activeApi = await resolvePlugin('api', availableApis, '@json-express/api-rest');
+    const activeTransport = await resolvePlugin('transport', availableTransports, '@json-express/transport-express');
+
+    // --- Dynamic Import Helper ---
+    const loadPluginInstance = async (pluginName: string, constructorArgs: any[] =[]) => {
+        // Use static imports for defaults to ensure fast booting when not overridden
+        if (pluginName === '@json-express/adapter-memory') return new MemoryDatabaseAdapter(...constructorArgs);
+        if (pluginName === '@json-express/api-rest') return new RestApiGenerator(constructorArgs[0]);
+        if (pluginName === '@json-express/transport-express') return new ExpressTransport(...constructorArgs);
+
+        // Dynamically import custom plugins (Ensures local node_modules precedence)
+        let mod;
+        try {
+            const localPath = join(cwd, 'node_modules', pluginName);
+            mod = await import(localPath);
+        } catch (e) {
+            // Fallback to standard resolution
+            mod = await import(pluginName);
+        }
+
+        // Pluck the exported Class and instantiate it
+        const PluginClass = Object.values(mod)[0] as any;
+        return new PluginClass(...constructorArgs);
+    };
+
+    // 3. Scan for JSON Data files (excluding configs)
     const files = readdirSync(cwd, { withFileTypes: true })
-        .filter(dirent => dirent.isFile() && extname(dirent.name).toLowerCase() === '.json')
+        .filter(dirent =>
+            dirent.isFile() &&
+            extname(dirent.name).toLowerCase() === '.json' &&
+            !dirent.name.includes('config') &&
+            !dirent.name.includes('package') &&
+            !dirent.name.includes('tsconfig')
+        )
         .map(dirent => dirent.name);
 
     const initialData: Record<string, any[]> = {};
-    let config = { port: 3000 }; // Default config
-
-    // 2. Parse the files
     for (const filename of files) {
-        if (filename === 'package.json' || filename === 'package-lock.json' || filename === 'tsconfig.json') {
-            continue;
-        }
-
-        const filePath = join(cwd, filename);
-        const fileContent = readFileSync(filePath, 'utf8');
+        const fileContent = readFileSync(join(cwd, filename), 'utf8');
         const parsed = JSON.parse(fileContent);
-
-        if (filename === 'config.json') {
-            config = { ...config, ...parsed };
-            continue;
-        }
-
         const collectionName = filename.replace('.json', '');
         initialData[collectionName] = Array.isArray(parsed) ? parsed : [parsed];
     }
@@ -40,30 +109,31 @@ export const startServer = async () => {
     const collections = Object.keys(initialData);
 
     if (collections.length === 0) {
-        console.warn('⚠️ No valid JSON data files found to serve.');
+        console.warn('⚠️  No valid JSON data files found to serve.');
         process.exit(1);
     }
 
-    // 3. Initialize the Kernel
+    // 4. Initialize the Kernel
     const kernel = new JsonExpressKernel();
+    kernel.registerConfigProvider(configProvider);
 
-    // 4. Instantiate & Configure Default Plugins
-    const memoryDb = new MemoryDatabaseAdapter();
-    memoryDb.loadData(initialData); // Load our parsed JSON into the DB
+    // 5. Instantiate, Configure & Register Plugins
+    const db = await loadPluginInstance(activeAdapter);
 
-    const restApi = new RestApiGenerator({ database: memoryDb });
-    const expressTransport = new ExpressTransport();
+    // Only local JSON memory adapters need explicit data loading
+    if (typeof db.loadData === 'function') {
+        db.loadData(initialData);
+    }
+    kernel.registerDatabase(db);
 
-    // 5. Register Plugins to the Kernel
-    kernel.registerDatabase(memoryDb);
-    kernel.registerApiGenerator(restApi);
-    kernel.registerTransport(expressTransport);
+    const api = await loadPluginInstance(activeApi, [{ database: db }]);
+    kernel.registerApiGenerator(api);
+
+    const transport = await loadPluginInstance(activeTransport);
+    kernel.registerTransport(transport);
 
     // 6. Boot the system!
-    await kernel.boot(collections, config.port);
+    // We now read the port directly from the Environment Config Provider
+    const port = configProvider.get<number>('port', 3000);
+    await kernel.boot(collections, port);
 };
-
-// // If run directly (not imported)
-// if (import.meta.url === `file://${process.argv[1]}`) {
-//     startServer().catch(console.error);
-// }
