@@ -61,15 +61,41 @@ interface IMiddleware {
   name: string;
   handle(req: JsonRequest, next: () => Promise<JsonResponse>): Promise<JsonResponse>;
 }
+/**
+ * 7. The Configuration Provider Contract
+ * Supplies configuration values to all other plugins during the boot sequence.
+ */
+interface IConfigProvider {
+  get<T>(key: string, defaultValue?: T): T;
+  has(key: string): boolean;
+}
 //#endregion
 //#region src/kernel.d.ts
 declare class JsonExpressKernel {
   private container;
   constructor();
+  registerConfigProvider(provider: IConfigProvider): void;
   registerDatabase(adapter: IDatabaseAdapter): void;
   registerTransport(transport: ITransport): void;
   registerApiGenerator(generator: IApiGenerator): void;
   boot(collections: Array<string>, port?: number): Promise<void>;
 }
 //#endregion
-export { IApiGenerator, IDatabaseAdapter, IMiddleware, ITransport, JsonExpressKernel, JsonRequest, JsonResponse, RouteDefinition };
+//#region src/config.d.ts
+/**
+ * Deeply merges multiple objects.
+ * Arrays and primitives are overwritten. Objects are merged recursively.
+ * Precedence goes from left to right (last object wins).
+ */
+declare function deepMerge(...objects: any[]): any;
+/**
+ * Retrieves a nested value from an object using dot notation.
+ */
+declare function getNestedValue(obj: any, path: string, defaultValue?: any): any;
+/**
+ * Converts a flat Record (e.g. process.env) with JEX_ prefixes and dot notation into a nested object.
+ * Example: { "JEX_DATABASE.MAX_CONNECTIONS": "100" } => { database: { max_connections: 100 } }
+ */
+declare function buildNestedConfigFromEnv(envVars: Record<string, string | undefined>, prefix?: string): Record<string, any>;
+//#endregion
+export { IApiGenerator, IConfigProvider, IDatabaseAdapter, IMiddleware, ITransport, JsonExpressKernel, JsonRequest, JsonResponse, RouteDefinition, buildNestedConfigFromEnv, deepMerge, getNestedValue };

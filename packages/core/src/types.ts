@@ -33,10 +33,15 @@ export interface RouteDefinition {
  */
 export interface IDatabaseAdapter {
     getAll(collection: string): Promise<any[]>;
+
     getById(collection: string, id: string): Promise<any>;
+
     search(collection: string, query: Record<string, any>): Promise<any[]>;
+
     create(collection: string, data: any): Promise<any>;
+
     update(collection: string, id: string, data: any): Promise<any>;
+
     delete(collection: string, id: string): Promise<any>;
 }
 
@@ -46,7 +51,9 @@ export interface IDatabaseAdapter {
  */
 export interface ITransport {
     registerRoute(route: RouteDefinition): void;
+
     start(port: number): Promise<void>;
+
     stop(): Promise<void>;
 }
 
@@ -64,5 +71,16 @@ export interface IApiGenerator {
  */
 export interface IMiddleware {
     name: string;
+
     handle(req: JsonRequest, next: () => Promise<JsonResponse>): Promise<JsonResponse>;
+}
+
+/**
+ * 7. The Configuration Provider Contract
+ * Supplies configuration values to all other plugins during the boot sequence.
+ */
+export interface IConfigProvider {
+    get<T>(key: string, defaultValue?: T): T;
+
+    has(key: string): boolean;
 }

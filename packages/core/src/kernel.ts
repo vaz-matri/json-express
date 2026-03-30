@@ -3,7 +3,8 @@ import type {
     IDatabaseAdapter,
     ITransport,
     IApiGenerator,
-    RouteDefinition
+    RouteDefinition,
+    IConfigProvider
 } from './types';
 
 export class JsonExpressKernel {
@@ -12,6 +13,10 @@ export class JsonExpressKernel {
     constructor() {
         // 1. Initialize the Dependency Injection Container
         this.container = createContainer();
+    }
+
+    public registerConfigProvider(provider: IConfigProvider) {
+        this.container.register({ configProvider: asValue(provider) })
     }
 
     // --- REGISTRATION METHODS ---
@@ -32,6 +37,22 @@ export class JsonExpressKernel {
 
     public async boot(collections: Array<string>, port: number = 3000) {
         console.log('🚀 JSON Express Kernel initializing...');
+
+        // 1. Establish Environment Context
+        const env = process.env.NODE_ENV || 'development'
+        this.container.register({ NODE_ENV: asValue(env) })
+
+        // Resolve ConfigProvider or provide an empty fallback
+        let configProvider: IConfigProvider
+        try {
+            configProvider = this.container.resolve<IConfigProvider>('configProvider')
+        } catch (e) {
+            configProvider = {
+                get: (key, def) => def as any,
+                has: () => false
+            }
+            this.container.register({ configProvider: asValue(configProvider) })
+        }
 
         // 2. Resolve the registered plugins from the container
         const db = this.container.resolve<IDatabaseAdapter>('database');
