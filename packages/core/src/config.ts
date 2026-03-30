@@ -54,7 +54,7 @@ export function buildNestedConfigFromEnv(envVars: Record<string, string | undefi
         const parts = normalizedPath.split('.')
 
         let current = config
-        for (let i = 0; i < parts.length - 1; i) {
+        for (let i = 0; i < parts.length - 1; i++) {
             const part = parts[i]
             if (!current[part]) current[part] = {}
             current = current[part]

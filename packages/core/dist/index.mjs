@@ -85,7 +85,7 @@ function buildNestedConfigFromEnv(envVars, prefix = "JEX_") {
 		if (!key.startsWith(prefix) || value === void 0) continue;
 		const parts = key.slice(prefix.length).toLowerCase().split(".");
 		let current = config;
-		for (let i = 0; i < parts.length - 1;) {
+		for (let i = 0; i < parts.length - 1; i++) {
 			const part = parts[i];
 			if (!current[part]) current[part] = {};
 			current = current[part];

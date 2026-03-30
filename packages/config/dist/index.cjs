@@ -28,14 +28,16 @@ path = __toESM(path);
 let js_yaml = require("js-yaml");
 js_yaml = __toESM(js_yaml);
 let jiti = require("jiti");
-jiti = __toESM(jiti);
 let url = require("url");
 let _json_express_core = require("@json-express/core");
 //#region src/index.ts
-const _require = (0, jiti.default)(typeof __filename !== "undefined" ? __filename : (0, url.fileURLToPath)(require("url").pathToFileURL(__filename).href));
-var AdvancedConfigProvider = class {
+const jiti$1 = (0, jiti.createJiti)(typeof __filename !== "undefined" ? __filename : (0, url.fileURLToPath)(require("url").pathToFileURL(__filename).href));
+var AdvancedConfigProvider = class AdvancedConfigProvider {
 	config = {};
-	constructor(cwd = process.cwd(), env = process.env.NODE_ENV || "development", envConfigOverrides = {}) {
+	constructor(config) {
+		this.config = config;
+	}
+	static async init(cwd = process.cwd(), env = process.env.NODE_ENV || "development", envConfigOverrides = {}) {
 		const extensions = [
 			"json",
 			"yml",
@@ -46,16 +48,16 @@ var AdvancedConfigProvider = class {
 			"ts"
 		];
 		const baseName = "jex.config";
-		const loadConfig = (name) => {
+		const loadConfig = async (name) => {
 			for (const ext of extensions) {
 				const filePath = path.default.join(cwd, `${name}.${ext}`);
-				if (fs.default.existsSync(filePath)) return this.parseFile(filePath, ext, env);
+				if (fs.default.existsSync(filePath)) return await this.parseFile(filePath, ext, env);
 			}
 			return {};
 		};
-		this.config = (0, _json_express_core.deepMerge)(loadConfig(baseName), loadConfig(`${baseName}.${env}`), envConfigOverrides);
+		return new AdvancedConfigProvider((0, _json_express_core.deepMerge)(await loadConfig(baseName), await loadConfig(`${baseName}.${env}`), envConfigOverrides));
 	}
-	parseFile(filePath, ext, env) {
+	static async parseFile(filePath, ext, env) {
 		try {
 			if (["json"].includes(ext)) return JSON.parse(fs.default.readFileSync(filePath, "utf8"));
 			if (["yml", "yaml"].includes(ext)) return js_yaml.default.load(fs.default.readFileSync(filePath, "utf8")) || {};
@@ -65,7 +67,7 @@ var AdvancedConfigProvider = class {
 				"mjs",
 				"ts"
 			].includes(ext)) {
-				const mod = _require(filePath);
+				const mod = await jiti$1.import(filePath);
 				const exported = mod.default || mod;
 				if (typeof exported === "function") return exported({ env });
 				return exported;
