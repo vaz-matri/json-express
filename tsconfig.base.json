@@ -9,6 +9,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    /* --- Security: Deny Leaking (No Source Maps) --- */
+    "sourceMap": false,
+    "inlineSourceMap": false,
+    "inlineSources": false
   }
 }

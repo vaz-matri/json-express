@@ -23,5 +23,8 @@
   "devDependencies": {
     "@json-express/core": "workspace:*",
     "@types/jsonwebtoken": "^9.0.4"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }

@@ -13,3 +13,7 @@ plan.txt
 # context-builder
 context*
 llm-context*
+
+# build outputs
+dist/
+.tsdown/

@@ -27,5 +27,8 @@
   },
   "peerDependencies": {
     "@json-express/core": "workspace:*"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }

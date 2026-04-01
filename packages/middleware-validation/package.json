@@ -22,5 +22,8 @@
   },
   "devDependencies": {
     "@json-express/core": "workspace:*"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
