@@ -22,6 +22,7 @@ const startServer = async () => {
 	const availableTransports = installedDeps.filter((d) => d.includes("transport-"));
 	const availableAdapters = installedDeps.filter((d) => d.includes("adapter-"));
 	const availableApis = installedDeps.filter((d) => d.includes("api-"));
+	const availableMiddlewares = installedDeps.filter((d) => d.includes("middleware-"));
 	const resolvePlugin = async (category, available, defaultPlugin) => {
 		const userPreference = configProvider.get(category);
 		if (userPreference && available.includes(userPreference)) return userPreference;
@@ -74,6 +75,13 @@ const startServer = async () => {
 	}
 	const kernel = new JsonExpressKernel();
 	kernel.registerConfigProvider(configProvider);
+	for (const mwName of availableMiddlewares) try {
+		const mw = await loadPluginInstance(mwName, [{ configProvider }]);
+		kernel.registerMiddleware(mw);
+		console.log(`🔌 Registered middleware: ${mwName}`);
+	} catch (e) {
+		console.error(`❌ Failed to load middleware ${mwName}:`, e?.message || e);
+	}
 	const db = await loadPluginInstance(activeAdapter, [{ configProvider }]);
 	if (typeof db.loadData === "function") db.loadData(initialData);
 	kernel.registerDatabase(db);

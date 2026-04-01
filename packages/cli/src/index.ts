@@ -28,6 +28,7 @@ export const startServer = async () => {
     const availableTransports = installedDeps.filter(d => d.includes('transport-'));
     const availableAdapters = installedDeps.filter(d => d.includes('adapter-'));
     const availableApis = installedDeps.filter(d => d.includes('api-'));
+    const availableMiddlewares = installedDeps.filter(d => d.includes('middleware-'));
 
     // --- Interactive Conflict Resolution Helper ---
     const resolvePlugin = async (category: string, available: string[], defaultPlugin: string) => {
@@ -116,6 +117,17 @@ export const startServer = async () => {
     // 4. Initialize the Kernel
     const kernel = new JsonExpressKernel();
     kernel.registerConfigProvider(configProvider);
+
+    // ✅ Load and register all discovered Middlewares
+    for (const mwName of availableMiddlewares) {
+        try {
+            const mw = await loadPluginInstance(mwName, [{ configProvider }]);
+            kernel.registerMiddleware(mw);
+            console.log(`🔌 Registered middleware: ${mwName}`);
+        } catch (e: any) {
+            console.error(`❌ Failed to load middleware ${mwName}:`, e?.message || e);
+        }
+    }
 
     // 5. Instantiate, Configure & Register Plugins
     // ✅ Pass configProvider to the Adapter

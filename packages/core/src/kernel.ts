@@ -4,11 +4,14 @@ import type {
     ITransport,
     IApiGenerator,
     RouteDefinition,
-    IConfigProvider
+    IConfigProvider,
+    IMiddleware
 } from './types';
+import { composeMiddlewares } from './pipeline';
 
 export class JsonExpressKernel {
     private container: AwilixContainer;
+    private middlewares: Map<string, IMiddleware> = new Map();
 
     constructor() {
         // 1. Initialize the Dependency Injection Container
@@ -31,6 +34,11 @@ export class JsonExpressKernel {
 
     public registerApiGenerator(generator: IApiGenerator) {
         this.container.register({ apiGenerator: asValue(generator) });
+    }
+
+    public registerMiddleware(middleware: IMiddleware) {
+        this.middlewares.set(middleware.name, middleware);
+        this.container.register({ [`middleware:${middleware.name}`]: asValue(middleware) });
     }
 
     // --- THE BOOT SEQUENCE ---
@@ -70,6 +78,16 @@ export class JsonExpressKernel {
         // 4. Pass those generated routes to the Transport Server
         console.log(`🔗 Registering ${routes.length} routes with the transport layer...`);
         for (const route of routes) {
+            if (route.middlewares && route.middlewares.length > 0) {
+                const assignedMiddlewares = route.middlewares.map(name => {
+                    const mw = this.middlewares.get(name);
+                    if (!mw) {
+                        throw new Error(`❌ Middleware '${name}' is required by route ${route.path} but was not registered.`);
+                    }
+                    return mw;
+                });
+                route.handler = composeMiddlewares(route.handler, assignedMiddlewares);
+            }
             transport.registerRoute(route);
         }
 

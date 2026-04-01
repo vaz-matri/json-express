@@ -1,7 +1,31 @@
 import { asValue, createContainer } from "awilix";
+//#region src/pipeline.ts
+/**
+* Composes an array of IMiddleware instances into a single execution chain
+* wrapping the final route handler.
+*
+* @param handler The original core route handler from the API Generator.
+* @param middlewares An array of ordered middleware instances to execute.
+* @returns A wrapped handler with the exact same signature.
+*/
+function composeMiddlewares(handler, middlewares) {
+	if (!middlewares || middlewares.length === 0) return handler;
+	return async (req) => {
+		let index = -1;
+		const dispatch = async (i) => {
+			if (i <= index) throw new Error("next() called multiple times");
+			index = i;
+			if (i === middlewares.length) return handler(req);
+			return middlewares[i].handle(req, () => dispatch(i + 1));
+		};
+		return dispatch(0);
+	};
+}
+//#endregion
 //#region src/kernel.ts
 var JsonExpressKernel = class {
 	container;
+	middlewares = /* @__PURE__ */ new Map();
 	constructor() {
 		this.container = createContainer();
 	}
@@ -16,6 +40,10 @@ var JsonExpressKernel = class {
 	}
 	registerApiGenerator(generator) {
 		this.container.register({ apiGenerator: asValue(generator) });
+	}
+	registerMiddleware(middleware) {
+		this.middlewares.set(middleware.name, middleware);
+		this.container.register({ [`middleware:${middleware.name}`]: asValue(middleware) });
 	}
 	async boot(collections, port = 3e3) {
 		console.log("🚀 JSON Express Kernel initializing...");
@@ -38,7 +66,17 @@ var JsonExpressKernel = class {
 		console.log(`⚙️  Generating API definitions for: ${collections.join(", ")}`);
 		const routes = apiGenerator.generate(collections);
 		console.log(`🔗 Registering ${routes.length} routes with the transport layer...`);
-		for (const route of routes) transport.registerRoute(route);
+		for (const route of routes) {
+			if (route.middlewares && route.middlewares.length > 0) {
+				const assignedMiddlewares = route.middlewares.map((name) => {
+					const mw = this.middlewares.get(name);
+					if (!mw) throw new Error(`❌ Middleware '${name}' is required by route ${route.path} but was not registered.`);
+					return mw;
+				});
+				route.handler = composeMiddlewares(route.handler, assignedMiddlewares);
+			}
+			transport.registerRoute(route);
+		}
 		console.log(`🟢 Starting server on port ${port}...`);
 		await transport.start(port);
 	}
@@ -102,4 +140,4 @@ function buildNestedConfigFromEnv(envVars, namespace = "jex") {
 	return config;
 }
 //#endregion
-export { JsonExpressKernel, buildNestedConfigFromEnv, deepMerge, getNestedValue };
+export { JsonExpressKernel, buildNestedConfigFromEnv, composeMiddlewares, deepMerge, getNestedValue };

@@ -73,11 +73,13 @@ interface IConfigProvider {
 //#region src/kernel.d.ts
 declare class JsonExpressKernel {
   private container;
+  private middlewares;
   constructor();
   registerConfigProvider(provider: IConfigProvider): void;
   registerDatabase(adapter: IDatabaseAdapter): void;
   registerTransport(transport: ITransport): void;
   registerApiGenerator(generator: IApiGenerator): void;
+  registerMiddleware(middleware: IMiddleware): void;
   boot(collections: Array<string>, port?: number): Promise<void>;
 }
 //#endregion
@@ -98,4 +100,15 @@ declare function getNestedValue(obj: any, path: string, defaultValue?: any): any
  */
 declare function buildNestedConfigFromEnv(envVars: Record<string, string | undefined>, namespace?: string): Record<string, any>;
 //#endregion
-export { IApiGenerator, IConfigProvider, IDatabaseAdapter, IMiddleware, ITransport, JsonExpressKernel, JsonRequest, JsonResponse, RouteDefinition, buildNestedConfigFromEnv, deepMerge, getNestedValue };
+//#region src/pipeline.d.ts
+/**
+ * Composes an array of IMiddleware instances into a single execution chain
+ * wrapping the final route handler.
+ *
+ * @param handler The original core route handler from the API Generator.
+ * @param middlewares An array of ordered middleware instances to execute.
+ * @returns A wrapped handler with the exact same signature.
+ */
+declare function composeMiddlewares(handler: (req: JsonRequest) => Promise<JsonResponse>, middlewares: IMiddleware[]): (req: JsonRequest) => Promise<JsonResponse>;
+//#endregion
+export { IApiGenerator, IConfigProvider, IDatabaseAdapter, IMiddleware, ITransport, JsonExpressKernel, JsonRequest, JsonResponse, RouteDefinition, buildNestedConfigFromEnv, composeMiddlewares, deepMerge, getNestedValue };
