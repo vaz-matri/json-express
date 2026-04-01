@@ -22,29 +22,14 @@ interface JsonResponse {
  * The API Generator plugins will output an array of these,
  * and the Transport plugins will consume them to create actual server routes.
  */
-interface RouteDefinition {
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE';
-  path: string;
-  handler: (req: JsonRequest) => Promise<JsonResponse>;
-  middlewares?: string[];
+/**
+ * 6. The Middleware Contract
+ * Hooks into the request/response lifecycle for Auth, Rate-Limiting, Validation, etc.
+ */
+interface IMiddleware {
+  name: string;
+  handle(req: JsonRequest, next: () => Promise<JsonResponse>): Promise<JsonResponse>;
 }
-/**
- * 3. The Database Adapter Contract
- * Any database plugin (Memory, Mongo, Postgres) MUST implement these methods.
- */
-/**
- * 4. The Transport Server Contract
- * Any server plugin (Express, Fastify) MUST implement these methods.
- */
-interface ITransport {
-  registerRoute(route: RouteDefinition): void;
-  start(port: number): Promise<void>;
-  stop(): Promise<void>;
-}
-/**
- * 5. The API Generator Contract
- * Transforms the Database operations into Route Definitions (REST or GraphQL).
- */
 /**
  * 7. The Configuration Provider Contract
  * Supplies configuration values to all other plugins during the boot sequence.
@@ -56,18 +41,16 @@ interface IConfigProvider {
 //#region src/kernel.d.ts
 //#endregion
 //#region src/index.d.ts
-declare class ExpressTransport implements ITransport {
-  private app;
-  private server;
-  private config?;
+declare class AuthMiddleware implements IMiddleware {
+  readonly name = "auth";
+  private secret;
+  private excludePaths;
   constructor({
     configProvider
-  }?: {
+  }: {
     configProvider?: IConfigProvider;
   });
-  registerRoute(route: RouteDefinition): void;
-  start(port: number): Promise<void>;
-  stop(): Promise<void>;
+  handle(req: JsonRequest, next: () => Promise<JsonResponse>): Promise<JsonResponse>;
 }
 //#endregion
-export { ExpressTransport };
+export { AuthMiddleware };

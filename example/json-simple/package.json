@@ -4,5 +4,8 @@
   "scripts": {
     "dev": "json-express",
     "serve": "node ../../packages/cli/bin/exec.js"
+  },
+  "dependencies": {
+    "@json-express/middleware-auth": "workspace:*"
   }
 }

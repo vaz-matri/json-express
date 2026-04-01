@@ -18,6 +18,8 @@ var ExpressTransport = class {
 		this.app[method](route.path, async (req, res) => {
 			try {
 				const jsonRequest = {
+					method: req.method,
+					path: req.originalUrl || req.path,
 					body: req.body,
 					query: req.query,
 					params: req.params,

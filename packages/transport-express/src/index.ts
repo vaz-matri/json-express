@@ -29,6 +29,8 @@ export class ExpressTransport implements ITransport {
         this.app[method](route.path, async (req: Request, res: Response) => {
             try {
                 const jsonRequest: JsonRequest = {
+                    method: req.method,
+                    path: req.originalUrl || req.path,
                     body: req.body,
                     query: req.query as Record<string, string>,
                     params: req.params,

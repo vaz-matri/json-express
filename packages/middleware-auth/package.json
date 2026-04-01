@@ -1,0 +1,27 @@
+{
+  "name": "@json-express/middleware-auth",
+  "version": "2.0.0-alpha.0",
+  "description": "JWT Authentication Middleware plugin for JSON Express",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@json-express/core": "workspace:*",
+    "@types/jsonwebtoken": "^9.0.4"
+  }
+}

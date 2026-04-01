@@ -5,6 +5,8 @@
  * We abstract this so our core doesn't care if it's Express, Fastify, or h3.
  */
 interface JsonRequest {
+  method: string;
+  path: string;
   body: any;
   query: Record<string, string | undefined>;
   params: Record<string, string | undefined>;
