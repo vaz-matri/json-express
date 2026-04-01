@@ -96,6 +96,6 @@ declare function getNestedValue(obj: any, path: string, defaultValue?: any): any
  * Converts a flat Record (e.g. process.env) with JEX_ prefixes and dot notation into a nested object.
  * Example: { "JEX_DATABASE.MAX_CONNECTIONS": "100" } => { database: { max_connections: 100 } }
  */
-declare function buildNestedConfigFromEnv(envVars: Record<string, string | undefined>, prefix?: string): Record<string, any>;
+declare function buildNestedConfigFromEnv(envVars: Record<string, string | undefined>, namespace?: string): Record<string, any>;
 //#endregion
 export { IApiGenerator, IConfigProvider, IDatabaseAdapter, IMiddleware, ITransport, JsonExpressKernel, JsonRequest, JsonResponse, RouteDefinition, buildNestedConfigFromEnv, deepMerge, getNestedValue };

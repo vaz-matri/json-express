@@ -27,7 +27,7 @@ var EnvConfigProvider = class {
 			...mergedRawEnv,
 			...process.env
 		};
-		this.config = buildNestedConfigFromEnv(mergedRawEnv, "JEX_");
+		this.config = buildNestedConfigFromEnv(mergedRawEnv, "jex");
 	}
 	get(key, defaultValue) {
 		return getNestedValue(this.config, key, defaultValue);

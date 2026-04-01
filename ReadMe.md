@@ -86,24 +86,58 @@ The next time you run `npx json-express`, the CLI detects Fastify, silently unlo
 ## 🧩 The Ecosystem (Mix & Match)
 
 ### 🛠️ Core & Tooling
-* **[`@json-express/core`](./packages/core)** - The headless Microkernel and IoC container.
-* **[`@json-express/cli`](./packages/cli)** - The command-line runner and auto-discovery engine.
+* **[`@json-express/core`](./packages/core/ReadMe.md)** - The headless Microkernel and IoC container.
+* **[`@json-express/cli`](./packages/cli/ReadMe.md)** - The command-line runner and auto-discovery engine.
 
 ### 🌐 Transports (Server Layer)
-* **[`@json-express/transport-express`](./packages/transport-express)** *(Default)* - Express.js server.
+* **[`@json-express/transport-express`](./packages/transport-express/ReadMe.md)** *(Default)* - Express.js server.
 * *(Upcoming)* `@json-express/transport-fastify` - High-performance Fastify server.
 * *(Upcoming)* `@json-express/transport-h3` - Lightweight, edge-ready h3 server.
 
 ### 🔌 API Paradigms
-* **[`@json-express/api-rest`](./packages/api-rest)** *(Default)* - Standardized RESTful routes (`GET`, `POST`, `PATCH`, `DELETE`).
+* **[`@json-express/api-rest`](./packages/api-rest/ReadMe.md)** *(Default)* - Standardized RESTful routes (`GET`, `POST`, `PATCH`, `DELETE`).
 * *(Upcoming)* `@json-express/api-graphql` - Generates a GraphQL schema and resolvers.
 
 ### 🗄️ Adapters (Database Layer)
-* **[`@json-express/adapter-memory`](./packages/adapter-memory)** *(Default)* - Fast, in-memory local JSON file storage.
+* **[`@json-express/adapter-memory`](./packages/adapter-memory/ReadMe.md)** *(Default)* - Fast, in-memory local JSON file storage.
 * *(Upcoming)* `@json-express/adapter-mongodb` - Persists your data to MongoDB.
 
 ### ⚙️ Configuration Providers
-* **[`@json-express/config-env`](./packages/config-env)** *(Default)* - Lightweight parser for cascading `.env` files.
+
+JSON Express relies on cascading, environment-aware configurations.
+By default, you can configure your server using a `.env` file. To avoid conflicts with other tools in your workspace, all JSON Express variables must be prefixed with the **`JEX`** namespace.
+
+We use **Spring Boot-style Relaxed Binding**, meaning you can use dot-notation for highly readable configurations right inside your `.env` file!
+
+```env
+# .env
+JEX.PORT=8080
+JEX.TRANSPORT.EXPRESS.LOGGER=true
+JEX.API.REST.PREFIX=/api/v1
+```
+
+*(Note: If you are deploying to Docker, AWS, or an OS that strictly forbids dots in environment variables, JSON Express seamlessly supports double-underscores as a fallback: `JEX__TRANSPORT__EXPRESS__LOGGER=true`)*
+
+For advanced, deeply nested configurations, install `@json-express/config` and create a `jex.config.json` (or `.yml`, `.ts`):
+
+```json
+{
+  "port": 8080,
+  "transport": {
+    "express": {
+      "logger": true
+    }
+  },
+  "api": {
+    "rest": {
+      "prefix": "/api/v1"
+    }
+  }
+}
+```
+
+Read more about each packages
+* **[`@json-express/config-env`](./packages/config-env/ReadMe.md)** *(Default)* - Lightweight parser for cascading `.env` files.
 * **[`@json-express/config`](./packages/config)** - Advanced parser for YAML, deep JSON, and functional JS/TS files.
 
 ---

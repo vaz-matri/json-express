@@ -53,7 +53,7 @@ var EnvConfigProvider = class {
 			...mergedRawEnv,
 			...process.env
 		};
-		this.config = (0, _json_express_core.buildNestedConfigFromEnv)(mergedRawEnv, "JEX_");
+		this.config = (0, _json_express_core.buildNestedConfigFromEnv)(mergedRawEnv, "jex");
 	}
 	get(key, defaultValue) {
 		return (0, _json_express_core.getNestedValue)(this.config, key, defaultValue);

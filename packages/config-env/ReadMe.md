@@ -9,23 +9,43 @@ Included by default via the `@json-express/cli`.
 
 ## ⚙️ How it Works
 
-### 1. The Prefix & Relaxed Binding
-To prevent clashes with other tools (like Next.js or Docker), this plugin **only reads variables starting with `JEX_`**.
-- A dot (`.`) translates to a nested object.
-- An underscore (`_`) is used for multi-word keys.
+### 1. Spring Boot-Style Relaxed Binding
+To prevent clashes with other tools (like Next.js or Docker), this plugin **only reads variables starting with the `JEX.` or `JEX_` prefix**.
+
+It uses strict, predictable rules to translate flat environment variables into deep JSON objects:
+- **A dot (`.`)** creates a nested object.
+- **An underscore (`_`)** is used for multi-word keys.
 
 ```env
-# Translates to: { database: { max_connections: 100 } }
-JEX_DATABASE_MAX_CONNECTIONS=100
+# 1. Basic properties
+JEX.PORT=4000
+# -> { port: 4000 }
 
-# Translates to: { transport: { express: { port: 8080 } } }
-JEX_TRANSPORT.EXPRESS.PORT=8080
+# 2. Nested blocks
+JEX.TRANSPORT.EXPRESS.LOGGER=true
+# -> { transport: { express: { logger: true } } }
+
+# 3. Multi-word keys
+JEX.DATABASE.MAX_CONNECTIONS=100
+# -> { database: { max_connections: 100 } }
 ```
 
-### 2. Environment Cascading
+### 2. The Docker / AWS Fallback
+Standard Linux terminals and some cloud providers (like AWS or Docker) strictly forbid dots (`.`) in environment variable names.
+
+JSON Express natively supports the industry-standard **double-underscore (`__`)** fallback. You can seamlessly swap to this syntax in production without changing any framework code; it maps to the exact same JSON structure!
+
+```env
+# Deployment-safe equivalent
+JEX__TRANSPORT__EXPRESS__LOGGER=true
+JEX__DATABASE__MAX_CONNECTIONS=100
+```
+
+### 3. Environment Cascading
 It automatically detects your `NODE_ENV` (e.g., `production`, `test`) and cascades overrides in the following Twelve-Factor priority order:
 1. System OS Variables (Highest)
 2. `.env.[mode].local`
 3. `.env.local`
 4. `.env.[mode]`
 5. `.env` (Lowest)
+```

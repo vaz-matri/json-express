@@ -40,13 +40,21 @@ You can configure this plugin using your `.env` file (via `config-env`) or a `je
 ### Using `.env`
 Remember to use the `JEX_` prefix. Dots (`.`) denote nested objects, and underscores (`_`) are used for multi-word keys.
 
+### Using `.env`
+Remember to use the `JEX.` namespace prefix. Dots (`.`) denote nested objects, and underscores (`_`) are used for multi-word keys.
+
 ```env
 # Change the default server port (default: 3000)
-JEX_TRANSPORT_EXPRESS_PORT=8080
+JEX.PORT=8080
+
+# Enable the built-in request logger (default: false)
+JEX.TRANSPORT.EXPRESS.LOGGER=true
 
 # Enable trust proxy for load balancers (default: false)
-JEX_TRANSPORT_EXPRESS_TRUST_PROXY=true
+JEX.TRANSPORT.EXPRESS.TRUST_PROXY=true
 ```
+
+*(If your deployment environment forbids dots in variables, use double-underscores: `JEX__TRANSPORT__EXPRESS__LOGGER=true`)*
 
 ### Using `jex.config.json`
 ```json

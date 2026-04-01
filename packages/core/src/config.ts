@@ -44,30 +44,43 @@ export function getNestedValue(obj: any, path: string, defaultValue?: any): any 
  * Converts a flat Record (e.g. process.env) with JEX_ prefixes and dot notation into a nested object.
  * Example: { "JEX_DATABASE.MAX_CONNECTIONS": "100" } => { database: { max_connections: 100 } }
  */
-export function buildNestedConfigFromEnv(envVars: Record<string, string | undefined>, prefix = 'JEX_'): Record<string, any> {
-    const config: Record<string, any> = {}
+export function buildNestedConfigFromEnv(envVars: Record<string, string | undefined>, namespace = 'jex'): Record<string, any> {
+    const config: Record<string, any> = {};
+
+    // Regex explanation:
+    // ^${namespace} -> Starts with 'jex'
+    // (?:\.|__)     -> Followed EXACTLY by a dot (.) or double underscore (__)
+    // (.*)$         -> Captures everything after it
+    // 'i' flag      -> Makes it completely case-insensitive (JEX, jex, Jex)
+    const regex = new RegExp(`^${namespace}(?:\\.|__)(.*)$`, 'i');
 
     for (const [key, value] of Object.entries(envVars)) {
-        if (!key.startsWith(prefix) || value === undefined) continue
+        if (value === undefined) continue;
 
-        const normalizedPath = key.slice(prefix.length).toLowerCase()
-        const parts = normalizedPath.split('.')
+        const match = key.match(regex);
+        if (!match) continue;
 
-        let current = config
+        // match[1] contains the rest of the key.
+        // 1. Lowercase it to normalize
+        // 2. Replace all remaining double underscores (__) with dots (.) to standardize block separators
+        // *Single underscores naturally remain untouched as multi-word separators!*
+        const normalizedPath = match[1].toLowerCase().replace(/__/g, '.');
+        const parts = normalizedPath.split('.');
+
+        let current = config;
         for (let i = 0; i < parts.length - 1; i++) {
-            const part = parts[i]
-            if (!current[part]) current[part] = {}
-            current = current[part]
+            const part = parts[i];
+            if (!current[part]) current[part] = {};
+            current = current[part];
         }
 
-        // Try to parse numbers or booleans implicitly, else keep as string
-        let parsedValue: any = value
-        if (value === 'true') parsedValue = true
-        else if (value === 'false') parsedValue = false
-        else if (!isNaN(Number(value)) && value.trim() !== '') parsedValue = Number(value)
+        let parsedValue: any = value;
+        if (value === 'true') parsedValue = true;
+        else if (value === 'false') parsedValue = false;
+        else if (!isNaN(Number(value)) && value.trim() !== '') parsedValue = Number(value);
 
-        current[parts[parts.length - 1]] = parsedValue
+        current[parts[parts.length - 1]] = parsedValue;
     }
 
-    return config
+    return config;
 }

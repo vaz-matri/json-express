@@ -29,8 +29,9 @@ export class EnvConfigProvider implements IConfigProvider {
         // 2. Real System environment variables have the ultimate highest priority
         mergedRawEnv = { ...mergedRawEnv, ...(process.env as Record<string, string>) };
 
-        // 3. Parse only "JEX_" prefixed vars into a nested object using Core utilities
-        this.config = buildNestedConfigFromEnv(mergedRawEnv, 'JEX_');
+        // 3. Parse only "jex." or "jex__" prefixed vars into a nested object using Core utilities
+        // ✅ FIX: Remove the array, just pass the string 'jex' (or nothing!)
+        this.config = buildNestedConfigFromEnv(mergedRawEnv, 'jex');
     }
 
     public get<T>(key: string, defaultValue?: T): T {

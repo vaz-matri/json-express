@@ -79,11 +79,14 @@ function getNestedValue(obj, path, defaultValue) {
 * Converts a flat Record (e.g. process.env) with JEX_ prefixes and dot notation into a nested object.
 * Example: { "JEX_DATABASE.MAX_CONNECTIONS": "100" } => { database: { max_connections: 100 } }
 */
-function buildNestedConfigFromEnv(envVars, prefix = "JEX_") {
+function buildNestedConfigFromEnv(envVars, namespace = "jex") {
 	const config = {};
+	const regex = new RegExp(`^${namespace}(?:\\.|__)(.*)$`, "i");
 	for (const [key, value] of Object.entries(envVars)) {
-		if (!key.startsWith(prefix) || value === void 0) continue;
-		const parts = key.slice(prefix.length).toLowerCase().split(".");
+		if (value === void 0) continue;
+		const match = key.match(regex);
+		if (!match) continue;
+		const parts = match[1].toLowerCase().replace(/__/g, ".").split(".");
 		let current = config;
 		for (let i = 0; i < parts.length - 1; i++) {
 			const part = parts[i];
