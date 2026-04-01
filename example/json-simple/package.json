@@ -9,5 +9,9 @@
     "@json-express/middleware-auth": "workspace:*",
     "@json-express/middleware-validation": "workspace:*",
     "@json-express/seeder-faker": "workspace:*"
+  },
+  "devDependencies": {
+    "@json-express/cli": "workspace:*",
+    "@json-express/plugin-devcert": "workspace:*"
   }
 }

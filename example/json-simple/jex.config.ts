@@ -22,5 +22,8 @@ export default {
                 genre: 'Rock'
             })
         }
-    }
+    },
+    
+    // Enable Automatic Local SSL Generation
+    https: true
 };

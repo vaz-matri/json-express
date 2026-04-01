@@ -1,10 +1,12 @@
 import express, { Request, Response, NextFunction, Application } from 'express';
-import type { Server } from 'http';
+import type { Server as HttpServer } from 'http';
+import type { Server as HttpsServer } from 'https';
+import https from 'https';
 import type { ITransport, RouteDefinition, JsonRequest, IConfigProvider } from '@json-express/core';
 
 export class ExpressTransport implements ITransport {
     private app: Application;
-    private server: Server | null = null;
+    private server: HttpServer | HttpsServer | null = null;
     private config?: IConfigProvider;
 
     constructor({ configProvider }: { configProvider?: IConfigProvider } = {}) {
@@ -55,10 +57,19 @@ export class ExpressTransport implements ITransport {
 
     public start(port: number): Promise<void> {
         return new Promise((resolve) => {
-            this.server = this.app.listen(port, () => {
-                console.log(`🚀 [ExpressTransport] Server listening on http://localhost:${port}`);
-                resolve();
-            });
+            const ssl = this.config?.get<{ key: Buffer | string; cert: Buffer | string }>('express.ssl');
+
+            if (ssl && ssl.key && ssl.cert) {
+                this.server = https.createServer(ssl, this.app).listen(port, () => {
+                    console.log(`🚀 [ExpressTransport] Server natively listening on https://localhost:${port}`);
+                    resolve();
+                });
+            } else {
+                this.server = this.app.listen(port, () => {
+                    console.log(`🚀 [ExpressTransport] Server listening on http://localhost:${port}`);
+                    resolve();
+                });
+            }
         });
     }
 

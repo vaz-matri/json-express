@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
-import { IConfigProvider, buildNestedConfigFromEnv, getNestedValue } from '@json-express/core';
+import { IConfigProvider, buildNestedConfigFromEnv, getNestedValue, setNestedValue } from '@json-express/core';
 
 export class EnvConfigProvider implements IConfigProvider {
     private config: Record<string, any> = {};
@@ -40,6 +40,10 @@ export class EnvConfigProvider implements IConfigProvider {
 
     public has(key: string): boolean {
         return getNestedValue(this.config, key, undefined) !== undefined;
+    }
+
+    public set<T>(key: string, value: T): void {
+        setNestedValue(this.config, key, value);
     }
 
     /** Helper to allow deep merging if the advanced config plugin is also loaded */

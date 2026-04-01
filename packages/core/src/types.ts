@@ -85,6 +85,11 @@ export interface IConfigProvider {
     get<T>(key: string, defaultValue?: T): T;
 
     has(key: string): boolean;
+
+    /**
+     * Mutates the active configuration dynamically at runtime.
+     */
+    set<T>(key: string, value: T): void;
 }
 
 /**
@@ -94,5 +99,14 @@ export interface IConfigProvider {
 export interface ISeeder {
     name: string;
     seed(database: IDatabaseAdapter, isForce: boolean): Promise<void>;
+}
+
+/**
+ * 9. The Plugin Contract
+ * Attaches generic behaviors to the kernel before boot
+ */
+export interface IPlugin {
+    name: string;
+    onBoot(kernel: any, configProvider: IConfigProvider): Promise<void>;
 }
 

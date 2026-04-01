@@ -6,7 +6,8 @@ import type {
     RouteDefinition,
     IConfigProvider,
     IMiddleware,
-    ISeeder
+    ISeeder,
+    IPlugin
 } from './types';
 import { composeMiddlewares } from './pipeline';
 
@@ -14,6 +15,7 @@ export class JsonExpressKernel {
     private container: AwilixContainer;
     private middlewares: Map<string, IMiddleware> = new Map();
     private seeders: ISeeder[] = [];
+    private plugins: IPlugin[] = [];
 
     constructor() {
         // 1. Initialize the Dependency Injection Container
@@ -48,6 +50,11 @@ export class JsonExpressKernel {
         this.container.register({ [`seeder:${seeder.name}`]: asValue(seeder) });
     }
 
+    public registerPlugin(plugin: IPlugin) {
+        this.plugins.push(plugin);
+        this.container.register({ [`plugin:${plugin.name}`]: asValue(plugin) });
+    }
+
     // --- THE BOOT SEQUENCE ---
 
     public async boot(collections: Array<string>, port: number = 3000, seedOptions?: { enable?: boolean, force?: boolean }) {
@@ -64,7 +71,8 @@ export class JsonExpressKernel {
         } catch (e) {
             configProvider = {
                 get: (key, def) => def as any,
-                has: () => false
+                has: () => false,
+                set: () => {}
             }
             this.container.register({ configProvider: asValue(configProvider) })
         }
@@ -104,6 +112,12 @@ export class JsonExpressKernel {
             for (const seeder of this.seeders) {
                 await seeder.seed(db, seedOptions.force || false);
             }
+        }
+
+        // 4.9 Execute Lifecycle Plugins (e.g., HTTPS Devcert, Loggers) before booting the server
+        for (const plugin of this.plugins) {
+            console.log(`🧩 Firing plugin boot hook: ${plugin.name}`);
+            await plugin.onBoot(this, configProvider);
         }
 
         // 5. Start the server!

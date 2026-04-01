@@ -41,6 +41,23 @@ export function getNestedValue(obj: any, path: string, defaultValue?: any): any 
 }
 
 /**
+ * Sets a nested value inside an object using dot notation.
+ * Mutates the original object. Creates missing intermediate objects.
+ */
+export function setNestedValue(obj: any, path: string, value: any): void {
+    const keys = path.split('.')
+    let current = obj
+    for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i]
+        if (current[key] === undefined || current[key] === null || typeof current[key] !== 'object') {
+            current[key] = {}
+        }
+        current = current[key]
+    }
+    current[keys[keys.length - 1]] = value
+}
+
+/**
  * Converts a flat Record (e.g. process.env) with JEX_ prefixes and dot notation into a nested object.
  * Example: { "JEX_DATABASE.MAX_CONNECTIONS": "100" } => { database: { max_connections: 100 } }
  */

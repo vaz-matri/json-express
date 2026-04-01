@@ -1,5 +1,7 @@
 import { readdirSync, readFileSync, existsSync, appendFileSync } from 'fs';
 import { extname, join } from 'path';
+import { createRequire } from 'module';
+import { pathToFileURL } from 'url';
 import prompts from 'prompts';
 import { JsonExpressKernel } from '@json-express/core';
 import { EnvConfigProvider } from '@json-express/config-env';
@@ -30,6 +32,7 @@ export const startServer = async () => {
     const availableApis = installedDeps.filter(d => d.includes('api-'));
     const availableMiddlewares = installedDeps.filter(d => d.includes('middleware-'));
     const availableSeeders = installedDeps.filter(d => d.includes('seeder-'));
+    const availablePlugins = installedDeps.filter(d => d.includes('plugin-'));
 
     // --- Parse CLI Execution Flags ---
     const isForceSeed = process.argv.includes('--seeder');
@@ -81,10 +84,16 @@ export const startServer = async () => {
         // Dynamically import custom plugins (Ensures local node_modules precedence)
         let mod;
         try {
-            const localPath = join(cwd, 'node_modules', pluginName);
-            mod = await import(localPath);
+            // 1. Create a resolver tightly scoped to the user's execution directory
+            const localRequire = createRequire(join(cwd, 'package.json'));
+            
+            // 2. Resolve the exact entrypoint file path using the package's exports
+            const resolvedPath = localRequire.resolve(pluginName);
+            
+            // 3. Import it using a rock-solid file:// URL (Cross-Platform)
+            mod = await import(pathToFileURL(resolvedPath).href);
         } catch (e) {
-            // Fallback to standard resolution
+            // Fallback to standard resolution (e.g. if plugin is globally bundled)
             mod = await import(pluginName);
         }
 
@@ -150,6 +159,17 @@ export const startServer = async () => {
             console.log(`🔌 Registered seeder: ${seederName}`);
         } catch (e: any) {
             console.error(`❌ Failed to load seeder ${seederName}:`, e?.message || e);
+        }
+    }
+
+    // ✅ Load and register all discovered Lifecycle Plugins
+    for (const pluginName of availablePlugins) {
+        try {
+            const plugin = await loadPluginInstance(pluginName, [{ configProvider }]);
+            kernel.registerPlugin(plugin);
+            console.log(`🔌 Registered lifecycle plugin: ${pluginName}`);
+        } catch (e: any) {
+            console.error(`❌ Failed to load plugin ${pluginName}:`, e?.message || e);
         }
     }
 

@@ -1,0 +1,29 @@
+{
+  "name": "@json-express/plugin-devcert",
+  "version": "2.0.0-alpha.0",
+  "description": "Automatic Local HTTPS via Devcert",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "devDependencies": {
+    "@json-express/core": "workspace:*"
+  },
+  "dependencies": {
+    "devcert": "^1.2.2"
+  }
+}

@@ -3,7 +3,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 import { createJiti } from 'jiti';
 import { fileURLToPath } from 'url';
-import { IConfigProvider, deepMerge, getNestedValue } from '@json-express/core';
+import { IConfigProvider, deepMerge, getNestedValue, setNestedValue } from '@json-express/core';
 
 // ✅ Initialize Jiti v2
 const jiti = createJiti(typeof __filename !== 'undefined' ? __filename : fileURLToPath(import.meta.url));
@@ -72,5 +72,9 @@ export class AdvancedConfigProvider implements IConfigProvider {
 
     public has(key: string): boolean {
         return getNestedValue(this.config, key, undefined) !== undefined;
+    }
+
+    public set<T>(key: string, value: T): void {
+        setNestedValue(this.config, key, value);
     }
 }
