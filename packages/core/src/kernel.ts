@@ -5,13 +5,15 @@ import type {
     IApiGenerator,
     RouteDefinition,
     IConfigProvider,
-    IMiddleware
+    IMiddleware,
+    ISeeder
 } from './types';
 import { composeMiddlewares } from './pipeline';
 
 export class JsonExpressKernel {
     private container: AwilixContainer;
     private middlewares: Map<string, IMiddleware> = new Map();
+    private seeders: ISeeder[] = [];
 
     constructor() {
         // 1. Initialize the Dependency Injection Container
@@ -41,9 +43,14 @@ export class JsonExpressKernel {
         this.container.register({ [`middleware:${middleware.name}`]: asValue(middleware) });
     }
 
+    public registerSeeder(seeder: ISeeder) {
+        this.seeders.push(seeder);
+        this.container.register({ [`seeder:${seeder.name}`]: asValue(seeder) });
+    }
+
     // --- THE BOOT SEQUENCE ---
 
-    public async boot(collections: Array<string>, port: number = 3000) {
+    public async boot(collections: Array<string>, port: number = 3000, seedOptions?: { enable?: boolean, force?: boolean }) {
         console.log('🚀 JSON Express Kernel initializing...');
 
         // 1. Establish Environment Context
@@ -89,6 +96,14 @@ export class JsonExpressKernel {
                 route.handler = composeMiddlewares(route.handler, assignedMiddlewares);
             }
             transport.registerRoute(route);
+        }
+
+        // 4.5 Execute Seeders if explicitly enabled by CLI or configuration
+        if (seedOptions?.enable && this.seeders.length > 0) {
+            console.log(`🌱 Executing ${this.seeders.length} seeders...`);
+            for (const seeder of this.seeders) {
+                await seeder.seed(db, seedOptions.force || false);
+            }
         }
 
         // 5. Start the server!

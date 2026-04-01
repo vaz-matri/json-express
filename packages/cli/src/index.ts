@@ -29,6 +29,11 @@ export const startServer = async () => {
     const availableAdapters = installedDeps.filter(d => d.includes('adapter-'));
     const availableApis = installedDeps.filter(d => d.includes('api-'));
     const availableMiddlewares = installedDeps.filter(d => d.includes('middleware-'));
+    const availableSeeders = installedDeps.filter(d => d.includes('seeder-'));
+
+    // --- Parse CLI Execution Flags ---
+    const isForceSeed = process.argv.includes('--seeder');
+    const isSmartSeed = process.argv.includes('--seed');
 
     // --- Interactive Conflict Resolution Helper ---
     const resolvePlugin = async (category: string, available: string[], defaultPlugin: string) => {
@@ -109,6 +114,14 @@ export const startServer = async () => {
 
     const collections = Object.keys(initialData);
 
+    // ✅ Inject Seeder collections to prevent Empty Dataset crash
+    const fakerConfig = configProvider.get<any>('faker.collections', {});
+    for (const key of Object.keys(fakerConfig)) {
+        if (!collections.includes(key)) {
+            collections.push(key);
+        }
+    }
+
     if (collections.length === 0) {
         console.warn('⚠️  No valid JSON data files found to serve.');
         process.exit(1);
@@ -126,6 +139,17 @@ export const startServer = async () => {
             console.log(`🔌 Registered middleware: ${mwName}`);
         } catch (e: any) {
             console.error(`❌ Failed to load middleware ${mwName}:`, e?.message || e);
+        }
+    }
+
+    // ✅ Load and register all discovered Seeders
+    for (const seederName of availableSeeders) {
+        try {
+            const seeder = await loadPluginInstance(seederName, [{ configProvider }]);
+            kernel.registerSeeder(seeder);
+            console.log(`🔌 Registered seeder: ${seederName}`);
+        } catch (e: any) {
+            console.error(`❌ Failed to load seeder ${seederName}:`, e?.message || e);
         }
     }
 
@@ -149,5 +173,5 @@ export const startServer = async () => {
     // 6. Boot the system!
     // We now read the port directly from the Environment Config Provider
     const port = configProvider.get<number>('port', 3000);
-    await kernel.boot(collections, port);
+    await kernel.boot(collections, port, { enable: isSmartSeed || isForceSeed, force: isForceSeed });
 };

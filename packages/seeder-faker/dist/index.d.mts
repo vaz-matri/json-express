@@ -27,29 +27,28 @@ interface IConfigProvider {
  * 8. The Seeder Contract
  * Generates initial data dynamically
  */
+interface ISeeder {
+  name: string;
+  seed(database: IDatabaseAdapter, isForce: boolean): Promise<void>;
+} //#endregion
+//#region src/kernel.d.ts
 //#endregion
 //#region src/index.d.ts
-declare class MemoryDatabaseAdapter implements IDatabaseAdapter {
-  private store;
-  private config?;
+interface FakerConfig {
+  mode?: 'auto' | 'manual';
+  count?: number;
+  collections?: Record<string, number | (() => any)>;
+}
+declare class FakerSeeder implements ISeeder {
+  readonly name = "faker";
+  private config;
   constructor({
     configProvider
-  }?: {
+  }: {
     configProvider?: IConfigProvider;
   });
-  /**
-   * Helper method to load the initial JSON data into memory
-   */
-  loadData(initialData: Record<string, any[]>): void;
-  private hasRef;
-  private getRefs;
-  private findById;
-  getAll(collection: string): Promise<any[]>;
-  getById(collection: string, id: string): Promise<any>;
-  search(collection: string, query: Record<string, any>): Promise<any[]>;
-  create(collection: string, data: any): Promise<any>;
-  update(collection: string, id: string, data: any): Promise<any>;
-  delete(collection: string, id: string): Promise<any>;
+  private getDefaultSchema;
+  seed(database: IDatabaseAdapter, isForce: boolean): Promise<void>;
 }
 //#endregion
-export { MemoryDatabaseAdapter };
+export { FakerConfig, FakerSeeder };

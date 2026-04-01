@@ -71,18 +71,31 @@ interface IConfigProvider {
   get<T>(key: string, defaultValue?: T): T;
   has(key: string): boolean;
 }
+/**
+ * 8. The Seeder Contract
+ * Generates initial data dynamically
+ */
+interface ISeeder {
+  name: string;
+  seed(database: IDatabaseAdapter, isForce: boolean): Promise<void>;
+}
 //#endregion
 //#region src/kernel.d.ts
 declare class JsonExpressKernel {
   private container;
   private middlewares;
+  private seeders;
   constructor();
   registerConfigProvider(provider: IConfigProvider): void;
   registerDatabase(adapter: IDatabaseAdapter): void;
   registerTransport(transport: ITransport): void;
   registerApiGenerator(generator: IApiGenerator): void;
   registerMiddleware(middleware: IMiddleware): void;
-  boot(collections: Array<string>, port?: number): Promise<void>;
+  registerSeeder(seeder: ISeeder): void;
+  boot(collections: Array<string>, port?: number, seedOptions?: {
+    enable?: boolean;
+    force?: boolean;
+  }): Promise<void>;
 }
 //#endregion
 //#region src/config.d.ts
@@ -113,4 +126,4 @@ declare function buildNestedConfigFromEnv(envVars: Record<string, string | undef
  */
 declare function composeMiddlewares(handler: (req: JsonRequest) => Promise<JsonResponse>, middlewares: IMiddleware[]): (req: JsonRequest) => Promise<JsonResponse>;
 //#endregion
-export { IApiGenerator, IConfigProvider, IDatabaseAdapter, IMiddleware, ITransport, JsonExpressKernel, JsonRequest, JsonResponse, RouteDefinition, buildNestedConfigFromEnv, composeMiddlewares, deepMerge, getNestedValue };
+export { IApiGenerator, IConfigProvider, IDatabaseAdapter, IMiddleware, ISeeder, ITransport, JsonExpressKernel, JsonRequest, JsonResponse, RouteDefinition, buildNestedConfigFromEnv, composeMiddlewares, deepMerge, getNestedValue };

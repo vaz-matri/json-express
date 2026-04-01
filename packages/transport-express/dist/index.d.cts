@@ -52,8 +52,11 @@ interface ITransport {
 interface IConfigProvider {
   get<T>(key: string, defaultValue?: T): T;
   has(key: string): boolean;
-} //#endregion
-//#region src/kernel.d.ts
+}
+/**
+ * 8. The Seeder Contract
+ * Generates initial data dynamically
+ */
 //#endregion
 //#region src/index.d.ts
 declare class ExpressTransport implements ITransport {

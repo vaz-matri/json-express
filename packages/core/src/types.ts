@@ -86,3 +86,13 @@ export interface IConfigProvider {
 
     has(key: string): boolean;
 }
+
+/**
+ * 8. The Seeder Contract
+ * Generates initial data dynamically
+ */
+export interface ISeeder {
+    name: string;
+    seed(database: IDatabaseAdapter, isForce: boolean): Promise<void>;
+}
+

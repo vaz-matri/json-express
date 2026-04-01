@@ -26,6 +26,7 @@ function composeMiddlewares(handler, middlewares) {
 var JsonExpressKernel = class {
 	container;
 	middlewares = /* @__PURE__ */ new Map();
+	seeders = [];
 	constructor() {
 		this.container = createContainer();
 	}
@@ -45,7 +46,11 @@ var JsonExpressKernel = class {
 		this.middlewares.set(middleware.name, middleware);
 		this.container.register({ [`middleware:${middleware.name}`]: asValue(middleware) });
 	}
-	async boot(collections, port = 3e3) {
+	registerSeeder(seeder) {
+		this.seeders.push(seeder);
+		this.container.register({ [`seeder:${seeder.name}`]: asValue(seeder) });
+	}
+	async boot(collections, port = 3e3, seedOptions) {
 		console.log("🚀 JSON Express Kernel initializing...");
 		const env = process.env.NODE_ENV || "development";
 		this.container.register({ NODE_ENV: asValue(env) });
@@ -76,6 +81,10 @@ var JsonExpressKernel = class {
 				route.handler = composeMiddlewares(route.handler, assignedMiddlewares);
 			}
 			transport.registerRoute(route);
+		}
+		if (seedOptions?.enable && this.seeders.length > 0) {
+			console.log(`🌱 Executing ${this.seeders.length} seeders...`);
+			for (const seeder of this.seeders) await seeder.seed(db, seedOptions.force || false);
 		}
 		console.log(`🟢 Starting server on port ${port}...`);
 		await transport.start(port);

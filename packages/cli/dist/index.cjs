@@ -47,6 +47,9 @@ const startServer = async () => {
 	const availableAdapters = installedDeps.filter((d) => d.includes("adapter-"));
 	const availableApis = installedDeps.filter((d) => d.includes("api-"));
 	const availableMiddlewares = installedDeps.filter((d) => d.includes("middleware-"));
+	const availableSeeders = installedDeps.filter((d) => d.includes("seeder-"));
+	const isForceSeed = process.argv.includes("--seeder");
+	const isSmartSeed = process.argv.includes("--seed");
 	const resolvePlugin = async (category, available, defaultPlugin) => {
 		const userPreference = configProvider.get(category);
 		if (userPreference && available.includes(userPreference)) return userPreference;
@@ -93,6 +96,8 @@ const startServer = async () => {
 		initialData[collectionName] = Array.isArray(parsed) ? parsed : [parsed];
 	}
 	const collections = Object.keys(initialData);
+	const fakerConfig = configProvider.get("faker.collections", {});
+	for (const key of Object.keys(fakerConfig)) if (!collections.includes(key)) collections.push(key);
 	if (collections.length === 0) {
 		console.warn("⚠️  No valid JSON data files found to serve.");
 		process.exit(1);
@@ -106,6 +111,13 @@ const startServer = async () => {
 	} catch (e) {
 		console.error(`❌ Failed to load middleware ${mwName}:`, e?.message || e);
 	}
+	for (const seederName of availableSeeders) try {
+		const seeder = await loadPluginInstance(seederName, [{ configProvider }]);
+		kernel.registerSeeder(seeder);
+		console.log(`🔌 Registered seeder: ${seederName}`);
+	} catch (e) {
+		console.error(`❌ Failed to load seeder ${seederName}:`, e?.message || e);
+	}
 	const db = await loadPluginInstance(activeAdapter, [{ configProvider }]);
 	if (typeof db.loadData === "function") db.loadData(initialData);
 	kernel.registerDatabase(db);
@@ -117,7 +129,10 @@ const startServer = async () => {
 	const transport = await loadPluginInstance(activeTransport, [{ configProvider }]);
 	kernel.registerTransport(transport);
 	const port = configProvider.get("port", 3e3);
-	await kernel.boot(collections, port);
+	await kernel.boot(collections, port, {
+		enable: isSmartSeed || isForceSeed,
+		force: isForceSeed
+	});
 };
 //#endregion
 exports.startServer = startServer;

@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@json-express/middleware-auth": "workspace:*",
-    "@json-express/middleware-validation": "workspace:*"
+    "@json-express/middleware-validation": "workspace:*",
+    "@json-express/seeder-faker": "workspace:*"
   }
 }

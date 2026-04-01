@@ -12,5 +12,15 @@ export default {
                 })
             }
         ]
+    },
+    faker: {
+        count: 5,
+        collections: {
+            artists: () => ({
+                id: Math.random().toString(36).substr(2, 9),
+                name: 'The Fake Mockers',
+                genre: 'Rock'
+            })
+        }
     }
 };
