@@ -6,6 +6,7 @@
     "serve": "node ../../packages/cli/bin/exec.js"
   },
   "dependencies": {
-    "@json-express/middleware-auth": "workspace:*"
+    "@json-express/middleware-auth": "workspace:*",
+    "@json-express/middleware-validation": "workspace:*"
   }
 }
