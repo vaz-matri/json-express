@@ -45,6 +45,9 @@ importers:
 
   example/json-simple:
     dependencies:
+      '@json-express/adapter-json':
+        specifier: workspace:*
+        version: link:../../packages/adapter-json
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../../packages/middleware-auth
@@ -64,6 +67,12 @@ importers:
       '@json-express/plugin-health':
         specifier: workspace:*
         version: link:../../packages/plugin-health
+
+  packages/adapter-json:
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/adapter-memory:
     devDependencies:
