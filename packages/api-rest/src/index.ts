@@ -10,6 +10,7 @@ import type {
 export class RestApiGenerator implements IApiGenerator {
     private db: IDatabaseAdapter;
     private config?: IConfigProvider;
+    private collections: string[] = [];
 
     constructor({ database, configProvider }: { database: IDatabaseAdapter, configProvider?: IConfigProvider }) {
         this.db = database;
@@ -17,11 +18,50 @@ export class RestApiGenerator implements IApiGenerator {
     }
 
     public generate(collections: string[]): RouteDefinition[] {
-        const routes: RouteDefinition[] =[];
+        const routes: RouteDefinition[] = [];
+        this.collections = collections;
 
         // 🌟 New Feature: Global API Prefix
         const rawPrefix = this.config?.get<string>('api.rest.prefix', '') ?? '';
         const prefix = rawPrefix.endsWith('/') ? rawPrefix.slice(0, -1) : rawPrefix;
+
+        // 🔍 Universal Cross-Collection Search (registered FIRST to avoid route shadowing)
+        const searchEnabled = this.config?.get<boolean>('api.rest.search') !== false;
+        if (searchEnabled) {
+            routes.push({
+                method: 'POST',
+                path: `${prefix}/search`,
+                handler: async (req: JsonRequest): Promise<JsonResponse> => {
+                    const body = req.body || {};
+                    const query: Record<string, any> = body.query || {};
+
+                    // If user specifies target collections, use those; otherwise search all
+                    const targetCollections: string[] = Array.isArray(body.collections) && body.collections.length > 0
+                        ? body.collections
+                        : this.collections;
+
+                    const results: Record<string, any[]> = {};
+
+                    for (const col of targetCollections) {
+                        try {
+                            const matches = Object.keys(query).length > 0
+                                ? await this.db.search(col, query)
+                                : await this.db.getAll(col);
+
+                            // Only include collections that returned results
+                            if (matches.length > 0) {
+                                results[col] = matches;
+                            }
+                        } catch (e: any) {
+                            // Gracefully skip unknown collections
+                            results[col] = [];
+                        }
+                    }
+
+                    return { statusCode: 200, body: results };
+                }
+            });
+        }
 
         for (const collection of collections) {
             const basePath = `${prefix}/${collection}`;
