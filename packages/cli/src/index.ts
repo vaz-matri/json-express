@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, existsSync, appendFileSync } from 'fs';
+import { readdirSync, readFileSync, writeFileSync, existsSync, appendFileSync } from 'fs';
 import { extname, join } from 'path';
 import { createRequire } from 'module';
 import { pathToFileURL } from 'url';
@@ -38,42 +38,79 @@ export const startServer = async () => {
     // --- Parse CLI Execution Flags ---
     const isForceSeed = process.argv.includes('--seeder');
     const isSmartSeed = process.argv.includes('--seed');
+    const isConfigure = process.argv.includes('--configure');
 
-    // --- Interactive Conflict Resolution Helper ---
+    // --- .env Key Overwriter (prevents duplicate lines on repeated --configure runs) ---
+    const setEnvKey = (key: string, value: string) => {
+        const envPath = join(cwd, '.env');
+        const normalizedKey = `JEX.${key.toUpperCase()}`;
+        const newLine = `${normalizedKey}=${value}`;
+
+        if (existsSync(envPath)) {
+            const existing = readFileSync(envPath, 'utf8');
+            const keyRegex = new RegExp(`^${normalizedKey}=.*$`, 'm');
+            if (keyRegex.test(existing)) {
+                // Overwrite existing key in-place
+                writeFileSync(envPath, existing.replace(keyRegex, newLine), 'utf8');
+                return;
+            }
+        }
+        // Append if key doesn't exist yet
+        appendFileSync(envPath, `\n${newLine}\n`);
+    };
+
+    // --- Interactive Plugin Resolution (with --configure support) ---
+    if (isConfigure) {
+        console.log('\n🔧 JSON Express — Plugin Configuration Wizard\n');
+    }
+
     const resolvePlugin = async (category: string, available: string[], defaultPlugin: string) => {
-        // 1. Check if user already explicitly defined a preference in .env
+        // FIX: Allow defaultPlugin as a valid .env override even when a custom plugin is installed
         const userPreference = configProvider.get<string>(category);
-        if (userPreference && available.includes(userPreference)) return userPreference;
+        if (!isConfigure && userPreference && (available.includes(userPreference) || userPreference === defaultPlugin)) {
+            return userPreference;
+        }
 
-        // 2. If exactly one custom plugin is installed, silently override the default!
-        if (available.length === 1) return available[0];
+        // In --configure mode OR when multiple plugins exist, always prompt
+        const shouldPrompt = isConfigure || available.length > 1;
+        if (shouldPrompt) {
+            // Build the full choice list: default first, then installed (deduped)
+            const allChoices = [defaultPlugin, ...available.filter(a => a !== defaultPlugin)];
 
-        // 3. If multiple plugins exist, pause and prompt the user (Fail Fast safely)
-        if (available.length > 1) {
-            console.log(`\n⚠️  Conflict Detected: Multiple ${category} layers found!`);
+            if (!isConfigure) {
+                console.log(`\n⚠️  Conflict Detected: Multiple ${category} layers found!`);
+            }
+
             const response = await prompts({
                 type: 'select',
                 name: 'choice',
-                message: `Which plugin would you like to use for the ${category} layer?`,
-                choices: available.map(a => ({ title: a, value: a }))
+                message: `Select ${category} plugin:`,
+                choices: allChoices.map(a => ({
+                    title: a === defaultPlugin ? `${a} (default)` : a,
+                    value: a
+                }))
             });
 
-            const choice = response.choice;
-
-            // Auto-write the preference to their .env file so it doesn't prompt them again
-            appendFileSync(join(cwd, '.env'), `\nJEX_${category.toUpperCase()}=${choice}\n`);
-            console.log(`✅ Saved preference to .env\n`);
-
+            const choice = response.choice || defaultPlugin;
+            setEnvKey(category, choice);
+            console.log(`✅ Saved: JEX.${category.toUpperCase()}=${choice}\n`);
             return choice;
         }
 
-        // 4. Fallback to bundled defaults
+        // Exactly one custom plugin installed — silently override the default
+        if (available.length === 1) return available[0];
+
+        // Fallback to bundled default
         return defaultPlugin;
     };
 
     const activeAdapter = await resolvePlugin('adapter', availableAdapters, '@json-express/adapter-memory');
     const activeApi = await resolvePlugin('api', availableApis, '@json-express/api-rest');
     const activeTransport = await resolvePlugin('transport', availableTransports, '@json-express/transport-express');
+
+    if (isConfigure) {
+        console.log('🚀 Configuration saved. Booting server...\n');
+    }
 
     // --- Dynamic Import Helper ---
     const loadPluginInstance = async (pluginName: string, constructorArgs: any[] =[]) => {
