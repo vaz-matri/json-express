@@ -1,0 +1,24 @@
+{
+  "name": "@json-express/plugin-health",
+  "version": "2.0.0-alpha.0",
+  "description": "Advanced health check plugin for json-express",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "@json-express/core": "workspace:*"
+  }
+}

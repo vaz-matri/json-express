@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@json-express/cli": "workspace:*",
+    "@json-express/plugin-health": "workspace:*",
     "@json-express/plugin-devcert": "workspace:*"
   }
 }

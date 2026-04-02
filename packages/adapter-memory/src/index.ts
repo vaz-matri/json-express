@@ -126,4 +126,8 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
         this.store[collection].splice(index, 1);
         return item;
     }
+
+    public async isHealthy(): Promise<boolean> {
+        return true;
+    }
 }

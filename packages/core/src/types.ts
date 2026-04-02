@@ -45,6 +45,8 @@ export interface IDatabaseAdapter {
     update(collection: string, id: string, data: any): Promise<any>;
 
     delete(collection: string, id: string): Promise<any>;
+
+    isHealthy?(): Promise<boolean>;
 }
 
 /**
