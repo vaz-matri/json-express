@@ -12,6 +12,7 @@ import { RestApiGenerator } from '@json-express/api-rest';
 import { ExpressTransport } from '@json-express/transport-express';
 import { ConsoleLogger } from '@json-express/logger-console';
 import { BaselineHealthPlugin, BaselineInfoPlugin } from './baseline-plugins.js';
+import { DocsPlugin } from '@json-express/plugin-docs';
 
 export const startServer = async () => {
     const cwd = process.cwd();
@@ -118,10 +119,11 @@ export const startServer = async () => {
     // --- Dynamic Import Helper ---
     const loadPluginInstance = async (pluginName: string, constructorArgs: any[] =[]) => {
         // Use static imports for defaults to ensure fast booting when not overridden
-        if (pluginName === '@json-express/adapter-memory') return new MemoryDatabaseAdapter(...constructorArgs);
+        if (pluginName === '@json-express/adapter-memory') return new MemoryDatabaseAdapter(constructorArgs[0]);
         if (pluginName === '@json-express/api-rest') return new RestApiGenerator(constructorArgs[0]);
-        if (pluginName === '@json-express/transport-express') return new ExpressTransport(...constructorArgs);
+        if (pluginName === '@json-express/transport-express') return new ExpressTransport(constructorArgs[0]);
         if (pluginName === '@json-express/logger-console') return new ConsoleLogger();
+        if (pluginName === '@json-express/plugin-docs') return new DocsPlugin();
 
         // Dynamically import custom plugins (Ensures local node_modules precedence)
         let mod;
@@ -232,13 +234,12 @@ export const startServer = async () => {
 
     if (!hasHealthOverride) {
         kernel.registerPlugin(new BaselineHealthPlugin());
-        console.log(`🔌 Registered baseline fallback: /health`);
-    } else {
-        console.log(`🔌 Bypassing baseline health (overridden by advanced health plugin)`);
     }
 
     kernel.registerPlugin(new BaselineInfoPlugin());
-    console.log(`🔌 Registered baseline fallback: /info`);
+
+    // ✅ Load and register the Documentation Plugin (Default)
+    kernel.registerPlugin(new DocsPlugin());
 
     // 5. Instantiate, Configure & Register Plugins
     // ✅ Pass configProvider to the Adapter

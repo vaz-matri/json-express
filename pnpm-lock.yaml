@@ -109,6 +109,9 @@ importers:
       '@json-express/logger-console':
         specifier: workspace:*
         version: link:../logger-console
+      '@json-express/plugin-docs':
+        specifier: workspace:*
+        version: link:../plugin-docs
       '@json-express/transport-express':
         specifier: workspace:*
         version: link:../transport-express
@@ -199,6 +202,12 @@ importers:
       devcert:
         specifier: ^1.2.2
         version: 1.2.3
+
+  packages/plugin-docs:
+    dependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/plugin-health:
     dependencies:

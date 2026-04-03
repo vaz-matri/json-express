@@ -33,7 +33,7 @@ export class ExpressTransport implements ITransport {
 
     public registerRoute(route: RouteDefinition): void {
         const method = route.method.toLowerCase() as 'get' | 'post' | 'patch' | 'delete';
-
+        
         this.app[method](route.path, async (req: Request, res: Response, next: NextFunction) => {
             const traceId = randomUUID();
             const startTime = Date.now();
@@ -65,7 +65,12 @@ export class ExpressTransport implements ITransport {
                     });
                 }
 
-                res.status(statusCode).json(jsonResponse.body);
+                const isHtml = res.getHeader('Content-Type') === 'text/html';
+                if (isHtml) {
+                    res.status(statusCode).send(jsonResponse.body);
+                } else {
+                    res.status(statusCode).json(jsonResponse.body);
+                }
             } catch (error: any) {
                 // Pass error to the centralized error middleware
                 next(error);
@@ -74,15 +79,15 @@ export class ExpressTransport implements ITransport {
     }
 
     public start(port: number): Promise<void> {
-        // 404 — catch-all for unknown routes (registered LAST)
-        this.app.use((req: Request, res: Response) => {
-            res.status(404).json({
-                statusCode: 404,
-                error: `Route ${req.method}:${req.originalUrl || req.path} not found`
-            });
-        });
-
         return new Promise((resolve) => {
+            // 404 — catch-all for unknown routes (registered LAST)
+            this.app.use((req: Request, res: Response) => {
+                res.status(404).json({
+                    statusCode: 404,
+                    error: `Route ${req.method}:${req.originalUrl || req.path} not found`
+                });
+            });
+
             const ssl = this.config?.get<{ key: Buffer | string; cert: Buffer | string }>('express.ssl');
 
             if (ssl && ssl.key && ssl.cert) {

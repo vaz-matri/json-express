@@ -129,3 +129,13 @@ export interface ILogger {
     child(context: any): ILogger;
 }
 
+/**
+ * 11. The Documentation Provider Contract
+ * Allows plugins to provide a "Home Page" or "Swagger UI" for the API.
+ */
+export interface IDocProvider {
+    renderTitle(): string;
+    renderDocumentation(routes: RouteDefinition[]): string; // Returns HTML
+    getManifest(routes: RouteDefinition[]): any;            // Returns JSON
+}
+

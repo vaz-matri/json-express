@@ -66,6 +66,10 @@ export class JsonExpressKernel {
         this.container.register({ [`plugin:${plugin.name}`]: asValue(plugin) });
     }
 
+    public registerDocProvider(provider: any) {
+        this.container.register({ docProvider: asValue(provider) });
+    }
+
     // --- THE BOOT SEQUENCE ---
 
     public async boot(collections: Array<string>, port: number = 3000, seedOptions?: { enable?: boolean, force?: boolean }) {
@@ -103,11 +107,9 @@ export class JsonExpressKernel {
         }
 
         // 3. Ask the API Generator to create abstract route definitions
-        console.log(`⚙️  Generating API definitions for: ${collections.join(', ')}`);
         const routes = apiGenerator.generate(collections);
 
         // 4. Pass those generated routes to the Transport Server
-        console.log(`🔗 Registering ${routes.length} routes with the transport layer...`);
         for (const route of routes) {
             if (route.middlewares && route.middlewares.length > 0) {
                 const assignedMiddlewares = route.middlewares.map(name => {
@@ -137,6 +139,37 @@ export class JsonExpressKernel {
         }
 
         // 5. Start the server!
+        // 5.1 If a DocProvider is present, register the "Self-Documenting" routes
+        try {
+            const docProvider = this.container.resolve<any>('docProvider');
+            if (docProvider) {
+                // HTML Home Page
+                transport.registerRoute({
+                    method: 'GET',
+                    path: '/',
+                    handler: async () => ({
+                        statusCode: 200,
+                        headers: { 'Content-Type': 'text/html' },
+                        body: docProvider.renderDocumentation(routes)
+                    })
+                });
+
+                // JSON Manifest
+                transport.registerRoute({
+                    method: 'GET',
+                    path: '/info/routes',
+                    handler: async () => ({
+                        statusCode: 200,
+                        body: docProvider.getManifest(routes)
+                    })
+                });
+
+                console.log(`📚 API Manifest available at: http://localhost:${port}/info/routes`);
+            }
+        } catch (e) {
+            // Silently skip if no docProvider is registered
+        }
+
         console.log(`🟢 Starting server on port ${port}...`);
         await transport.start(port);
     }
