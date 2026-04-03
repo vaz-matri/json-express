@@ -24,12 +24,12 @@ You can control the logger via standard JSON Express environment variables (`JEX
 | :--- | :--- | :--- |
 | `JEX.LOG.LEVEL` | `info` | Logging severity (`info`, `debug`, `warn`, `error`). |
 | `JEX.LOG.PRETTY` | `auto` | Set to `true` for pretty terminal output, `false` for raw JSON. |
-| `JEX.LOG.PATH` | `null` | Set to a directory (e.g., `./logs`) to enable file-based logging. |
+| `JEX.LOG.PATH` | `./logs` | Destination for logs. Set to `stdout` or `stderr` for terminal output. |
 
 ### 🔄 Logging Modes
 
-1.  **Stdout Mode (Default)**: Active when `JEX.LOG.PATH` is not set. Perfect for Docker and Kubernetes.
-2.  **File Mode**: Triggered when `JEX.LOG.PATH` is defined. If set to a directory, it will automatically create and write to `app.log`.
+1.  **File Mode (Default)**: Logs are written to `./logs/app.log` by default. You can override this with a custom path (e.g., `JEX.LOG.PATH=/var/log/my-app`).
+2.  **Stream Mode**: Set `JEX.LOG.PATH=stdout` or `stderr` to pipe logs directly to the terminal. Combined with `JEX.LOG.PRETTY=true`, this provides the best developer experience.
 
 ## 💻 Manual Usage
 
