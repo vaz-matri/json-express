@@ -87,7 +87,11 @@ export function buildNestedConfigFromEnv(envVars: Record<string, string | undefi
         let current = config;
         for (let i = 0; i < parts.length - 1; i++) {
             const part = parts[i];
-            if (!current[part]) current[part] = {};
+            // Fix: If the intermediate path doesn't exist or is not an object, create it.
+            // This prevents flat keys (like JEX.API) from breaking nested keys (like JEX.API.REST.PREFIX).
+            if (!current[part] || typeof current[part] !== 'object') {
+                current[part] = {};
+            }
             current = current[part];
         }
 
@@ -96,7 +100,11 @@ export function buildNestedConfigFromEnv(envVars: Record<string, string | undefi
         else if (value === 'false') parsedValue = false;
         else if (!isNaN(Number(value)) && value.trim() !== '') parsedValue = Number(value);
 
-        current[parts[parts.length - 1]] = parsedValue;
+        // Fix: If we're setting a terminal value but an object already exists there,
+        // we skip it to prevent losing nested config (Nested keys take priority).
+        if (typeof current[parts[parts.length - 1]] !== 'object') {
+            current[parts[parts.length - 1]] = parsedValue;
+        }
     }
 
     return config;

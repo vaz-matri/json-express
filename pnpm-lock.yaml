@@ -48,6 +48,9 @@ importers:
       '@json-express/adapter-json':
         specifier: workspace:*
         version: link:../../packages/adapter-json
+      '@json-express/logger-pino':
+        specifier: workspace:*
+        version: link:../../packages/logger-pino
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../../packages/middleware-auth
