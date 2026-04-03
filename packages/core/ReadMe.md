@@ -25,6 +25,8 @@ Any official or community plugin must implement one of these core interfaces exp
 - `IRealtimeAdapter` (Event/WebSocket Layer)
 - `IMiddleware` (Interceptor Layer)
 - `IConfigProvider` (Configuration Layer)
+- `IPlugin` (Lifecycle Layer)
+- `ISeeder` (Data Seeding Layer)
 
 ### Core Utilities
 The `core` package also exposes vital Twelve-Factor configuration utilities used by other plugins:

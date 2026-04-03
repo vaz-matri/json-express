@@ -15,6 +15,7 @@ visit[jsonexpress.com](https://jsonexpress.com)
 - **Agnostic Microkernel** - Pluggable architecture! Swap out the Database, Server (Transport), or API Paradigm without rewriting your business logic.
 - **Auto-Discovery** - Install a plugin and the CLI automatically detects and wires it up. No boilerplate needed.
 - **Twelve-Factor Configuration** - Cascading environment variables and smart configurations built for enterprise.
+- **Built-in Observability** - Native `/health` and `/info` endpoints for production-ready monitoring.
 
 ---
 
@@ -91,7 +92,7 @@ The next time you run `npx json-express`, the CLI detects Fastify, silently unlo
 
 ### 🌐 Transports (Server Layer)
 * **[`@json-express/transport-express`](./packages/transport-express/ReadMe.md)** *(Default)* - Express.js server.
-* *(Upcoming)* `@json-express/transport-fastify` - High-performance Fastify server.
+* **[`@json-express/transport-fastify`](./packages/transport-fastify/ReadMe.md)** - High-performance Fastify server.
 * *(Upcoming)* `@json-express/transport-h3` - Lightweight, edge-ready h3 server.
 
 ### 🔌 API Paradigms
