@@ -1,3 +1,4 @@
+import { RequestContext } from '@json-express/core';
 import type { ILogger } from '@json-express/core';
 
 /**
@@ -30,7 +31,12 @@ export class ConsoleLogger implements ILogger {
     }
 
     private format(level: string, message: string, context?: any): string {
-        const ctx = { ...(this.options.context || {}), ...context };
+        const traceId = RequestContext.getTraceId();
+        const ctx = {
+            ...(traceId ? { traceId } : {}),
+            ...(this.options.context || {}),
+            ...context,
+        };
         const ctxString = Object.keys(ctx).length > 0 ? ` ${JSON.stringify(ctx)}` : '';
         return `[${level}] ${message}${ctxString}`;
     }

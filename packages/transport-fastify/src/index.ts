@@ -1,6 +1,8 @@
 import Fastify from 'fastify';
+import { randomUUID } from 'crypto';
 import type { FastifyBaseLogger, FastifyTypeProviderDefault, RawServerBase, FastifyError, FastifyRequest, FastifyReply } from 'fastify';
 import type { ITransport, RouteDefinition, JsonRequest, IConfigProvider, ILogger } from '@json-express/core';
+import { RequestContext } from '@json-express/core';
 
 export class FastifyTransport implements ITransport {
     private fastify: ReturnType<typeof Fastify>;
@@ -52,6 +54,9 @@ export class FastifyTransport implements ITransport {
         const method = route.method.toLowerCase() as 'get' | 'post' | 'patch' | 'delete';
 
         this.fastify[method](route.path, async (request: FastifyRequest, reply: FastifyReply) => {
+            const traceId = randomUUID();
+            const startTime = Date.now();
+
             const jsonRequest: JsonRequest = {
                 method: request.method,
                 path: request.url,
@@ -59,15 +64,24 @@ export class FastifyTransport implements ITransport {
                 query: request.query as Record<string, string | undefined>,
                 params: request.params as Record<string, string | undefined>,
                 headers: request.headers as Record<string, string | string[] | undefined>,
+                traceId,
             };
 
-            const jsonResponse = await route.handler(jsonRequest);
+            const jsonResponse = await RequestContext.run({ traceId, startTime }, () =>
+                route.handler(jsonRequest)
+            );
+
+            const latency = Date.now() - startTime;
+            const statusCode = jsonResponse.statusCode ?? 200;
+
+            // Post-response access log
+            this.logger.info(`${request.method} ${request.url} ${statusCode} (${latency}ms)`, { traceId });
 
             if (jsonResponse.headers) {
                 reply.headers(jsonResponse.headers);
             }
 
-            reply.code(jsonResponse.statusCode ?? 200).send(jsonResponse.body);
+            reply.code(statusCode).send(jsonResponse.body);
         });
     }
 

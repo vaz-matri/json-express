@@ -1,12 +1,15 @@
-import type { IDatabaseAdapter, IConfigProvider } from '@json-express/core';
+import type { IDatabaseAdapter, IConfigProvider, ILogger } from '@json-express/core';
+import { ConsoleLogger } from '@json-express/core';
 
 export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     // Our in-memory store representing the parsed JSON files
     private store: Record<string, any[]> = {};
     private config?: IConfigProvider;
+    private logger: ILogger;
 
-    constructor({ configProvider }: { configProvider?: IConfigProvider } = {}) {
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
         this.config = configProvider;
+        this.logger = logger?.child({ component: 'DB-Memory' }) ?? new ConsoleLogger({ context: { component: 'DB-Memory' } });
     }
 
     /**
@@ -50,6 +53,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     // --- IDatabaseAdapter Implementation ---
 
     public async getAll(collection: string): Promise<any[]> {
+        this.logger.info(`Get all from '${collection}'`);
         const items = this.store[collection] ||[];
 
         // Ported referencing/population logic
@@ -87,6 +91,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async getById(collection: string, id: string): Promise<any> {
+        this.logger.info(`Get '${id}' from '${collection}'`);
         const { item } = this.findById(collection, id);
         return item;
     }
@@ -99,6 +104,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async create(collection: string, data: any): Promise<any> {
+        this.logger.info(`Create in '${collection}'`);
         if (!this.store[collection]) {
             this.store[collection] =[];
         }
@@ -111,6 +117,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async update(collection: string, id: string, data: any): Promise<any> {
+        this.logger.info(`Update '${id}' in '${collection}'`);
         const { item, index } = this.findById(collection, id);
 
         // Merge updates, ensuring ID cannot be overwritten
@@ -121,6 +128,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async delete(collection: string, id: string): Promise<any> {
+        this.logger.info(`Delete '${id}' from '${collection}'`);
         const { item, index } = this.findById(collection, id);
 
         this.store[collection].splice(index, 1);

@@ -140,7 +140,14 @@ export const startServer = async () => {
         }
 
         // Pluck the exported Class and instantiate it
-        const PluginClass = Object.values(mod)[0] as any;
+        // We look for the first function/class and ignore non-constructable exports like __esModule
+        const exports = Object.values(mod);
+        const PluginClass = exports.find(v => typeof v === 'function') as any;
+        
+        if (!PluginClass) {
+            throw new Error(`No constructable export found in plugin ${pluginName}`);
+        }
+        
         return new PluginClass(...constructorArgs);
     };
 

@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync, writeFileSync, renameSync, accessSync, constants } from 'fs';
 import { join, extname } from 'path';
-import type { IDatabaseAdapter, IConfigProvider } from '@json-express/core';
+import type { IDatabaseAdapter, IConfigProvider, ILogger } from '@json-express/core';
+import { ConsoleLogger } from '@json-express/core';
 
 export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     private store: Record<string, any[]> = {};
@@ -8,10 +9,12 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     private timers: Record<string, ReturnType<typeof setTimeout>> = {};
     private cwd: string;
     private config?: IConfigProvider;
+    private logger: ILogger;
 
-    constructor({ configProvider }: { configProvider?: IConfigProvider } = {}) {
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
         this.config = configProvider;
         this.cwd = process.cwd();
+        this.logger = logger?.child({ component: 'DB-Json' }) ?? new ConsoleLogger({ context: { component: 'DB-Json' } });
         this._scanAndLoad();
     }
 
@@ -36,7 +39,7 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
                 this.store[collection] = Array.isArray(parsed) ? parsed : [parsed];
                 this.filePaths[collection] = filePath;
             } catch (e) {
-                console.warn(`[adapter-json] Skipping unreadable file: ${dirent.name}`);
+                this.logger.warn(`Skipping unreadable file: ${dirent.name}`);
             }
         }
     }
@@ -61,7 +64,7 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
                 // Atomic rename — safe even on crash
                 renameSync(tmpPath, filePath);
             } catch (e) {
-                console.error(`[adapter-json] Failed to persist '${collection}':`, e);
+                this.logger.error(`Failed to persist '${collection}'`, { error: (e as Error).message });
             }
 
             delete this.timers[collection];
@@ -107,6 +110,7 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async getAll(collection: string): Promise<any[]> {
+        this.logger.info(`Get all from '${collection}'`);
         const items = this.store[collection] || [];
 
         return items.map(item => {
@@ -141,6 +145,7 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async getById(collection: string, id: string): Promise<any> {
+        this.logger.info(`Get '${id}' from '${collection}'`);
         const { item } = this.findById(collection, id);
         return item;
     }
@@ -153,6 +158,7 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async create(collection: string, data: any): Promise<any> {
+        this.logger.info(`Create in '${collection}'`);
         if (!this.store[collection]) {
             this.store[collection] = [];
             // New collection — register a file path for it
@@ -167,6 +173,7 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async update(collection: string, id: string, data: any): Promise<any> {
+        this.logger.info(`Update '${id}' in '${collection}'`);
         const { item, index } = this.findById(collection, id);
 
         const updatedItem = { ...item, ...data, id };
@@ -177,6 +184,7 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async delete(collection: string, id: string): Promise<any> {
+        this.logger.info(`Delete '${id}' from '${collection}'`);
         const { item, index } = this.findById(collection, id);
 
         this.store[collection].splice(index, 1);

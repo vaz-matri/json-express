@@ -1,5 +1,6 @@
-import type { ZodSchema, ZodError } from 'zod';
-import type { IMiddleware, JsonRequest, JsonResponse, IConfigProvider } from '@json-express/core';
+import type { ZodSchema } from 'zod';
+import type { IMiddleware, JsonRequest, JsonResponse, IConfigProvider, ILogger } from '@json-express/core';
+import { ConsoleLogger } from '@json-express/core';
 
 export interface ValidationRule {
     method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | '*';
@@ -11,8 +12,10 @@ export interface ValidationRule {
 export class ValidationMiddleware implements IMiddleware {
     public readonly name = 'validation';
     private rules: ValidationRule[] = [];
+    private logger: ILogger;
 
-    constructor({ configProvider }: { configProvider?: IConfigProvider }) {
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger }) {
+        this.logger = logger?.child({ component: 'Validation' }) ?? new ConsoleLogger({ context: { component: 'Validation' } });
         if (!configProvider) return;
         
         const configRules = configProvider.get<ValidationRule[]>('validation.rules', []);
@@ -73,6 +76,7 @@ export class ValidationMiddleware implements IMiddleware {
 
         // If validation failed, reject immediately
         if (Object.keys(errors).length > 0) {
+            this.logger.warn('Validation failed', { fields: Object.keys(errors) });
             return {
                 statusCode: 400,
                 body: {
@@ -80,6 +84,10 @@ export class ValidationMiddleware implements IMiddleware {
                     details: errors
                 }
             };
+        }
+
+        if (matchedRule) {
+            this.logger.debug('Validation passed');
         }
 
         return next();

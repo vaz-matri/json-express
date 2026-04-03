@@ -9,12 +9,14 @@ export interface JsonRequest {
     query: Record<string, string | undefined>;
     params: Record<string, string | undefined>;
     headers: Record<string, string | string[] | undefined>;
+    traceId?: string;
 }
 
 export interface JsonResponse {
     statusCode?: number;
     body?: any;
     headers?: Record<string, string>;
+    latency?: number;
 }
 
 /**

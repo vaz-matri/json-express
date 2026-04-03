@@ -1,3 +1,4 @@
+import { RequestContext } from '@json-express/core';
 import pino from 'pino';
 import type { ILogger, IConfigProvider } from '@json-express/core';
 import { join } from 'path';
@@ -56,19 +57,23 @@ export class PinoLogger implements ILogger {
     }
 
     public info(message: string, context?: any): void {
-        this.logger.info(context || {}, message);
+        const traceId = RequestContext.getTraceId();
+        this.logger.info({ ...(traceId ? { traceId } : {}), ...context }, message);
     }
 
     public warn(message: string, context?: any): void {
-        this.logger.warn(context || {}, message);
+        const traceId = RequestContext.getTraceId();
+        this.logger.warn({ ...(traceId ? { traceId } : {}), ...context }, message);
     }
 
     public error(message: string, context?: any): void {
-        this.logger.error(context || {}, message);
+        const traceId = RequestContext.getTraceId();
+        this.logger.error({ ...(traceId ? { traceId } : {}), ...context }, message);
     }
 
     public debug(message: string, context?: any): void {
-        this.logger.debug(context || {}, message);
+        const traceId = RequestContext.getTraceId();
+        this.logger.debug({ ...(traceId ? { traceId } : {}), ...context }, message);
     }
 
     public child(context: any): ILogger {

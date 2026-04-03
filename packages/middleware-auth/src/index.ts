@@ -1,12 +1,15 @@
 import jwt from 'jsonwebtoken';
-import type { IMiddleware, JsonRequest, JsonResponse, IConfigProvider } from '@json-express/core';
+import type { IMiddleware, JsonRequest, JsonResponse, IConfigProvider, ILogger } from '@json-express/core';
+import { ConsoleLogger } from '@json-express/core';
 
 export class AuthMiddleware implements IMiddleware {
     public readonly name = 'auth';
     private secret: string | null = null;
     private excludePaths: string[] = [];
+    private logger: ILogger;
 
-    constructor({ configProvider }: { configProvider?: IConfigProvider }) {
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger }) {
+        this.logger = logger?.child({ component: 'Auth' }) ?? new ConsoleLogger({ context: { component: 'Auth' } });
         if (!configProvider) return;
 
         // Extract secret
@@ -25,7 +28,7 @@ export class AuthMiddleware implements IMiddleware {
     public async handle(req: JsonRequest, next: () => Promise<JsonResponse>): Promise<JsonResponse> {
         // 1. If no secret is configured, bypass authentication entirely
         if (!this.secret) {
-            console.warn('⚠️ [AuthMiddleware] JEX__AUTH__SECRET is missing. Authentication bypassed completely.');
+            this.logger.warn('JEX_AUTH_SECRET is missing. Authentication bypassed.');
             return next();
         }
 
@@ -37,6 +40,7 @@ export class AuthMiddleware implements IMiddleware {
         // 3. Extract Bearer token
         const authHeader = req.headers['authorization'];
         if (!authHeader || Array.isArray(authHeader) || !authHeader.startsWith('Bearer ')) {
+            this.logger.warn('Rejected — missing or invalid Bearer token');
             return {
                 statusCode: 401,
                 body: { error: 'Unauthorized: Missing or invalid Bearer token.' }
@@ -52,8 +56,10 @@ export class AuthMiddleware implements IMiddleware {
             // Inject decoded user payload into headers so downstream plugins/generators can access it
             req.headers['x-user-payload'] = JSON.stringify(decoded);
 
+            this.logger.info('Access granted');
             return next();
         } catch (error: any) {
+            this.logger.warn('Rejected — invalid or expired token');
             return {
                 statusCode: 403,
                 body: { error: 'Forbidden: Invalid or expired token.' }

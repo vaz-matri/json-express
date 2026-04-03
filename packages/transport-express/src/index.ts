@@ -2,7 +2,9 @@ import express, { Request, Response, NextFunction, Application } from 'express';
 import type { Server as HttpServer } from 'http';
 import type { Server as HttpsServer } from 'https';
 import https from 'https';
+import { randomUUID } from 'crypto';
 import type { ITransport, RouteDefinition, JsonRequest, IConfigProvider, ILogger } from '@json-express/core';
+import { RequestContext } from '@json-express/core';
 
 export class ExpressTransport implements ITransport {
     private app: Application;
@@ -17,14 +19,6 @@ export class ExpressTransport implements ITransport {
 
         // Built-in middleware for parsing JSON requests
         this.app.use(express.json());
-
-        // 🌟 New Feature: Optional Logger driven by Config
-        if (this.config?.get('transport.express.logger', false)) {
-            this.app.use((req: Request, res: Response, next: NextFunction) => {
-                this.logger.info(`${req.method} ${req.originalUrl}`);
-                next();
-            });
-        }
 
         // --- Consistent JSON error convention across all transports ---
         // 500 — unhandled errors from route handlers
@@ -41,17 +35,29 @@ export class ExpressTransport implements ITransport {
         const method = route.method.toLowerCase() as 'get' | 'post' | 'patch' | 'delete';
 
         this.app[method](route.path, async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                const jsonRequest: JsonRequest = {
-                    method: req.method,
-                    path: req.originalUrl || req.path,
-                    body: req.body,
-                    query: req.query as Record<string, string>,
-                    params: req.params,
-                    headers: req.headers as Record<string, string | string[] | undefined>
-                };
+            const traceId = randomUUID();
+            const startTime = Date.now();
 
-                const jsonResponse = await route.handler(jsonRequest);
+            const jsonRequest: JsonRequest = {
+                method: req.method,
+                path: req.originalUrl || req.path,
+                body: req.body,
+                query: req.query as Record<string, string>,
+                params: req.params,
+                headers: req.headers as Record<string, string | string[] | undefined>,
+                traceId,
+            };
+
+            try {
+                const jsonResponse = await RequestContext.run({ traceId, startTime }, () =>
+                    route.handler(jsonRequest)
+                );
+
+                const latency = Date.now() - startTime;
+                const statusCode = jsonResponse.statusCode ?? 200;
+
+                // Post-response access log — industry standard
+                this.logger.info(`${req.method} ${req.originalUrl || req.path} ${statusCode} (${latency}ms)`, { traceId });
 
                 if (jsonResponse.headers) {
                     Object.entries(jsonResponse.headers).forEach(([key, value]) => {
@@ -59,7 +65,7 @@ export class ExpressTransport implements ITransport {
                     });
                 }
 
-                res.status(jsonResponse.statusCode || 200).json(jsonResponse.body);
+                res.status(statusCode).json(jsonResponse.body);
             } catch (error: any) {
                 // Pass error to the centralized error middleware
                 next(error);

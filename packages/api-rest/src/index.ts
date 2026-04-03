@@ -4,17 +4,25 @@ import type {
     RouteDefinition,
     JsonRequest,
     JsonResponse,
-    IConfigProvider
+    IConfigProvider,
+    ILogger
 } from '@json-express/core';
+import { ConsoleLogger } from '@json-express/core';
 
 export class RestApiGenerator implements IApiGenerator {
     private db: IDatabaseAdapter;
     private config?: IConfigProvider;
+    private logger: ILogger;
     private collections: string[] = [];
 
-    constructor({ database, configProvider }: { database: IDatabaseAdapter, configProvider?: IConfigProvider }) {
+    constructor({ database, configProvider, logger }: {
+        database: IDatabaseAdapter;
+        configProvider?: IConfigProvider;
+        logger?: ILogger;
+    }) {
         this.db = database;
         this.config = configProvider;
+        this.logger = logger?.child({ component: 'API-REST' }) ?? new ConsoleLogger({ context: { component: 'API-REST' } });
     }
 
     public generate(collections: string[]): RouteDefinition[] {
@@ -39,6 +47,8 @@ export class RestApiGenerator implements IApiGenerator {
                     const targetCollections: string[] = Array.isArray(body.collections) && body.collections.length > 0
                         ? body.collections
                         : this.collections;
+
+                    this.logger.info(`Handling search`, { collections: targetCollections });
 
                     const results: Record<string, any[]> = {};
 
@@ -71,6 +81,7 @@ export class RestApiGenerator implements IApiGenerator {
                 method: 'GET',
                 path: basePath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
+                    this.logger.info(`Handling ${collection}.getAll`);
                     const hasQuery = Object.keys(req.query).length > 0;
                     const data = hasQuery
                         ? await this.db.search(collection, req.query as Record<string, any>)
@@ -84,6 +95,7 @@ export class RestApiGenerator implements IApiGenerator {
                 path: itemPath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
                     const id = req.params['id'];
+                    this.logger.info(`Handling ${collection}.getById`, { id });
                     if (!id) return { statusCode: 400, body: { error: 'Missing resource ID.' } };
 
                     const record = await this.db.getById(collection, id);
@@ -97,6 +109,7 @@ export class RestApiGenerator implements IApiGenerator {
                 method: 'POST',
                 path: basePath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
+                    this.logger.info(`Handling ${collection}.create`);
                     if (!req.body || typeof req.body !== 'object') {
                         return { statusCode: 400, body: { error: 'Request body must be a JSON object.' } };
                     }
@@ -110,6 +123,7 @@ export class RestApiGenerator implements IApiGenerator {
                 path: itemPath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
                     const id = req.params['id'];
+                    this.logger.info(`Handling ${collection}.update`, { id });
                     if (!id) return { statusCode: 400, body: { error: 'Missing resource ID.' } };
                     if (!req.body || typeof req.body !== 'object') {
                         return { statusCode: 400, body: { error: 'Request body must be a JSON object.' } };
@@ -127,6 +141,7 @@ export class RestApiGenerator implements IApiGenerator {
                 path: itemPath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
                     const id = req.params['id'];
+                    this.logger.info(`Handling ${collection}.delete`, { id });
                     if (!id) return { statusCode: 400, body: { error: 'Missing resource ID.' } };
 
                     const deleted = await this.db.delete(collection, id);

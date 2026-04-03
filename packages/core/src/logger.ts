@@ -1,3 +1,4 @@
+import { RequestContext } from './context';
 import type { ILogger } from './types';
 
 /**
@@ -29,7 +30,12 @@ export class ConsoleLogger implements ILogger {
     }
 
     private format(level: string, message: string, context?: any): string {
-        const ctx = { ...this.context, ...context };
+        const traceId = RequestContext.getTraceId();
+        const ctx = {
+            ...(traceId ? { traceId } : {}),
+            ...this.context,
+            ...context,
+        };
         const ctxString = Object.keys(ctx).length > 0 ? ` ${JSON.stringify(ctx)}` : '';
         return `[${level}] ${message}${ctxString}`;
     }
