@@ -23,6 +23,10 @@ class SwaggerDocProvider implements IDocProvider {
         return 'JSON Express API — Interactive Swagger UI';
     }
 
+    getDocumentationMessage(port: number): string {
+        return `🛡️ Interactive Swagger UI: http://localhost:${port}/`;
+    }
+
     /**
      * Translates JSON Express Routes into OpenAPI 3.0.0 Path Objects
      */

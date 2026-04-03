@@ -27,6 +27,10 @@ class LightweightDocProvider implements IDocProvider {
         return 'JSON Express API Manifest';
     }
 
+    getDocumentationMessage(port: number): string {
+        return `📚 API Manifest available at: http://localhost:${port}/info/routes`;
+    }
+
     getManifest(routes: RouteDefinition[]): any {
         return routes.map(r => ({
             method: r.method,

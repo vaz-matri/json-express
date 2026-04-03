@@ -136,6 +136,9 @@ export interface ILogger {
 export interface IDocProvider {
     renderTitle(): string;
     renderDocumentation(routes: RouteDefinition[]): string; // Returns HTML
+    /**
+     * Returns a professional boot-time log message with a clickable link.
+     */
+    getDocumentationMessage(port: number): string;
     getManifest(routes: RouteDefinition[]): any;            // Returns JSON
 }
-

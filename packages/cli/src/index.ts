@@ -218,7 +218,13 @@ export const startServer = async () => {
     }
 
     // ✅ Register the Documentation Plugin (Default) first so it can be overridden
-    kernel.registerPlugin(new DocsPlugin());
+    // Skip if Swagger is already present in the project to avoid redundant boot hooks
+    const hasSwagger = availablePlugins.some(p => p.includes('plugin-swagger'));
+    if (!hasSwagger) {
+        kernel.registerPlugin(new DocsPlugin());
+    } else {
+        // console.log('🛡️ Swagger plugin detected, skipping default documentation dashboard.');
+    }
 
     // ✅ Load and register all discovered Lifecycle Plugins
     let hasHealthOverride = false;

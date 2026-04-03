@@ -164,7 +164,7 @@ export class JsonExpressKernel {
                     })
                 });
 
-                console.log(`📚 API Manifest available at: http://localhost:${port}/info/routes`);
+                console.log(docProvider.getDocumentationMessage(port));
             }
         } catch (e) {
             // Silently skip if no docProvider is registered
