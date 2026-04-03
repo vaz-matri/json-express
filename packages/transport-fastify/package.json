@@ -23,10 +23,9 @@
   "peerDependencies": {
     "@json-express/core": "workspace:*"
   },
-  "devDependencies": {
-    "@json-express/core": "workspace:*"
-  },
+  "devDependencies": {},
   "dependencies": {
-    "fastify": "^5.3.3"
+    "fastify": "^5.3.3",
+    "@json-express/core": "workspace:*"
   }
 }

@@ -18,10 +18,10 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
+    "@json-express/core": "workspace:*",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@json-express/core": "workspace:*"
   },
   "files": [
     "dist"

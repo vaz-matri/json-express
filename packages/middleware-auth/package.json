@@ -18,10 +18,10 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
+    "@json-express/core": "workspace:*",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "@json-express/core": "workspace:*",
     "@types/jsonwebtoken": "^9.0.4"
   },
   "files": [

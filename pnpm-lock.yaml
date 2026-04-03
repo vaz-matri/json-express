@@ -75,19 +75,19 @@ importers:
         version: link:../../packages/plugin-health
 
   packages/adapter-json:
-    devDependencies:
+    dependencies:
       '@json-express/core':
         specifier: workspace:*
         version: link:../core
 
   packages/adapter-memory:
-    devDependencies:
+    dependencies:
       '@json-express/core':
         specifier: workspace:*
         version: link:../core
 
   packages/api-rest:
-    devDependencies:
+    dependencies:
       '@json-express/core':
         specifier: workspace:*
         version: link:../core
@@ -122,6 +122,9 @@ importers:
 
   packages/config:
     dependencies:
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../core
       jiti:
         specifier: ^1.21.6
         version: 1.21.7
@@ -129,22 +132,18 @@ importers:
         specifier: ^4.1.0
         version: 4.1.1
     devDependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
 
   packages/config-env:
     dependencies:
-      dotenv:
-        specifier: ^16.4.5
-        version: 16.6.1
-    devDependencies:
       '@json-express/core':
         specifier: workspace:*
         version: link:../core
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.6.1
 
   packages/core:
     dependencies:
@@ -172,36 +171,34 @@ importers:
 
   packages/middleware-auth:
     dependencies:
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../core
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.3
     devDependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       '@types/jsonwebtoken':
         specifier: ^9.0.4
         version: 9.0.10
 
   packages/middleware-validation:
     dependencies:
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../core
       zod:
         specifier: ^3.23.8
         version: 3.25.76
-    devDependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
 
   packages/plugin-devcert:
     dependencies:
-      devcert:
-        specifier: ^1.2.2
-        version: 1.2.3
-    devDependencies:
       '@json-express/core':
         specifier: workspace:*
         version: link:../core
+      devcert:
+        specifier: ^1.2.2
+        version: 1.2.3
 
   packages/plugin-health:
     dependencies:
@@ -214,33 +211,31 @@ importers:
       '@faker-js/faker':
         specifier: ^8.4.1
         version: 8.4.1
-    devDependencies:
       '@json-express/core':
         specifier: workspace:*
         version: link:../core
 
   packages/transport-express:
     dependencies:
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../core
       express:
         specifier: 5.1.0
         version: 5.1.0
     devDependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.25
 
   packages/transport-fastify:
     dependencies:
-      fastify:
-        specifier: ^5.3.3
-        version: 5.8.4
-    devDependencies:
       '@json-express/core':
         specifier: workspace:*
         version: link:../core
+      fastify:
+        specifier: ^5.3.3
+        version: 5.8.4
 
 packages:
 

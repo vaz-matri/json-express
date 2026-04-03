@@ -18,11 +18,10 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "dotenv": "^16.4.5"
-  },
-  "devDependencies": {
+    "dotenv": "^16.4.5",
     "@json-express/core": "workspace:*"
   },
+  "devDependencies": {},
   "peerDependencies": {
     "@json-express/core": "workspace:*"
   },

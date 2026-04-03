@@ -22,7 +22,7 @@
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@json-express/core": "workspace:*"
   },
   "files": [

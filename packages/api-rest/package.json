@@ -17,8 +17,10 @@
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
-  "devDependencies": {
+  "dependencies": {
     "@json-express/core": "workspace:*"
+  },
+  "devDependencies": {
   },
   "files": [
     "dist"
