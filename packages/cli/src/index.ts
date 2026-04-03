@@ -217,6 +217,9 @@ export const startServer = async () => {
         }
     }
 
+    // ✅ Register the Documentation Plugin (Default) first so it can be overridden
+    kernel.registerPlugin(new DocsPlugin());
+
     // ✅ Load and register all discovered Lifecycle Plugins
     let hasHealthOverride = false;
     for (const pluginName of availablePlugins) {
@@ -237,9 +240,7 @@ export const startServer = async () => {
     }
 
     kernel.registerPlugin(new BaselineInfoPlugin());
-
-    // ✅ Load and register the Documentation Plugin (Default)
-    kernel.registerPlugin(new DocsPlugin());
+    console.log(`🔌 Registered baseline fallback: /info`);
 
     // 5. Instantiate, Configure & Register Plugins
     // ✅ Pass configProvider to the Adapter

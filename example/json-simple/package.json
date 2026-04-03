@@ -9,6 +9,9 @@
     "@json-express/adapter-json": "workspace:*",
     "@json-express/middleware-auth": "workspace:*",
     "@json-express/middleware-validation": "workspace:*",
+    "@json-express/plugin-devcert": "workspace:*",
+    "@json-express/plugin-health": "workspace:*",
+    "@json-express/plugin-swagger": "workspace:*",
     "@json-express/seeder-faker": "workspace:*",
     "@json-express/transport-fastify": "workspace:*",
     "@json-express/logger-pino": "workspace:*"

@@ -57,6 +57,15 @@ importers:
       '@json-express/middleware-validation':
         specifier: workspace:*
         version: link:../../packages/middleware-validation
+      '@json-express/plugin-devcert':
+        specifier: workspace:*
+        version: link:../../packages/plugin-devcert
+      '@json-express/plugin-health':
+        specifier: workspace:*
+        version: link:../../packages/plugin-health
+      '@json-express/plugin-swagger':
+        specifier: workspace:*
+        version: link:../../packages/plugin-swagger
       '@json-express/seeder-faker':
         specifier: workspace:*
         version: link:../../packages/seeder-faker
@@ -67,12 +76,6 @@ importers:
       '@json-express/cli':
         specifier: workspace:*
         version: link:../../packages/cli
-      '@json-express/plugin-devcert':
-        specifier: workspace:*
-        version: link:../../packages/plugin-devcert
-      '@json-express/plugin-health':
-        specifier: workspace:*
-        version: link:../../packages/plugin-health
 
   packages/adapter-json:
     dependencies:
@@ -213,6 +216,12 @@ importers:
     dependencies:
       '@json-express/core':
         specifier: workspace:*
+        version: link:../core
+
+  packages/plugin-swagger:
+    dependencies:
+      '@json-express/core':
+        specifier: workspace:^
         version: link:../core
 
   packages/seeder-faker:
