@@ -23,12 +23,22 @@ export class ExpressTransport implements ITransport {
                 next();
             });
         }
+
+        // --- Consistent JSON error convention across all transports ---
+        // 500 — unhandled errors from route handlers
+        this.app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+            const statusCode = err.statusCode || err.status || 500;
+            res.status(statusCode).json({
+                statusCode,
+                error: err.message || 'Internal Server Error'
+            });
+        });
     }
 
     public registerRoute(route: RouteDefinition): void {
         const method = route.method.toLowerCase() as 'get' | 'post' | 'patch' | 'delete';
 
-        this.app[method](route.path, async (req: Request, res: Response) => {
+        this.app[method](route.path, async (req: Request, res: Response, next: NextFunction) => {
             try {
                 const jsonRequest: JsonRequest = {
                     method: req.method,
@@ -49,13 +59,21 @@ export class ExpressTransport implements ITransport {
 
                 res.status(jsonResponse.statusCode || 200).json(jsonResponse.body);
             } catch (error: any) {
-                console.error(`❌ [ExpressTransport] Error on ${route.method} ${route.path}:`, error);
-                res.status(500).json({ error: error.message || 'Internal Server Error' });
+                // Pass error to the centralized error middleware
+                next(error);
             }
         });
     }
 
     public start(port: number): Promise<void> {
+        // 404 — catch-all for unknown routes (registered LAST)
+        this.app.use((req: Request, res: Response) => {
+            res.status(404).json({
+                statusCode: 404,
+                error: `Route ${req.method}:${req.originalUrl || req.path} not found`
+            });
+        });
+
         return new Promise((resolve) => {
             const ssl = this.config?.get<{ key: Buffer | string; cert: Buffer | string }>('express.ssl');
 

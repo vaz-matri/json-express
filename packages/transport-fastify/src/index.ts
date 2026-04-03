@@ -48,7 +48,6 @@ export class FastifyTransport implements ITransport {
 
     public registerRoute(route: RouteDefinition): void {
         const method = route.method.toLowerCase() as 'get' | 'post' | 'patch' | 'delete';
-        console.log(`[FastifyTransport] Registered route: ${route.method} ${route.path}`);
 
         this.fastify[method](route.path, async (request: FastifyRequest, reply: FastifyReply) => {
             const jsonRequest: JsonRequest = {
