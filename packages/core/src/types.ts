@@ -111,4 +111,19 @@ export interface IPlugin {
     name: string;
     onBoot(kernel: any, configProvider: IConfigProvider): Promise<void>;
 }
+/**
+ * 10. The Logger Contract
+ * Provides a standardized way for all plugins to output logs.
+ */
+export interface ILogger {
+    info(message: string, context?: any): void;
+    warn(message: string, context?: any): void;
+    error(message: string, context?: any): void;
+    debug(message: string, context?: any): void;
+
+    /**
+     * Creates a child logger with additional context (standard in Pino/Winston).
+     */
+    child(context: any): ILogger;
+}
 

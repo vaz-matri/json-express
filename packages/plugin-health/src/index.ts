@@ -1,9 +1,11 @@
-import type { IPlugin, IConfigProvider, JsonRequest, JsonResponse, ITransport, IDatabaseAdapter } from '@json-express/core';
+import type { IPlugin, IConfigProvider, JsonRequest, JsonResponse, ITransport, IDatabaseAdapter, ILogger } from '@json-express/core';
 
 export class AdvancedHealthPlugin implements IPlugin {
     name = 'advanced-health';
 
     async onBoot(kernel: any, configProvider: IConfigProvider) {
+        const logger: ILogger = kernel.container.resolve('logger').child({ component: 'Health' });
+
         if (configProvider.get('transport.express.health') === false) return;
         
         try {
@@ -39,7 +41,7 @@ export class AdvancedHealthPlugin implements IPlugin {
                 }
             });
         } catch (e) {
-            console.warn(`[AdvancedHealthPlugin] Could not register route: ${e}`);
+            logger.warn(`Could not register health route.`, { error: (e as any)?.message });
         }
     }
 }

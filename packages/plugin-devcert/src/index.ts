@@ -1,13 +1,15 @@
 import devcert from 'devcert';
-import type { IPlugin, IConfigProvider } from '@json-express/core';
+import type { IPlugin, IConfigProvider, ILogger } from '@json-express/core';
 
 export class DevcertPlugin implements IPlugin {
     public readonly name = 'devcert';
 
     public async onBoot(kernel: any, configProvider: IConfigProvider): Promise<void> {
+        const logger: ILogger = kernel.container.resolve('logger').child({ component: 'Devcert' });
+
         // 1. Production Defense in Depth! Never request sudo/keychain access in Prod.
         if (process.env.NODE_ENV === 'production') {
-            console.log('🛡️  [DevcertPlugin] Production environment detected. Aborting local SSL generation safely.');
+            logger.info('Production environment detected. Aborting local SSL generation safely.');
             return;
         }
 
@@ -18,7 +20,7 @@ export class DevcertPlugin implements IPlugin {
             return; // Stay perfectly silent if not explicitly requested
         }
 
-        console.log('🔒 [DevcertPlugin] HTTPS requested. Checking local DevCert SSL certificates...');
+        logger.info('HTTPS requested. Checking local DevCert SSL certificates...');
 
         try {
             // 3. Request or Generate local machine certificates
@@ -27,13 +29,13 @@ export class DevcertPlugin implements IPlugin {
             // 4. Inject credentials back into the Configuration State safely!
             if (typeof configProvider.set === 'function') {
                 configProvider.set('express.ssl', ssl);
-                console.log('✅ [DevcertPlugin] Successfully bound trusted SSL certificates to the Express Transport.');
+                logger.info('Successfully bound trusted SSL certificates to the Express Transport.');
             } else {
-                console.warn('⚠️  [DevcertPlugin] Could not inject SSL certs. ConfigProvider does not support dynamic .set() method.');
+                logger.warn('Could not inject SSL certs. ConfigProvider does not support dynamic .set() method.');
             }
 
         } catch (error: any) {
-            console.error('❌ [DevcertPlugin] Failed to generate local SSL certificates. Falling back to HTTP.', error.message);
+            logger.error('Failed to generate local SSL certificates. Falling back to HTTP.', { error: error.message });
         }
     }
 }

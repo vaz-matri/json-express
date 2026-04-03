@@ -2,16 +2,18 @@ import express, { Request, Response, NextFunction, Application } from 'express';
 import type { Server as HttpServer } from 'http';
 import type { Server as HttpsServer } from 'https';
 import https from 'https';
-import type { ITransport, RouteDefinition, JsonRequest, IConfigProvider } from '@json-express/core';
+import type { ITransport, RouteDefinition, JsonRequest, IConfigProvider, ILogger } from '@json-express/core';
 
 export class ExpressTransport implements ITransport {
     private app: Application;
     private server: HttpServer | HttpsServer | null = null;
     private config?: IConfigProvider;
+    private logger: ILogger;
 
-    constructor({ configProvider }: { configProvider?: IConfigProvider } = {}) {
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider, logger: ILogger }) {
         this.app = express();
         this.config = configProvider;
+        this.logger = logger.child({ component: 'Express' });
 
         // Built-in middleware for parsing JSON requests
         this.app.use(express.json());
@@ -19,7 +21,7 @@ export class ExpressTransport implements ITransport {
         // 🌟 New Feature: Optional Logger driven by Config
         if (this.config?.get('transport.express.logger', false)) {
             this.app.use((req: Request, res: Response, next: NextFunction) => {
-                console.log(`[Express] ${req.method} ${req.originalUrl}`);
+                this.logger.info(`${req.method} ${req.originalUrl}`);
                 next();
             });
         }
@@ -79,12 +81,12 @@ export class ExpressTransport implements ITransport {
 
             if (ssl && ssl.key && ssl.cert) {
                 this.server = https.createServer(ssl, this.app).listen(port, () => {
-                    console.log(`🚀 [ExpressTransport] Server natively listening on https://localhost:${port}`);
+                    this.logger.info(`Server natively listening on https://localhost:${port}`);
                     resolve();
                 });
             } else {
                 this.server = this.app.listen(port, () => {
-                    console.log(`🚀 [ExpressTransport] Server listening on http://localhost:${port}`);
+                    this.logger.info(`Server listening on http://localhost:${port}`);
                     resolve();
                 });
             }

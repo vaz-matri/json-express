@@ -1,0 +1,47 @@
+# @json-express/logger-pino
+
+High-performance, industry-standard structured logging for JSON Express.
+
+## 📦 Overview
+
+`@json-express/logger-pino` is the recommended logger for production environments. It provides high-speed, asynchronous, and JSON-structured log output, making it compatible with modern observability stacks like the ELK stack, Splunk, Datadog, and CloudWatch.
+
+It leverages [Pino](https://github.com/pinojs/pino) under the hood and implements the JSON Express `ILogger` interface.
+
+## 🚀 Key Features
+
+*   **12-Factor Ready**: Streams to Stdout/Stderr by default.
+*   **Pretty Printing**: Uses `pino-pretty` in development for a premium developer experience.
+*   **Enterprise Mode**: Supports direct-to-file logging with automatic path resolution.
+*   **High Performance**: Asynchronous logging to minimize overhead on the framework.
+
+## 🛠️ Configuration
+
+You can control the logger via standard JSON Express environment variables (`JEX.*`):
+
+| Key | Default | Description |
+| :--- | :--- | :--- |
+| `JEX.LOG.LEVEL` | `info` | Logging severity (`info`, `debug`, `warn`, `error`). |
+| `JEX.LOG.PRETTY` | `auto` | Set to `true` for pretty terminal output, `false` for raw JSON. |
+| `JEX.LOG.PATH` | `null` | Set to a directory (e.g., `./logs`) to enable file-based logging. |
+
+### 🔄 Logging Modes
+
+1.  **Stdout Mode (Default)**: Active when `JEX.LOG.PATH` is not set. Perfect for Docker and Kubernetes.
+2.  **File Mode**: Triggered when `JEX.LOG.PATH` is defined. If set to a directory, it will automatically create and write to `app.log`.
+
+## 💻 Manual Usage
+
+If you are building a custom instance of JSON Express without the CLI:
+
+```typescript
+import { JsonExpressKernel } from '@json-express/core';
+import { EnvConfigProvider } from '@json-express/config-env';
+import { PinoLogger } from '@json-express/logger-pino';
+
+const config = new EnvConfigProvider();
+const logger = new PinoLogger({ configProvider: config });
+
+const kernel = new JsonExpressKernel();
+kernel.registerLogger(logger);
+```

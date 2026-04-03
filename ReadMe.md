@@ -16,6 +16,7 @@ visit[jsonexpress.com](https://jsonexpress.com)
 - **Auto-Discovery** - Install a plugin and the CLI automatically detects and wires it up. No boilerplate needed.
 - **Twelve-Factor Configuration** - Cascading environment variables and smart configurations built for enterprise.
 - **Built-in Observability** - Native `/health` and `/info` endpoints for production-ready monitoring.
+- **Standardized Logging** - Pluggable logging layer! Swap between basic console output and high-performance Pino JSON logs with a single install.
 
 ---
 
@@ -60,11 +61,12 @@ JSON Express v2 is built on a "Headless Microkernel" architecture. The `@json-ex
 When you start the CLI, the Kernel boots in phases:
 1. **Configuration:** Loads environment variables and config files.
 2. **Auto-Discovery:** Scans your `package.json` to see which plugins you have installed.
-3. **Registration:** Binds the Database, API Generator, and Server Transport layers together.
+3. **Registration:** Binds the Logger, Database, API Generator, and Server Transport layers together.
 4. **Boot:** The Database parses your data, the API Generator builds the routes, and the Transport server starts listening!
 
 ### The Default Stack ("Batteries Included")
 If you run the CLI without installing any custom plugins, it automatically falls back to its highly-capable default stack:
+- **Logger:** [`@json-express/logger-console`](./packages/logger-console)
 - **Server:** [`@json-express/transport-express`](./packages/transport-express)
 - **API:** [`@json-express/api-rest`](./packages/api-rest)
 - **Database:** [`@json-express/adapter-memory`](./packages/adapter-memory)
@@ -103,43 +105,9 @@ The next time you run `npx json-express`, the CLI detects Fastify, silently unlo
 * **[`@json-express/adapter-memory`](./packages/adapter-memory/ReadMe.md)** *(Default)* - Fast, in-memory local JSON file storage.
 * *(Upcoming)* `@json-express/adapter-mongodb` - Persists your data to MongoDB.
 
-### ⚙️ Configuration Providers
-
-JSON Express relies on cascading, environment-aware configurations.
-By default, you can configure your server using a `.env` file. To avoid conflicts with other tools in your workspace, all JSON Express variables must be prefixed with the **`JEX`** namespace.
-
-We use **Spring Boot-style Relaxed Binding**, meaning you can use dot-notation for highly readable configurations right inside your `.env` file!
-
-```env
-# .env
-JEX.PORT=8080
-JEX.TRANSPORT.EXPRESS.LOGGER=true
-JEX.API.REST.PREFIX=/api/v1
-```
-
-*(Note: If you are deploying to Docker, AWS, or an OS that strictly forbids dots in environment variables, JSON Express seamlessly supports double-underscores as a fallback: `JEX__TRANSPORT__EXPRESS__LOGGER=true`)*
-
-For advanced, deeply nested configurations, install `@json-express/config` and create a `jex.config.json` (or `.yml`, `.ts`):
-
-```json
-{
-  "port": 8080,
-  "transport": {
-    "express": {
-      "logger": true
-    }
-  },
-  "api": {
-    "rest": {
-      "prefix": "/api/v1"
-    }
-  }
-}
-```
-
-Read more about each packages
-* **[`@json-express/config-env`](./packages/config-env/ReadMe.md)** *(Default)* - Lightweight parser for cascading `.env` files.
-* **[`@json-express/config`](./packages/config)** - Advanced parser for YAML, deep JSON, and functional JS/TS files.
+### 📊 Loggers (Observability Layer)
+* **[`@json-express/logger-console`](./packages/logger-console/ReadMe.md)** *(Default)* - Zero-dependency standard output logging.
+* **[`@json-express/logger-pino`](./packages/logger-pino/ReadMe.md)** - Enterprise high-performance structured JSON logging.
 
 ---
 

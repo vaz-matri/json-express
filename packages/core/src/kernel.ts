@@ -7,8 +7,10 @@ import type {
     IConfigProvider,
     IMiddleware,
     ISeeder,
-    IPlugin
+    IPlugin,
+    ILogger
 } from './types';
+import { ConsoleLogger } from './logger';
 import { composeMiddlewares } from './pipeline';
 
 export class JsonExpressKernel {
@@ -16,9 +18,13 @@ export class JsonExpressKernel {
     private middlewares: Map<string, IMiddleware> = new Map();
     private seeders: ISeeder[] = [];
     private plugins: IPlugin[] = [];
+    private logger: ILogger;
 
     constructor() {
-        // 1. Initialize the Dependency Injection Container
+        // 1. Initialize Default Logger
+        this.logger = new ConsoleLogger();
+
+        // 2. Initialize the Dependency Injection Container
         this.container = createContainer();
     }
 
@@ -40,6 +46,11 @@ export class JsonExpressKernel {
         this.container.register({ apiGenerator: asValue(generator) });
     }
 
+    public registerLogger(logger: ILogger) {
+        this.logger = logger;
+        this.container.register({ logger: asValue(logger) });
+    }
+
     public registerMiddleware(middleware: IMiddleware) {
         this.middlewares.set(middleware.name, middleware);
         this.container.register({ [`middleware:${middleware.name}`]: asValue(middleware) });
@@ -58,11 +69,16 @@ export class JsonExpressKernel {
     // --- THE BOOT SEQUENCE ---
 
     public async boot(collections: Array<string>, port: number = 3000, seedOptions?: { enable?: boolean, force?: boolean }) {
-        console.log('🚀 JSON Express Kernel initializing...');
+        this.logger.info('🚀 JSON Express Kernel initializing...');
 
         // 1. Establish Environment Context
         const env = process.env.NODE_ENV || 'development'
         this.container.register({ NODE_ENV: asValue(env) })
+
+        // Ensure logger is registered in the container as 'logger' for other plugins to resolve
+        if (!this.container.hasRegistration('logger')) {
+            this.container.register({ logger: asValue(this.logger) });
+        }
 
         // Resolve ConfigProvider or provide an empty fallback
         let configProvider: IConfigProvider
@@ -87,11 +103,11 @@ export class JsonExpressKernel {
         }
 
         // 3. Ask the API Generator to create abstract route definitions
-        console.log(`⚙️  Generating API definitions for: ${collections.join(', ')}`);
+        this.logger.info(`⚙️  Generating API definitions for: ${collections.join(', ')}`);
         const routes = apiGenerator.generate(collections);
 
         // 4. Pass those generated routes to the Transport Server
-        console.log(`🔗 Registering ${routes.length} routes with the transport layer...`);
+        this.logger.info(`🔗 Registering ${routes.length} routes with the transport layer...`);
         for (const route of routes) {
             if (route.middlewares && route.middlewares.length > 0) {
                 const assignedMiddlewares = route.middlewares.map(name => {
@@ -108,7 +124,7 @@ export class JsonExpressKernel {
 
         // 4.5 Execute Seeders if explicitly enabled by CLI or configuration
         if (seedOptions?.enable && this.seeders.length > 0) {
-            console.log(`🌱 Executing ${this.seeders.length} seeders...`);
+            this.logger.info(`🌱 Executing ${this.seeders.length} seeders...`);
             for (const seeder of this.seeders) {
                 await seeder.seed(db, seedOptions.force || false);
             }
@@ -116,12 +132,12 @@ export class JsonExpressKernel {
 
         // 4.9 Execute Lifecycle Plugins (e.g., HTTPS Devcert, Loggers) before booting the server
         for (const plugin of this.plugins) {
-            console.log(`🧩 Firing plugin boot hook: ${plugin.name}`);
+            this.logger.info(`🧩 Firing plugin boot hook: ${plugin.name}`);
             await plugin.onBoot(this, configProvider);
         }
 
         // 5. Start the server!
-        console.log(`🟢 Starting server on port ${port}...`);
+        this.logger.info(`🟢 Starting server on port ${port}...`);
         await transport.start(port);
     }
 }

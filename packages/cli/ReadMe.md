@@ -58,7 +58,7 @@ npx json-express --configure
 **Key behaviours:**
 - Always runs all three prompts regardless of existing `.env` state
 - Always includes the **bundled default as an explicit option**
-- Writes selections to `.env` **in-place** — running `--configure` twice never creates duplicate keys
+- writes selections to `.env` **in-place** — running `--configure` twice never creates duplicate keys
 - Boots the server normally after saving
 
 ---
@@ -68,14 +68,17 @@ npx json-express --configure
 You can bypass the Auto-Discovery Engine and explicitly pin any layer to a specific plugin — including the bundled defaults:
 
 ```env
-# Force back to the in-memory adapter even if adapter-json is installed
+# Force back to the in-memory adapter
 JEX.ADAPTER=@json-express/adapter-memory
 
-# Force back to REST even if api-graphql is installed
+# Force back to REST 
 JEX.API=@json-express/api-rest
 
 # Force a specific transport
-JEX.TRANSPORT=@json-express/transport-express
+JEX.TRANSPORT=@json-express/transport-fastify
+
+# Pin to the high-performance Pino logger
+JEX.LOGGER=@json-express/logger-pino
 ```
 
 ---
@@ -110,12 +113,13 @@ The CLI automatically registers two built-in lifecycle plugins requiring zero us
 CLI (startServer)
   ├─ Phase 1: Load Config (EnvConfigProvider)
   ├─ Phase 2: Auto-Discovery (scan package.json)
-  ├─ Phase 3: Resolve Layers (adapter / api / transport)
+  ├─ Phase 3: Resolve Layers (logger / adapter / api / transport)
   │    ├─ Check .env preference → respect it (including defaults)
   │    ├─ --configure → always prompt with full choices list
   │    ├─ 1 custom plugin → silent override
   │    └─ 2+ of same category → conflict prompt → save to .env
-  ├─ Phase 4: Register Middlewares, Seeders, Lifecycle Plugins
-  ├─ Phase 5: Register Baseline Health + Info plugins
-  └─ Phase 6: Boot the Kernel
+  ├─ Phase 4: Resolve & Register Logger (First! Audit all other registers)
+  ├─ Phase 5: Register Middlewares, Seeders, Lifecycle Plugins
+  ├─ Phase 6: Register Baseline Health + Info plugins
+  └─ Phase 7: Boot the Kernel
 ```

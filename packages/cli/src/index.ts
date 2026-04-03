@@ -10,6 +10,7 @@ import { EnvConfigProvider } from '@json-express/config-env';
 import { MemoryDatabaseAdapter } from '@json-express/adapter-memory';
 import { RestApiGenerator } from '@json-express/api-rest';
 import { ExpressTransport } from '@json-express/transport-express';
+import { ConsoleLogger } from '@json-express/logger-console';
 import { BaselineHealthPlugin, BaselineInfoPlugin } from './baseline-plugins.js';
 
 export const startServer = async () => {
@@ -33,6 +34,7 @@ export const startServer = async () => {
     const availableApis = installedDeps.filter(d => d.includes('api-'));
     const availableMiddlewares = installedDeps.filter(d => d.includes('middleware-'));
     const availableSeeders = installedDeps.filter(d => d.includes('seeder-'));
+    const availableLoggers = installedDeps.filter(d => d.includes('logger-'));
     const availablePlugins = installedDeps.filter(d => d.includes('plugin-'));
 
     // --- Parse CLI Execution Flags ---
@@ -107,6 +109,7 @@ export const startServer = async () => {
     const activeAdapter = await resolvePlugin('adapter', availableAdapters, '@json-express/adapter-memory');
     const activeApi = await resolvePlugin('api', availableApis, '@json-express/api-rest');
     const activeTransport = await resolvePlugin('transport', availableTransports, '@json-express/transport-express');
+    const activeLogger = await resolvePlugin('logger', availableLoggers, '@json-express/logger-console');
 
     if (isConfigure) {
         console.log('🚀 Configuration saved. Booting server...\n');
@@ -118,6 +121,7 @@ export const startServer = async () => {
         if (pluginName === '@json-express/adapter-memory') return new MemoryDatabaseAdapter(...constructorArgs);
         if (pluginName === '@json-express/api-rest') return new RestApiGenerator(constructorArgs[0]);
         if (pluginName === '@json-express/transport-express') return new ExpressTransport(...constructorArgs);
+        if (pluginName === '@json-express/logger-console') return new ConsoleLogger();
 
         // Dynamically import custom plugins (Ensures local node_modules precedence)
         let mod;
@@ -177,6 +181,10 @@ export const startServer = async () => {
     // 4. Initialize the Kernel
     const kernel = new JsonExpressKernel();
     kernel.registerConfigProvider(configProvider);
+
+    // 4.1 Resolve and Register Logger (Registered FIRST to catch all other logs)
+    const loggerInstance = await loadPluginInstance(activeLogger, [{ configProvider }]);
+    kernel.registerLogger(loggerInstance);
 
     // ✅ Load and register all discovered Middlewares
     for (const mwName of availableMiddlewares) {

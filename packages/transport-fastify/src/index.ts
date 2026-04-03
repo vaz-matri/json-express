@@ -1,13 +1,15 @@
 import Fastify from 'fastify';
 import type { FastifyBaseLogger, FastifyTypeProviderDefault, RawServerBase, FastifyError, FastifyRequest, FastifyReply } from 'fastify';
-import type { ITransport, RouteDefinition, JsonRequest, IConfigProvider } from '@json-express/core';
+import type { ITransport, RouteDefinition, JsonRequest, IConfigProvider, ILogger } from '@json-express/core';
 
 export class FastifyTransport implements ITransport {
     private fastify: ReturnType<typeof Fastify>;
     private config?: IConfigProvider;
+    private logger: ILogger;
 
-    constructor({ configProvider }: { configProvider?: IConfigProvider } = {}) {
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider, logger: ILogger }) {
         this.config = configProvider;
+        this.logger = logger.child({ component: 'Fastify' });
 
         const enableLogger = this.config?.get<boolean>('transport.fastify.logger', false) ?? false;
 
@@ -74,7 +76,7 @@ export class FastifyTransport implements ITransport {
             try {
                 await this.fastify.listen({ port, host: '0.0.0.0' });
                 const isHttps = !!this.config?.get('transport.fastify.ssl.key');
-                console.log(`🚀 [FastifyTransport] Server listening on ${isHttps ? 'https' : 'http'}://localhost:${port}`);
+                this.logger.info(`Server listening on ${isHttps ? 'https' : 'http'}://localhost:${port}`);
                 resolve();
             } catch (err) {
                 reject(err);

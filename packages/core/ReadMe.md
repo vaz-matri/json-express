@@ -22,6 +22,7 @@ Any official or community plugin must implement one of these core interfaces exp
 - `IDatabaseAdapter` (Storage Layer)
 - `IApiGenerator` (Paradigm Layer)
 - `ITransport` (Server Layer)
+- `ILogger` (Observability Layer)
 - `IRealtimeAdapter` (Event/WebSocket Layer)
 - `IMiddleware` (Interceptor Layer)
 - `IConfigProvider` (Configuration Layer)

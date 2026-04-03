@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import type { ISeeder, IDatabaseAdapter, IConfigProvider } from '@json-express/core';
+import type { ISeeder, IDatabaseAdapter, IConfigProvider, ILogger } from '@json-express/core';
 
 export interface FakerConfig {
     mode?: 'auto' | 'manual';
@@ -10,9 +10,11 @@ export interface FakerConfig {
 export class FakerSeeder implements ISeeder {
     public readonly name = 'faker';
     private config: FakerConfig;
+    private logger: ILogger;
 
-    constructor({ configProvider }: { configProvider?: IConfigProvider }) {
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider, logger: ILogger }) {
         this.config = configProvider?.get<FakerConfig>('faker', {}) || {};
+        this.logger = logger.child({ component: 'Faker' });
     }
 
     private getDefaultSchema() {
@@ -32,11 +34,11 @@ export class FakerSeeder implements ISeeder {
             if (!isForce) {
                 const existingData = await database.getAll(collection);
                 if (existingData && existingData.length > 0) {
-                    console.log(`⏭️  [FakerSeeder] Skipping collection '${collection}', already contains ${existingData.length} records.`);
+                    this.logger.info(`Skipping collection '${collection}', already contains ${existingData.length} records.`, { collection, count: existingData.length });
                     continue;
                 }
             } else {
-                console.log(`⚠️  [FakerSeeder] Force mode activated for collection '${collection}'. Injecting new records.`);
+                this.logger.warn(`Force mode activated for collection '${collection}'. Injecting new records.`, { collection });
             }
 
             let count = defaultCount;
@@ -49,7 +51,7 @@ export class FakerSeeder implements ISeeder {
             } 
 
             // Generate and insert
-            console.log(`🔨 [FakerSeeder] Generating ${count} mock records for '${collection}'...`);
+            this.logger.info(`Generating ${count} mock records for '${collection}'...`, { collection, targetCount: count });
             for (let i = 0; i < count; i++) {
                 const mockRecord = schemaGenerator();
                 await database.create(collection, mockRecord);
