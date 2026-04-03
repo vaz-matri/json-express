@@ -69,7 +69,7 @@ export class JsonExpressKernel {
     // --- THE BOOT SEQUENCE ---
 
     public async boot(collections: Array<string>, port: number = 3000, seedOptions?: { enable?: boolean, force?: boolean }) {
-        this.logger.info('🚀 JSON Express Kernel initializing...');
+        console.log('🚀 JSON Express Kernel initializing...');
 
         // 1. Establish Environment Context
         const env = process.env.NODE_ENV || 'development'
@@ -103,11 +103,11 @@ export class JsonExpressKernel {
         }
 
         // 3. Ask the API Generator to create abstract route definitions
-        this.logger.info(`⚙️  Generating API definitions for: ${collections.join(', ')}`);
+        console.log(`⚙️  Generating API definitions for: ${collections.join(', ')}`);
         const routes = apiGenerator.generate(collections);
 
         // 4. Pass those generated routes to the Transport Server
-        this.logger.info(`🔗 Registering ${routes.length} routes with the transport layer...`);
+        console.log(`🔗 Registering ${routes.length} routes with the transport layer...`);
         for (const route of routes) {
             if (route.middlewares && route.middlewares.length > 0) {
                 const assignedMiddlewares = route.middlewares.map(name => {
@@ -124,7 +124,7 @@ export class JsonExpressKernel {
 
         // 4.5 Execute Seeders if explicitly enabled by CLI or configuration
         if (seedOptions?.enable && this.seeders.length > 0) {
-            this.logger.info(`🌱 Executing ${this.seeders.length} seeders...`);
+            console.log(`🌱 Executing ${this.seeders.length} seeders...`);
             for (const seeder of this.seeders) {
                 await seeder.seed(db, seedOptions.force || false);
             }
@@ -132,12 +132,12 @@ export class JsonExpressKernel {
 
         // 4.9 Execute Lifecycle Plugins (e.g., HTTPS Devcert, Loggers) before booting the server
         for (const plugin of this.plugins) {
-            this.logger.info(`🧩 Firing plugin boot hook: ${plugin.name}`);
+            console.log(`🧩 Firing plugin boot hook: ${plugin.name}`);
             await plugin.onBoot(this, configProvider);
         }
 
         // 5. Start the server!
-        this.logger.info(`🟢 Starting server on port ${port}...`);
+        console.log(`🟢 Starting server on port ${port}...`);
         await transport.start(port);
     }
 }

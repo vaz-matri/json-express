@@ -128,10 +128,10 @@ export const startServer = async () => {
         try {
             // 1. Create a resolver tightly scoped to the user's execution directory
             const localRequire = createRequire(join(cwd, 'package.json'));
-            
+
             // 2. Resolve the exact entrypoint file path using the package's exports
             const resolvedPath = localRequire.resolve(pluginName);
-            
+
             // 3. Import it using a rock-solid file:// URL (Cross-Platform)
             mod = await import(pathToFileURL(resolvedPath).href);
         } catch (e) {
@@ -189,7 +189,7 @@ export const startServer = async () => {
     // ✅ Load and register all discovered Middlewares
     for (const mwName of availableMiddlewares) {
         try {
-            const mw = await loadPluginInstance(mwName, [{ configProvider }]);
+            const mw = await loadPluginInstance(mwName, [{ configProvider, logger: loggerInstance }]);
             kernel.registerMiddleware(mw);
             console.log(`🔌 Registered middleware: ${mwName}`);
         } catch (e: any) {
@@ -200,7 +200,7 @@ export const startServer = async () => {
     // ✅ Load and register all discovered Seeders
     for (const seederName of availableSeeders) {
         try {
-            const seeder = await loadPluginInstance(seederName, [{ configProvider }]);
+            const seeder = await loadPluginInstance(seederName, [{ configProvider, logger: loggerInstance }]);
             kernel.registerSeeder(seeder);
             console.log(`🔌 Registered seeder: ${seederName}`);
         } catch (e: any) {
@@ -215,7 +215,7 @@ export const startServer = async () => {
             if (pluginName.includes('plugin-health')) {
                 hasHealthOverride = true;
             }
-            const plugin = await loadPluginInstance(pluginName, [{ configProvider }]);
+            const plugin = await loadPluginInstance(pluginName, [{ configProvider, logger: loggerInstance }]);
             kernel.registerPlugin(plugin);
             console.log(`🔌 Registered lifecycle plugin: ${pluginName}`);
         } catch (e: any) {
@@ -229,13 +229,13 @@ export const startServer = async () => {
     } else {
         console.log(`🔌 Bypassing baseline health (overridden by advanced health plugin)`);
     }
-    
+
     kernel.registerPlugin(new BaselineInfoPlugin());
     console.log(`🔌 Registered baseline fallback: /info`);
 
     // 5. Instantiate, Configure & Register Plugins
     // ✅ Pass configProvider to the Adapter
-    const db = await loadPluginInstance(activeAdapter, [{ configProvider }]);
+    const db = await loadPluginInstance(activeAdapter, [{ configProvider, logger: loggerInstance }]);
 
     if (typeof db.loadData === 'function') {
         db.loadData(initialData);
@@ -243,11 +243,11 @@ export const startServer = async () => {
     kernel.registerDatabase(db);
 
     // ✅ Pass database AND configProvider to the API Generator
-    const api = await loadPluginInstance(activeApi, [{ database: db, configProvider }]);
+    const api = await loadPluginInstance(activeApi, [{ database: db, configProvider, logger: loggerInstance }]);
     kernel.registerApiGenerator(api);
 
     // ✅ Pass configProvider to the Transport Server
-    const transport = await loadPluginInstance(activeTransport,[{ configProvider }]);
+    const transport = await loadPluginInstance(activeTransport,[{ configProvider, logger: loggerInstance }]);
     kernel.registerTransport(transport);
 
     // 6. Boot the system!
