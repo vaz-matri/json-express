@@ -36,7 +36,16 @@ export class ConsoleLogger implements ILogger {
             ...this.context,
             ...context,
         };
+
+        let prefix = '';
+        const isDebugContext = process.env.JEX_DEBUG_CONTEXT === 'true' || process.env.JEX_DEBUG_CONTEXT === '1';
+        
+        // Diagnostic Mode: Warn if we are inside a component but lost the traceId
+        if (isDebugContext && !traceId && this.context.component && this.context.component !== 'Kernel') {
+            prefix = ' [⚠️ CONTEXT LOST]';
+        }
+
         const ctxString = Object.keys(ctx).length > 0 ? ` ${JSON.stringify(ctx)}` : '';
-        return `[${level}] ${message}${ctxString}`;
+        return `[${level}]${prefix} ${message}${ctxString}`;
     }
 }

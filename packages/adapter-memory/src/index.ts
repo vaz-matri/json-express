@@ -53,8 +53,8 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     // --- IDatabaseAdapter Implementation ---
 
     public async getAll(collection: string): Promise<any[]> {
-        this.logger.info(`Get all from '${collection}'`);
         const items = this.store[collection] ||[];
+        this.logger.info(`Read all from '${collection}'`, { count: items.length });
 
         // Ported referencing/population logic
         return items.map(item => {
@@ -91,20 +91,21 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async getById(collection: string, id: string): Promise<any> {
-        this.logger.info(`Get '${id}' from '${collection}'`);
+        this.logger.info(`Read '${id}' from '${collection}'`, { id });
         const { item } = this.findById(collection, id);
         return item;
     }
 
     public async search(collection: string, query: Record<string, any>): Promise<any[]> {
         const items = this.store[collection] ||[];
-        return items.filter(item => {
+        const results = items.filter(item => {
             return Object.keys(query).every(searchKey => query[searchKey] === item[searchKey]);
         });
+        this.logger.info(`Search in '${collection}'`, { count: results.length });
+        return results;
     }
 
     public async create(collection: string, data: any): Promise<any> {
-        this.logger.info(`Create in '${collection}'`);
         if (!this.store[collection]) {
             this.store[collection] =[];
         }
@@ -113,25 +114,25 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
         const newItem = { id: `${Date.now()}`, ...data };
         this.store[collection].push(newItem);
 
+        this.logger.info(`Created in '${collection}'`, { id: newItem.id });
         return newItem;
     }
 
     public async update(collection: string, id: string, data: any): Promise<any> {
-        this.logger.info(`Update '${id}' in '${collection}'`);
         const { item, index } = this.findById(collection, id);
 
         // Merge updates, ensuring ID cannot be overwritten
         const updatedItem = { ...item, ...data, id };
         this.store[collection][index] = updatedItem;
 
+        this.logger.info(`Updated '${id}' in '${collection}'`, { id });
         return updatedItem;
     }
 
     public async delete(collection: string, id: string): Promise<any> {
-        this.logger.info(`Delete '${id}' from '${collection}'`);
         const { item, index } = this.findById(collection, id);
-
         this.store[collection].splice(index, 1);
+        this.logger.info(`Deleted '${id}' from '${collection}'`, { id });
         return item;
     }
 

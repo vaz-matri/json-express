@@ -110,8 +110,8 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async getAll(collection: string): Promise<any[]> {
-        this.logger.info(`Get all from '${collection}'`);
         const items = this.store[collection] || [];
+        this.logger.info(`Read all from '${collection}'`, { count: items.length });
 
         return items.map(item => {
             const clonedItem = { ...item };
@@ -145,20 +145,21 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async getById(collection: string, id: string): Promise<any> {
-        this.logger.info(`Get '${id}' from '${collection}'`);
+        this.logger.info(`Read '${id}' from '${collection}'`, { id });
         const { item } = this.findById(collection, id);
         return item;
     }
 
     public async search(collection: string, query: Record<string, any>): Promise<any[]> {
         const items = this.store[collection] || [];
-        return items.filter(item =>
+        const results = items.filter(item =>
             Object.keys(query).every(key => query[key] === item[key])
         );
+        this.logger.info(`Search in '${collection}'`, { count: results.length });
+        return results;
     }
 
     public async create(collection: string, data: any): Promise<any> {
-        this.logger.info(`Create in '${collection}'`);
         if (!this.store[collection]) {
             this.store[collection] = [];
             // New collection — register a file path for it
@@ -168,27 +169,28 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
         const newItem = { id: `${Date.now()}`, ...data };
         this.store[collection].push(newItem);
 
+        this.logger.info(`Created in '${collection}'`, { id: newItem.id });
         this._persist(collection);
         return newItem;
     }
 
     public async update(collection: string, id: string, data: any): Promise<any> {
-        this.logger.info(`Update '${id}' in '${collection}'`);
         const { item, index } = this.findById(collection, id);
 
         const updatedItem = { ...item, ...data, id };
         this.store[collection][index] = updatedItem;
 
+        this.logger.info(`Updated '${id}' in '${collection}'`, { id });
         this._persist(collection);
         return updatedItem;
     }
 
     public async delete(collection: string, id: string): Promise<any> {
-        this.logger.info(`Delete '${id}' from '${collection}'`);
         const { item, index } = this.findById(collection, id);
 
         this.store[collection].splice(index, 1);
 
+        this.logger.info(`Deleted '${id}' from '${collection}'`, { id });
         this._persist(collection);
         return item;
     }

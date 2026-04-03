@@ -14,6 +14,7 @@ It leverages [Pino](https://github.com/pinojs/pino) under the hood and implement
 *   **Pretty Printing**: Uses `pino-pretty` in development for a premium developer experience.
 *   **Enterprise Mode**: Supports direct-to-file logging with automatic path resolution.
 *   **High Performance**: Asynchronous logging to minimize overhead on the framework.
+*   **Request Correlation**: Automatically picks up the framework-wide `traceId` from `RequestContext` and injects it into every log line without manual propagation.
 
 ## 🛠️ Configuration
 

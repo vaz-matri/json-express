@@ -15,8 +15,9 @@ visit[jsonexpress.com](https://jsonexpress.com)
 - **Agnostic Microkernel** - Pluggable architecture! Swap out the Database, Server (Transport), or API Paradigm without rewriting your business logic.
 - **Auto-Discovery** - Install a plugin and the CLI automatically detects and wires it up. No boilerplate needed.
 - **Twelve-Factor Configuration** - Cascading environment variables and smart configurations built for enterprise.
-- **Built-in Observability** - Native `/health` and `/info` endpoints for production-ready monitoring.
-- **Standardized Logging** - Pluggable logging layer! Swap between basic console output and high-performance Pino JSON logs with a single install.
+- **Deep Observability & Correlated Tracing** - Uses `AsyncLocalStorage` to automatically propagate a unique `traceId` across every layer (Transport → Middleware → API → Database).
+- **Standardized Logging** - Pluggable logging layer! Includes metadata (ID, Counts) by default, and supports zero-latency trace correlation between basic console output and high-performance Pino JSON logs.
+- **Developer Diagnostics** - Built-in Context Diagnostic Mode (`JEX_DEBUG_CONTEXT=true`) to instantly detect and warn about lost request traces during development.
 
 ---
 

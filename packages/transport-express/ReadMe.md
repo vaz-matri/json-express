@@ -43,18 +43,20 @@ Remember to use the `JEX_` prefix. Dots (`.`) denote nested objects, and undersc
 ### Using `.env`
 Remember to use the `JEX.` namespace prefix. Dots (`.`) denote nested objects, and underscores (`_`) are used for multi-word keys.
 
+### Automated Access Logging & Tracing
+The Express transport now automatically performs **post-response access logging** using the framework's configured logger. 
+- It generates a unique `traceId` via `AsyncLocalStorage` for every request.
+- It logs the method, path, status code, and latency (in ms) once the request is complete.
+- **No configuration required.** The old `JEX.TRANSPORT.EXPRESS.LOGGER` flag has been deprecated and superseded by this automated behavior.
+
+### Other Options
 ```env
 # Change the default server port (default: 3000)
 JEX.PORT=8080
 
-# Enable the built-in request logger (default: false)
-JEX.TRANSPORT.EXPRESS.LOGGER=true
-
 # Enable trust proxy for load balancers (default: false)
 JEX.TRANSPORT.EXPRESS.TRUST_PROXY=true
 ```
-
-*(If your deployment environment forbids dots in variables, use double-underscores: `JEX__TRANSPORT__EXPRESS__LOGGER=true`)*
 
 ### Using `jex.config.json`
 ```json

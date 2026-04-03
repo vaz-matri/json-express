@@ -30,6 +30,11 @@ memoryDb.loadData({
 kernel.registerDatabase(memoryDb);
 ```
 
-## ⚙️ Configuration
-By default, this adapter expects `.json` files in the current working directory.
-*(Future configuration options for strict-typing and custom file paths will be documented here).*
+## 🛡️ Integrated Observability
+Every database operation is now automatically logged through the framework's centralized logger. 
+- **Tracing**: All logs are correlated with the framework-wide `traceId`.
+- **Metadata Auditing**: It logs the **count** of records found for `getAll`/`search` and the **record ID** for `create`, `update`, and `delete`.
+- **Privacy**: No actual record content (sensitive data) is ever written to the logs.
+
+## 📄 License
+[MIT License](../../LICENSE)

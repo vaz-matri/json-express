@@ -24,11 +24,16 @@ JSON Express will automatically detect and use this transport if it is the only 
 JEX.TRANSPORT=@json-express/transport-fastify
 ```
 
+### Automated Access Logging & Tracing
+The Fastify transport now automatically performs **post-response access logging** using the framework's configured logger. 
+- It generates a unique `traceId` via `AsyncLocalStorage` for every request.
+- It logs the method, path, status code, and latency (in ms) once the request is complete.
+- **No configuration required.** The old `transport.fastify.logger` flag has been deprecated and superseded by this automated behavior.
+
 ### Options
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `transport.fastify.logger` | `boolean` | `false` | Enable built-in Pino request logging. |
 | `transport.fastify.ssl.key` | `string` | `undefined` | Path to SSL key file or raw PEM string. |
 | `transport.fastify.ssl.cert` | `string` | `undefined` | Path to SSL certificate file or raw PEM string. |
 

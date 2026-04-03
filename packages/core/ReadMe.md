@@ -29,6 +29,11 @@ Any official or community plugin must implement one of these core interfaces exp
 - `IPlugin` (Lifecycle Layer)
 - `ISeeder` (Data Seeding Layer)
 
+### Request Context & Tracing
+The `core` package provides a robust mechanism for request-scoped correlation using Node.js `AsyncLocalStorage`:
+- `RequestContext`: A global utility to store and retrieve `traceId` and `startTime` consistently across the entire framework without parameter drilling.
+- `ConsoleLogger`: The built-in logger that automatically pulls `traceId` from the context for all log entries.
+
 ### Core Utilities
 The `core` package also exposes vital Twelve-Factor configuration utilities used by other plugins:
 - `normalizeKey()`: Safely strips prefixes and converts `.` to nested objects.

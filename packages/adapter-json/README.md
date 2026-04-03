@@ -116,15 +116,24 @@ Fully supports the JSON Express relational linking system inherited from `adapte
 
 ---
 
+## 🛡️ Integrated Observability & Auditing
+
+Every database operation is now automatically logged through the framework's centralized logger. 
+- **Tracing**: All logs are correlated with the framework-wide `traceId`.
+- **Metadata**: It logs the **count** of records found for `getAll`/`search` and the **record ID** for `create`, `update`, and `delete`.
+- **Privacy**: No actual record content (sensitive data) is ever written to the logs.
+
+---
+
 ## Architecture Note
 
 ```
 JsonFileDatabaseAdapter
   ├─ constructor()    → scans cwd, loads .json files, records file paths
-  ├─ getAll/search   → in-memory with full ref resolution
-  ├─ create          → add to store + _persist()
-  ├─ update          → mutate store + _persist()
-  ├─ delete          → remove from store + _persist()
+  ├─ getAll/search   → in-memory with full ref resolution + metadata logging
+  ├─ create          → add to store + _persist() + ID logging
+  ├─ update          → mutate store + _persist() + ID logging
+  ├─ delete          → remove from store + _persist() + ID logging
   ├─ _persist(col)   → debounced (50ms) atomic write → .tmp → rename
   └─ isHealthy()     → fs.access(R_OK | W_OK) on all tracked files
 ```
