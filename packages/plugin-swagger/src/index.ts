@@ -27,23 +27,27 @@ class SwaggerDocProvider implements IDocProvider {
         return `🛡️ Interactive Swagger UI: http://localhost:${port}/`;
     }
 
+    private convertPathToOpenApi(path: string): string {
+        return path.replace(/:([a-zA-Z0-9_]+)/g, '{$1}');
+    }
+
     /**
      * Translates JSON Express Routes into OpenAPI 3.0.0 Path Objects
      */
-    getManifest(routes: RouteDefinition[]): any {
+    private generateOpenApiSpec(routes: RouteDefinition[]): any {
         const paths: Record<string, any> = {};
 
         for (const route of routes) {
             const method = route.method.toLowerCase();
-            const path = route.path;
+            const openApiPath = this.convertPathToOpenApi(route.path);
 
-            if (!paths[path]) paths[path] = {};
+            if (!paths[openApiPath]) paths[openApiPath] = {};
 
-            paths[path][method] = {
-                summary: `Operation on ${path}`,
+            paths[openApiPath][method] = {
+                summary: `Operation on ${route.path}`,
                 description: `Standard ${method.toUpperCase()} endpoint managed by JSON Express.`,
-                tags: [this.extractResource(path)],
-                parameters: this.extractPathParams(path),
+                tags: [this.extractResource(route.path)],
+                parameters: this.extractPathParams(route.path),
                 responses: {
                     200: {
                         description: 'Successful operation',
@@ -58,7 +62,7 @@ class SwaggerDocProvider implements IDocProvider {
 
             // Add request body for mutation methods
             if (['post', 'patch', 'put'].includes(method)) {
-                paths[path][method].requestBody = {
+                paths[openApiPath][method].requestBody = {
                     content: {
                         'application/json': {
                             schema: { type: 'object' }
@@ -77,6 +81,14 @@ class SwaggerDocProvider implements IDocProvider {
             },
             paths
         };
+    }
+
+    getManifest(routes: RouteDefinition[]): any {
+        return routes.map(r => ({
+            method: r.method,
+            path: r.path,
+            middlewares: r.middlewares || []
+        }));
     }
 
     renderDocumentation(routes: RouteDefinition[]): string {
@@ -105,7 +117,7 @@ class SwaggerDocProvider implements IDocProvider {
     <script>
     window.onload = function() {
         const ui = SwaggerUIBundle({
-            url: "/info/routes", // Point to the dynamic manifest endpoint
+            spec: ${JSON.stringify(this.generateOpenApiSpec(routes))},
             dom_id: '#swagger-ui',
             deepLinking: true,
             presets: [

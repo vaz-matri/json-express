@@ -36,7 +36,8 @@ export const startServer = async () => {
     const availableMiddlewares = installedDeps.filter(d => d.includes('middleware-'));
     const availableSeeders = installedDeps.filter(d => d.includes('seeder-'));
     const availableLoggers = installedDeps.filter(d => d.includes('logger-'));
-    const availablePlugins = installedDeps.filter(d => d.includes('plugin-'));
+    const availableDocs = installedDeps.filter(d => d.includes('plugin-docs') || d.includes('plugin-swagger'));
+    const availablePlugins = installedDeps.filter(d => d.includes('plugin-') && !d.includes('plugin-docs') && !d.includes('plugin-swagger'));
 
     // --- Parse CLI Execution Flags ---
     const isForceSeed = process.argv.includes('--seeder');
@@ -111,6 +112,7 @@ export const startServer = async () => {
     const activeApi = await resolvePlugin('api', availableApis, '@json-express/api-rest');
     const activeTransport = await resolvePlugin('transport', availableTransports, '@json-express/transport-express');
     const activeLogger = await resolvePlugin('logger', availableLoggers, '@json-express/logger-console');
+    const activeDocs = await resolvePlugin('docs', availableDocs, '@json-express/plugin-docs');
 
     if (isConfigure) {
         console.log('🚀 Configuration saved. Booting server...\n');
@@ -217,13 +219,13 @@ export const startServer = async () => {
         }
     }
 
-    // ✅ Register the Documentation Plugin (Default) first so it can be overridden
-    // Skip if Swagger is already present in the project to avoid redundant boot hooks
-    const hasSwagger = availablePlugins.some(p => p.includes('plugin-swagger'));
-    if (!hasSwagger) {
-        kernel.registerPlugin(new DocsPlugin());
-    } else {
-        // console.log('🛡️ Swagger plugin detected, skipping default documentation dashboard.');
+    // ✅ Load and register the resolved Documentation Provider
+    try {
+        const docs = await loadPluginInstance(activeDocs, [{ configProvider, logger: loggerInstance }]);
+        kernel.registerPlugin(docs);
+        console.log(`🔌 Registered documentation provider: ${activeDocs}`);
+    } catch (e: any) {
+        console.error(`❌ Failed to load documentation provider ${activeDocs}:`, e?.message || e);
     }
 
     // ✅ Load and register all discovered Lifecycle Plugins

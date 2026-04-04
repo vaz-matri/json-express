@@ -8,7 +8,8 @@ import type {
     IMiddleware,
     ISeeder,
     IPlugin,
-    ILogger
+    ILogger,
+    IDocProvider
 } from './types';
 import { ConsoleLogger } from './logger';
 import { composeMiddlewares } from './pipeline';
@@ -66,7 +67,7 @@ export class JsonExpressKernel {
         this.container.register({ [`plugin:${plugin.name}`]: asValue(plugin) });
     }
 
-    public registerDocProvider(provider: any) {
+    public registerDocProvider(provider: IDocProvider) {
         this.container.register({ docProvider: asValue(provider) });
     }
 
