@@ -51,6 +51,10 @@ importers:
       '@json-express/plugin-health':
         specifier: workspace:*
         version: link:../../packages/plugin-health
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.59.1
+        version: 1.59.1
 
   example/html-simple: {}
 
