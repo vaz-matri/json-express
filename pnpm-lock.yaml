@@ -51,10 +51,6 @@ importers:
       '@json-express/plugin-health':
         specifier: workspace:*
         version: link:../../packages/plugin-health
-    devDependencies:
-      '@playwright/test':
-        specifier: ^1.59.1
-        version: 1.59.1
 
   example/html-simple: {}
 
@@ -134,12 +130,12 @@ importers:
       '@json-express/core':
         specifier: workspace:*
         version: link:../core
+      '@json-express/docs-light':
+        specifier: workspace:*
+        version: link:../docs-light
       '@json-express/logger-console':
         specifier: workspace:*
         version: link:../logger-console
-      '@json-express/plugin-docs':
-        specifier: workspace:*
-        version: link:../plugin-docs
       '@json-express/transport-express':
         specifier: workspace:*
         version: link:../transport-express
@@ -181,6 +177,18 @@ importers:
       awilix:
         specifier: ^10.0.1
         version: 10.0.2
+
+  packages/docs-light:
+    dependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
+
+  packages/docs-swagger:
+    dependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/logger-console:
     dependencies:
@@ -231,22 +239,10 @@ importers:
         specifier: ^1.2.2
         version: 1.2.3
 
-  packages/plugin-docs:
-    dependencies:
-      '@json-express/core':
-        specifier: workspace:^
-        version: link:../core
-
   packages/plugin-health:
     dependencies:
       '@json-express/core':
         specifier: workspace:*
-        version: link:../core
-
-  packages/plugin-swagger:
-    dependencies:
-      '@json-express/core':
-        specifier: workspace:^
         version: link:../core
 
   packages/seeder-faker:

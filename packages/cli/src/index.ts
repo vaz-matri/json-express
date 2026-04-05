@@ -11,7 +11,7 @@ import { MemoryDatabaseAdapter } from '@json-express/adapter-memory';
 import { RestApiGenerator } from '@json-express/api-rest';
 import { ExpressTransport } from '@json-express/transport-express';
 import { ConsoleLogger } from '@json-express/logger-console';
-import { DocsPlugin } from '@json-express/plugin-docs';
+import { LightDocProvider } from '@json-express/docs-light';
 
 export const startServer = async () => {
     const cwd = process.cwd();
@@ -35,8 +35,8 @@ export const startServer = async () => {
     const availableMiddlewares = installedDeps.filter(d => d.includes('middleware-'));
     const availableSeeders = installedDeps.filter(d => d.includes('seeder-'));
     const availableLoggers = installedDeps.filter(d => d.includes('logger-'));
-    const availableDocs = installedDeps.filter(d => d.includes('plugin-docs') || d.includes('plugin-swagger'));
-    const availablePlugins = installedDeps.filter(d => d.includes('plugin-') && !d.includes('plugin-docs') && !d.includes('plugin-swagger'));
+    const availableDocs = installedDeps.filter(d => d.includes('docs-'));
+    const availablePlugins = installedDeps.filter(d => d.includes('plugin-'));
 
     // --- Parse CLI Execution Flags ---
     const isForceSeed = process.argv.includes('--seeder');
@@ -111,7 +111,7 @@ export const startServer = async () => {
     const activeApi = await resolvePlugin('api', availableApis, '@json-express/api-rest');
     const activeTransport = await resolvePlugin('transport', availableTransports, '@json-express/transport-express');
     const activeLogger = await resolvePlugin('logger', availableLoggers, '@json-express/logger-console');
-    const activeDocs = await resolvePlugin('docs', availableDocs, '@json-express/plugin-docs');
+    const activeDocs = await resolvePlugin('docs', availableDocs, '@json-express/docs-light');
 
     if (isConfigure) {
         console.log('🚀 Configuration saved. Booting server...\n');
@@ -124,7 +124,7 @@ export const startServer = async () => {
         if (pluginName === '@json-express/api-rest') return new RestApiGenerator(constructorArgs[0]);
         if (pluginName === '@json-express/transport-express') return new ExpressTransport(constructorArgs[0]);
         if (pluginName === '@json-express/logger-console') return new ConsoleLogger();
-        if (pluginName === '@json-express/plugin-docs') return new DocsPlugin();
+        if (pluginName === '@json-express/docs-light') return new LightDocProvider(constructorArgs[0]);
 
         // Dynamically import custom plugins (Ensures local node_modules precedence)
         let mod;
@@ -146,11 +146,11 @@ export const startServer = async () => {
         // We look for the first function/class and ignore non-constructable exports like __esModule
         const exports = Object.values(mod);
         const PluginClass = exports.find(v => typeof v === 'function') as any;
-        
+
         if (!PluginClass) {
             throw new Error(`No constructable export found in plugin ${pluginName}`);
         }
-        
+
         return new PluginClass(...constructorArgs);
     };
 
@@ -221,7 +221,7 @@ export const startServer = async () => {
     // ✅ Load and register the resolved Documentation Provider
     try {
         const docs = await loadPluginInstance(activeDocs, [{ configProvider, logger: loggerInstance }]);
-        kernel.registerPlugin(docs);
+        kernel.registerDocProvider(docs);
         console.log(`🔌 Registered documentation provider: ${activeDocs}`);
     } catch (e: any) {
         console.error(`❌ Failed to load documentation provider ${activeDocs}:`, e?.message || e);

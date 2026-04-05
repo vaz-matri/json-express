@@ -1,37 +1,27 @@
-import type { 
-    IPlugin, 
-    IConfigProvider, 
-    IDocProvider, 
-    RouteDefinition, 
-    ILogger,
-    IApiGenerator
+import type {
+    IConfigProvider,
+    IDocProvider,
+    RouteDefinition,
+    ILogger
 } from '@json-express/core';
 
-export class DocsPlugin implements IPlugin {
-    name = 'docs';
+export class LightDocProvider implements IDocProvider {
+    private logger?: ILogger;
 
-    async onBoot(kernel: any, configProvider: IConfigProvider) {
-        const logger: ILogger = kernel.container.resolve('logger');
-        
-        // Register the lightweight provider
-        kernel.registerDocProvider(new LightweightDocProvider(kernel));
-        
-        logger.info('Self-documenting plugin initialized.');
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
+        this.logger = logger?.child({ component: 'Docs-Light' });
+        this.logger?.info('Lightweight API documentation provider initialized.');
     }
-}
 
-class LightweightDocProvider implements IDocProvider {
-    constructor(private kernel: any) {}
-
-    renderTitle(): string {
+    public renderTitle(): string {
         return 'JSON Express API Manifest';
     }
 
-    getDocumentationMessage(port: number): string {
+    public getDocumentationMessage(port: number): string {
         return `📚 API Manifest available at: http://localhost:${port}/info/routes`;
     }
 
-    getManifest(routes: RouteDefinition[]): any {
+    public getManifest(routes: RouteDefinition[]): any {
         return routes.map(r => ({
             method: r.method,
             path: r.path,
@@ -39,9 +29,9 @@ class LightweightDocProvider implements IDocProvider {
         }));
     }
 
-    renderDocumentation(routes: RouteDefinition[]): string {
+    public renderDocumentation(routes: RouteDefinition[]): string {
         const sortedRoutes = [...routes].sort((a, b) => a.path.localeCompare(b.path));
-        
+
         // Group by resource (first part of path after /api/v1/)
         const groups: Record<string, RouteDefinition[]> = {};
         for (const route of sortedRoutes) {

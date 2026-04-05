@@ -1,7 +1,7 @@
 {
-  "name": "@json-express/plugin-docs",
+  "name": "@json-express/docs-swagger",
   "version": "2.0.0-alpha.0",
-  "description": "Lightweight, zero-dependency self-documenting API manifest for JSON Express",
+  "description": "Interactive Swagger UI and dynamic OpenAPI 3.0 specification for JSON Express",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

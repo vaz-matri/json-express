@@ -1,29 +1,23 @@
-import type { 
-    IPlugin, 
-    IConfigProvider, 
-    IDocProvider, 
-    RouteDefinition, 
-    ILogger 
+import type {
+    IConfigProvider,
+    IDocProvider,
+    RouteDefinition,
+    ILogger
 } from '@json-express/core';
 
-export class SwaggerPlugin implements IPlugin {
-    name = 'swagger';
+export class SwaggerDocProvider implements IDocProvider {
+    private logger?: ILogger;
 
-    async onBoot(kernel: any, configProvider: IConfigProvider) {
-        const logger: ILogger = kernel.container.resolve('logger');
-        // Register the Swagger provider to override the default one
-        kernel.registerDocProvider(new SwaggerDocProvider());
-        
-        logger.info('Interactive Swagger documentation plugin initialized.');
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
+        this.logger = logger?.child({ component: 'Docs-Swagger' });
+        this.logger?.info('Interactive Swagger documentation provider initialized.');
     }
-}
 
-class SwaggerDocProvider implements IDocProvider {
-    renderTitle(): string {
+    public renderTitle(): string {
         return 'JSON Express API — Interactive Swagger UI';
     }
 
-    getDocumentationMessage(port: number): string {
+    public getDocumentationMessage(port: number): string {
         return `🛡️ Interactive Swagger UI: http://localhost:${port}/`;
     }
 
@@ -83,7 +77,7 @@ class SwaggerDocProvider implements IDocProvider {
         };
     }
 
-    getManifest(routes: RouteDefinition[]): any {
+    public getManifest(routes: RouteDefinition[]): any {
         return routes.map(r => ({
             method: r.method,
             path: r.path,
@@ -91,7 +85,7 @@ class SwaggerDocProvider implements IDocProvider {
         }));
     }
 
-    renderDocumentation(routes: RouteDefinition[]): string {
+    public renderDocumentation(routes: RouteDefinition[]): string {
         return `
 <!DOCTYPE html>
 <html lang="en">

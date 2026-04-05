@@ -3,6 +3,7 @@ example/
 logo
 LICENSE
 *.md
+*-lock.*
 
 TODO
 - how about core/src/index.ts file
