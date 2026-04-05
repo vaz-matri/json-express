@@ -1,0 +1,14 @@
+{
+    "name": "health",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/core": "workspace:*",
+        "@json-express/cli": "workspace:*",
+        "@json-express/plugin-health": "workspace:*"
+    }
+}

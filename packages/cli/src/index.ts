@@ -11,7 +11,6 @@ import { MemoryDatabaseAdapter } from '@json-express/adapter-memory';
 import { RestApiGenerator } from '@json-express/api-rest';
 import { ExpressTransport } from '@json-express/transport-express';
 import { ConsoleLogger } from '@json-express/logger-console';
-import { BaselineHealthPlugin, BaselineInfoPlugin } from './baseline-plugins.js';
 import { DocsPlugin } from '@json-express/plugin-docs';
 
 export const startServer = async () => {
@@ -229,12 +228,8 @@ export const startServer = async () => {
     }
 
     // ✅ Load and register all discovered Lifecycle Plugins
-    let hasHealthOverride = false;
     for (const pluginName of availablePlugins) {
         try {
-            if (pluginName.includes('plugin-health')) {
-                hasHealthOverride = true;
-            }
             const plugin = await loadPluginInstance(pluginName, [{ configProvider, logger: loggerInstance }]);
             kernel.registerPlugin(plugin);
             console.log(`🔌 Registered lifecycle plugin: ${pluginName}`);
@@ -242,13 +237,6 @@ export const startServer = async () => {
             console.error(`❌ Failed to load plugin ${pluginName}:`, e?.message || e);
         }
     }
-
-    if (!hasHealthOverride) {
-        kernel.registerPlugin(new BaselineHealthPlugin());
-    }
-
-    kernel.registerPlugin(new BaselineInfoPlugin());
-    console.log(`🔌 Registered baseline fallback: /info`);
 
     // 5. Instantiate, Configure & Register Plugins
     // ✅ Pass configProvider to the Adapter
