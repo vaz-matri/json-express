@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, writeFileSync, renameSync, accessSync, constants } from 'fs';
 import { join, extname } from 'path';
-import type { IDatabaseAdapter, IConfigProvider, ILogger } from '@json-express/core';
+import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator } from '@json-express/core';
 import { ConsoleLogger } from '@json-express/core';
 
 export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
@@ -10,11 +10,13 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     private cwd: string;
     private config?: IConfigProvider;
     private logger: ILogger;
+    private idGenerator?: IIdGenerator;
 
-    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
+    constructor({ configProvider, logger, idGenerator }: { configProvider?: IConfigProvider; logger?: ILogger; idGenerator?: IIdGenerator } = {}) {
         this.config = configProvider;
         this.cwd = process.cwd();
         this.logger = logger?.child({ component: 'DB-Json' }) ?? new ConsoleLogger({ context: { component: 'DB-Json' } });
+        this.idGenerator = idGenerator;
         this._scanAndLoad();
     }
 
@@ -36,8 +38,25 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
                 const content = readFileSync(filePath, 'utf8');
                 const parsed = JSON.parse(content);
                 const collection = dirent.name.replace('.json', '');
-                this.store[collection] = Array.isArray(parsed) ? parsed : [parsed];
+                let data = Array.isArray(parsed) ? parsed : [parsed];
+
+                // Auto-assign IDs to records missing them
+                let modified = false;
+                data = data.map(item => {
+                    if (item.id === undefined) {
+                        modified = true;
+                        return { id: (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`), ...item };
+                    }
+                    return item;
+                });
+
+                this.store[collection] = data;
                 this.filePaths[collection] = filePath;
+
+                if (modified) {
+                    this.logger.info(`Assigned missing IDs to '${collection}'`);
+                    this._persist(collection);
+                }
             } catch (e) {
                 this.logger.warn(`Skipping unreadable file: ${dirent.name}`);
             }
@@ -166,7 +185,8 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
             this.filePaths[collection] = join(this.cwd, `${collection}.json`);
         }
 
-        const newItem = { id: `${Date.now()}`, ...data };
+        const newId = data.id !== undefined ? data.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);
+        const newItem = { ...data, id: newId };
         this.store[collection].push(newItem);
 
         this.logger.info(`Created in '${collection}'`, { id: newItem.id });

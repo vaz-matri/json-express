@@ -1,4 +1,4 @@
-import type { IDatabaseAdapter, IConfigProvider, ILogger } from '@json-express/core';
+import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator } from '@json-express/core';
 import { ConsoleLogger } from '@json-express/core';
 
 export class MemoryDatabaseAdapter implements IDatabaseAdapter {
@@ -6,16 +6,27 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     private store: Record<string, any[]> = {};
     private config?: IConfigProvider;
     private logger: ILogger;
+    private idGenerator?: IIdGenerator;
 
-    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
+    constructor({ configProvider, logger, idGenerator }: { configProvider?: IConfigProvider; logger?: ILogger; idGenerator?: IIdGenerator } = {}) {
         this.config = configProvider;
         this.logger = logger?.child({ component: 'DB-Memory' }) ?? new ConsoleLogger({ context: { component: 'DB-Memory' } });
+        this.idGenerator = idGenerator;
     }
 
     /**
      * Helper method to load the initial JSON data into memory
      */
     public loadData(initialData: Record<string, any[]>) {
+        // Ensure every record has an ID
+        for (const collection of Object.keys(initialData)) {
+            initialData[collection] = initialData[collection].map(item => {
+                if (item.id === undefined) {
+                    return { id: (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`), ...item };
+                }
+                return item;
+            });
+        }
         this.store = initialData;
     }
 
@@ -111,7 +122,8 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
         }
 
         // Auto-generate ID if missing
-        const newItem = { id: `${Date.now()}`, ...data };
+        const newId = data.id !== undefined ? data.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);
+        const newItem = { ...data, id: newId };
         this.store[collection].push(newItem);
 
         this.logger.info(`Created in '${collection}'`, { id: newItem.id });

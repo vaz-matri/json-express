@@ -19,7 +19,6 @@ export class FakerSeeder implements ISeeder {
 
     private getDefaultSchema() {
         return {
-            id: faker.string.uuid(),
             title: faker.word.words(3),
             createdAt: faker.date.recent().toISOString()
         };

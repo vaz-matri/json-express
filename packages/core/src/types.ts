@@ -135,10 +135,18 @@ export interface ILogger {
  */
 export interface IDocProvider {
     renderTitle(): string;
-    renderDocumentation(routes: RouteDefinition[]): string; // Returns HTML
+    renderDocumentation(routes: RouteDefinition[], path: string): string; // Returns HTML
     /**
      * Returns a professional boot-time log message with a clickable link.
      */
     getDocumentationMessage(port: number, path: string): string;
     getManifest(routes: RouteDefinition[]): any;            // Returns JSON
+}
+
+/**
+ * 12. The ID Generator Contract
+ * Provides unique identifiers for newly created records.
+ */
+export interface IIdGenerator {
+    generate(): string | number;
 }

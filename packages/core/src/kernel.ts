@@ -9,13 +9,21 @@ import type {
     ISeeder,
     IPlugin,
     ILogger,
-    IDocProvider
+    IDocProvider,
+    IIdGenerator
 } from './types';
 import { ConsoleLogger } from './logger';
+import { randomUUID } from 'crypto';
 import { composeMiddlewares } from './pipeline';
 
+class DefaultIdGenerator implements IIdGenerator {
+    generate(): string {
+        return randomUUID();
+    }
+}
+
 export class JsonExpressKernel {
-    private container: AwilixContainer;
+    public container: AwilixContainer;
     private middlewares: Map<string, IMiddleware> = new Map();
     private seeders: ISeeder[] = [];
     private plugins: IPlugin[] = [];
@@ -27,10 +35,19 @@ export class JsonExpressKernel {
 
         // 2. Initialize the Dependency Injection Container
         this.container = createContainer();
+
+        // 3. Register the default ID Generator immediately
+        this.container.register({
+            idGenerator: asValue(new DefaultIdGenerator())
+        });
     }
 
     public registerConfigProvider(provider: IConfigProvider) {
         this.container.register({ configProvider: asValue(provider) })
+    }
+
+    public registerIdGenerator(generator: IIdGenerator) {
+        this.container.register({ idGenerator: asValue(generator) });
     }
 
     // --- REGISTRATION METHODS ---
@@ -156,7 +173,7 @@ export class JsonExpressKernel {
                     handler: async () => ({
                         statusCode: 200,
                         headers: { 'Content-Type': 'text/html' },
-                        body: docProvider.renderDocumentation(routes)
+                        body: docProvider.renderDocumentation(routes, path)
                     })
                 });
 

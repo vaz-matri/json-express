@@ -36,6 +36,7 @@ export const startServer = async () => {
     const availableSeeders = installedDeps.filter(d => d.includes('seeder-'));
     const availableLoggers = installedDeps.filter(d => d.includes('logger-'));
     const availableDocs = installedDeps.filter(d => d.includes('docs-'));
+    const availableIds = installedDeps.filter(d => d.includes('id-'));
     const availablePlugins = installedDeps.filter(d => d.includes('plugin-'));
 
     // --- Parse CLI Execution Flags ---
@@ -196,6 +197,15 @@ export const startServer = async () => {
     const loggerInstance = await loadPluginInstance(activeLogger, [{ configProvider }]);
     kernel.registerLogger(loggerInstance);
 
+    // 4.2 Resolve ID Generator (Fall back to Kernel's default if not installed)
+    let idGeneratorInstance = kernel.container.resolve('idGenerator');
+    if (availableIds.length > 0) {
+        const activeId = await resolvePlugin('id', availableIds, availableIds[0]);
+        idGeneratorInstance = await loadPluginInstance(activeId, [{ configProvider, logger: loggerInstance }]);
+        kernel.registerIdGenerator(idGeneratorInstance);
+        console.log(`🔌 Registered ID generator: ${activeId}`);
+    }
+
     // ✅ Load and register all discovered Middlewares
     for (const mwName of availableMiddlewares) {
         try {
@@ -239,8 +249,12 @@ export const startServer = async () => {
     }
 
     // 5. Instantiate, Configure & Register Plugins
-    // ✅ Pass configProvider to the Adapter
-    const db = await loadPluginInstance(activeAdapter, [{ configProvider, logger: loggerInstance }]);
+    // ✅ Pass configProvider and idGenerator to the Adapter
+    const db = await loadPluginInstance(activeAdapter, [{
+        configProvider,
+        logger: loggerInstance,
+        idGenerator: idGeneratorInstance
+    }]);
 
     if (typeof db.loadData === 'function') {
         db.loadData(initialData);

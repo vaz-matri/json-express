@@ -84,7 +84,7 @@ export class SwaggerDocProvider implements IDocProvider {
         return this.generateOpenApiSpec(routes);
     }
 
-    public renderDocumentation(routes: RouteDefinition[]): string {
+    public renderDocumentation(routes: RouteDefinition[], path: string): string {
         return `
 <!DOCTYPE html>
 <html lang="en">
@@ -110,7 +110,7 @@ export class SwaggerDocProvider implements IDocProvider {
     <script>
     window.onload = function() {
         const ui = SwaggerUIBundle({
-            url: "./docs/json",
+            url: "${path}/json",
             dom_id: '#swagger-ui',
             deepLinking: true,
             presets: [

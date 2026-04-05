@@ -32,7 +32,7 @@ export class LightDocProvider implements IDocProvider {
         }));
     }
 
-    public renderDocumentation(routes: RouteDefinition[]): string {
+    public renderDocumentation(routes: RouteDefinition[], path: string): string {
         const sortedRoutes = [...routes].sort((a, b) => a.path.localeCompare(b.path));
 
         // Group by resource (first part of path after /api/v1/)
@@ -233,7 +233,7 @@ export class LightDocProvider implements IDocProvider {
         <footer>
             Built with ⚡ by JSON Express v2
             <div class="links">
-                <a href="./docs/json">Raw JSON Manifest</a>
+                <a href="${path}/json">Raw JSON Manifest</a>
                 <a href="/health">System Health</a>
             </div>
         </footer>
