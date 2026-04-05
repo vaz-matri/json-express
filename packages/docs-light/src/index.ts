@@ -17,8 +17,11 @@ export class LightDocProvider implements IDocProvider {
         return 'JSON Express API Manifest';
     }
 
-    public getDocumentationMessage(port: number): string {
-        return `📚 API Manifest available at: http://localhost:${port}/info/routes`;
+    public getDocumentationMessage(port: number, path: string): string {
+        return [
+            `📚 API Documentation (Light) available at: ${path}`,
+            `🔗 Raw JSON Manifest available at: ${path}/json`
+        ].join('\n');
     }
 
     public getManifest(routes: RouteDefinition[]): any {
@@ -230,7 +233,7 @@ export class LightDocProvider implements IDocProvider {
         <footer>
             Built with ⚡ by JSON Express v2
             <div class="links">
-                <a href="/info/routes">Raw JSON Manifest</a>
+                <a href="./docs/json">Raw JSON Manifest</a>
                 <a href="/health">System Health</a>
             </div>
         </footer>

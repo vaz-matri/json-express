@@ -17,8 +17,11 @@ export class SwaggerDocProvider implements IDocProvider {
         return 'JSON Express API — Interactive Swagger UI';
     }
 
-    public getDocumentationMessage(port: number): string {
-        return `🛡️ Interactive Swagger UI: http://localhost:${port}/`;
+    public getDocumentationMessage(port: number, path: string): string {
+        return [
+            `📚 API Documentation (Swagger) available at: ${path}`,
+            `🔗 OpenAPI 3.0 Spec available at: ${path}/json`
+        ].join('\n');
     }
 
     private convertPathToOpenApi(path: string): string {
@@ -78,11 +81,7 @@ export class SwaggerDocProvider implements IDocProvider {
     }
 
     public getManifest(routes: RouteDefinition[]): any {
-        return routes.map(r => ({
-            method: r.method,
-            path: r.path,
-            middlewares: r.middlewares || []
-        }));
+        return this.generateOpenApiSpec(routes);
     }
 
     public renderDocumentation(routes: RouteDefinition[]): string {
@@ -111,7 +110,7 @@ export class SwaggerDocProvider implements IDocProvider {
     <script>
     window.onload = function() {
         const ui = SwaggerUIBundle({
-            spec: ${JSON.stringify(this.generateOpenApiSpec(routes))},
+            url: "./docs/json",
             dom_id: '#swagger-ui',
             deepLinking: true,
             presets: [

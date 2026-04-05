@@ -142,12 +142,17 @@ export class JsonExpressKernel {
         // 5. Start the server!
         // 5.1 If a DocProvider is present, register the "Self-Documenting" routes
         try {
-            const docProvider = this.container.resolve<any>('docProvider');
+            const docProvider = this.container.resolve<IDocProvider>('docProvider');
             if (docProvider) {
+                // Read the path from config (defaulting to /docs)
+                const rawDocsPath = configProvider.get<string>('docs.path', '/docs');
+                // Ensure no trailing slash
+                const docsPath = rawDocsPath.endsWith('/') ? rawDocsPath.slice(0, -1) : rawDocsPath;
+
                 // HTML Home Page
                 transport.registerRoute({
                     method: 'GET',
-                    path: '/',
+                    path: docsPath,
                     handler: async () => ({
                         statusCode: 200,
                         headers: { 'Content-Type': 'text/html' },
@@ -158,14 +163,14 @@ export class JsonExpressKernel {
                 // JSON Manifest
                 transport.registerRoute({
                     method: 'GET',
-                    path: '/info/routes',
+                    path: `${docsPath}/json`,
                     handler: async () => ({
                         statusCode: 200,
                         body: docProvider.getManifest(routes)
                     })
                 });
 
-                console.log(docProvider.getDocumentationMessage(port));
+                console.log(docProvider.getDocumentationMessage(port, docsPath));
             }
         } catch (e) {
             // Silently skip if no docProvider is registered

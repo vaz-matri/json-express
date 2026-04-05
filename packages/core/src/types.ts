@@ -139,6 +139,6 @@ export interface IDocProvider {
     /**
      * Returns a professional boot-time log message with a clickable link.
      */
-    getDocumentationMessage(port: number): string;
+    getDocumentationMessage(port: number, path: string): string;
     getManifest(routes: RouteDefinition[]): any;            // Returns JSON
 }
