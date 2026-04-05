@@ -30,7 +30,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
 
         for (const [key, value] of Object.entries(obj)) {
             if (this.hasRef(value)) {
-                details[key] =[{ ref: (value as any).ref, id: (value as any).id }];
+                details[key] = [{ ref: (value as any).ref, id: (value as any).id }];
             } else if (Array.isArray(value) && value.length > 0 && this.hasRef(value[0])) {
                 details[key] = value.map(item => ({ ref: item.ref, id: item.id }));
             }
@@ -40,7 +40,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     }
 
     private findById(collection: string, id: string) {
-        const items = this.store[collection] ||[];
+        const items = this.store[collection] || [];
         const index = items.findIndex((item) => item.id === id);
 
         if (index === -1) {
@@ -53,7 +53,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     // --- IDatabaseAdapter Implementation ---
 
     public async getAll(collection: string): Promise<any[]> {
-        const items = this.store[collection] ||[];
+        const items = this.store[collection] || [];
         this.logger.info(`Read all from '${collection}'`, { count: items.length });
 
         // Ported referencing/population logic
@@ -66,7 +66,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
                 const refObjArr: any[] = [];
 
                 refs[refField].forEach(({ id: refId, ref }) => {
-                    const refItems = this.store[ref] ||[];
+                    const refItems = this.store[ref] || [];
 
                     if (refId) {
                         const refObj = refItems.find(i => i.id === refId);
@@ -97,7 +97,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async search(collection: string, query: Record<string, any>): Promise<any[]> {
-        const items = this.store[collection] ||[];
+        const items = this.store[collection] || [];
         const results = items.filter(item => {
             return Object.keys(query).every(searchKey => query[searchKey] === item[searchKey]);
         });
@@ -107,7 +107,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
 
     public async create(collection: string, data: any): Promise<any> {
         if (!this.store[collection]) {
-            this.store[collection] =[];
+            this.store[collection] = [];
         }
 
         // Auto-generate ID if missing

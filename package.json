@@ -5,10 +5,12 @@
     "build": "pnpm -r run build",
     "dev": "pnpm -r --parallel run dev",
     "test": "vitest run",
+    "e2e": "pnpm --filter './example/**' test",
     "publish:all": "pnpm -r publish --access public"
   },
   "devDependencies": {
     "@json-express/core": "workspace:^",
+    "@playwright/test": "^1.59.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.5.0",
     "tsdown": "^0.21.7",

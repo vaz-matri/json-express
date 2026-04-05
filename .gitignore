@@ -17,3 +17,7 @@ llm-context*
 # build outputs
 dist/
 .tsdown/
+
+# playright
+playwright-report/
+test-results/
