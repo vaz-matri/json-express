@@ -24,6 +24,7 @@ class DefaultIdGenerator implements IIdGenerator {
 
 export class JsonExpressKernel {
     public container: AwilixContainer;
+    public context: Map<string, any> = new Map();
     private middlewares: Map<string, IMiddleware> = new Map();
     private seeders: ISeeder[] = [];
     private plugins: IPlugin[] = [];
@@ -115,6 +116,14 @@ export class JsonExpressKernel {
             this.container.register({ configProvider: asValue(configProvider) })
         }
 
+        // 1.5 Execute the onRegister (setup) phase for all plugins
+        for (const plugin of this.plugins) {
+            if (plugin.onRegister) {
+                console.log(`🧩 Firing plugin register hook: ${plugin.name}`);
+                await plugin.onRegister(this, configProvider);
+            }
+        }
+
         // 2. Resolve the registered plugins from the container
         const db = this.container.resolve<IDatabaseAdapter>('database');
         const apiGenerator = this.container.resolve<IApiGenerator>('apiGenerator');
@@ -195,5 +204,43 @@ export class JsonExpressKernel {
 
         console.log(`🟢 Starting server on port ${port}...`);
         await transport.start(port);
+
+        // 6. Execute the onReady phase for all plugins
+        for (const plugin of this.plugins) {
+            if (plugin.onReady) {
+                console.log(`🧩 Firing plugin ready hook: ${plugin.name}`);
+                await plugin.onReady(this, configProvider);
+            }
+        }
+    }
+    
+    // --- GRACEFUL TEARDOWN ---
+
+    public async shutdown() {
+        console.log('🛑 Initiating JSON Express Kernel shutdown sequence...');
+        
+        let configProvider: IConfigProvider;
+        try {
+            configProvider = this.container.resolve<IConfigProvider>('configProvider');
+        } catch (e) {
+            configProvider = { get: (key, def) => def as any, has: () => false, set: () => {} };
+        }
+
+        for (const plugin of this.plugins) {
+            if (plugin.onShutdown) {
+                console.log(`🧩 Firing plugin shutdown hook: ${plugin.name}`);
+                await plugin.onShutdown(this, configProvider);
+            }
+        }
+
+        try {
+            const transport = this.container.resolve<ITransport>('transport');
+            console.log('🔌 Stopping Transport Layer...');
+            await transport.stop();
+        } catch (e) {
+            // Silently ignore if transport isn't resolved
+        }
+
+        console.log('🛑 Kernel shutdown complete.');
     }
 }

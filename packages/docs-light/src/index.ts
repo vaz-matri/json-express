@@ -35,11 +35,12 @@ export class LightDocProvider implements IDocProvider {
     public renderDocumentation(routes: RouteDefinition[], path: string): string {
         const sortedRoutes = [...routes].sort((a, b) => a.path.localeCompare(b.path));
 
-        // Group by resource (first part of path after /api/v1/)
+        // Group by resource (extract the first meaningful path segment)
         const groups: Record<string, RouteDefinition[]> = {};
         for (const route of sortedRoutes) {
-            const parts = route.path.split('/');
-            const resource = parts[3] || 'System'; // Assuming /api/v1/:resource
+            // Remove empty segments, 'api', and version strings like 'v1', 'v2'
+            const parts = route.path.split('/').filter(p => p && p !== 'api' && !/^v\d+$/.test(p));
+            const resource = parts[0] ? parts[0].toLowerCase() : 'system';
             if (!groups[resource]) groups[resource] = [];
             groups[resource].push(route);
         }

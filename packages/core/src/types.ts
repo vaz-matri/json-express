@@ -1,3 +1,5 @@
+import type { JsonExpressKernel } from './kernel';
+
 /**
  * 1. The Generic Request & Response
  * We abstract this so our core doesn't care if it's Express, Fastify, or h3.
@@ -29,6 +31,7 @@ export interface RouteDefinition {
     path: string;
     handler: (req: JsonRequest) => Promise<JsonResponse>;
     middlewares?: string[]; // Array of middleware names to apply (e.g., ['auth', 'rate-limit'])
+    metadata?: Record<string, any>; // Arbitrary metadata attached to the route (e.g. schemas, auth rules)
 }
 
 /**
@@ -111,7 +114,10 @@ export interface ISeeder {
  */
 export interface IPlugin {
     name: string;
-    onBoot(kernel: any, configProvider: IConfigProvider): Promise<void>;
+    onRegister?(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
+    onBoot(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
+    onReady?(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
+    onShutdown?(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
 }
 /**
  * 10. The Logger Contract

@@ -269,8 +269,22 @@ export const startServer = async () => {
     const transport = await loadPluginInstance(activeTransport,[{ configProvider, logger: loggerInstance }]);
     kernel.registerTransport(transport);
 
-    // 6. Boot the system!
+    // Boot the system!
     // We now read the port directly from the Environment Config Provider
     const port = configProvider.get<number>('port', 3000);
+
+    // --- GRACEFUL TEARDOWN CAPTURE ---
+    let isShuttingDown = false;
+    const handleShutdown = async () => {
+        if (isShuttingDown) return;
+        isShuttingDown = true;
+        console.log('\n'); // Clean newline after ^C
+        await kernel.shutdown();
+        process.exit(0);
+    };
+
+    process.on('SIGINT', handleShutdown);
+    process.on('SIGTERM', handleShutdown);
+
     await kernel.boot(collections, port, { enable: isSmartSeed || isForceSeed, force: isForceSeed });
 };
