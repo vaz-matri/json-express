@@ -13,6 +13,7 @@
     "@json-express/plugin-health": "workspace:*",
     "@json-express/seeder-faker": "workspace:*",
     "@json-express/transport-fastify": "workspace:*",
+    "@json-express/docs-swagger": "workspace:*",
     "@json-express/logger-pino": "workspace:*"
   },
   "devDependencies": {

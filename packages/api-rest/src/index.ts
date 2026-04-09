@@ -25,6 +25,43 @@ export class RestApiGenerator implements IApiGenerator {
         this.logger = logger?.child({ component: 'API-REST' }) ?? new ConsoleLogger({ context: { component: 'API-REST' } });
     }
 
+    private enrichRoute(route: RouteDefinition): RouteDefinition {
+        route.middlewares = route.middlewares || [];
+        route.metadata = route.metadata || {};
+
+        // 1. Auth Metadata & Middleware
+        // If auth secret exists, assume routes are protected unless specifically excluded.
+        const authSecret = this.config?.get<string>('auth.secret');
+        if (authSecret) {
+            const rawExclude = this.config?.get<string | string[]>('auth.exclude', []);
+            const excludePaths = Array.isArray(rawExclude) ? rawExclude : (typeof rawExclude === 'string' ? rawExclude.split(',').map(s => s.trim()) : []);
+            
+            const isExcluded = excludePaths.some(p => route.path.startsWith(p));
+            if (!isExcluded) {
+                if (!route.middlewares.includes('auth')) route.middlewares.push('auth');
+                route.metadata.isProtected = true;
+            }
+        }
+
+        // 2. Validation Metadata & Middleware
+        const validationRules = this.config?.get<any[]>('validation.rules', []);
+        if (validationRules && validationRules.length > 0) {
+            const matchedRule = validationRules.find(r => {
+                const pathMatch = r.path instanceof RegExp ? r.path.test(route.path) : (route.path === r.path || route.path.startsWith(r.path));
+                const methodMatch = r.method === '*' || r.method.toUpperCase() === route.method.toUpperCase();
+                return pathMatch && methodMatch;
+            });
+
+            if (matchedRule) {
+                if (!route.middlewares.includes('validation')) route.middlewares.push('validation');
+                if (matchedRule.body) route.metadata.schema = matchedRule.body;
+                if (matchedRule.query) route.metadata.querySchema = matchedRule.query;
+            }
+        }
+
+        return route;
+    }
+
     public generate(collections: string[]): RouteDefinition[] {
         const routes: RouteDefinition[] = [];
         this.collections = collections;
@@ -36,7 +73,7 @@ export class RestApiGenerator implements IApiGenerator {
         // 🔍 Universal Cross-Collection Search (registered FIRST to avoid route shadowing)
         const searchEnabled = this.config?.get<boolean>('api.rest.search') !== false;
         if (searchEnabled) {
-            routes.push({
+            routes.push(this.enrichRoute({
                 method: 'POST',
                 path: `${prefix}/search`,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
@@ -70,14 +107,14 @@ export class RestApiGenerator implements IApiGenerator {
 
                     return { statusCode: 200, body: results };
                 }
-            });
+            }));
         }
 
         for (const collection of collections) {
             const basePath = `${prefix}/${collection}`;
             const itemPath = `${prefix}/${collection}/:id`;
 
-            routes.push({
+            routes.push(this.enrichRoute({
                 method: 'GET',
                 path: basePath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
@@ -88,9 +125,9 @@ export class RestApiGenerator implements IApiGenerator {
                         : await this.db.getAll(collection);
                     return { statusCode: 200, body: data };
                 }
-            });
+            }));
 
-            routes.push({
+            routes.push(this.enrichRoute({
                 method: 'GET',
                 path: itemPath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
@@ -103,9 +140,9 @@ export class RestApiGenerator implements IApiGenerator {
 
                     return { statusCode: 200, body: record };
                 }
-            });
+            }));
 
-            routes.push({
+            routes.push(this.enrichRoute({
                 method: 'POST',
                 path: basePath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
@@ -116,9 +153,9 @@ export class RestApiGenerator implements IApiGenerator {
                     const created = await this.db.create(collection, req.body);
                     return { statusCode: 201, body: created };
                 }
-            });
+            }));
 
-            routes.push({
+            routes.push(this.enrichRoute({
                 method: 'PATCH',
                 path: itemPath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
@@ -134,9 +171,9 @@ export class RestApiGenerator implements IApiGenerator {
 
                     return { statusCode: 200, body: updated };
                 }
-            });
+            }));
 
-            routes.push({
+            routes.push(this.enrichRoute({
                 method: 'DELETE',
                 path: itemPath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
@@ -149,7 +186,7 @@ export class RestApiGenerator implements IApiGenerator {
 
                     return { statusCode: 200, body: { message: `Resource '${id}' deleted from '${collection}'.` } };
                 }
-            });
+            }));
         }
 
         return routes;

@@ -84,6 +84,9 @@ importers:
       '@json-express/adapter-json':
         specifier: workspace:*
         version: link:../../packages/adapter-json
+      '@json-express/docs-swagger':
+        specifier: workspace:*
+        version: link:../../packages/docs-swagger
       '@json-express/logger-pino':
         specifier: workspace:*
         version: link:../../packages/logger-pino

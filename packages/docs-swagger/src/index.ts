@@ -57,12 +57,30 @@ export class SwaggerDocProvider implements IDocProvider {
                 }
             };
 
+            // 🔐 Security Metadata Interpretation
+            if (route.metadata?.isProtected) {
+                paths[openApiPath][method].security = [{ bearerAuth: [] }];
+            }
+
+            // 📄 Schema Metadata Interpretation (Zod -> OpenAPI 3)
+            let requestSchema: any = { type: 'object' };
+            if (route.metadata?.schema) {
+                const s = route.metadata.schema;
+                console.log(`[Docs Swagger] Intercepted schema for ${method} ${openApiPath}`, !!s.shape);
+                if (s._def?.typeName === 'ZodObject' || s.shape) {
+                    requestSchema = this.convertZodToOpenApi(s);
+                    console.log(`[Docs Swagger] Converted Schema:`, JSON.stringify(requestSchema));
+                } else {
+                    requestSchema = { type: 'object', description: 'Opaque Schema' };
+                }
+            }
+
             // Add request body for mutation methods
             if (['post', 'patch', 'put'].includes(method)) {
                 paths[openApiPath][method].requestBody = {
                     content: {
                         'application/json': {
-                            schema: { type: 'object' }
+                            schema: requestSchema
                         }
                     }
                 };
@@ -76,7 +94,16 @@ export class SwaggerDocProvider implements IDocProvider {
                 version: '1.0.0',
                 description: 'Auto-generated interactive API documentation.'
             },
-            paths
+            paths,
+            components: {
+                securitySchemes: {
+                    bearerAuth: {
+                        type: 'http',
+                        scheme: 'bearer',
+                        bearerFormat: 'JWT'
+                    }
+                }
+            }
         };
     }
 
@@ -150,5 +177,34 @@ export class SwaggerDocProvider implements IDocProvider {
             }
         }
         return params;
+    }
+
+    private convertZodToOpenApi(zodSchema: any): any {
+        const schema: any = { type: 'object', properties: {}, required: [] };
+        // Fallback for non-zod objects natively mapped
+        if (!zodSchema.shape) return schema;
+
+        for (const [key, prop] of Object.entries(zodSchema.shape)) {
+            const def = (prop as any)._def;
+            if (!def) continue;
+
+            const isOptional = def.typeName === 'ZodOptional' || def.typeName === 'ZodDefault';
+            const innerDef = isOptional && def.innerType ? def.innerType._def : def;
+
+            if (!isOptional) {
+                schema.required.push(key);
+            }
+
+            const typeName = innerDef?.typeName || def.typeName;
+            if (typeName === 'ZodString') schema.properties[key] = { type: 'string' };
+            else if (typeName === 'ZodNumber') schema.properties[key] = { type: 'number' };
+            else if (typeName === 'ZodBoolean') schema.properties[key] = { type: 'boolean' };
+            else if (typeName === 'ZodArray') schema.properties[key] = { type: 'array', items: {} }; // Basic fallback
+            else if (typeName === 'ZodObject') schema.properties[key] = this.convertZodToOpenApi(isOptional ? def.innerType : prop);
+            else schema.properties[key] = { type: 'string' }; // Ultimate fallback for unknowns
+        }
+
+        if (schema.required.length === 0) delete schema.required;
+        return schema;
     }
 }
