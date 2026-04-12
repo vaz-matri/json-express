@@ -1,0 +1,14 @@
+{
+    "name": "logger-pino",
+    "version": "1.0.0",
+    "description": "E2E test for logger-pino — verifies Pino logger swap and server boot",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/core": "workspace:*",
+        "@json-express/cli": "workspace:*",
+        "@json-express/logger-pino": "workspace:*"
+    }
+}

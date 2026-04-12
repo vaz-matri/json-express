@@ -12,6 +12,7 @@ plan.txt
 # context-builder
 context*
 llm-context*
+todo/
 
 # build outputs
 dist/
@@ -20,3 +21,5 @@ dist/
 # playright
 playwright-report/
 test-results/
+
+.envrc

@@ -1,0 +1,14 @@
+{
+    "name": "config",
+    "version": "1.0.0",
+    "description": "E2E test for config — verifies advanced jex.config.ts loading and API prefix",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/core": "workspace:*",
+        "@json-express/cli": "workspace:*",
+        "@json-express/config": "workspace:*"
+    }
+}

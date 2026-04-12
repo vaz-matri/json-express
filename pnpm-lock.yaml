@@ -40,6 +40,39 @@ importers:
         specifier: ^4.1.2
         version: 4.1.2(@types/node@25.5.0)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.4)(jiti@2.6.1))
 
+  example/adapter-json:
+    dependencies:
+      '@json-express/adapter-json':
+        specifier: workspace:*
+        version: link:../../packages/adapter-json
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
+  example/api-rest:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
+  example/config:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
   example/docs-light:
     dependencies:
       '@json-express/cli':
@@ -60,18 +93,6 @@ importers:
       '@json-express/docs-swagger':
         specifier: workspace:*
         version: link:../../packages/docs-swagger
-
-  example/health:
-    dependencies:
-      '@json-express/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@json-express/plugin-health':
-        specifier: workspace:*
-        version: link:../../packages/plugin-health
 
   example/html-simple: {}
 
@@ -113,6 +134,84 @@ importers:
         specifier: workspace:*
         version: link:../../packages/cli
 
+  example/logger-pino:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/logger-pino':
+        specifier: workspace:*
+        version: link:../../packages/logger-pino
+
+  example/middleware-auth:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/middleware-auth':
+        specifier: workspace:*
+        version: link:../../packages/middleware-auth
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.3
+
+  example/middleware-validation:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/middleware-validation':
+        specifier: workspace:*
+        version: link:../../packages/middleware-validation
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+
+  example/plugin-devcert:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/plugin-devcert':
+        specifier: workspace:*
+        version: link:../../packages/plugin-devcert
+
+  example/plugin-health:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/plugin-health':
+        specifier: workspace:*
+        version: link:../../packages/plugin-health
+
+  example/seeder-faker:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/seeder-faker':
+        specifier: workspace:*
+        version: link:../../packages/seeder-faker
+
   example/simple:
     dependencies:
       '@json-express/cli':
@@ -121,6 +220,39 @@ importers:
       '@json-express/core':
         specifier: workspace:*
         version: link:../../packages/core
+
+  example/transport-fastify:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/transport-fastify':
+        specifier: workspace:*
+        version: link:../../packages/transport-fastify
+
+  example/validation-swagger:
+    dependencies:
+      '@json-express/api-rest':
+        specifier: workspace:*
+        version: link:../../packages/api-rest
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/docs-swagger':
+        specifier: workspace:*
+        version: link:../../packages/docs-swagger
+      '@json-express/middleware-validation':
+        specifier: workspace:*
+        version: link:../../packages/middleware-validation
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
 
   packages/adapter-json:
     dependencies:

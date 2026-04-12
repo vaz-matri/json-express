@@ -1,0 +1,17 @@
+{
+    "name": "validation-swagger",
+    "version": "1.0.0",
+    "description": "E2E Test for inter-package communication between api-rest, validation, and swagger",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/core": "workspace:*",
+        "@json-express/cli": "workspace:*",
+        "@json-express/api-rest": "workspace:*",
+        "@json-express/middleware-validation": "workspace:*",
+        "@json-express/docs-swagger": "workspace:*",
+        "zod": "^3.22.4"
+    }
+}
