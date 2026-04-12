@@ -182,7 +182,7 @@ export class JsonExpressKernel {
                     handler: async () => ({
                         statusCode: 200,
                         headers: { 'Content-Type': 'text/html' },
-                        body: docProvider.renderDocumentation(routes, path)
+                        body: docProvider.renderDocumentation(routes, docsPath)
                     })
                 });
 
@@ -213,12 +213,12 @@ export class JsonExpressKernel {
             }
         }
     }
-    
+
     // --- GRACEFUL TEARDOWN ---
 
     public async shutdown() {
         console.log('🛑 Initiating JSON Express Kernel shutdown sequence...');
-        
+
         let configProvider: IConfigProvider;
         try {
             configProvider = this.container.resolve<IConfigProvider>('configProvider');
