@@ -179,10 +179,10 @@ export class JsonExpressKernel {
                 transport.registerRoute({
                     method: 'GET',
                     path: docsPath,
-                    handler: async () => ({
+                    handler: async (req) => ({
                         statusCode: 200,
                         headers: { 'Content-Type': 'text/html' },
-                        body: docProvider.renderDocumentation(routes, docsPath)
+                        body: docProvider.renderDocumentation(routes, docsPath, req)
                     })
                 });
 
@@ -190,9 +190,9 @@ export class JsonExpressKernel {
                 transport.registerRoute({
                     method: 'GET',
                     path: `${docsPath}/json`,
-                    handler: async () => ({
+                    handler: async (req) => ({
                         statusCode: 200,
-                        body: docProvider.getManifest(routes)
+                        body: docProvider.getManifest(routes, req)
                     })
                 });
 

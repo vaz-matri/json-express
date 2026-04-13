@@ -2,14 +2,17 @@ import type {
     IConfigProvider,
     IDocProvider,
     RouteDefinition,
+    JsonRequest,
     ILogger
 } from '@json-express/core';
 
 export class LightDocProvider implements IDocProvider {
     private logger?: ILogger;
+    private configProvider?: IConfigProvider;
 
     constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
         this.logger = logger?.child({ component: 'Docs-Light' });
+        this.configProvider = configProvider;
         this.logger?.info('Lightweight API documentation provider initialized.');
     }
 
@@ -24,7 +27,7 @@ export class LightDocProvider implements IDocProvider {
         ].join('\n');
     }
 
-    public getManifest(routes: RouteDefinition[]): any {
+    public getManifest(routes: RouteDefinition[], _req: JsonRequest): any {
         return routes.map(r => ({
             method: r.method,
             path: r.path,
@@ -32,7 +35,23 @@ export class LightDocProvider implements IDocProvider {
         }));
     }
 
-    public renderDocumentation(routes: RouteDefinition[], path: string): string {
+    public renderDocumentation(routes: RouteDefinition[], path: string, req: JsonRequest): string {
+        // Layer 4: hardcoded override (enterprise escape hatch)
+        const hardcodedOverride = this.configProvider?.get<string>('docs.baseUrl');
+
+        // Layer 1: proxy headers (production reverse-proxy)
+        const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http';
+        const host = (req.headers['x-forwarded-host'] as string)
+            || (req.headers['host'] as string)
+            || req.hostname
+            || 'localhost';
+
+        // Layer 3: API prefix from config
+        const prefix = this.configProvider?.get<string>('api.prefix', '') || '';
+
+        const dynamicBaseUrl = `${proto}://${host}${prefix}`;
+        const displayBaseUrl = hardcodedOverride || dynamicBaseUrl;
+
         const sortedRoutes = [...routes].sort((a, b) => a.path.localeCompare(b.path));
 
         // Group by resource (extract the first meaningful path segment)
@@ -225,6 +244,7 @@ export class LightDocProvider implements IDocProvider {
         <header>
             <h1>JSON Express</h1>
             <div class="subtitle">Interactive API Documentation & Manifest</div>
+            ${displayBaseUrl ? `<div class="subtitle" style="margin-top: 0.5rem; color: var(--primary);">Base URL: <strong>${displayBaseUrl}</strong></div>` : ''}
         </header>
 
         <div class="grid">

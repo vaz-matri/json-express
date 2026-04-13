@@ -2,14 +2,17 @@ import type {
     IConfigProvider,
     IDocProvider,
     RouteDefinition,
+    JsonRequest,
     ILogger
 } from '@json-express/core';
 
 export class SwaggerDocProvider implements IDocProvider {
     private logger?: ILogger;
+    private configProvider?: IConfigProvider;
 
     constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
         this.logger = logger?.child({ component: 'Docs-Swagger' });
+        this.configProvider = configProvider;
         this.logger?.info('Interactive Swagger documentation provider initialized.');
     }
 
@@ -28,10 +31,21 @@ export class SwaggerDocProvider implements IDocProvider {
         return path.replace(/:([a-zA-Z0-9_]+)/g, '{$1}');
     }
 
+    private resolveBaseUrl(req: JsonRequest): string {
+        const hardcodedOverride = this.configProvider?.get<string>('docs.baseUrl');
+        const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http';
+        const host = (req.headers['x-forwarded-host'] as string)
+            || (req.headers['host'] as string)
+            || req.hostname
+            || 'localhost';
+        const prefix = this.configProvider?.get<string>('api.prefix', '') || '';
+        return hardcodedOverride || `${proto}://${host}${prefix}`;
+    }
+
     /**
      * Translates JSON Express Routes into OpenAPI 3.0.0 Path Objects
      */
-    private generateOpenApiSpec(routes: RouteDefinition[]): any {
+    private generateOpenApiSpec(routes: RouteDefinition[], baseUrl: string): any {
         const paths: Record<string, any> = {};
 
         for (const route of routes) {
@@ -94,6 +108,7 @@ export class SwaggerDocProvider implements IDocProvider {
                 version: '1.0.0',
                 description: 'Auto-generated interactive API documentation.'
             },
+            servers: [{ url: baseUrl }],
             paths,
             components: {
                 securitySchemes: {
@@ -107,11 +122,11 @@ export class SwaggerDocProvider implements IDocProvider {
         };
     }
 
-    public getManifest(routes: RouteDefinition[]): any {
-        return this.generateOpenApiSpec(routes);
+    public getManifest(routes: RouteDefinition[], req: JsonRequest): any {
+        return this.generateOpenApiSpec(routes, this.resolveBaseUrl(req));
     }
 
-    public renderDocumentation(routes: RouteDefinition[], path: string): string {
+    public renderDocumentation(routes: RouteDefinition[], path: string, req: JsonRequest): string {
         return `
 <!DOCTYPE html>
 <html lang="en">

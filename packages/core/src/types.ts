@@ -12,6 +12,9 @@ export interface JsonRequest {
     params: Record<string, string | undefined>;
     headers: Record<string, string | string[] | undefined>;
     traceId?: string;
+    protocol?: string;    // 'http' | 'https'
+    hostname?: string;    // e.g. 'localhost' or 'my-app.com'
+    originalUrl?: string; // full URI including any prefix
 }
 
 export interface JsonResponse {
@@ -141,12 +144,12 @@ export interface ILogger {
  */
 export interface IDocProvider {
     renderTitle(): string;
-    renderDocumentation(routes: RouteDefinition[], path: string): string; // Returns HTML
+    renderDocumentation(routes: RouteDefinition[], path: string, req: JsonRequest): string; // Returns HTML
     /**
      * Returns a professional boot-time log message with a clickable link.
      */
     getDocumentationMessage(port: number, path: string): string;
-    getManifest(routes: RouteDefinition[]): any;            // Returns JSON
+    getManifest(routes: RouteDefinition[], req: JsonRequest): any;            // Returns JSON
 }
 
 /**

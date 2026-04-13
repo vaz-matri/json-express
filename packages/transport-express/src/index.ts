@@ -46,6 +46,9 @@ export class ExpressTransport implements ITransport {
                 params: req.params,
                 headers: req.headers as Record<string, string | string[] | undefined>,
                 traceId,
+                protocol: req.protocol,
+                hostname: req.hostname,
+                originalUrl: req.originalUrl,
             };
 
             try {

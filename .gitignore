@@ -3,6 +3,8 @@ node_modules/
 
 # ide
 .idea
+.claude
+CLAUDE.md
 
 # plans
 plan.txt
