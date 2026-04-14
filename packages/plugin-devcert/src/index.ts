@@ -24,7 +24,7 @@ export class DevcertPlugin implements IPlugin {
 
         try {
             // 3. Request or Generate local machine certificates
-            const ssl = await devcert.certificateFor('localhost', { installCertutil: true });
+            const ssl = await devcert.certificateFor('localhost', { skipCertutilInstall: false });
             
             // 4. Inject credentials back into the Configuration State safely!
             if (typeof configProvider.set === 'function') {

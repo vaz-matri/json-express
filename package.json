@@ -2,6 +2,8 @@
   "name": "json-express",
   "private": true,
   "scripts": {
+    "typecheck": "tsc --build tsconfig.check.json --noEmit",
+    "prebuild": "pnpm run typecheck",
     "build": "pnpm -r run build",
     "dev": "pnpm -r --parallel run dev",
     "test": "vitest run",

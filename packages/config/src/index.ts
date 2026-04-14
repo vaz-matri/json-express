@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import { createJiti } from 'jiti';
+import createJiti from 'jiti';
 import { fileURLToPath } from 'url';
 import { IConfigProvider, deepMerge, getNestedValue, setNestedValue } from '@json-express/core';
 
@@ -51,8 +51,7 @@ export class AdvancedConfigProvider implements IConfigProvider {
                 return yaml.load(fs.readFileSync(filePath, 'utf8')) || {};
             }
             if (['js', 'cjs', 'mjs', 'ts'].includes(ext)) {
-                // ✅ Use Jiti v2 async import
-                const mod = await jiti.import(filePath);
+                const mod = jiti(filePath) as any;
                 const exported: any = mod.default || mod;
 
                 if (typeof exported === 'function') {

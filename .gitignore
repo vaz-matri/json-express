@@ -19,6 +19,7 @@ todo/
 # build outputs
 dist/
 .tsdown/
+*.tsbuildinfo
 
 # playright
 playwright-report/
