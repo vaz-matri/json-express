@@ -1,3 +1,7 @@
+import { existsSync, readdirSync } from 'fs';
+import { extname, join } from 'path';
+import { createJiti } from 'jiti';
+
 import type {
     IApiGenerator,
     IDatabaseAdapter,
@@ -5,7 +9,9 @@ import type {
     JsonRequest,
     JsonResponse,
     IConfigProvider,
-    ILogger
+    ILogger,
+    ModelSchema,
+    QueryOptions
 } from '@json-express/core';
 import { ConsoleLogger } from '@json-express/core';
 
@@ -14,6 +20,7 @@ export class RestApiGenerator implements IApiGenerator {
     private config?: IConfigProvider;
     private logger: ILogger;
     private collections: string[] = [];
+    private schemas: ModelSchema[] = [];
 
     constructor({ database, configProvider, logger }: {
         database: IDatabaseAdapter;
@@ -25,12 +32,15 @@ export class RestApiGenerator implements IApiGenerator {
         this.logger = logger?.child({ component: 'API-REST' }) ?? new ConsoleLogger({ context: { component: 'API-REST' } });
     }
 
+    public setSchemas(schemas: ModelSchema[]) {
+        this.logger.info(`Received ${schemas.length} schemas for endpoint parsing`);
+        this.schemas = schemas;
+    }
+
     private enrichRoute(route: RouteDefinition): RouteDefinition {
         route.middlewares = route.middlewares || [];
         route.metadata = route.metadata || {};
 
-        // 1. Auth Metadata & Middleware
-        // If auth secret exists, assume routes are protected unless specifically excluded.
         const authSecret = this.config?.get<string>('auth.secret');
         if (authSecret) {
             const rawExclude = this.config?.get<string | string[]>('auth.exclude', []);
@@ -43,7 +53,6 @@ export class RestApiGenerator implements IApiGenerator {
             }
         }
 
-        // 2. Validation Metadata & Middleware
         const validationRules = this.config?.get<any[]>('validation.rules', []);
         if (validationRules && validationRules.length > 0) {
             const matchedRule = validationRules.find(r => {
@@ -62,54 +71,42 @@ export class RestApiGenerator implements IApiGenerator {
         return route;
     }
 
-    public generate(collections: string[]): RouteDefinition[] {
+    private bindCustomEndpoint(handler: any): (req: JsonRequest) => Promise<JsonResponse> {
+        return async (req: JsonRequest) => {
+            let statusCode = 200;
+            let responseBody: any = undefined;
+
+            const resHelper = {
+                status: (code: number) => { statusCode = code; return resHelper; },
+                send: (body: any) => { responseBody = body; },
+                json: (body: any) => { responseBody = body; }
+            };
+
+            const ctx = { db: this.db };
+            
+            try {
+                const result = await handler(req, resHelper as any, ctx);
+                // If they return the strict object declarative style:
+                if (result && typeof result === 'object' && ('statusCode' in result || 'body' in result)) {
+                    return result as JsonResponse;
+                }
+                // If they used the Express-like mutator helpers res.send():
+                return { statusCode, body: responseBody };
+            } catch (error: any) {
+                this.logger.error(`Error in custom endpoint`, { error: error.message });
+                return { statusCode: 500, body: { error: error.message } };
+            }
+        };
+    }
+
+    public async generate(collections: string[]): Promise<RouteDefinition[]> {
         const routes: RouteDefinition[] = [];
         this.collections = collections;
 
-        // 🌟 New Feature: Global API Prefix
         const rawPrefix = this.config?.get<string>('api.rest.prefix', '') ?? '';
         const prefix = rawPrefix.endsWith('/') ? rawPrefix.slice(0, -1) : rawPrefix;
 
-        // 🔍 Universal Cross-Collection Search (registered FIRST to avoid route shadowing)
-        const searchEnabled = this.config?.get<boolean>('api.rest.search') !== false;
-        if (searchEnabled) {
-            routes.push(this.enrichRoute({
-                method: 'POST',
-                path: `${prefix}/search`,
-                handler: async (req: JsonRequest): Promise<JsonResponse> => {
-                    const body = req.body || {};
-                    const query: Record<string, any> = body.query || {};
-
-                    // If user specifies target collections, use those; otherwise search all
-                    const targetCollections: string[] = Array.isArray(body.collections) && body.collections.length > 0
-                        ? body.collections
-                        : this.collections;
-
-                    this.logger.info(`Handling search`, { collections: targetCollections });
-
-                    const results: Record<string, any[]> = {};
-
-                    for (const col of targetCollections) {
-                        try {
-                            const matches = Object.keys(query).length > 0
-                                ? await this.db.search(col, query)
-                                : await this.db.getAll(col);
-
-                            // Only include collections that returned results
-                            if (matches.length > 0) {
-                                results[col] = matches;
-                            }
-                        } catch (e: any) {
-                            // Gracefully skip unknown collections
-                            results[col] = [];
-                        }
-                    }
-
-                    return { statusCode: 200, body: results };
-                }
-            }));
-        }
-
+        // --- Core Auto-Generated Standard Routes --- //
         for (const collection of collections) {
             const basePath = `${prefix}/${collection}`;
             const itemPath = `${prefix}/${collection}/:id`;
@@ -119,10 +116,18 @@ export class RestApiGenerator implements IApiGenerator {
                 path: basePath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
                     this.logger.info(`Handling ${collection}.getAll`);
-                    const hasQuery = Object.keys(req.query).length > 0;
+                    
+                    // Parse QueryOptions cleanly
+                    const { _expand, _embed, ...cleanQuery } = req.query;
+                    const options: QueryOptions = {
+                        expand: _expand ? String(_expand).split(',').map(s => s.trim()) : undefined,
+                        embed: _embed ? String(_embed).split(',').map(s => s.trim()) : undefined
+                    };
+
+                    const hasQuery = Object.keys(cleanQuery).length > 0;
                     const data = hasQuery
-                        ? await this.db.search(collection, req.query as Record<string, any>)
-                        : await this.db.getAll(collection);
+                        ? await this.db.search(collection, cleanQuery, options)
+                        : await this.db.getAll(collection, options);
                     return { statusCode: 200, body: data };
                 }
             }));
@@ -135,7 +140,13 @@ export class RestApiGenerator implements IApiGenerator {
                     this.logger.info(`Handling ${collection}.getById`, { id });
                     if (!id) return { statusCode: 400, body: { error: 'Missing resource ID.' } };
 
-                    const record = await this.db.getById(collection, id);
+                    const { _expand, _embed } = req.query;
+                    const options: QueryOptions = {
+                        expand: _expand ? String(_expand).split(',').map(s => s.trim()) : undefined,
+                        embed: _embed ? String(_embed).split(',').map(s => s.trim()) : undefined
+                    };
+
+                    const record = await this.db.getById(collection, id, options);
                     if (!record) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
 
                     return { statusCode: 200, body: record };
@@ -187,6 +198,65 @@ export class RestApiGenerator implements IApiGenerator {
                     return { statusCode: 200, body: { message: `Resource '${id}' deleted from '${collection}'.` } };
                 }
             }));
+        }
+
+        // --- Extensibility 1: Model-Bound Endpoints --- //
+        for (const schema of this.schemas) {
+            if (schema.endpoints) {
+                for (const [routeKey, handler] of Object.entries(schema.endpoints)) {
+                    // "GET /stats"
+                    const parts = routeKey.split(' ');
+                    const method = parts.length > 1 ? parts[0] : 'GET';
+                    const pathStr = parts.length > 1 ? parts[1] : parts[0];
+                    const cleanPath = pathStr.startsWith('/') ? pathStr : `/${pathStr}`;
+                    const fullPath = `${prefix}/${schema.name}${cleanPath}`;
+
+                    this.logger.info(`Mapping Model-Bound Endpoint: ${method.toUpperCase()} ${fullPath}`);
+
+                    routes.push(this.enrichRoute({
+                        method: method.toUpperCase() as any,
+                        path: fullPath,
+                        handler: this.bindCustomEndpoint(handler)
+                    }));
+                }
+            }
+        }
+
+        // --- Extensibility 2: Global '/routes' Scanner --- //
+        const cwd = process.cwd();
+        const routesDir = join(cwd, 'routes');
+        if (existsSync(routesDir)) {
+            const jiti = createJiti(import.meta.url, { interopDefault: true });
+            const routeFiles = readdirSync(routesDir, { withFileTypes: true })
+                .filter(d => d.isFile() && (extname(d.name) === '.ts' || extname(d.name) === '.js'))
+                .map(d => d.name);
+            
+            for (const filename of routeFiles) {
+                try {
+                    const mod = await jiti.import(join(routesDir, filename)) as any;
+                    const defaultExport = mod.default || mod;
+                    
+                    if (defaultExport && defaultExport.endpoints) {
+                        for (const [routeKey, handler] of Object.entries(defaultExport.endpoints)) {
+                            const parts = routeKey.split(' ');
+                            const method = parts.length > 1 ? parts[0] : 'GET';
+                            const pathStr = parts.length > 1 ? parts[1] : parts[0];
+                            const cleanPath = pathStr.startsWith('/') ? pathStr : `/${pathStr}`;
+                            const fullPath = `${prefix}${cleanPath}`;
+
+                            this.logger.info(`Mapping Global Endpoint: ${method.toUpperCase()} ${fullPath}`);
+
+                            routes.push(this.enrichRoute({
+                                method: method.toUpperCase() as any,
+                                path: fullPath,
+                                handler: this.bindCustomEndpoint(handler)
+                            }));
+                        }
+                    }
+                } catch (e: any) {
+                    this.logger.error(`Error loading global route ${filename}:`, { error: e.message });
+                }
+            }
         }
 
         return routes;

@@ -10,14 +10,13 @@ Skip the backend bottleneck and go from prototype to MVP launch faster.
 visit[jsonexpress.com](https://jsonexpress.com)
 
 ## ✨ Features
-- **Zero-Config REST API** - Instantly generates GET, POST, PATCH, and DELETE operations based on your files.
-- **Relational Data** - Automatically resolves linked data across collections using `id` and `ref`.
-- **Agnostic Microkernel** - Pluggable architecture! Swap out the Database, Server (Transport), or API Paradigm without rewriting your business logic.
-- **Auto-Discovery** - Install a plugin and the CLI automatically detects and wires it up. No boilerplate needed.
-- **Twelve-Factor Configuration** - Cascading environment variables and smart configurations built for enterprise.
-- **Deep Observability & Correlated Tracing** - Uses `AsyncLocalStorage` to automatically propagate a unique `traceId` across every layer (Transport → Middleware → API → Database).
-- **Standardized Logging** - Pluggable logging layer! Includes metadata (ID, Counts) by default, and supports zero-latency trace correlation between basic console output and high-performance Pino JSON logs.
-- **Developer Diagnostics** - Built-in Context Diagnostic Mode (`JEX_DEBUG_CONTEXT=true`) to instantly detect and warn about lost request traces during development.
+- **Schema-Driven Engine** - Define strongly-typed data models using `defineModel` for the ultimate Code-First experience. Drop TypeScript files into `/models` and JSON Express transpiles them at runtime with zero-config via `jiti`!
+- **Data & Logic Separation** - Strictly separates your definition schemas (`/models/albums.ts`) from your permanent disk storage (`/data/albums.json`).
+- **REST Joins** - The Memory database automatically resolves relationships natively! Use `?_expand=artistId` directly in HTTP requests to join objects securely.
+- **Custom Endpoints** - Extend your models immediately using the `endpoints: {}` block in schemas, or drop global API routes straight into a root `/routes` directory. 
+- **The `export` Command** - Start hacking in raw JSON. When you need relationships, run `json-express export albums` to instantly scaffold a strict, typed schema blueprint from your unstructured data.
+- **Microkernel Architecture** - Pluggable design! Swap out the Database, Transport (Express/Fastify), or API paradigm without breaking your logic.
+- **Deep Observability** - Fully correlated tracing via `AsyncLocalStorage` seamlessly connecting every Request → Middleware → API → Database call across the framework.
 
 ---
 
@@ -29,28 +28,38 @@ You can run JSON Express globally for instant prototyping, or install it locally
 Get up and running in seconds without installing anything in your project.
 
 ```bash
-# 1. Create a directory for your data
-$ mkdir my-api && cd my-api
+# 1. Boilerplate your folder structure
+$ mkdir -p my-api/data my-api/models && cd my-api
 
-# 2. Create some JSON data
-$ echo '[{"id": "1", "name": "The Marshall Mathers LP", "artist": "Eminem"}]' > albums.json
+# 2. Start hacking your data
+$ echo '[{"id": "1", "name": "The Marshall Mathers LP", "artist": "Eminem"}]' > data/albums.json
 
 # 3. Run JSON Express via npx!
 $ npx @json-express/cli
 ```
 
-### Option B: Local Installation (For Customization)
-If you want to override default plugins, manage dependencies, or use advanced configurations:
+### Option B: The Schema-Driven Experience
+When you're ready to add relations or webhooks to your data, scaffold a TypeScript schema natively without configuring TSC!
 
 ```bash
-# Install the CLI as a dev dependency
-$ npm install @json-express/cli -D
+# Export the raw JSON into a typed schema instantly:
+$ npx @json-express/cli export albums
 
-# Add a script to your package.json
-# "scripts": { "dev": "json-express" }
+# Edit your new strongly-typed model:
+# (Inside models/albums.ts)
+import { defineModel, types } from '@json-express/core';
 
-# Start the server
-$ npm run dev
+export default defineModel('albums', {
+    fields: {
+        name: types.string(),
+        artistId: types.relation({ target: 'artists', type: 'many-to-one' })
+    },
+    endpoints: {
+        'GET /stats': async (req, res, ctx) => {
+             res.send({ status: 'album stats go here' });
+        }
+    }
+});
 ```
 
 ---

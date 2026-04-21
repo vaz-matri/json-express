@@ -5,3 +5,5 @@ export * from './pipeline';
 export * from './request-context';
 export * from './logger';
 export * from './errors';
+export * from './schema';
+

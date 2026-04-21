@@ -15,9 +15,10 @@
     "@json-express/api-rest": "workspace:*",
     "@json-express/config-env": "workspace:*",
     "@json-express/core": "workspace:*",
-    "@json-express/logger-console": "workspace:*",
     "@json-express/docs-light": "workspace:*",
+    "@json-express/logger-console": "workspace:*",
     "@json-express/transport-express": "workspace:*",
+    "jiti": "^2.6.1",
     "prompts": "^2.4.2"
   },
   "devDependencies": {

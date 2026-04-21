@@ -12,9 +12,18 @@ import { RestApiGenerator } from '@json-express/api-rest';
 import { ExpressTransport } from '@json-express/transport-express';
 import { ConsoleLogger } from '@json-express/logger-console';
 import { LightDocProvider } from '@json-express/docs-light';
+import { loadSchemasAndData } from './loaders/schema-loader';
+import { runExportSchema } from './commands/export';
 
 export const startServer = async () => {
     const cwd = process.cwd();
+
+    // 0. Intercept CLI Commands (e.g., Export Schema)
+    if (process.argv[2] === 'export') {
+        const collection = process.argv[3];
+        runExportSchema(cwd, collection);
+        return;
+    }
 
     // 1. Initialize Configuration Phase
     const configProvider = new EnvConfigProvider(cwd);
@@ -155,26 +164,11 @@ export const startServer = async () => {
         return new PluginClass(...constructorArgs);
     };
 
-    // 3. Scan for JSON Data files (excluding configs)
-    const files = readdirSync(cwd, { withFileTypes: true })
-        .filter(dirent =>
-            dirent.isFile() &&
-            extname(dirent.name).toLowerCase() === '.json' &&
-            !dirent.name.includes('config') &&
-            !dirent.name.includes('package') &&
-            !dirent.name.includes('tsconfig')
-        )
-        .map(dirent => dirent.name);
-
-    const initialData: Record<string, any[]> = {};
-    for (const filename of files) {
-        const fileContent = readFileSync(join(cwd, filename), 'utf8');
-        const parsed = JSON.parse(fileContent);
-        const collectionName = filename.replace('.json', '');
-        initialData[collectionName] = Array.isArray(parsed) ? parsed : [parsed];
-    }
-
-    const collections = Object.keys(initialData);
+    // 3. Centralized Schema Loader (Scans /models and /data)
+    const { schemas, initialData } = await loadSchemasAndData(cwd);
+    
+    // The collections list now comes directly from the instantiated schemas
+    const collections = schemas.map(s => s.name);
 
     // ✅ Inject Seeder collections to prevent Empty Dataset crash
     const fakerConfig = configProvider.get<any>('faker.collections', {});
@@ -185,13 +179,16 @@ export const startServer = async () => {
     }
 
     if (collections.length === 0) {
-        console.warn('⚠️  No valid JSON data files found to serve.');
+        console.warn('⚠️  No valid Model Schemas or JSON data files found to serve. Try dropping a JSON file into /data.');
         process.exit(1);
     }
 
     // 4. Initialize the Kernel
     const kernel = new JsonExpressKernel();
     kernel.registerConfigProvider(configProvider);
+    
+    // Push the parsed schemas into the Kernel Context so plugins can dynamically read them later
+    kernel.context.set('schemas', schemas);
 
     // 4.1 Resolve and Register Logger (Registered FIRST to catch all other logs)
     const loggerInstance = await loadPluginInstance(activeLogger, [{ configProvider }]);
@@ -259,10 +256,16 @@ export const startServer = async () => {
     if (typeof db.loadData === 'function') {
         db.loadData(initialData);
     }
+    if (typeof db.setSchemas === 'function') {
+        db.setSchemas(schemas);
+    }
     kernel.registerDatabase(db);
 
     // ✅ Pass database AND configProvider to the API Generator
     const api = await loadPluginInstance(activeApi, [{ database: db, configProvider, logger: loggerInstance }]);
+    if (typeof api.setSchemas === 'function') {
+        api.setSchemas(schemas);
+    }
     kernel.registerApiGenerator(api);
 
     // ✅ Pass configProvider to the Transport Server

@@ -134,7 +134,7 @@ export class JsonExpressKernel {
         }
 
         // 3. Ask the API Generator to create abstract route definitions
-        const routes = apiGenerator.generate(collections);
+        const routes = await apiGenerator.generate(collections);
 
         // 4. Pass those generated routes to the Transport Server
         for (const route of routes) {

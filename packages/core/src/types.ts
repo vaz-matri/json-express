@@ -1,4 +1,5 @@
 import type { JsonExpressKernel } from './kernel';
+import type { ModelSchema } from './schema/model';
 
 /**
  * 1. The Generic Request & Response
@@ -41,18 +42,25 @@ export interface RouteDefinition {
  * 3. The Database Adapter Contract
  * Any database plugin (Memory, Mongo, Postgres) MUST implement these methods.
  */
+export interface QueryOptions {
+    expand?: string[];
+    embed?: string[];
+}
+
 export interface IDatabaseAdapter {
-    getAll(collection: string): Promise<any[]>;
+    setSchemas?(schemas: ModelSchema[]): void;
+    
+    getAll<T = any>(collection: string, options?: QueryOptions): Promise<T[]>;
 
-    getById(collection: string, id: string): Promise<any>;
+    getById<T = any>(collection: string, id: string, options?: QueryOptions): Promise<T>;
 
-    search(collection: string, query: Record<string, any>): Promise<any[]>;
+    search<T = any>(collection: string, query: Record<string, any>, options?: QueryOptions): Promise<T[]>;
 
-    create(collection: string, data: any): Promise<any>;
+    create<T = any>(collection: string, data: any): Promise<T>;
 
-    update(collection: string, id: string, data: any): Promise<any>;
+    update<T = any>(collection: string, id: string, data: any): Promise<T>;
 
-    delete(collection: string, id: string): Promise<any>;
+    delete<T = any>(collection: string, id: string): Promise<T>;
 
     isHealthy?(): Promise<boolean>;
 }
@@ -74,7 +82,8 @@ export interface ITransport {
  * Transforms the Database operations into Route Definitions (REST or GraphQL).
  */
 export interface IApiGenerator {
-    generate(collections: string[]): RouteDefinition[];
+    setSchemas?(schemas: ModelSchema[]): void;
+    generate(collections: string[]): RouteDefinition[] | Promise<RouteDefinition[]>;
 }
 
 /**

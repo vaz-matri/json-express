@@ -1,0 +1,22 @@
+[
+  {
+    "id": "art-1",
+    "name": "The Beatles",
+    "genre": "Rock"
+  },
+  {
+    "id": "art-2",
+    "name": "Daft Punk",
+    "genre": "Electronic/Dance"
+  },
+  {
+    "name": "Pink Floyd",
+    "genre": "Rock",
+    "id": "d46c53ce-f859-4487-b713-4252b5a6a188"
+  },
+  {
+    "name": "Pink Floyd",
+    "genre": "Rock",
+    "id": "02d48a29-df49-4959-933d-6c31b5851823"
+  }
+]
