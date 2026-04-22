@@ -1,0 +1,12 @@
+[
+  {
+    "id": "art-1",
+    "name": "The Beatles",
+    "genre": "Rock"
+  },
+  {
+    "id": "art-2",
+    "name": "Daft Punk",
+    "genre": "Electronic"
+  }
+]

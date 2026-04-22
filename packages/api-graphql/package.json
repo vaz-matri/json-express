@@ -1,0 +1,27 @@
+{
+  "name": "@json-express/api-graphql",
+  "version": "2.0.0-alpha.0",
+  "description": "GraphQL API Generator plugin for JSON Express",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {
+    "@json-express/core": "workspace:*",
+    "graphql": "^16.0.0"
+  },
+  "files": [
+    "dist"
+  ]
+}
