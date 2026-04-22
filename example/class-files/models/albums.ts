@@ -5,6 +5,6 @@ export default defineModel({
         id: types.id(),
         title: types.string({ required: true }),
         artistId: types.string({ required: true }),
-        artist: types.relation({ target: 'artists', type: 'many-to-one' })
+        artist: types.relation({ target: 'artists', type: 'many-to-one', foreignKey: 'artistId' })
     }
 });

@@ -10,6 +10,6 @@ export default defineConfig({
   webServer: {
     command: 'npm run serve',
     url: 'http://localhost:3000/docs',
-    reuseExistingServer: true,
+    reuseExistingServer: false,
   },
 });

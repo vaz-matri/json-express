@@ -78,8 +78,10 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
             const relationType = (fieldDef.options as any).type;
 
             if (relationType === 'many-to-one' || relationType === 'one-to-one') {
-                // Current item holds the Foreign Key
-                const fkValue = item[expandField];
+                // Current item holds the Foreign Key.
+                // Use explicit foreignKey option, or fall back to the '{fieldName}Id' convention.
+                const fkField = (fieldDef.options as any).foreignKey || `${expandField}Id`;
+                const fkValue = item[fkField];
                 if (fkValue) {
                     const expandedRecord = targetItems.find(t => String(t.id) === String(fkValue));
                     populated[expandField] = expandedRecord || null;

@@ -20,6 +20,7 @@ export interface NumberOptions extends BaseOptions {
 export interface RelationOptions {
     target: string;
     type: 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
+    foreignKey?: string; // The field on this record that holds the FK value (e.g. 'artistId')
     onDelete?: 'CASCADE' | 'SET NULL' | 'RESTRICT';
 }
 

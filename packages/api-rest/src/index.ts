@@ -146,10 +146,13 @@ export class RestApiGenerator implements IApiGenerator {
                         embed: _embed ? String(_embed).split(',').map(s => s.trim()) : undefined
                     };
 
-                    const record = await this.db.getById(collection, id, options);
-                    if (!record) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
-
-                    return { statusCode: 200, body: record };
+                    try {
+                        const record = await this.db.getById(collection, id, options);
+                        if (!record) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                        return { statusCode: 200, body: record };
+                    } catch (e: any) {
+                        return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                    }
                 }
             }));
 
@@ -177,10 +180,13 @@ export class RestApiGenerator implements IApiGenerator {
                         return { statusCode: 400, body: { error: 'Request body must be a JSON object.' } };
                     }
 
-                    const updated = await this.db.update(collection, id, req.body);
-                    if (!updated) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
-
-                    return { statusCode: 200, body: updated };
+                    try {
+                        const updated = await this.db.update(collection, id, req.body);
+                        if (!updated) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                        return { statusCode: 200, body: updated };
+                    } catch (e: any) {
+                        return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                    }
                 }
             }));
 
@@ -192,10 +198,13 @@ export class RestApiGenerator implements IApiGenerator {
                     this.logger.info(`Handling ${collection}.delete`, { id });
                     if (!id) return { statusCode: 400, body: { error: 'Missing resource ID.' } };
 
-                    const deleted = await this.db.delete(collection, id);
-                    if (!deleted) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
-
-                    return { statusCode: 200, body: { message: `Resource '${id}' deleted from '${collection}'.` } };
+                    try {
+                        const deleted = await this.db.delete(collection, id);
+                        if (!deleted) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                        return { statusCode: 200, body: { message: `Resource '${id}' deleted from '${collection}'.` } };
+                    } catch (e: any) {
+                        return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                    }
                 }
             }));
         }
