@@ -63,9 +63,9 @@ importers:
 
   example/class-files:
     dependencies:
-      '@json-express/adapter-memory':
+      '@json-express/adapter-json':
         specifier: workspace:*
-        version: link:../../packages/adapter-memory
+        version: link:../../packages/adapter-json
       '@json-express/api-rest':
         specifier: workspace:*
         version: link:../../packages/api-rest

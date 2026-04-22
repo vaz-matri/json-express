@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, writeFileSync, renameSync, accessSync, constants } from 'fs';
+import { readFileSync, readdirSync, writeFileSync, renameSync, accessSync, existsSync, mkdirSync, constants } from 'fs';
 import { join, extname } from 'path';
 import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator } from '@json-express/core';
 import { ConsoleLogger } from '@json-express/core';
@@ -23,17 +23,15 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     // --- File Discovery & Initial Load ---
 
     private _scanAndLoad() {
-        const files = readdirSync(this.cwd, { withFileTypes: true }).filter(
-            dirent =>
-                dirent.isFile() &&
-                extname(dirent.name).toLowerCase() === '.json' &&
-                !dirent.name.includes('config') &&
-                !dirent.name.includes('package') &&
-                !dirent.name.includes('tsconfig')
+        const dataDir = join(this.cwd, 'data');
+        if (!existsSync(dataDir)) return;
+
+        const files = readdirSync(dataDir, { withFileTypes: true }).filter(
+            dirent => dirent.isFile() && extname(dirent.name).toLowerCase() === '.json'
         );
 
         for (const dirent of files) {
-            const filePath = join(this.cwd, dirent.name);
+            const filePath = join(dataDir, dirent.name);
             try {
                 const content = readFileSync(filePath, 'utf8');
                 const parsed = JSON.parse(content);
@@ -181,8 +179,9 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     public async create(collection: string, data: any): Promise<any> {
         if (!this.store[collection]) {
             this.store[collection] = [];
-            // New collection — register a file path for it
-            this.filePaths[collection] = join(this.cwd, `${collection}.json`);
+            const dataDir = join(this.cwd, 'data');
+            if (!existsSync(dataDir)) mkdirSync(dataDir);
+            this.filePaths[collection] = join(dataDir, `${collection}.json`);
         }
 
         const newId = data.id !== undefined ? data.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);

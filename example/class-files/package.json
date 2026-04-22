@@ -6,7 +6,7 @@
     "test": "playwright test"
   },
   "dependencies": {
-    "@json-express/adapter-memory": "workspace:*",
+    "@json-express/adapter-json": "workspace:*",
     "@json-express/api-rest": "workspace:*",
     "@json-express/transport-express": "workspace:*",
     "@json-express/core": "workspace:*"
