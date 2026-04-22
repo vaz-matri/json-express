@@ -1,5 +1,3 @@
-import { writeFileSync, existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
 import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, QueryOptions, ModelSchema } from '@json-express/core';
 import { ConsoleLogger } from '@json-express/core';
 
@@ -30,22 +28,6 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
             });
         }
         this.store = initialData;
-    }
-
-    private syncToDisk(collection: string) {
-        // We sync directly back to the ./data folder.
-        // Wrapped in try-catch to prevent crashes in serverless/readonly environments.
-        try {
-            const cwd = process.cwd();
-            const dataDir = join(cwd, 'data');
-            if (!existsSync(dataDir)) {
-                mkdirSync(dataDir);
-            }
-            const filepath = join(dataDir, `${collection}.json`);
-            writeFileSync(filepath, JSON.stringify(this.store[collection] || [], null, 2), 'utf8');
-        } catch (e: any) {
-            this.logger.warn(`Failed to sync '${collection}' to disk: ${e.message}`);
-        }
     }
 
     private findById(collection: string, id: string) {
@@ -131,7 +113,6 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
         const newItem = { ...data, id: newId };
         this.store[collection].push(newItem);
 
-        this.syncToDisk(collection);
         this.logger.info(`Created in '${collection}'`, { id: newItem.id });
         return newItem as T;
     }
@@ -142,7 +123,6 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
         const updatedItem = { ...item, ...data, id };
         this.store[collection][index] = updatedItem;
 
-        this.syncToDisk(collection);
         this.logger.info(`Updated '${id}' in '${collection}'`, { id });
         return updatedItem as T;
     }
@@ -150,8 +130,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     public async delete<T = any>(collection: string, id: string): Promise<T> {
         const { item, index } = this.findById(collection, id);
         this.store[collection].splice(index, 1);
-        
-        this.syncToDisk(collection);
+
         this.logger.info(`Deleted '${id}' from '${collection}'`, { id });
         return item as T;
     }
