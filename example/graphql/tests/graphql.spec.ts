@@ -40,6 +40,46 @@ test.describe('GraphQL — Queries', () => {
         expect(Array.isArray(data.artists)).toBeTruthy();
         expect(data.artists.length).toBeGreaterThanOrEqual(2);
     });
+
+    test('reverse relation: artist.albums uses foreignKey, not value heuristic', async ({ request }) => {
+        const res = await gql(
+            request,
+            `{ artists { id name albums { id title artistId } } }`
+        );
+        expect(res.ok()).toBeTruthy();
+        const { data, errors } = await res.json();
+        expect(errors).toBeUndefined();
+        const beatles = data.artists.find((a: any) => a.id === 'art-1');
+        const daft = data.artists.find((a: any) => a.id === 'art-2');
+        expect(beatles.albums.every((a: any) => a.artistId === 'art-1')).toBeTruthy();
+        expect(daft.albums.every((a: any) => a.artistId === 'art-2')).toBeTruthy();
+    });
+});
+
+test.describe('GraphQL — List args (limit, offset, where)', () => {
+    test('limit caps the result count', async ({ request }) => {
+        const res = await gql(request, `{ albums(limit: 1) { id } }`);
+        const { data } = await res.json();
+        expect(data.albums).toHaveLength(1);
+    });
+
+    test('offset skips the leading records', async ({ request }) => {
+        const full = await gql(request, `{ albums { id } }`);
+        const { data: fullData } = await full.json();
+        const res = await gql(request, `{ albums(offset: 1, limit: 10) { id } }`);
+        const { data } = await res.json();
+        expect(data.albums).toHaveLength(fullData.albums.length - 1);
+        expect(data.albums[0].id).toBe(fullData.albums[1].id);
+    });
+
+    test('where filters by field equality', async ({ request }) => {
+        const res = await gql(
+            request,
+            `{ albums(where: { artistId: "art-1" }) { id artistId } }`
+        );
+        const { data } = await res.json();
+        expect(data.albums.every((a: any) => a.artistId === 'art-1')).toBeTruthy();
+    });
 });
 
 test.describe('GraphQL — Mutations', () => {
@@ -97,5 +137,31 @@ test.describe('GraphQL — Mutations', () => {
         const body = await res.json();
         expect(body.errors).toBeDefined();
         expect(body.errors[0].message).toContain('Missing "query"');
+    });
+});
+
+test.describe('GraphQL — Error mapping', () => {
+    test('updateAlbum with unknown id returns NOT_FOUND', async ({ request }) => {
+        const res = await gql(
+            request,
+            `mutation UpdateAlbum($id: ID!, $input: AlbumInput!) {
+                updateAlbum(id: $id, input: $input) { id }
+            }`,
+            { id: 'does-not-exist', input: { title: 'whatever', artistId: 'art-1' } }
+        );
+        const body = await res.json();
+        expect(body.errors).toBeDefined();
+        expect(body.errors[0].extensions.code).toBe('NOT_FOUND');
+    });
+
+    test('deleteAlbum with unknown id returns NOT_FOUND', async ({ request }) => {
+        const res = await gql(
+            request,
+            `mutation DeleteAlbum($id: ID!) { deleteAlbum(id: $id) { id } }`,
+            { id: 'does-not-exist' }
+        );
+        const body = await res.json();
+        expect(body.errors).toBeDefined();
+        expect(body.errors[0].extensions.code).toBe('NOT_FOUND');
     });
 });

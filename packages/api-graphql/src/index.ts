@@ -6,9 +6,11 @@ import {
     GraphQLFloat,
     GraphQLBoolean,
     GraphQLID,
+    GraphQLInt,
     GraphQLList,
     GraphQLNonNull,
     GraphQLScalarType,
+    GraphQLError,
     graphql as executeGraphQL,
 } from 'graphql';
 import type {
@@ -47,6 +49,25 @@ function scalarFor(type: string): GraphQLScalarType {
         case 'boolean': return GraphQLBoolean;
         default: return GraphQLString; // string, date, unknown
     }
+}
+
+// Structural shape for a Zod-compatible schema. Typed locally so api-graphql
+// does not depend on zod or middleware-validation directly.
+interface ParsableSchema {
+    safeParse(input: unknown): { success: boolean; data?: any; error?: { format(): any } };
+}
+interface ValidationRule {
+    method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | '*';
+    path: string | RegExp;
+    body?: ParsableSchema;
+    query?: ParsableSchema;
+}
+
+function matchRule(rule: ValidationRule, method: string, path: string): boolean {
+    const methodOk = rule.method === '*' || rule.method.toUpperCase() === method.toUpperCase();
+    if (!methodOk) return false;
+    if (rule.path instanceof RegExp) return rule.path.test(path);
+    return path === rule.path || path.startsWith(rule.path);
 }
 
 const GRAPHIQL_HTML = `<!DOCTYPE html>
@@ -95,13 +116,14 @@ export class GraphQLApiGenerator implements IApiGenerator {
         this.schemas = schemas;
     }
 
-    private buildSchema(collections: string[]): GraphQLSchema {
+    private buildSchema(collections: string[], rules: ValidationRule[]): GraphQLSchema {
         const db = this.db;
         const schemaMap = new Map(this.schemas.map((s) => [s.name, s]));
 
         // Phase 1: register all GraphQLObjectTypes up-front so relation thunks can reference them
         const typeRegistry = new Map<string, GraphQLObjectType>();
         const inputRegistry = new Map<string, GraphQLInputObjectType>();
+        const whereRegistry = new Map<string, GraphQLInputObjectType>();
 
         for (const collection of collections) {
             const typeName = toTypeName(collection);
@@ -143,12 +165,11 @@ export class GraphQLApiGenerator implements IApiGenerator {
                                     type: isMany ? new GraphQLList(targetType) : targetType,
                                     resolve: async (parent: any) => {
                                         if (isMany) {
-                                            const all = await db.getAll(opts.target);
-                                            return (all as any[]).filter((item) =>
-                                                Object.values(item).some(
-                                                    (v) => String(v) === String(parent.id)
-                                                )
-                                            );
+                                            // Reverse FK: the child records on opts.target carry a column
+                                            // pointing back at parent.id. Use the explicit foreignKey
+                                            // if provided, else fall back to `${parentSingular}Id`.
+                                            const fkField = opts.foreignKey ?? `${toSingular(collection)}Id`;
+                                            return await db.search(opts.target, { [fkField]: parent.id });
                                         }
                                         const fkField = opts.foreignKey ?? `${fieldName}Id`;
                                         const fkValue = parent[fkField];
@@ -189,6 +210,24 @@ export class GraphQLApiGenerator implements IApiGenerator {
                     },
                 })
             );
+
+            // Where-input: scalar fields (all optional) for exact-match filtering on list queries.
+            // Relations are excluded; id is included since filtering by id is useful.
+            whereRegistry.set(
+                collection,
+                new GraphQLInputObjectType({
+                    name: `${typeName}WhereInput`,
+                    fields: () => {
+                        if (!modelSchema) return { id: { type: GraphQLID } };
+                        const whereFields: Record<string, any> = {};
+                        for (const [fieldName, fieldDef] of Object.entries(modelSchema.fields)) {
+                            if (fieldDef.type === 'relation') continue;
+                            whereFields[fieldName] = { type: scalarFor(fieldDef.type) };
+                        }
+                        return whereFields;
+                    },
+                })
+            );
         }
 
         // Phase 2: build Query and Mutation root types
@@ -198,13 +237,28 @@ export class GraphQLApiGenerator implements IApiGenerator {
         for (const collection of collections) {
             const gqlType = typeRegistry.get(collection)!;
             const inputType = inputRegistry.get(collection)!;
+            const whereType = whereRegistry.get(collection)!;
             const typeName = toTypeName(collection);
             const singleField = toSingular(collection); // e.g. 'album'
 
             // List: always use the collection name (e.g. 'albums')
             queryFields[collection] = {
                 type: new GraphQLList(gqlType),
-                resolve: () => db.getAll(collection),
+                args: {
+                    limit: { type: GraphQLInt },
+                    offset: { type: GraphQLInt },
+                    where: { type: whereType },
+                },
+                resolve: async (_: any, args: any) => {
+                    const { limit, offset, where } = args ?? {};
+                    const hasWhere = where && Object.keys(where).length > 0;
+                    const all = hasWhere
+                        ? await db.search(collection, where)
+                        : await db.getAll(collection);
+                    const start = offset ?? 0;
+                    const end = limit != null ? start + limit : undefined;
+                    return (all as any[]).slice(start, end);
+                },
             };
 
             // Single: use singular form only if it differs from the collection name
@@ -216,10 +270,16 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 };
             }
 
+            const createRule = rules.find((r) => matchRule(r, 'POST', `/${collection}`));
+            const updateRule = rules.find((r) => matchRule(r, 'PATCH', `/${collection}`));
+
             mutationFields[`create${typeName}`] = {
                 type: gqlType,
                 args: { input: { type: new GraphQLNonNull(inputType) } },
-                resolve: (_: any, { input }: any) => db.create(collection, input),
+                resolve: async (_: any, { input }: any) => {
+                    const validated = runValidation(createRule, input, typeName);
+                    return db.create(collection, validated);
+                },
             };
 
             mutationFields[`update${typeName}`] = {
@@ -228,13 +288,20 @@ export class GraphQLApiGenerator implements IApiGenerator {
                     id: { type: new GraphQLNonNull(GraphQLID) },
                     input: { type: new GraphQLNonNull(inputType) },
                 },
-                resolve: (_: any, { id, input }: any) => db.update(collection, id, input),
+                resolve: async (_: any, { id, input }: any) => {
+                    await ensureExists(db, collection, id, typeName);
+                    const validated = runValidation(updateRule, input, typeName);
+                    return db.update(collection, id, validated);
+                },
             };
 
             mutationFields[`delete${typeName}`] = {
                 type: gqlType,
                 args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-                resolve: (_: any, { id }: any) => db.delete(collection, id),
+                resolve: async (_: any, { id }: any) => {
+                    await ensureExists(db, collection, id, typeName);
+                    return db.delete(collection, id);
+                },
             };
         }
 
@@ -253,7 +320,8 @@ export class GraphQLApiGenerator implements IApiGenerator {
             return [];
         }
 
-        const schema = this.buildSchema(collections);
+        const rules = this.config?.get<ValidationRule[]>('validation.rules', []) ?? [];
+        const schema = this.buildSchema(collections, rules);
         this.logger.info(`GraphQL API ready at POST ${endpoint}`, { collections });
 
         const routes: RouteDefinition[] = [];
@@ -321,5 +389,33 @@ export class GraphQLApiGenerator implements IApiGenerator {
         }
 
         return routes;
+    }
+}
+
+function runValidation(rule: ValidationRule | undefined, input: any, typeName: string): any {
+    if (!rule?.body) return input;
+    const parsed = rule.body.safeParse(input);
+    if (!parsed.success) {
+        throw new GraphQLError(`${typeName} input validation failed`, {
+            extensions: {
+                code: 'BAD_USER_INPUT',
+                details: parsed.error?.format?.(),
+            },
+        });
+    }
+    return parsed.data ?? input;
+}
+
+async function ensureExists(
+    db: IDatabaseAdapter,
+    collection: string,
+    id: string,
+    typeName: string
+): Promise<void> {
+    const existing = await db.getById(collection, id).catch(() => null);
+    if (!existing) {
+        throw new GraphQLError(`${typeName} with id '${id}' not found`, {
+            extensions: { code: 'NOT_FOUND' },
+        });
     }
 }

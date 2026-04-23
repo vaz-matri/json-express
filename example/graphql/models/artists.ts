@@ -5,5 +5,6 @@ export default defineModel({
         id: types.id(),
         name: types.string({ required: true }),
         genre: types.string(),
+        albums: types.relation({ target: 'albums', type: 'one-to-many', foreignKey: 'artistId' }),
     },
 });
