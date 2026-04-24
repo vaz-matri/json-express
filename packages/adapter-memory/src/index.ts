@@ -1,6 +1,12 @@
 import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, QueryOptions, ModelSchema } from '@json-express/core';
 import { ConsoleLogger } from '@json-express/core';
 
+function toSingular(name: string): string {
+    if (name.endsWith('ies')) return name.slice(0, -3) + 'y';
+    if (name.endsWith('s')) return name.slice(0, -1);
+    return name;
+}
+
 export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     private store: Record<string, any[]> = {};
     private config?: IConfigProvider;
@@ -68,12 +74,12 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
                     const expandedRecord = targetItems.find(t => String(t.id) === String(fkValue));
                     populated[expandField] = expandedRecord || null;
                 }
-            } else if (relationType === 'one-to-many') {
-                // Heuristic: Foreign records point BACK to this item's ID
-                const childRecords = targetItems.filter(child => {
-                     return Object.entries(child).some(([k, v]) => String(v) === String(item.id));
-                });
-                populated[expandField] = childRecords;
+            } else if (relationType === 'one-to-many' || relationType === 'many-to-many') {
+                // Reverse FK: child records on the target collection carry a column pointing
+                // back at this record's id. Use the explicit foreignKey option, or fall back
+                // to the `${parentSingular}Id` convention.
+                const fkField = (fieldDef.options as any).foreignKey || `${toSingular(collection)}Id`;
+                populated[expandField] = targetItems.filter(child => String(child[fkField]) === String(item.id));
             }
         }
 
