@@ -60,3 +60,69 @@ test.describe('Middleware Auth — JWT Protection', () => {
         expect(body.id).toBeDefined();
     });
 });
+
+test.describe('Schema-Driven RBAC — posts (access rules)', () => {
+    test.describe.configure({ mode: 'serial' });
+
+    test('anonymous GET /posts succeeds (read: public)', async ({ request }) => {
+        const response = await request.get('/posts');
+        expect(response.status()).toBe(200);
+        const body = await response.json();
+        expect(Array.isArray(body)).toBe(true);
+        expect(body.length).toBeGreaterThanOrEqual(2);
+    });
+
+    test('anonymous POST /posts is blocked by auth middleware (401)', async ({ request }) => {
+        const response = await request.post('/posts', { data: { title: 'X', body: 'Y' } });
+        expect(response.status()).toBe(401);
+    });
+
+    test('non-admin POST /posts returns 403', async ({ request }) => {
+        const token = jwt.sign({ sub: 'user-2', role: 'viewer' }, SECRET, { expiresIn: '1h' });
+        const response = await request.post('/posts', {
+            headers: { Authorization: `Bearer ${token}` },
+            data: { title: 'Forbidden', body: 'Try' }
+        });
+        expect(response.status()).toBe(403);
+        const body = await response.json();
+        expect(body.error).toMatch(/admin/);
+    });
+
+    test('admin POST /posts returns 201', async ({ request }) => {
+        const token = jwt.sign({ sub: 'user-1', role: 'admin' }, SECRET, { expiresIn: '1h' });
+        const response = await request.post('/posts', {
+            headers: { Authorization: `Bearer ${token}` },
+            data: { title: 'Admin Post', body: 'OK' }
+        });
+        expect(response.status()).toBe(201);
+        const body = await response.json();
+        expect(body.title).toBe('Admin Post');
+    });
+
+    test('editor PATCH /posts/:id succeeds (update: [admin, editor])', async ({ request }) => {
+        const token = jwt.sign({ sub: 'user-3', role: 'editor' }, SECRET, { expiresIn: '1h' });
+        const response = await request.patch('/posts/p-1', {
+            headers: { Authorization: `Bearer ${token}` },
+            data: { title: 'Edited by editor' }
+        });
+        expect(response.status()).toBe(200);
+        const body = await response.json();
+        expect(body.title).toBe('Edited by editor');
+    });
+
+    test('editor DELETE /posts/:id is forbidden (delete: admin only)', async ({ request }) => {
+        const token = jwt.sign({ sub: 'user-3', role: 'editor' }, SECRET, { expiresIn: '1h' });
+        const response = await request.delete('/posts/p-1', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        expect(response.status()).toBe(403);
+    });
+
+    test('admin DELETE /posts/:id succeeds', async ({ request }) => {
+        const token = jwt.sign({ sub: 'user-1', role: 'admin' }, SECRET, { expiresIn: '1h' });
+        const response = await request.delete('/posts/p-2', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        expect(response.status()).toBe(200);
+    });
+});

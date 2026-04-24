@@ -64,10 +64,13 @@ const albumSchema: ModelSchema = {
     },
 };
 
-async function invokePost(routes: any[], body: any) {
+async function invokePost(routes: any[], body: any, headers: Record<string, any> = {}) {
     const route = routes.find((r) => r.method === 'POST');
-    return route.handler({ body, method: 'POST', path: route.path, query: {}, params: {}, headers: {} });
+    return route.handler({ body, method: 'POST', path: route.path, query: {}, params: {}, headers });
 }
+
+const adminHeader = { 'x-user-payload': JSON.stringify({ sub: 'u-1', role: 'admin' }) };
+const userHeader = { 'x-user-payload': JSON.stringify({ sub: 'u-2', role: 'user' }) };
 
 describe('api-graphql — validation.rules enforcement', () => {
     it('rejects create mutations whose input fails the matched Zod rule', async () => {
@@ -161,5 +164,99 @@ describe('api-graphql — NOT_FOUND mapping', () => {
 
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors[0].extensions.code).toBe('NOT_FOUND');
+    });
+});
+
+const protectedAlbumSchema: ModelSchema = {
+    name: 'albums',
+    fields: {
+        id: { type: 'id', options: {} } as any,
+        title: { type: 'string', options: {} } as any,
+        artistId: { type: 'string', options: {} } as any,
+    },
+    access: {
+        read: 'public',
+        create: 'admin',
+        update: 'admin',
+        delete: ['admin', 'editor'],
+    },
+};
+
+describe('api-graphql — RBAC enforcement', () => {
+    it('public read allows anonymous list query', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([protectedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(routes, { query: `{ albums { id title } }` });
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.albums.length).toBe(1);
+    });
+
+    it('protected create returns UNAUTHENTICATED without payload', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([protectedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(routes, {
+            query: `mutation { createAlbum(input: { title: "x", artistId: "y" }) { id } }`,
+        });
+
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0].extensions.code).toBe('UNAUTHENTICATED');
+        expect(db.createdWith).toBeNull();
+    });
+
+    it('protected create returns FORBIDDEN with non-matching role', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([protectedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `mutation { createAlbum(input: { title: "x", artistId: "y" }) { id } }` },
+            userHeader
+        );
+
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0].extensions.code).toBe('FORBIDDEN');
+        expect(db.createdWith).toBeNull();
+    });
+
+    it('protected create succeeds with matching role', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([protectedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `mutation { createAlbum(input: { title: "Kind of Blue", artistId: "art-3" }) { id title } }` },
+            adminHeader
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.createAlbum.title).toBe('Kind of Blue');
+    });
+
+    it('array role rule allows any matching role (editor for delete)', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([protectedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const editorHeader = { 'x-user-payload': JSON.stringify({ sub: 'u-3', role: 'editor' }) };
+        const res = await invokePost(
+            routes,
+            { query: `mutation { deleteAlbum(id: "alb-1") { id } }` },
+            editorHeader
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.deleteAlbum.id).toBe('alb-1');
     });
 });

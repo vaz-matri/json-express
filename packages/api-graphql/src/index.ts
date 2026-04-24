@@ -20,8 +20,23 @@ import type {
     ILogger,
     ModelSchema,
     RouteDefinition,
+    AccessRule,
+    AccessOp,
 } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/core';
+import { ConsoleLogger, evaluateAccess } from '@json-express/core';
+
+interface ResolverContext {
+    userPayload: string | string[] | undefined;
+}
+
+function enforceAccess(rule: AccessRule | undefined, ctx: ResolverContext, typeName: string, op: AccessOp): void {
+    const verdict = evaluateAccess(rule, ctx?.userPayload);
+    if (!verdict.allowed) {
+        throw new GraphQLError(`${verdict.reason} (${typeName}.${op})`, {
+            extensions: { code: verdict.code },
+        });
+    }
+}
 
 const JSONScalar = new GraphQLScalarType({
     name: 'JSON',
@@ -241,6 +256,12 @@ export class GraphQLApiGenerator implements IApiGenerator {
             const typeName = toTypeName(collection);
             const singleField = toSingular(collection); // e.g. 'album'
 
+            const access = schemaMap.get(collection)?.access;
+            const readRule = access?.read;
+            const createAccessRule = access?.create;
+            const updateAccessRule = access?.update;
+            const deleteAccessRule = access?.delete;
+
             // List: always use the collection name (e.g. 'albums')
             queryFields[collection] = {
                 type: new GraphQLList(gqlType),
@@ -249,7 +270,8 @@ export class GraphQLApiGenerator implements IApiGenerator {
                     offset: { type: GraphQLInt },
                     where: { type: whereType },
                 },
-                resolve: async (_: any, args: any) => {
+                resolve: async (_: any, args: any, ctx: ResolverContext) => {
+                    enforceAccess(readRule, ctx, typeName, 'read');
                     const { limit, offset, where } = args ?? {};
                     const hasWhere = where && Object.keys(where).length > 0;
                     const all = hasWhere
@@ -266,7 +288,10 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 queryFields[singleField] = {
                     type: gqlType,
                     args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-                    resolve: (_: any, { id }: { id: string }) => db.getById(collection, id),
+                    resolve: (_: any, { id }: { id: string }, ctx: ResolverContext) => {
+                        enforceAccess(readRule, ctx, typeName, 'read');
+                        return db.getById(collection, id);
+                    },
                 };
             }
 
@@ -276,7 +301,8 @@ export class GraphQLApiGenerator implements IApiGenerator {
             mutationFields[`create${typeName}`] = {
                 type: gqlType,
                 args: { input: { type: new GraphQLNonNull(inputType) } },
-                resolve: async (_: any, { input }: any) => {
+                resolve: async (_: any, { input }: any, ctx: ResolverContext) => {
+                    enforceAccess(createAccessRule, ctx, typeName, 'create');
                     const validated = runValidation(createRule, input, typeName);
                     return db.create(collection, validated);
                 },
@@ -288,7 +314,8 @@ export class GraphQLApiGenerator implements IApiGenerator {
                     id: { type: new GraphQLNonNull(GraphQLID) },
                     input: { type: new GraphQLNonNull(inputType) },
                 },
-                resolve: async (_: any, { id, input }: any) => {
+                resolve: async (_: any, { id, input }: any, ctx: ResolverContext) => {
+                    enforceAccess(updateAccessRule, ctx, typeName, 'update');
                     await ensureExists(db, collection, id, typeName);
                     const validated = runValidation(updateRule, input, typeName);
                     return db.update(collection, id, validated);
@@ -298,7 +325,8 @@ export class GraphQLApiGenerator implements IApiGenerator {
             mutationFields[`delete${typeName}`] = {
                 type: gqlType,
                 args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-                resolve: async (_: any, { id }: any) => {
+                resolve: async (_: any, { id }: any, ctx: ResolverContext) => {
+                    enforceAccess(deleteAccessRule, ctx, typeName, 'delete');
                     await ensureExists(db, collection, id, typeName);
                     return db.delete(collection, id);
                 },
@@ -356,11 +384,13 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 }
 
                 try {
+                    const ctx: ResolverContext = { userPayload: req.headers['x-user-payload'] };
                     const result = await executeGraphQL({
                         schema,
                         source: query,
                         variableValues: variables,
                         operationName,
+                        contextValue: ctx,
                     });
                     return { statusCode: 200, body: result };
                 } catch (err: any) {

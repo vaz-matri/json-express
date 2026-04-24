@@ -1,0 +1,4 @@
+[
+    { "id": "p-1", "title": "Hello World", "body": "First post" },
+    { "id": "p-2", "title": "RBAC Demo", "body": "Schema-driven access control" }
+]

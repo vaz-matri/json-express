@@ -11,9 +11,18 @@ import type {
     IConfigProvider,
     ILogger,
     ModelSchema,
-    QueryOptions
+    QueryOptions,
+    AccessRule,
+    AccessOp
 } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/core';
+import { ConsoleLogger, evaluateAccess } from '@json-express/core';
+
+function denyResponse(verdict: { code: 'UNAUTHENTICATED' | 'FORBIDDEN'; reason: string }): JsonResponse {
+    return {
+        statusCode: verdict.code === 'UNAUTHENTICATED' ? 401 : 403,
+        body: { error: verdict.reason },
+    };
+}
 
 export class RestApiGenerator implements IApiGenerator {
     private db: IDatabaseAdapter;
@@ -37,15 +46,17 @@ export class RestApiGenerator implements IApiGenerator {
         this.schemas = schemas;
     }
 
-    private enrichRoute(route: RouteDefinition): RouteDefinition {
+    private enrichRoute(route: RouteDefinition, opRule?: AccessRule): RouteDefinition {
         route.middlewares = route.middlewares || [];
         route.metadata = route.metadata || {};
 
         const authSecret = this.config?.get<string>('auth.secret');
-        if (authSecret) {
+        // 'public' rules opt the route out of the auth gate so anonymous traffic isn't 401'd
+        // before the handler runs. The handler still re-evaluates the rule for defense in depth.
+        if (authSecret && opRule !== 'public') {
             const rawExclude = this.config?.get<string | string[]>('auth.exclude', []);
             const excludePaths = Array.isArray(rawExclude) ? rawExclude : (typeof rawExclude === 'string' ? rawExclude.split(',').map(s => s.trim()) : []);
-            
+
             const isExcluded = excludePaths.some(p => route.path.startsWith(p));
             if (!isExcluded) {
                 if (!route.middlewares.includes('auth')) route.middlewares.push('auth');
@@ -106,17 +117,29 @@ export class RestApiGenerator implements IApiGenerator {
         const rawPrefix = this.config?.get<string>('api.rest.prefix', '') ?? '';
         const prefix = rawPrefix.endsWith('/') ? rawPrefix.slice(0, -1) : rawPrefix;
 
+        const schemaMap = new Map(this.schemas.map(s => [s.name, s]));
+        const ruleFor = (collection: string, op: AccessOp): AccessRule | undefined =>
+            schemaMap.get(collection)?.access?.[op];
+
         // --- Core Auto-Generated Standard Routes --- //
         for (const collection of collections) {
             const basePath = `${prefix}/${collection}`;
             const itemPath = `${prefix}/${collection}/:id`;
+
+            const readRule = ruleFor(collection, 'read');
+            const createRule = ruleFor(collection, 'create');
+            const updateRule = ruleFor(collection, 'update');
+            const deleteRule = ruleFor(collection, 'delete');
 
             routes.push(this.enrichRoute({
                 method: 'GET',
                 path: basePath,
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
                     this.logger.info(`Handling ${collection}.getAll`);
-                    
+
+                    const verdict = evaluateAccess(readRule, req.headers['x-user-payload']);
+                    if (!verdict.allowed) return denyResponse(verdict);
+
                     // Parse QueryOptions cleanly
                     const { _expand, _embed, ...cleanQuery } = req.query;
                     const options: QueryOptions = {
@@ -130,7 +153,7 @@ export class RestApiGenerator implements IApiGenerator {
                         : await this.db.getAll(collection, options);
                     return { statusCode: 200, body: data };
                 }
-            }));
+            }, readRule));
 
             routes.push(this.enrichRoute({
                 method: 'GET',
@@ -139,6 +162,9 @@ export class RestApiGenerator implements IApiGenerator {
                     const id = req.params['id'];
                     this.logger.info(`Handling ${collection}.getById`, { id });
                     if (!id) return { statusCode: 400, body: { error: 'Missing resource ID.' } };
+
+                    const verdict = evaluateAccess(readRule, req.headers['x-user-payload']);
+                    if (!verdict.allowed) return denyResponse(verdict);
 
                     const { _expand, _embed } = req.query;
                     const options: QueryOptions = {
@@ -154,7 +180,7 @@ export class RestApiGenerator implements IApiGenerator {
                         return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
                     }
                 }
-            }));
+            }, readRule));
 
             routes.push(this.enrichRoute({
                 method: 'POST',
@@ -164,10 +190,14 @@ export class RestApiGenerator implements IApiGenerator {
                     if (!req.body || typeof req.body !== 'object') {
                         return { statusCode: 400, body: { error: 'Request body must be a JSON object.' } };
                     }
+
+                    const verdict = evaluateAccess(createRule, req.headers['x-user-payload']);
+                    if (!verdict.allowed) return denyResponse(verdict);
+
                     const created = await this.db.create(collection, req.body);
                     return { statusCode: 201, body: created };
                 }
-            }));
+            }, createRule));
 
             routes.push(this.enrichRoute({
                 method: 'PATCH',
@@ -180,6 +210,9 @@ export class RestApiGenerator implements IApiGenerator {
                         return { statusCode: 400, body: { error: 'Request body must be a JSON object.' } };
                     }
 
+                    const verdict = evaluateAccess(updateRule, req.headers['x-user-payload']);
+                    if (!verdict.allowed) return denyResponse(verdict);
+
                     try {
                         const updated = await this.db.update(collection, id, req.body);
                         if (!updated) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
@@ -188,7 +221,7 @@ export class RestApiGenerator implements IApiGenerator {
                         return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
                     }
                 }
-            }));
+            }, updateRule));
 
             routes.push(this.enrichRoute({
                 method: 'DELETE',
@@ -198,6 +231,9 @@ export class RestApiGenerator implements IApiGenerator {
                     this.logger.info(`Handling ${collection}.delete`, { id });
                     if (!id) return { statusCode: 400, body: { error: 'Missing resource ID.' } };
 
+                    const verdict = evaluateAccess(deleteRule, req.headers['x-user-payload']);
+                    if (!verdict.allowed) return denyResponse(verdict);
+
                     try {
                         const deleted = await this.db.delete(collection, id);
                         if (!deleted) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
@@ -206,7 +242,7 @@ export class RestApiGenerator implements IApiGenerator {
                         return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
                     }
                 }
-            }));
+            }, deleteRule));
         }
 
         // --- Extensibility 1: Model-Bound Endpoints --- //

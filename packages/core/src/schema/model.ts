@@ -30,12 +30,21 @@ export interface ModelHooks<T = any> {
     // We will expand these lifecycles as needed
 }
 
+export type AccessRule = 'public' | 'owner' | string | string[];
+
+export interface AuthRules {
+    create?: AccessRule;
+    read?: AccessRule;
+    update?: AccessRule;
+    delete?: AccessRule;
+}
+
 export interface ModelConfig<TFields extends Record<string, TypeDefinition> = any> {
-    name?: string; 
+    name?: string;
     fields: TFields;
     endpoints?: Record<string, CustomEndpointHandler>;
     hooks?: ModelHooks;
-    access?: Record<string, any>; // Staged for plugin-auth
+    access?: AuthRules;
 }
 
 export interface ModelSchema<TFields extends Record<string, TypeDefinition> = any> extends ModelConfig<TFields> {
