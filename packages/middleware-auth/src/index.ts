@@ -26,6 +26,11 @@ export class AuthMiddleware implements IMiddleware {
     }
 
     public async handle(req: JsonRequest, next: () => Promise<JsonResponse>): Promise<JsonResponse> {
+        // SECURITY: Always strip client-provided internal headers to prevent spoofing!
+        // If an attacker sends this header manually, we must discard it before anything else.
+        delete req.headers['x-user-payload'];
+        delete req.headers['X-User-Payload'];
+
         // 1. If no secret is configured, bypass authentication entirely
         if (!this.secret) {
             this.logger.warn('JEX_AUTH_SECRET is missing. Authentication bypassed.');
