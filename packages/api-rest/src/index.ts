@@ -12,16 +12,26 @@ import type {
     ILogger,
     ModelSchema,
     QueryOptions,
-    AccessRule,
-    AccessOp
+    AccessRule
 } from '@json-express/core';
-import { ConsoleLogger, evaluateAccess } from '@json-express/core';
+import {
+    ConsoleLogger,
+    evaluateAccess,
+    needsOwnerCheck,
+    resolveOwnerField,
+    resolveUserId,
+    ownsRecord,
+} from '@json-express/core';
 
 function denyResponse(verdict: { code: 'UNAUTHENTICATED' | 'FORBIDDEN'; reason: string }): JsonResponse {
     return {
         statusCode: verdict.code === 'UNAUTHENTICATED' ? 401 : 403,
         body: { error: verdict.reason },
     };
+}
+
+function notFound(collection: string, id: string): JsonResponse {
+    return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
 }
 
 export class RestApiGenerator implements IApiGenerator {
@@ -118,18 +128,18 @@ export class RestApiGenerator implements IApiGenerator {
         const prefix = rawPrefix.endsWith('/') ? rawPrefix.slice(0, -1) : rawPrefix;
 
         const schemaMap = new Map(this.schemas.map(s => [s.name, s]));
-        const ruleFor = (collection: string, op: AccessOp): AccessRule | undefined =>
-            schemaMap.get(collection)?.access?.[op];
 
         // --- Core Auto-Generated Standard Routes --- //
         for (const collection of collections) {
             const basePath = `${prefix}/${collection}`;
             const itemPath = `${prefix}/${collection}/:id`;
 
-            const readRule = ruleFor(collection, 'read');
-            const createRule = ruleFor(collection, 'create');
-            const updateRule = ruleFor(collection, 'update');
-            const deleteRule = ruleFor(collection, 'delete');
+            const access = schemaMap.get(collection)?.access;
+            const readRule = access?.read;
+            const createRule = access?.create;
+            const updateRule = access?.update;
+            const deleteRule = access?.delete;
+            const ownerField = resolveOwnerField(access);
 
             routes.push(this.enrichRoute({
                 method: 'GET',
@@ -146,6 +156,14 @@ export class RestApiGenerator implements IApiGenerator {
                         expand: _expand ? String(_expand).split(',').map(s => s.trim()) : undefined,
                         embed: _embed ? String(_embed).split(',').map(s => s.trim()) : undefined
                     };
+
+                    if (needsOwnerCheck(readRule)) {
+                        // Force owner clause to overwrite any client-supplied value for the owner field —
+                        // clients must not be able to query around their own ownership.
+                        cleanQuery[ownerField] = resolveUserId(verdict.user);
+                        const data = await this.db.search(collection, cleanQuery, options);
+                        return { statusCode: 200, body: data };
+                    }
 
                     const hasQuery = Object.keys(cleanQuery).length > 0;
                     const data = hasQuery
@@ -174,10 +192,14 @@ export class RestApiGenerator implements IApiGenerator {
 
                     try {
                         const record = await this.db.getById(collection, id, options);
-                        if (!record) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                        if (!record) return notFound(collection, id);
+                        if (needsOwnerCheck(readRule) && !ownsRecord(record, ownerField, verdict.user)) {
+                            // Return 404 (not 403) so callers can't probe for IDs they don't own.
+                            return notFound(collection, id);
+                        }
                         return { statusCode: 200, body: record };
-                    } catch (e: any) {
-                        return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                    } catch {
+                        return notFound(collection, id);
                     }
                 }
             }, readRule));
@@ -193,6 +215,11 @@ export class RestApiGenerator implements IApiGenerator {
 
                     const verdict = evaluateAccess(createRule, req.headers['x-user-payload']);
                     if (!verdict.allowed) return denyResponse(verdict);
+
+                    if (needsOwnerCheck(createRule)) {
+                        // Auto-stamp the caller as owner; overwrite any client-supplied value.
+                        req.body[ownerField] = resolveUserId(verdict.user);
+                    }
 
                     const created = await this.db.create(collection, req.body);
                     return { statusCode: 201, body: created };
@@ -213,12 +240,22 @@ export class RestApiGenerator implements IApiGenerator {
                     const verdict = evaluateAccess(updateRule, req.headers['x-user-payload']);
                     if (!verdict.allowed) return denyResponse(verdict);
 
+                    if (needsOwnerCheck(updateRule)) {
+                        try {
+                            const existing = await this.db.getById(collection, id);
+                            if (!existing) return notFound(collection, id);
+                            if (!ownsRecord(existing, ownerField, verdict.user)) return notFound(collection, id);
+                        } catch {
+                            return notFound(collection, id);
+                        }
+                    }
+
                     try {
                         const updated = await this.db.update(collection, id, req.body);
-                        if (!updated) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                        if (!updated) return notFound(collection, id);
                         return { statusCode: 200, body: updated };
-                    } catch (e: any) {
-                        return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                    } catch {
+                        return notFound(collection, id);
                     }
                 }
             }, updateRule));
@@ -234,12 +271,22 @@ export class RestApiGenerator implements IApiGenerator {
                     const verdict = evaluateAccess(deleteRule, req.headers['x-user-payload']);
                     if (!verdict.allowed) return denyResponse(verdict);
 
+                    if (needsOwnerCheck(deleteRule)) {
+                        try {
+                            const existing = await this.db.getById(collection, id);
+                            if (!existing) return notFound(collection, id);
+                            if (!ownsRecord(existing, ownerField, verdict.user)) return notFound(collection, id);
+                        } catch {
+                            return notFound(collection, id);
+                        }
+                    }
+
                     try {
                         const deleted = await this.db.delete(collection, id);
-                        if (!deleted) return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                        if (!deleted) return notFound(collection, id);
                         return { statusCode: 200, body: { message: `Resource '${id}' deleted from '${collection}'.` } };
-                    } catch (e: any) {
-                        return { statusCode: 404, body: { error: `Resource '${id}' not found in '${collection}'.` } };
+                    } catch {
+                        return notFound(collection, id);
                     }
                 }
             }, deleteRule));

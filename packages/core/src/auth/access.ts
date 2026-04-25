@@ -1,4 +1,4 @@
-import type { AccessRule } from '../schema/model';
+import type { AccessRule, AuthRules } from '../schema/model';
 
 export type AccessOp = 'create' | 'read' | 'update' | 'delete';
 
@@ -39,7 +39,13 @@ export function evaluateAccess(
     }
 
     if (rule === 'owner') {
-        throw new Error("'owner' access rule requires Phase B row-level security — not implemented");
+        // Authentication is required to resolve ownership; the per-record check
+        // is performed by the caller via ownsRecord() after fetching the row.
+        const user = decodePayload(userPayloadHeader);
+        if (!user) {
+            return { allowed: false, code: 'UNAUTHENTICATED', reason: 'Authentication required' };
+        }
+        return { allowed: true, user };
     }
 
     const user = decodePayload(userPayloadHeader);
@@ -60,4 +66,33 @@ export function evaluateAccess(
     }
 
     return { allowed: true, user };
+}
+
+export function needsOwnerCheck(rule: AccessRule | undefined): boolean {
+    return rule === 'owner';
+}
+
+export function resolveOwnerField(access: AuthRules | undefined): string {
+    return access?.ownerField ?? 'ownerId';
+}
+
+/**
+ * Resolves a user identifier from a JWT-shaped payload, with a pragmatic fallback
+ * across common claim names: `sub` (RFC 7519 standard) → `id` → `userId`.
+ */
+export function resolveUserId(user: Record<string, any> | null | undefined): string | null {
+    if (!user) return null;
+    const id = user.sub ?? user.id ?? user.userId;
+    return id != null ? String(id) : null;
+}
+
+export function ownsRecord(
+    record: any,
+    ownerField: string,
+    user: Record<string, any> | null | undefined
+): boolean {
+    if (!record || !user) return false;
+    const userId = resolveUserId(user);
+    if (userId == null) return false;
+    return String(record[ownerField]) === userId;
 }

@@ -37,6 +37,11 @@ export interface AuthRules {
     read?: AccessRule;
     update?: AccessRule;
     delete?: AccessRule;
+    /**
+     * Column on the record used for ownership checks when an op rule is `'owner'`.
+     * Defaults to `'ownerId'`.
+     */
+    ownerField?: string;
 }
 
 export interface ModelConfig<TFields extends Record<string, TypeDefinition> = any> {

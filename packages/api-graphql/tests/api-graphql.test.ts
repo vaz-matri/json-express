@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest';
+import jwt from 'jsonwebtoken';
 import { GraphQLApiGenerator } from '../src/index';
 import type { IConfigProvider, IDatabaseAdapter, ModelSchema } from '@json-express/core';
+
+const TEST_SECRET = 'phase-b-test-secret';
+
+function bearer(payload: Record<string, any>): { authorization: string } {
+    return { authorization: `Bearer ${jwt.sign(payload, TEST_SECRET)}` };
+}
 
 // Minimal duck-typed "Zod-like" schema that always fails with a shaped error.
 // api-graphql only requires { safeParse } — it does not import zod directly.
@@ -15,10 +22,14 @@ const passingSchema = {
     safeParse: (input: any) => ({ success: true, data: { ...input, normalized: true } }),
 };
 
-function makeConfig(rules: any[]): IConfigProvider {
+function makeConfig(rules: any[], opts: { authSecret?: string } = {}): IConfigProvider {
     return {
-        get: (key: string, def?: any) => (key === 'validation.rules' ? rules : def),
-        has: () => false,
+        get: (key: string, def?: any) => {
+            if (key === 'validation.rules') return rules;
+            if (key === 'auth.secret') return opts.authSecret ?? def;
+            return def;
+        },
+        has: (key: string) => key === 'auth.secret' && !!opts.authSecret,
         set: () => {},
     };
 }
@@ -69,8 +80,8 @@ async function invokePost(routes: any[], body: any, headers: Record<string, any>
     return route.handler({ body, method: 'POST', path: route.path, query: {}, params: {}, headers });
 }
 
-const adminHeader = { 'x-user-payload': JSON.stringify({ sub: 'u-1', role: 'admin' }) };
-const userHeader = { 'x-user-payload': JSON.stringify({ sub: 'u-2', role: 'user' }) };
+const adminHeader = bearer({ sub: 'u-1', role: 'admin' });
+const userHeader = bearer({ sub: 'u-2', role: 'user' });
 
 describe('api-graphql — validation.rules enforcement', () => {
     it('rejects create mutations whose input fails the matched Zod rule', async () => {
@@ -185,7 +196,7 @@ const protectedAlbumSchema: ModelSchema = {
 describe('api-graphql — RBAC enforcement', () => {
     it('public read allows anonymous list query', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -197,7 +208,7 @@ describe('api-graphql — RBAC enforcement', () => {
 
     it('protected create returns UNAUTHENTICATED without payload', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -212,7 +223,7 @@ describe('api-graphql — RBAC enforcement', () => {
 
     it('protected create returns FORBIDDEN with non-matching role', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -229,7 +240,7 @@ describe('api-graphql — RBAC enforcement', () => {
 
     it('protected create succeeds with matching role', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -245,11 +256,11 @@ describe('api-graphql — RBAC enforcement', () => {
 
     it('array role rule allows any matching role (editor for delete)', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
-        const editorHeader = { 'x-user-payload': JSON.stringify({ sub: 'u-3', role: 'editor' }) };
+        const editorHeader = bearer({ sub: 'u-3', role: 'editor' });
         const res = await invokePost(
             routes,
             { query: `mutation { deleteAlbum(id: "alb-1") { id } }` },
@@ -258,5 +269,224 @@ describe('api-graphql — RBAC enforcement', () => {
 
         expect(res.body.errors).toBeUndefined();
         expect(res.body.data.deleteAlbum.id).toBe('alb-1');
+    });
+});
+
+const ownedAlbumSchema: ModelSchema = {
+    name: 'albums',
+    fields: {
+        id: { type: 'id', options: {} } as any,
+        title: { type: 'string', options: {} } as any,
+        ownerId: { type: 'string', options: {} } as any,
+    },
+    access: {
+        read: 'owner',
+        create: 'owner',
+        update: 'owner',
+        delete: 'owner',
+    },
+};
+
+function ownedDb(): InMemoryAdapter {
+    const db = new InMemoryAdapter();
+    db.store = {
+        albums: [
+            { id: 'a1', title: "u1's first", ownerId: 'u-1' },
+            { id: 'a2', title: "u1's second", ownerId: 'u-1' },
+            { id: 'a3', title: "u2's only", ownerId: 'u-2' },
+        ],
+    };
+    return db;
+}
+
+describe('api-graphql — Owner row-level security', () => {
+    it('list filters to caller-owned records', async () => {
+        const db = ownedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([ownedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `{ albums { id ownerId } }` },
+            bearer({ sub: 'u-1' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.albums.map((a: any) => a.id).sort()).toEqual(['a1', 'a2']);
+        expect(res.body.data.albums.every((a: any) => a.ownerId === 'u-1')).toBe(true);
+    });
+
+    it('list overwrites client-supplied where clause for the owner field', async () => {
+        const db = ownedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([ownedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            // u-1 trying to spoof u-2's records via where filter
+            { query: `{ albums(where: { ownerId: "u-2" }) { id ownerId } }` },
+            bearer({ sub: 'u-1' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.albums.every((a: any) => a.ownerId === 'u-1')).toBe(true);
+    });
+
+    it('list anonymous returns UNAUTHENTICATED', async () => {
+        const db = ownedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([ownedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(routes, { query: `{ albums { id } }` });
+
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0].extensions.code).toBe('UNAUTHENTICATED');
+    });
+
+    it('byId returns NOT_FOUND for cross-owner access', async () => {
+        const db = ownedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([ownedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `{ album(id: "a3") { id } }` },
+            bearer({ sub: 'u-1' })
+        );
+
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0].extensions.code).toBe('NOT_FOUND');
+    });
+
+    it('create auto-stamps ownerId from caller, overwriting client value', async () => {
+        const db = ownedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([ownedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            // client tries to forge ownerId — should be overwritten with caller.sub
+            { query: `mutation { createAlbum(input: { title: "Nope", ownerId: "u-2" }) { id ownerId } }` },
+            bearer({ sub: 'u-1' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.createAlbum.ownerId).toBe('u-1');
+        expect(db.createdWith.ownerId).toBe('u-1');
+    });
+
+    it('update on cross-owner record returns NOT_FOUND', async () => {
+        const db = ownedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([ownedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `mutation { updateAlbum(id: "a3", input: { title: "hijack", ownerId: "u-2" }) { id } }` },
+            bearer({ sub: 'u-1' })
+        );
+
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0].extensions.code).toBe('NOT_FOUND');
+    });
+
+    it('delete on cross-owner record returns NOT_FOUND', async () => {
+        const db = ownedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([ownedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `mutation { deleteAlbum(id: "a3") { id } }` },
+            bearer({ sub: 'u-1' })
+        );
+
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0].extensions.code).toBe('NOT_FOUND');
+    });
+
+    it('owner update on own record succeeds', async () => {
+        const db = ownedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([ownedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `mutation { updateAlbum(id: "a1", input: { title: "Renamed" }) { id title } }` },
+            bearer({ sub: 'u-1' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.updateAlbum.title).toBe('Renamed');
+    });
+});
+
+describe('api-graphql — Soft-decode on /graphql', () => {
+    it('strips client-supplied x-user-payload to prevent header spoofing', async () => {
+        const db = ownedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([ownedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        // Client forges x-user-payload with no Authorization header — should be stripped.
+        const res = await invokePost(
+            routes,
+            { query: `{ albums { id } }` },
+            { 'x-user-payload': JSON.stringify({ sub: 'u-1' }) }
+        );
+
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0].extensions.code).toBe('UNAUTHENTICATED');
+    });
+
+    it('public ops succeed anonymously even when auth.secret is configured', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([protectedAlbumSchema]);   // read: 'public'
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(routes, { query: `{ albums { id } }` });
+
+        expect(res.body.errors).toBeUndefined();
+        expect(Array.isArray(res.body.data.albums)).toBe(true);
+    });
+
+    it('public ops succeed with a valid token too', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([protectedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `{ albums { id } }` },
+            bearer({ sub: 'u-1' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+    });
+
+    it('invalid token is silently ignored on public ops (no 401 from middleware)', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([protectedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `{ albums { id } }` },
+            { authorization: 'Bearer total-garbage' }
+        );
+
+        // Public read still succeeds; invalid token doesn't break anything.
+        expect(res.body.errors).toBeUndefined();
     });
 });

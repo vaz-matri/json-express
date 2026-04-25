@@ -126,3 +126,93 @@ test.describe('Schema-Driven RBAC — posts (access rules)', () => {
         expect(response.status()).toBe(200);
     });
 });
+
+test.describe('Schema-Driven RBAC — notes (owner row-level security)', () => {
+    test.describe.configure({ mode: 'serial' });
+
+    const tokenA = jwt.sign({ sub: 'user-a' }, SECRET, { expiresIn: '1h' });
+    const tokenB = jwt.sign({ sub: 'user-b' }, SECRET, { expiresIn: '1h' });
+
+    test('anonymous GET /notes returns 401', async ({ request }) => {
+        const response = await request.get('/notes');
+        expect(response.status()).toBe(401);
+    });
+
+    test('user-a GET /notes returns only user-a records', async ({ request }) => {
+        const response = await request.get('/notes', {
+            headers: { Authorization: `Bearer ${tokenA}` }
+        });
+        expect(response.status()).toBe(200);
+        const body = await response.json();
+        expect(body.length).toBe(2);
+        expect(body.every((n: any) => n.ownerId === 'user-a')).toBe(true);
+    });
+
+    test('user-b GET /notes returns only user-b records', async ({ request }) => {
+        const response = await request.get('/notes', {
+            headers: { Authorization: `Bearer ${tokenB}` }
+        });
+        expect(response.status()).toBe(200);
+        const body = await response.json();
+        expect(body.length).toBe(1);
+        expect(body[0].ownerId).toBe('user-b');
+    });
+
+    test('user-a GET /notes?ownerId=user-b cannot spoof — owner clause overwrites', async ({ request }) => {
+        const response = await request.get('/notes?ownerId=user-b', {
+            headers: { Authorization: `Bearer ${tokenA}` }
+        });
+        expect(response.status()).toBe(200);
+        const body = await response.json();
+        expect(body.every((n: any) => n.ownerId === 'user-a')).toBe(true);
+    });
+
+    test('user-a GET /notes/:id on user-b record returns 404 (no existence leak)', async ({ request }) => {
+        const response = await request.get('/notes/n-b-1', {
+            headers: { Authorization: `Bearer ${tokenA}` }
+        });
+        expect(response.status()).toBe(404);
+    });
+
+    test('user-a PATCH /notes/:id on user-b record returns 404', async ({ request }) => {
+        const response = await request.patch('/notes/n-b-1', {
+            headers: { Authorization: `Bearer ${tokenA}` },
+            data: { title: 'hijack attempt' }
+        });
+        expect(response.status()).toBe(404);
+    });
+
+    test('user-a DELETE /notes/:id on user-b record returns 404', async ({ request }) => {
+        const response = await request.delete('/notes/n-b-1', {
+            headers: { Authorization: `Bearer ${tokenA}` }
+        });
+        expect(response.status()).toBe(404);
+    });
+
+    test('user-a POST /notes auto-stamps ownerId=user-a even when client sends ownerId=user-b', async ({ request }) => {
+        const response = await request.post('/notes', {
+            headers: { Authorization: `Bearer ${tokenA}` },
+            data: { title: 'A new note', body: '...', ownerId: 'user-b' }
+        });
+        expect(response.status()).toBe(201);
+        const body = await response.json();
+        expect(body.ownerId).toBe('user-a');
+    });
+
+    test('user-a PATCH own note succeeds', async ({ request }) => {
+        const response = await request.patch('/notes/n-a-1', {
+            headers: { Authorization: `Bearer ${tokenA}` },
+            data: { title: 'Updated by owner' }
+        });
+        expect(response.status()).toBe(200);
+        const body = await response.json();
+        expect(body.title).toBe('Updated by owner');
+    });
+
+    test('user-a DELETE own note succeeds', async ({ request }) => {
+        const response = await request.delete('/notes/n-a-2', {
+            headers: { Authorization: `Bearer ${tokenA}` }
+        });
+        expect(response.status()).toBe(200);
+    });
+});

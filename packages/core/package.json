@@ -23,7 +23,11 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "awilix": "^10.0.1"
+    "awilix": "^10.0.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.4"
   },
   "files": [
     "dist"

@@ -1,6 +1,5 @@
-import jwt from 'jsonwebtoken';
 import type { IMiddleware, JsonRequest, JsonResponse, IConfigProvider, ILogger } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/core';
+import { ConsoleLogger, verifyJwt } from '@json-express/core';
 
 export class AuthMiddleware implements IMiddleware {
     public readonly name = 'auth';
@@ -42,9 +41,9 @@ export class AuthMiddleware implements IMiddleware {
             return next();
         }
 
-        // 3. Extract Bearer token
+        // 3. Extract Bearer token (header presence check stays here so we can return 401 vs 403 distinctly)
         const authHeader = req.headers['authorization'];
-        if (!authHeader || Array.isArray(authHeader) || !authHeader.startsWith('Bearer ')) {
+        if (typeof authHeader !== 'string' || !authHeader.startsWith('Bearer ')) {
             this.logger.warn('Rejected — missing or invalid Bearer token');
             return {
                 statusCode: 401,
@@ -52,23 +51,20 @@ export class AuthMiddleware implements IMiddleware {
             };
         }
 
-        const token = authHeader.split(' ')[1];
-
-        // 4. Verify token
-        try {
-            const decoded = jwt.verify(token, this.secret);
-            
-            // Inject decoded user payload into headers so downstream plugins/generators can access it
-            req.headers['x-user-payload'] = JSON.stringify(decoded);
-
-            this.logger.info('Access granted');
-            return next();
-        } catch (error: any) {
+        // 4. Verify token via the shared core primitive
+        const userPayload = verifyJwt(authHeader, this.secret);
+        if (!userPayload) {
             this.logger.warn('Rejected — invalid or expired token');
             return {
                 statusCode: 403,
                 body: { error: 'Forbidden: Invalid or expired token.' }
             };
         }
+
+        // Inject decoded user payload into headers so downstream plugins/generators can access it
+        req.headers['x-user-payload'] = userPayload;
+
+        this.logger.info('Access granted');
+        return next();
     }
 }

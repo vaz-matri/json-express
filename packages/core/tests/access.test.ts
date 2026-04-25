@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateAccess } from '../src/auth/access';
+import {
+    evaluateAccess,
+    needsOwnerCheck,
+    resolveOwnerField,
+    resolveUserId,
+    ownsRecord,
+} from '../src/auth/access';
 
 const adminPayload = JSON.stringify({ sub: 'u-1', role: 'admin' });
 const userPayload = JSON.stringify({ sub: 'u-2', role: 'user' });
@@ -73,12 +79,110 @@ describe('evaluateAccess', () => {
         if (!v.allowed) expect(v.code).toBe('FORBIDDEN');
     });
 
-    it('throws on owner rule (Phase B feature)', () => {
-        expect(() => evaluateAccess('owner', adminPayload)).toThrow(/owner/i);
+    it('owner rule with valid payload allows (caller does post-record check)', () => {
+        const v = evaluateAccess('owner', adminPayload);
+        expect(v.allowed).toBe(true);
+        if (v.allowed) expect(v.user).toEqual({ sub: 'u-1', role: 'admin' });
+    });
+
+    it('owner rule with no payload returns UNAUTHENTICATED', () => {
+        const v = evaluateAccess('owner', undefined);
+        expect(v.allowed).toBe(false);
+        if (!v.allowed) expect(v.code).toBe('UNAUTHENTICATED');
+    });
+
+    it('owner rule with malformed payload returns UNAUTHENTICATED', () => {
+        const v = evaluateAccess('owner', 'not-json{');
+        expect(v.allowed).toBe(false);
+        if (!v.allowed) expect(v.code).toBe('UNAUTHENTICATED');
     });
 
     it('handles header value that is an array (Express multi-value headers)', () => {
         const v = evaluateAccess('admin', [adminPayload]);
         expect(v.allowed).toBe(true);
+    });
+});
+
+describe('needsOwnerCheck', () => {
+    it('returns true only for the literal owner rule', () => {
+        expect(needsOwnerCheck('owner')).toBe(true);
+        expect(needsOwnerCheck('public')).toBe(false);
+        expect(needsOwnerCheck('admin')).toBe(false);
+        expect(needsOwnerCheck(['admin', 'editor'])).toBe(false);
+        expect(needsOwnerCheck(undefined)).toBe(false);
+    });
+});
+
+describe('resolveOwnerField', () => {
+    it('defaults to ownerId', () => {
+        expect(resolveOwnerField(undefined)).toBe('ownerId');
+        expect(resolveOwnerField({})).toBe('ownerId');
+        expect(resolveOwnerField({ read: 'owner' })).toBe('ownerId');
+    });
+
+    it('honors explicit ownerField override', () => {
+        expect(resolveOwnerField({ ownerField: 'authorId' })).toBe('authorId');
+    });
+});
+
+describe('resolveUserId', () => {
+    it('uses sub by default', () => {
+        expect(resolveUserId({ sub: 'u-1' })).toBe('u-1');
+    });
+
+    it('falls back to id when sub is missing', () => {
+        expect(resolveUserId({ id: 'u-2' })).toBe('u-2');
+    });
+
+    it('falls back to userId as last resort', () => {
+        expect(resolveUserId({ userId: 'u-3' })).toBe('u-3');
+    });
+
+    it('prefers sub over id over userId', () => {
+        expect(resolveUserId({ sub: 'a', id: 'b', userId: 'c' })).toBe('a');
+        expect(resolveUserId({ id: 'b', userId: 'c' })).toBe('b');
+    });
+
+    it('coerces non-string ids to string', () => {
+        expect(resolveUserId({ sub: 42 })).toBe('42');
+    });
+
+    it('returns null on missing payload or no claim', () => {
+        expect(resolveUserId(null)).toBeNull();
+        expect(resolveUserId({})).toBeNull();
+        expect(resolveUserId({ role: 'admin' })).toBeNull();
+    });
+});
+
+describe('ownsRecord', () => {
+    it('returns true when record[ownerField] equals user.sub', () => {
+        expect(ownsRecord({ ownerId: 'u-1' }, 'ownerId', { sub: 'u-1' })).toBe(true);
+    });
+
+    it('coerces both sides to string for comparison', () => {
+        expect(ownsRecord({ ownerId: 1 }, 'ownerId', { sub: '1' })).toBe(true);
+        expect(ownsRecord({ ownerId: '1' }, 'ownerId', { sub: 1 })).toBe(true);
+    });
+
+    it('returns false when ids do not match', () => {
+        expect(ownsRecord({ ownerId: 'u-1' }, 'ownerId', { sub: 'u-2' })).toBe(false);
+    });
+
+    it('returns false when record has no ownerField', () => {
+        expect(ownsRecord({}, 'ownerId', { sub: 'u-1' })).toBe(false);
+    });
+
+    it('returns false when user has no resolvable id', () => {
+        expect(ownsRecord({ ownerId: 'u-1' }, 'ownerId', {})).toBe(false);
+    });
+
+    it('returns false on null inputs', () => {
+        expect(ownsRecord(null, 'ownerId', { sub: 'u-1' })).toBe(false);
+        expect(ownsRecord({ ownerId: 'u-1' }, 'ownerId', null)).toBe(false);
+    });
+
+    it('honors a custom ownerField', () => {
+        expect(ownsRecord({ authorId: 'u-1' }, 'authorId', { sub: 'u-1' })).toBe(true);
+        expect(ownsRecord({ authorId: 'u-1' }, 'ownerId', { sub: 'u-1' })).toBe(false);
     });
 });

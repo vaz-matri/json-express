@@ -21,6 +21,10 @@
     "@json-express/core": "workspace:*",
     "graphql": "^16.0.0"
   },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.4",
+    "jsonwebtoken": "^9.0.2"
+  },
   "files": [
     "dist"
   ]

@@ -23,19 +23,43 @@ import type {
     AccessRule,
     AccessOp,
 } from '@json-express/core';
-import { ConsoleLogger, evaluateAccess } from '@json-express/core';
+import {
+    ConsoleLogger,
+    evaluateAccess,
+    needsOwnerCheck,
+    resolveOwnerField,
+    resolveUserId,
+    ownsRecord,
+    verifyJwt,
+} from '@json-express/core';
 
 interface ResolverContext {
     userPayload: string | string[] | undefined;
 }
 
-function enforceAccess(rule: AccessRule | undefined, ctx: ResolverContext, typeName: string, op: AccessOp): void {
+/**
+ * Runs `evaluateAccess` and throws a GraphQLError on deny. Returns the user payload
+ * (which may be null) so the caller can perform owner checks without re-decoding.
+ */
+function enforceAccess(
+    rule: AccessRule | undefined,
+    ctx: ResolverContext,
+    typeName: string,
+    op: AccessOp
+): Record<string, any> | null {
     const verdict = evaluateAccess(rule, ctx?.userPayload);
     if (!verdict.allowed) {
         throw new GraphQLError(`${verdict.reason} (${typeName}.${op})`, {
             extensions: { code: verdict.code },
         });
     }
+    return verdict.user;
+}
+
+function notFoundError(typeName: string, id: string): GraphQLError {
+    return new GraphQLError(`${typeName} with id '${id}' not found`, {
+        extensions: { code: 'NOT_FOUND' },
+    });
 }
 
 const JSONScalar = new GraphQLScalarType({
@@ -261,6 +285,7 @@ export class GraphQLApiGenerator implements IApiGenerator {
             const createAccessRule = access?.create;
             const updateAccessRule = access?.update;
             const deleteAccessRule = access?.delete;
+            const ownerField = resolveOwnerField(access);
 
             // List: always use the collection name (e.g. 'albums')
             queryFields[collection] = {
@@ -271,11 +296,16 @@ export class GraphQLApiGenerator implements IApiGenerator {
                     where: { type: whereType },
                 },
                 resolve: async (_: any, args: any, ctx: ResolverContext) => {
-                    enforceAccess(readRule, ctx, typeName, 'read');
+                    const user = enforceAccess(readRule, ctx, typeName, 'read');
                     const { limit, offset, where } = args ?? {};
-                    const hasWhere = where && Object.keys(where).length > 0;
-                    const all = hasWhere
-                        ? await db.search(collection, where)
+                    const filter: Record<string, any> = { ...(where ?? {}) };
+                    if (needsOwnerCheck(readRule)) {
+                        // Owner clause overwrites any client-supplied value to prevent spoofing.
+                        filter[ownerField] = resolveUserId(user);
+                    }
+                    const hasFilter = Object.keys(filter).length > 0;
+                    const all = hasFilter
+                        ? await db.search(collection, filter)
                         : await db.getAll(collection);
                     const start = offset ?? 0;
                     const end = limit != null ? start + limit : undefined;
@@ -288,9 +318,15 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 queryFields[singleField] = {
                     type: gqlType,
                     args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-                    resolve: (_: any, { id }: { id: string }, ctx: ResolverContext) => {
-                        enforceAccess(readRule, ctx, typeName, 'read');
-                        return db.getById(collection, id);
+                    resolve: async (_: any, { id }: { id: string }, ctx: ResolverContext) => {
+                        const user = enforceAccess(readRule, ctx, typeName, 'read');
+                        const record = await db.getById(collection, id).catch(() => null);
+                        if (!record) throw notFoundError(typeName, id);
+                        if (needsOwnerCheck(readRule) && !ownsRecord(record, ownerField, user)) {
+                            // 404 (not 403) so callers cannot probe for IDs they don't own.
+                            throw notFoundError(typeName, id);
+                        }
+                        return record;
                     },
                 };
             }
@@ -302,8 +338,12 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 type: gqlType,
                 args: { input: { type: new GraphQLNonNull(inputType) } },
                 resolve: async (_: any, { input }: any, ctx: ResolverContext) => {
-                    enforceAccess(createAccessRule, ctx, typeName, 'create');
+                    const user = enforceAccess(createAccessRule, ctx, typeName, 'create');
                     const validated = runValidation(createRule, input, typeName);
+                    if (needsOwnerCheck(createAccessRule)) {
+                        // Auto-stamp caller as owner; overwrites any client-supplied value.
+                        validated[ownerField] = resolveUserId(user);
+                    }
                     return db.create(collection, validated);
                 },
             };
@@ -315,8 +355,12 @@ export class GraphQLApiGenerator implements IApiGenerator {
                     input: { type: new GraphQLNonNull(inputType) },
                 },
                 resolve: async (_: any, { id, input }: any, ctx: ResolverContext) => {
-                    enforceAccess(updateAccessRule, ctx, typeName, 'update');
-                    await ensureExists(db, collection, id, typeName);
+                    const user = enforceAccess(updateAccessRule, ctx, typeName, 'update');
+                    const existing = await db.getById(collection, id).catch(() => null);
+                    if (!existing) throw notFoundError(typeName, id);
+                    if (needsOwnerCheck(updateAccessRule) && !ownsRecord(existing, ownerField, user)) {
+                        throw notFoundError(typeName, id);
+                    }
                     const validated = runValidation(updateRule, input, typeName);
                     return db.update(collection, id, validated);
                 },
@@ -326,8 +370,12 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 type: gqlType,
                 args: { id: { type: new GraphQLNonNull(GraphQLID) } },
                 resolve: async (_: any, { id }: any, ctx: ResolverContext) => {
-                    enforceAccess(deleteAccessRule, ctx, typeName, 'delete');
-                    await ensureExists(db, collection, id, typeName);
+                    const user = enforceAccess(deleteAccessRule, ctx, typeName, 'delete');
+                    const existing = await db.getById(collection, id).catch(() => null);
+                    if (!existing) throw notFoundError(typeName, id);
+                    if (needsOwnerCheck(deleteAccessRule) && !ownsRecord(existing, ownerField, user)) {
+                        throw notFoundError(typeName, id);
+                    }
                     return db.delete(collection, id);
                 },
             };
@@ -354,24 +402,16 @@ export class GraphQLApiGenerator implements IApiGenerator {
 
         const routes: RouteDefinition[] = [];
 
-        // Mirror api-rest's auth enrichment pattern
-        const middlewares: string[] = [];
-        if (this.config?.has('auth.secret')) {
-            const rawExclude = this.config.get<string | string[]>('auth.exclude', []);
-            const excludePaths = Array.isArray(rawExclude)
-                ? rawExclude
-                : typeof rawExclude === 'string'
-                ? rawExclude.split(',').map((s) => s.trim())
-                : [];
-            if (!excludePaths.some((p) => endpoint.startsWith(p))) {
-                middlewares.push('auth');
-            }
-        }
+        // GraphQL is single-endpoint: blanket-gating /graphql with the auth middleware can't
+        // express per-op rules. Instead the route is left open and the handler does an
+        // unconditional soft-decode of the Bearer token, populating user context for the
+        // resolvers. Resolvers remain the source of truth via evaluateAccess.
+        const authSecret = this.config?.get<string>('auth.secret');
 
         routes.push({
             method: 'POST',
             path: endpoint,
-            middlewares,
+            middlewares: [],
             metadata: { graphql: true },
             handler: async (req) => {
                 const { query, variables, operationName } = req.body ?? {};
@@ -381,6 +421,16 @@ export class GraphQLApiGenerator implements IApiGenerator {
                         statusCode: 400,
                         body: { errors: [{ message: 'Missing "query" in request body' }] },
                     };
+                }
+
+                // Anti-spoof: drop any client-supplied x-user-payload before we (maybe) re-set it
+                // from a verified JWT. Without this, a forged header could pose as authenticated.
+                delete req.headers['x-user-payload'];
+                delete req.headers['X-User-Payload'];
+
+                if (authSecret) {
+                    const verified = verifyJwt(req.headers['authorization'], authSecret);
+                    if (verified) req.headers['x-user-payload'] = verified;
                 }
 
                 try {
@@ -436,16 +486,3 @@ function runValidation(rule: ValidationRule | undefined, input: any, typeName: s
     return parsed.data ?? input;
 }
 
-async function ensureExists(
-    db: IDatabaseAdapter,
-    collection: string,
-    id: string,
-    typeName: string
-): Promise<void> {
-    const existing = await db.getById(collection, id).catch(() => null);
-    if (!existing) {
-        throw new GraphQLError(`${typeName} with id '${id}' not found`, {
-            extensions: { code: 'NOT_FOUND' },
-        });
-    }
-}

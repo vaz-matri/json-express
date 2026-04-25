@@ -1,0 +1,5 @@
+[
+    { "id": "n-a-1", "title": "User A — first", "body": "private to A", "ownerId": "user-a" },
+    { "id": "n-a-2", "title": "User A — second", "body": "also private to A", "ownerId": "user-a" },
+    { "id": "n-b-1", "title": "User B — only", "body": "private to B", "ownerId": "user-b" }
+]
