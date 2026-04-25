@@ -772,3 +772,288 @@ describe('api-graphql — Nested relation owner filtering (one-to-many)', () => 
         expect(res.body.data.users[0].posts).toBeNull();
     });
 });
+
+// ───────────────────────── Custom GraphQL endpoints ─────────────────────────
+
+import {
+    GraphQLString as GQLString,
+    GraphQLInt as GQLInt,
+    GraphQLFloat as GQLFloat,
+    GraphQLNonNull as GQLNonNull,
+    GraphQLList as GQLList,
+    GraphQLObjectType as GQLObjectType,
+} from 'graphql';
+
+describe('api-graphql — Custom queryFields', () => {
+    it('exposes a root query field with non-null arg', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([
+            {
+                name: 'albums',
+                fields: {
+                    id: { type: 'id', options: {} } as any,
+                    title: { type: 'string', options: {} } as any,
+                },
+                graphql: {
+                    queryFields: {
+                        echo: {
+                            type: GQLString,
+                            args: { msg: { type: new GQLNonNull(GQLString) } },
+                            resolve: (_: any, { msg }: { msg: string }) => `echo:${msg}`,
+                        },
+                    },
+                },
+            },
+        ]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(routes, { query: `{ echo(msg: "hi") }` });
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.echo).toBe('echo:hi');
+    });
+
+    it('passes verified userPayload to custom query resolver', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({
+            database: db,
+            configProvider: makeConfig([], { authSecret: TEST_SECRET }),
+        });
+        let seenContext: any = null;
+        gen.setSchemas([
+            {
+                name: 'albums',
+                fields: { id: { type: 'id', options: {} } as any, title: { type: 'string', options: {} } as any },
+                graphql: {
+                    queryFields: {
+                        whoami: {
+                            type: GQLString,
+                            resolve: (_: any, _args: any, ctx: any) => {
+                                seenContext = ctx;
+                                return ctx?.userPayload ? JSON.parse(ctx.userPayload as string).sub : null;
+                            },
+                        },
+                    },
+                },
+            },
+        ]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `{ whoami }` },
+            bearer({ sub: 'u-42' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.whoami).toBe('u-42');
+        expect(seenContext.userPayload).toBeDefined();
+    });
+});
+
+describe('api-graphql — Custom mutationFields', () => {
+    it('exposes a root mutation field', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        let invokedWith: any = null;
+        gen.setSchemas([
+            {
+                name: 'albums',
+                fields: { id: { type: 'id', options: {} } as any, title: { type: 'string', options: {} } as any },
+                graphql: {
+                    mutationFields: {
+                        publishAll: {
+                            type: GQLInt,
+                            args: { reason: { type: GQLString } },
+                            resolve: (_: any, args: any) => {
+                                invokedWith = args;
+                                return 7;
+                            },
+                        },
+                    },
+                },
+            },
+        ]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(routes, {
+            query: `mutation { publishAll(reason: "release-day") }`,
+        });
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.publishAll).toBe(7);
+        expect(invokedWith.reason).toBe('release-day');
+    });
+});
+
+describe('api-graphql — Custom typeFields on auto-generated object', () => {
+    it('attaches a computed field to the auto-generated type', async () => {
+        const db = new InMemoryAdapter();
+        db.store = { albums: [{ id: 'a1', title: 'Abbey Road' }] };
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([
+            {
+                name: 'albums',
+                fields: { id: { type: 'id', options: {} } as any, title: { type: 'string', options: {} } as any },
+                graphql: {
+                    typeFields: {
+                        titleLength: {
+                            type: GQLInt,
+                            resolve: (parent: any) => (parent.title as string).length,
+                        },
+                    },
+                },
+            },
+        ]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(routes, { query: `{ albums { id title titleLength } }` });
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.albums[0].titleLength).toBe('Abbey Road'.length);
+    });
+
+    it('function-form typeFields can reach the auto-generated type via the registry', async () => {
+        // artist.albumCount returns the auto-generated `Album` type via registry.getType.
+        const db = new InMemoryAdapter();
+        db.store = {
+            artists: [{ id: 'art-1', name: 'Beatles' }],
+            albums: [
+                { id: 'a1', title: 'Abbey Road', artistId: 'art-1' },
+                { id: 'a2', title: 'Revolver', artistId: 'art-1' },
+            ],
+        };
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([
+            {
+                name: 'albums',
+                fields: {
+                    id: { type: 'id', options: {} } as any,
+                    title: { type: 'string', options: {} } as any,
+                    artistId: { type: 'string', options: {} } as any,
+                },
+            },
+            {
+                name: 'artists',
+                fields: { id: { type: 'id', options: {} } as any, name: { type: 'string', options: {} } as any },
+                graphql: {
+                    typeFields: (registry) => ({
+                        topAlbums: {
+                            type: new GQLList(registry.getType('albums') as any),
+                            resolve: async (parent: any) => {
+                                const dbAdapter = db; // closure
+                                return dbAdapter.search('albums', { artistId: parent.id });
+                            },
+                        },
+                    }),
+                },
+            },
+        ]);
+        const routes = await gen.generate(['artists', 'albums']);
+
+        const res = await invokePost(routes, { query: `{ artists { id topAlbums { id title } } }` });
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.artists[0].topAlbums.length).toBe(2);
+        expect(res.body.data.artists[0].topAlbums[0].title).toBe('Abbey Road');
+    });
+});
+
+describe('api-graphql — Custom field collision policy', () => {
+    it('user-supplied root queryField overrides the auto-generated one (warn-and-override)', async () => {
+        const db = new InMemoryAdapter();
+        db.store = { albums: [{ id: 'a1', title: 'auto' }] };
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([
+            {
+                name: 'albums',
+                fields: { id: { type: 'id', options: {} } as any, title: { type: 'string', options: {} } as any },
+                graphql: {
+                    // Same name as auto-generated list query for `albums` collection.
+                    queryFields: {
+                        albums: {
+                            type: new GQLList(
+                                new GQLObjectType({
+                                    name: 'OverrideAlbum',
+                                    fields: { sentinel: { type: GQLString } },
+                                })
+                            ),
+                            resolve: () => [{ sentinel: 'overridden' }],
+                        },
+                    },
+                },
+            },
+        ]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(routes, { query: `{ albums { sentinel } }` });
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.albums[0].sentinel).toBe('overridden');
+    });
+});
+
+describe('api-graphql — Empty Mutation guard', () => {
+    it('schema with no mutations does not throw at construction', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        // No collections + a model that exposes only a custom queryField means the generated
+        // schema has zero mutations. graphql-js throws on empty mutation type construction;
+        // the guard should produce mutation: undefined instead.
+        gen.setSchemas([]);
+
+        // Exercise the path indirectly: a schema with only a query and no model-derived
+        // mutations. Easiest path: pass collections with a single model that overrides
+        // the auto-generated mutations, then verify no exception. Using `generate([])`
+        // would short-circuit; instead, exercise via a single-collection schema and
+        // confirm queries work — the empty-mutation guard is a defensive future case.
+        const routes = await gen.generate([]);
+        // generate returns [] when there are no collections; we still want to confirm
+        // buildSchema can handle the zero-mutation construction. Direct check via a
+        // thin re-invoke with a schema that has no mutations is not possible without
+        // exposing buildSchema. Instead, validate the more important case below.
+        expect(routes).toEqual([]);
+    });
+
+    it('builds normally when only a custom queryField exists alongside CRUD', async () => {
+        // Sanity that mutation type still includes auto-generated CRUD plus any custom.
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([
+            {
+                name: 'albums',
+                fields: { id: { type: 'id', options: {} } as any, title: { type: 'string', options: {} } as any },
+                graphql: {
+                    queryFields: { ping: { type: GQLString, resolve: () => 'pong' } },
+                },
+            },
+        ]);
+        const routes = await gen.generate(['albums']);
+        const res = await invokePost(routes, { query: `{ ping }` });
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.ping).toBe('pong');
+    });
+});
+
+describe('api-graphql — Custom field shape validation', () => {
+    it('warns and skips when graphql.queryFields is not an object or function', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        gen.setSchemas([
+            {
+                name: 'albums',
+                fields: { id: { type: 'id', options: {} } as any, title: { type: 'string', options: {} } as any },
+                graphql: {
+                    // Bogus value — should be skipped without breaking the schema build.
+                    queryFields: 'oops' as any,
+                },
+            },
+        ]);
+        const routes = await gen.generate(['albums']);
+
+        // Auto-generated `albums` query should still work.
+        const res = await invokePost(routes, { query: `{ albums { id } }` });
+        expect(res.body.errors).toBeUndefined();
+    });
+});

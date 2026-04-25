@@ -61,12 +61,62 @@ export interface AuthRules {
     fields?: Record<string, FieldAccess>;
 }
 
+/**
+ * Read-only handle to the auto-generated GraphQL types, passed to function-form
+ * `graphql.*Fields` blocks so user resolvers can reference auto-generated types
+ * (e.g. constructing a custom field that returns the auto-generated `Album` type).
+ *
+ * Values are typed as `unknown` so core stays free of a `graphql` dependency;
+ * cast to `GraphQLObjectType` / `GraphQLInputObjectType` in user code.
+ */
+export interface TypeRegistry {
+    getType(collection: string): unknown;
+    getInputType(collection: string): unknown;
+    getWhereType(collection: string): unknown;
+}
+
+/**
+ * A map of GraphQL field names to graphql-js `GraphQLFieldConfig` objects, OR
+ * a function returning that map. The function form receives a `TypeRegistry`
+ * so resolvers can reference auto-generated types lazily — useful when a custom
+ * field returns the auto-generated `Album` type, for example.
+ */
+export type GraphQLFieldsBlock =
+    | Record<string, any>
+    | ((registry: TypeRegistry) => Record<string, any>);
+
+/**
+ * Custom GraphQL fields layered onto the auto-generated schema for this model.
+ *
+ * - `queryFields` and `mutationFields` extend the root `Query` / `Mutation` types.
+ * - `typeFields` extend the auto-generated `GraphQLObjectType` for this model
+ *   (e.g. a computed `Artist.albumCount` defined on `artists.ts`).
+ *
+ * Resolvers receive `(parent, args, context, info)` per graphql-js convention.
+ * `context` carries `{ userPayload, db }`:
+ *   - `userPayload`: stringified JWT payload (or `string[]` / `undefined`) produced
+ *     by the soft-decode of the request's `Authorization` header. Use
+ *     `evaluateAccess(rule, ctx.userPayload)` from `@json-express/core` to enforce
+ *     auth inside a custom resolver.
+ *   - `db`: the active `IDatabaseAdapter`, so resolvers can read/write the same
+ *     store the auto-generated CRUD uses.
+ *
+ * On collision with an auto-generated field, the user-supplied value wins and
+ * a warning is logged.
+ */
+export interface ModelGraphQLBlock {
+    queryFields?: GraphQLFieldsBlock;
+    mutationFields?: GraphQLFieldsBlock;
+    typeFields?: GraphQLFieldsBlock;
+}
+
 export interface ModelConfig<TFields extends Record<string, TypeDefinition> = any> {
     name?: string;
     fields: TFields;
     endpoints?: Record<string, CustomEndpointHandler>;
     hooks?: ModelHooks;
     access?: AuthRules;
+    graphql?: ModelGraphQLBlock;
 }
 
 export interface ModelSchema<TFields extends Record<string, TypeDefinition> = any> extends ModelConfig<TFields> {

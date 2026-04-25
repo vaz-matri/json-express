@@ -298,6 +298,18 @@ importers:
         specifier: ^3.22.4
         version: 3.25.76
 
+  examples/login:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/middleware-auth':
+        specifier: workspace:*
+        version: link:../../packages/middleware-auth
+
   packages/adapter-json:
     dependencies:
       '@json-express/core':

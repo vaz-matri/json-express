@@ -22,6 +22,8 @@ import type {
     RouteDefinition,
     AccessRule,
     AccessOp,
+    GraphQLFieldsBlock,
+    TypeRegistry,
 } from '@json-express/core';
 import {
     ConsoleLogger,
@@ -37,6 +39,7 @@ import {
 
 interface ResolverContext {
     userPayload: string | string[] | undefined;
+    db: IDatabaseAdapter;
 }
 
 /**
@@ -159,12 +162,58 @@ export class GraphQLApiGenerator implements IApiGenerator {
 
     private buildSchema(collections: string[], rules: ValidationRule[]): GraphQLSchema {
         const db = this.db;
+        const logger = this.logger;
         const schemaMap = new Map(this.schemas.map((s) => [s.name, s]));
 
         // Phase 1: register all GraphQLObjectTypes up-front so relation thunks can reference them
         const typeRegistry = new Map<string, GraphQLObjectType>();
         const inputRegistry = new Map<string, GraphQLInputObjectType>();
         const whereRegistry = new Map<string, GraphQLInputObjectType>();
+
+        // Read-only handle exposed to user-supplied function-form `graphql.*Fields` blocks.
+        // Lets custom resolvers reference auto-generated types lazily.
+        const registry: TypeRegistry = {
+            getType: (collection) => typeRegistry.get(collection),
+            getInputType: (collection) => inputRegistry.get(collection),
+            getWhereType: (collection) => whereRegistry.get(collection),
+        };
+
+        // Resolve a `GraphQLFieldsBlock` (object | function) into an object map.
+        // Validates the value is plain-object or function — anything else is a no-op + warning.
+        const resolveFieldsBlock = (
+            block: GraphQLFieldsBlock | undefined,
+            label: string
+        ): Record<string, any> => {
+            if (block === undefined || block === null) return {};
+            if (typeof block === 'function') {
+                try {
+                    const result = block(registry);
+                    if (result && typeof result === 'object') return result;
+                    logger.warn(`Ignoring ${label}: function did not return a plain object`);
+                    return {};
+                } catch (err: any) {
+                    logger.error(`Error resolving ${label}`, { error: err?.message });
+                    return {};
+                }
+            }
+            if (typeof block === 'object') return block as Record<string, any>;
+            logger.warn(`Ignoring ${label}: expected object or function`);
+            return {};
+        };
+
+        // Merge user-supplied fields into a target map; warn-and-override on collision.
+        const mergeUserFields = (
+            target: Record<string, any>,
+            extras: Record<string, any>,
+            label: string
+        ) => {
+            for (const [name, config] of Object.entries(extras)) {
+                if (name in target) {
+                    logger.warn(`'${label}.${name}' overridden by user-supplied field`);
+                }
+                target[name] = config;
+            }
+        };
 
         for (const collection of collections) {
             const typeName = toTypeName(collection);
@@ -260,6 +309,13 @@ export class GraphQLApiGenerator implements IApiGenerator {
                                 }
                             }
                         }
+
+                        // User-supplied typeFields layered onto the auto-generated object type.
+                        const customTypeFields = resolveFieldsBlock(
+                            modelSchema.graphql?.typeFields,
+                            `${typeName}.typeFields`
+                        );
+                        mergeUserFields(fields, customTypeFields, typeName);
 
                         return fields;
                     },
@@ -419,9 +475,32 @@ export class GraphQLApiGenerator implements IApiGenerator {
             };
         }
 
+        // User-supplied root queryFields / mutationFields layered onto the generated schema.
+        // Walks schemas a final time so the order is deterministic per-collection.
+        for (const collection of collections) {
+            const modelSchema = schemaMap.get(collection);
+            if (!modelSchema?.graphql) continue;
+            const customQueryFields = resolveFieldsBlock(
+                modelSchema.graphql.queryFields,
+                `${collection}.graphql.queryFields`
+            );
+            mergeUserFields(queryFields, customQueryFields, 'Query');
+            const customMutationFields = resolveFieldsBlock(
+                modelSchema.graphql.mutationFields,
+                `${collection}.graphql.mutationFields`
+            );
+            mergeUserFields(mutationFields, customMutationFields, 'Mutation');
+        }
+
+        // Mutation type is optional in graphql-js; constructing one with zero
+        // fields throws. Defensive guard for future "queries-only" projects.
+        const mutationType = Object.keys(mutationFields).length > 0
+            ? new GraphQLObjectType({ name: 'Mutation', fields: mutationFields })
+            : undefined;
+
         return new GraphQLSchema({
             query: new GraphQLObjectType({ name: 'Query', fields: queryFields }),
-            mutation: new GraphQLObjectType({ name: 'Mutation', fields: mutationFields }),
+            mutation: mutationType,
         });
     }
 
@@ -472,7 +551,7 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 }
 
                 try {
-                    const ctx: ResolverContext = { userPayload: req.headers['x-user-payload'] };
+                    const ctx: ResolverContext = { userPayload: req.headers['x-user-payload'], db: this.db };
                     const result = await executeGraphQL({
                         schema,
                         source: query,

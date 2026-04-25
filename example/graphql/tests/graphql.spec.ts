@@ -165,3 +165,41 @@ test.describe('GraphQL — Error mapping', () => {
         expect(body.errors[0].extensions.code).toBe('NOT_FOUND');
     });
 });
+
+test.describe('GraphQL — Custom endpoints', () => {
+    test('typeFields: artist.albumCount uses ctx.db', async ({ request }) => {
+        const res = await gql(request, `{ artists { id name albumCount } }`);
+        expect(res.ok()).toBeTruthy();
+        const { data, errors } = await res.json();
+        expect(errors).toBeUndefined();
+        const beatles = data.artists.find((a: any) => a.id === 'art-1');
+        const daft = data.artists.find((a: any) => a.id === 'art-2');
+        expect(beatles.albumCount).toBeGreaterThanOrEqual(1);
+        expect(daft.albumCount).toBeGreaterThanOrEqual(1);
+    });
+
+    test('queryFields: artistsCount returns the live store size', async ({ request }) => {
+        const res = await gql(request, `{ artistsCount }`);
+        expect(res.ok()).toBeTruthy();
+        const { data, errors } = await res.json();
+        expect(errors).toBeUndefined();
+        expect(typeof data.artistsCount).toBe('number');
+        expect(data.artistsCount).toBeGreaterThanOrEqual(2);
+    });
+
+    test('typeFields and queryFields appear in introspection', async ({ request }) => {
+        const res = await gql(
+            request,
+            `{
+                __type(name: "Artist") { fields { name } }
+                queryRoot: __type(name: "Query") { fields { name } }
+            }`
+        );
+        const { data, errors } = await res.json();
+        expect(errors).toBeUndefined();
+        const artistFieldNames = data.__type.fields.map((f: any) => f.name);
+        const queryFieldNames = data.queryRoot.fields.map((f: any) => f.name);
+        expect(artistFieldNames).toContain('albumCount');
+        expect(queryFieldNames).toContain('artistsCount');
+    });
+});
