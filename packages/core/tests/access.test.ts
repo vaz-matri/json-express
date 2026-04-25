@@ -5,7 +5,11 @@ import {
     resolveOwnerField,
     resolveUserId,
     ownsRecord,
+    getFieldRule,
+    stripDeniedReadFields,
+    stripDeniedWriteFields,
 } from '../src/auth/access';
+import type { AuthRules } from '../src/schema/model';
 
 const adminPayload = JSON.stringify({ sub: 'u-1', role: 'admin' });
 const userPayload = JSON.stringify({ sub: 'u-2', role: 'user' });
@@ -184,5 +188,175 @@ describe('ownsRecord', () => {
     it('honors a custom ownerField', () => {
         expect(ownsRecord({ authorId: 'u-1' }, 'authorId', { sub: 'u-1' })).toBe(true);
         expect(ownsRecord({ authorId: 'u-1' }, 'ownerId', { sub: 'u-1' })).toBe(false);
+    });
+});
+
+describe('getFieldRule', () => {
+    const access: AuthRules = {
+        read: 'public',
+        update: 'admin',
+        fields: {
+            email: { read: 'admin', update: 'admin' },
+            secret: { read: 'owner' },
+        },
+    };
+
+    it('returns the declared rule for a (field, op) pair', () => {
+        expect(getFieldRule(access, 'email', 'read')).toBe('admin');
+        expect(getFieldRule(access, 'email', 'update')).toBe('admin');
+        expect(getFieldRule(access, 'secret', 'read')).toBe('owner');
+    });
+
+    it('returns undefined when the field has no rule for that op', () => {
+        expect(getFieldRule(access, 'email', 'create')).toBeUndefined();
+        expect(getFieldRule(access, 'secret', 'update')).toBeUndefined();
+    });
+
+    it('returns undefined for fields without any rule', () => {
+        expect(getFieldRule(access, 'name', 'read')).toBeUndefined();
+    });
+
+    it('returns undefined when access has no fields block', () => {
+        expect(getFieldRule({ read: 'public' }, 'email', 'read')).toBeUndefined();
+        expect(getFieldRule(undefined, 'email', 'read')).toBeUndefined();
+    });
+});
+
+describe('stripDeniedReadFields', () => {
+    const access: AuthRules = {
+        fields: {
+            email: { read: 'admin' },
+            secret: { read: 'owner' },
+        },
+    };
+
+    it('omits role-restricted field for non-matching role', () => {
+        const result = stripDeniedReadFields(
+            { id: 'r-1', name: 'Alice', email: 'a@b.co' },
+            access,
+            { sub: 'u-1', role: 'user' }
+        );
+        expect(result).toEqual({ id: 'r-1', name: 'Alice' });
+    });
+
+    it('keeps role-restricted field for matching role', () => {
+        const result = stripDeniedReadFields(
+            { id: 'r-1', name: 'Alice', email: 'a@b.co' },
+            access,
+            { sub: 'u-1', role: 'admin' }
+        );
+        expect(result).toEqual({ id: 'r-1', name: 'Alice', email: 'a@b.co' });
+    });
+
+    it('owner-scoped field is visible only to record owner', () => {
+        const record = { id: 'r-1', ownerId: 'u-1', secret: 'shh' };
+        expect(stripDeniedReadFields(record, access, { sub: 'u-1' })).toEqual(record);
+        expect(stripDeniedReadFields(record, access, { sub: 'u-2' })).toEqual({
+            id: 'r-1',
+            ownerId: 'u-1',
+        });
+    });
+
+    it('owner-scoped field with no payload is omitted', () => {
+        const record = { id: 'r-1', ownerId: 'u-1', secret: 'shh' };
+        expect(stripDeniedReadFields(record, access, null)).toEqual({
+            id: 'r-1',
+            ownerId: 'u-1',
+        });
+    });
+
+    it('only filters declared fields — undeclared fields pass through', () => {
+        const result = stripDeniedReadFields(
+            { id: 'r-1', name: 'A', randomField: 'x', email: 'a@b' },
+            access,
+            { sub: 'u', role: 'user' }
+        );
+        expect(result).toEqual({ id: 'r-1', name: 'A', randomField: 'x' });
+    });
+
+    it('passes through unchanged when access has no fields block', () => {
+        const record = { id: 'r-1', email: 'a@b' };
+        expect(stripDeniedReadFields(record, { read: 'public' }, null)).toEqual(record);
+        expect(stripDeniedReadFields(record, undefined, null)).toEqual(record);
+    });
+
+    it('respects a custom ownerField', () => {
+        const customAccess: AuthRules = {
+            ownerField: 'authorId',
+            fields: { secret: { read: 'owner' } },
+        };
+        const record = { id: 'r-1', authorId: 'u-1', secret: 'shh' };
+        expect(stripDeniedReadFields(record, customAccess, { sub: 'u-1' })).toEqual(record);
+        expect(stripDeniedReadFields(record, customAccess, { sub: 'u-2' })).toEqual({
+            id: 'r-1',
+            authorId: 'u-1',
+        });
+    });
+});
+
+describe('stripDeniedWriteFields', () => {
+    const access: AuthRules = {
+        fields: {
+            adminNotes: { update: 'admin', create: 'admin' },
+            email: { update: 'admin' },
+            ownedField: { update: 'owner' },
+        },
+    };
+
+    it('strips update-denied fields for non-matching role', () => {
+        const result = stripDeniedWriteFields(
+            { title: 'T', email: 'new@x', adminNotes: 'private' },
+            access,
+            { sub: 'u-1', role: 'user' },
+            'update'
+        );
+        expect(result).toEqual({ title: 'T' });
+    });
+
+    it('keeps update-denied fields for matching role', () => {
+        const result = stripDeniedWriteFields(
+            { title: 'T', email: 'new@x', adminNotes: 'private' },
+            access,
+            { sub: 'u-1', role: 'admin' },
+            'update'
+        );
+        expect(result).toEqual({ title: 'T', email: 'new@x', adminNotes: 'private' });
+    });
+
+    it('strips create-denied fields for non-matching role', () => {
+        const result = stripDeniedWriteFields(
+            { title: 'T', adminNotes: 'private' },
+            access,
+            { sub: 'u-1', role: 'user' },
+            'create'
+        );
+        expect(result).toEqual({ title: 'T' });
+    });
+
+    it('only consults the requested op (update rule does not block create)', () => {
+        // email has only `update: 'admin'` — create should pass through
+        const result = stripDeniedWriteFields(
+            { title: 'T', email: 'new@x' },
+            access,
+            { sub: 'u-1', role: 'user' },
+            'create'
+        );
+        expect(result).toEqual({ title: 'T', email: 'new@x' });
+    });
+
+    it("'owner' write field rule passes through (op-level rule already enforced ownership)", () => {
+        // Caller has reached this point so they're presumed to own the record (or be allowed)
+        const result = stripDeniedWriteFields(
+            { title: 'T', ownedField: 'value' },
+            access,
+            { sub: 'u-1' },
+            'update'
+        );
+        expect(result).toEqual({ title: 'T', ownedField: 'value' });
+    });
+
+    it('passes through unchanged when access has no fields block', () => {
+        const body = { title: 'T', email: 'a@b' };
+        expect(stripDeniedWriteFields(body, { read: 'public' }, null, 'update')).toEqual(body);
     });
 });

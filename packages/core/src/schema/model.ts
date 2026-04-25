@@ -32,6 +32,17 @@ export interface ModelHooks<T = any> {
 
 export type AccessRule = 'public' | 'owner' | string | string[];
 
+/**
+ * Per-field access overrides, evaluated against the authenticated caller.
+ * Only restricts further than the op-level rule — a field absent from
+ * `AuthRules.fields` is governed entirely by the op-level rule.
+ */
+export interface FieldAccess {
+    read?: AccessRule;
+    create?: AccessRule;
+    update?: AccessRule;
+}
+
 export interface AuthRules {
     create?: AccessRule;
     read?: AccessRule;
@@ -42,6 +53,12 @@ export interface AuthRules {
      * Defaults to `'ownerId'`.
      */
     ownerField?: string;
+    /**
+     * Field-level access overrides. Read-denied fields are omitted from REST
+     * responses (and `null` in GraphQL); write-denied fields are stripped
+     * silently from `req.body` before db.create/db.update.
+     */
+    fields?: Record<string, FieldAccess>;
 }
 
 export interface ModelConfig<TFields extends Record<string, TypeDefinition> = any> {

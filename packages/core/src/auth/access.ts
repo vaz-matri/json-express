@@ -96,3 +96,88 @@ export function ownsRecord(
     if (userId == null) return false;
     return String(record[ownerField]) === userId;
 }
+
+/**
+ * Returns the field-level rule for a given (fieldName, op), or `undefined` if
+ * no field-level override is declared. The caller treats `undefined` as
+ * "field is governed by the op-level rule" (i.e. unrestricted at the field level).
+ */
+export function getFieldRule(
+    access: AuthRules | undefined,
+    fieldName: string,
+    op: 'read' | 'create' | 'update'
+): AccessRule | undefined {
+    return access?.fields?.[fieldName]?.[op];
+}
+
+function isFieldAllowed(
+    rule: AccessRule | undefined,
+    record: any,
+    access: AuthRules | undefined,
+    user: Record<string, any> | null
+): boolean {
+    if (rule === undefined) return true;
+    if (rule === 'public') return true;
+    if (rule === 'owner') {
+        // Field-level owner rule defers to the parent record's ownership.
+        return ownsRecord(record, resolveOwnerField(access), user);
+    }
+    if (!user) return false;
+    const allowedRoles = Array.isArray(rule) ? rule : [rule];
+    const userRoles = Array.isArray(user.role)
+        ? user.role.filter((v: any) => typeof v === 'string')
+        : typeof user.role === 'string'
+        ? [user.role]
+        : [];
+    return userRoles.some((r: string) => allowedRoles.includes(r));
+}
+
+/**
+ * Returns a shallow copy of `record` with read-denied keys omitted. Pass-through
+ * when `access.fields` is absent.
+ */
+export function stripDeniedReadFields<T extends Record<string, any>>(
+    record: T,
+    access: AuthRules | undefined,
+    user: Record<string, any> | null
+): Partial<T> {
+    if (!record || !access?.fields) return record;
+    const out: Record<string, any> = {};
+    for (const key of Object.keys(record)) {
+        const rule = access.fields[key]?.read;
+        if (isFieldAllowed(rule, record, access, user)) out[key] = record[key];
+    }
+    return out as Partial<T>;
+}
+
+/**
+ * Returns a shallow copy of `body` with create/update-denied keys silently dropped.
+ * No-op when `access.fields` is absent.
+ *
+ * Note: write-side rules are evaluated without a record context (records don't
+ * exist yet on create, and on update the strip happens before mutation). Owner-
+ * scoped *write* field rules therefore degrade to "deny non-owner" only after
+ * the caller has passed the op-level owner check — which it must, since this
+ * helper runs after the op-level access verdict.
+ */
+export function stripDeniedWriteFields<T extends Record<string, any>>(
+    body: T,
+    access: AuthRules | undefined,
+    user: Record<string, any> | null,
+    op: 'create' | 'update'
+): Partial<T> {
+    if (!body || typeof body !== 'object' || !access?.fields) return body;
+    const out: Record<string, any> = {};
+    for (const key of Object.keys(body)) {
+        const rule = access.fields[key]?.[op];
+        // For write ops we don't have a record to check ownership against;
+        // pass `null` so 'owner' field rules collapse to "allow if caller has reached this point".
+        // The op-level rule already enforced who can write at all.
+        if (rule === 'owner') {
+            out[key] = (body as any)[key];
+            continue;
+        }
+        if (isFieldAllowed(rule, null, access, user)) out[key] = (body as any)[key];
+    }
+    return out as Partial<T>;
+}

@@ -490,3 +490,285 @@ describe('api-graphql — Soft-decode on /graphql', () => {
         expect(res.body.errors).toBeUndefined();
     });
 });
+
+// ───────────────────────── Phase C — Field-level access ─────────────────────────
+
+const fieldGuardedAlbumSchema: ModelSchema = {
+    name: 'albums',
+    fields: {
+        id: { type: 'id', options: {} } as any,
+        title: { type: 'string', options: {} } as any,
+        ownerId: { type: 'string', options: {} } as any,
+        adminNotes: { type: 'string', options: {} } as any,
+        privateNote: { type: 'string', options: {} } as any,
+    },
+    access: {
+        read: 'public',
+        create: 'public',
+        update: 'public',
+        fields: {
+            adminNotes: { read: 'admin', create: 'admin', update: 'admin' },
+            privateNote: { read: 'owner' },
+        },
+    },
+};
+
+function fieldGuardedDb(): InMemoryAdapter {
+    const db = new InMemoryAdapter();
+    db.store = {
+        albums: [
+            { id: 'a1', title: 'Album 1', ownerId: 'u-1', adminNotes: 'top secret', privateNote: 'u1-note' },
+            { id: 'a2', title: 'Album 2', ownerId: 'u-2', adminNotes: 'also secret', privateNote: 'u2-note' },
+        ],
+    };
+    return db;
+}
+
+describe('api-graphql — Field-level read access', () => {
+    it('omits role-restricted field for anonymous reader (returns null)', async () => {
+        const db = fieldGuardedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([fieldGuardedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(routes, { query: `{ albums { id title adminNotes } }` });
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.albums.every((a: any) => a.adminNotes === null)).toBe(true);
+        expect(res.body.data.albums[0].title).toBe('Album 1');
+    });
+
+    it('returns role-restricted field for matching role', async () => {
+        const db = fieldGuardedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([fieldGuardedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `{ albums { id adminNotes } }` },
+            bearer({ sub: 'u-9', role: 'admin' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.albums[0].adminNotes).toBe('top secret');
+    });
+
+    it('owner-scoped field is visible only on records the caller owns', async () => {
+        const db = fieldGuardedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([fieldGuardedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `{ albums { id ownerId privateNote } }` },
+            bearer({ sub: 'u-1' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        const a1 = res.body.data.albums.find((a: any) => a.id === 'a1');
+        const a2 = res.body.data.albums.find((a: any) => a.id === 'a2');
+        expect(a1.privateNote).toBe('u1-note');     // u-1 owns a1
+        expect(a2.privateNote).toBeNull();          // u-1 does NOT own a2
+    });
+});
+
+describe('api-graphql — Field-level write access', () => {
+    it('strips role-restricted field from create input for non-admin caller', async () => {
+        const db = fieldGuardedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([fieldGuardedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        const res = await invokePost(
+            routes,
+            { query: `mutation { createAlbum(input: { title: "New", adminNotes: "hijack" }) { id } }` },
+            bearer({ sub: 'u-1', role: 'user' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        expect(db.createdWith.title).toBe('New');
+        expect(db.createdWith.adminNotes).toBeUndefined();
+    });
+
+    it('keeps role-restricted field in create input for admin caller', async () => {
+        const db = fieldGuardedDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([fieldGuardedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        await invokePost(
+            routes,
+            { query: `mutation { createAlbum(input: { title: "Admin Post", adminNotes: "kept" }) { id } }` },
+            bearer({ sub: 'u-9', role: 'admin' })
+        );
+
+        expect(db.createdWith.adminNotes).toBe('kept');
+    });
+
+    it('strips role-restricted field from update input for non-admin caller', async () => {
+        // Track what update receives via a wrapper
+        const db = fieldGuardedDb();
+        let updatedWith: any = null;
+        const origUpdate = db.update.bind(db);
+        db.update = async (c, id, data) => {
+            updatedWith = data;
+            return origUpdate(c, id, data);
+        };
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([fieldGuardedAlbumSchema]);
+        const routes = await gen.generate(['albums']);
+
+        await invokePost(
+            routes,
+            { query: `mutation { updateAlbum(id: "a1", input: { title: "Renamed", adminNotes: "hijack" }) { id } }` },
+            bearer({ sub: 'u-1', role: 'user' })
+        );
+
+        expect(updatedWith.title).toBe('Renamed');
+        expect(updatedWith.adminNotes).toBeUndefined();
+    });
+});
+
+// ───────────────────────── Phase C — Nested relation access ─────────────────────────
+
+const usersAdminOnly: ModelSchema = {
+    name: 'users',
+    fields: {
+        id: { type: 'id', options: {} } as any,
+        name: { type: 'string', options: {} } as any,
+    },
+    access: { read: 'admin' },
+};
+
+const postsPublicWithAuthor: ModelSchema = {
+    name: 'posts',
+    fields: {
+        id: { type: 'id', options: {} } as any,
+        title: { type: 'string', options: {} } as any,
+        userId: { type: 'string', options: {} } as any,
+        author: {
+            type: 'relation',
+            options: { target: 'users', type: 'many-to-one', foreignKey: 'userId' },
+        } as any,
+    },
+    access: { read: 'public' },
+};
+
+function postsAndUsersDb(): InMemoryAdapter {
+    const db = new InMemoryAdapter();
+    db.store = {
+        posts: [
+            { id: 'p1', title: 'Hello', userId: 'u-1' },
+            { id: 'p2', title: 'World', userId: 'u-2' },
+        ],
+        users: [
+            { id: 'u-1', name: 'Alice' },
+            { id: 'u-2', name: 'Bob' },
+        ],
+    };
+    return db;
+}
+
+describe('api-graphql — Nested relation access', () => {
+    it('anonymous nested query into admin-only target returns errors and nulls the relation', async () => {
+        const db = postsAndUsersDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([postsPublicWithAuthor, usersAdminOnly]);
+        const routes = await gen.generate(['posts', 'users']);
+
+        const res = await invokePost(routes, { query: `{ posts { id title author { id name } } }` });
+
+        // Posts read succeeds (public); each `author` field errors with UNAUTHENTICATED.
+        expect(res.body.data.posts.length).toBe(2);
+        expect(res.body.data.posts.every((p: any) => p.author === null)).toBe(true);
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.every((e: any) => e.extensions.code === 'UNAUTHENTICATED')).toBe(true);
+    });
+
+    it('admin nested query into admin-only target succeeds', async () => {
+        const db = postsAndUsersDb();
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([postsPublicWithAuthor, usersAdminOnly]);
+        const routes = await gen.generate(['posts', 'users']);
+
+        const res = await invokePost(
+            routes,
+            { query: `{ posts { id author { id name } } }` },
+            bearer({ sub: 'u-x', role: 'admin' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        expect(res.body.data.posts[0].author.name).toBe('Alice');
+        expect(res.body.data.posts[1].author.name).toBe('Bob');
+    });
+});
+
+const postsOwnerOnly: ModelSchema = {
+    name: 'posts',
+    fields: {
+        id: { type: 'id', options: {} } as any,
+        title: { type: 'string', options: {} } as any,
+        ownerId: { type: 'string', options: {} } as any,
+    },
+    access: { read: 'owner' },
+};
+
+const usersWithOwnedPosts: ModelSchema = {
+    name: 'users',
+    fields: {
+        id: { type: 'id', options: {} } as any,
+        name: { type: 'string', options: {} } as any,
+        posts: {
+            type: 'relation',
+            options: { target: 'posts', type: 'one-to-many', foreignKey: 'userId' },
+        } as any,
+    },
+    access: { read: 'public' },
+};
+
+describe('api-graphql — Nested relation owner filtering (one-to-many)', () => {
+    it('relation list applies owner filter for owner-scoped target', async () => {
+        const db = new InMemoryAdapter();
+        db.store = {
+            users: [{ id: 'u-1', name: 'Alice' }],
+            posts: [
+                { id: 'p1', title: 'mine A', userId: 'u-1', ownerId: 'u-1' },
+                { id: 'p2', title: 'mine B', userId: 'u-1', ownerId: 'u-1' },
+                // Dirty data: a row that links via FK but has a different owner — must be filtered out.
+                { id: 'p3', title: 'someone else', userId: 'u-1', ownerId: 'u-2' },
+            ],
+        };
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([usersWithOwnedPosts, postsOwnerOnly]);
+        const routes = await gen.generate(['users', 'posts']);
+
+        const res = await invokePost(
+            routes,
+            { query: `{ users { id posts { id ownerId } } }` },
+            bearer({ sub: 'u-1' })
+        );
+
+        expect(res.body.errors).toBeUndefined();
+        const ids = res.body.data.users[0].posts.map((p: any) => p.id).sort();
+        expect(ids).toEqual(['p1', 'p2']);
+    });
+
+    it('anonymous nested into owner-scoped relation returns UNAUTHENTICATED', async () => {
+        const db = new InMemoryAdapter();
+        db.store = {
+            users: [{ id: 'u-1', name: 'Alice' }],
+            posts: [{ id: 'p1', title: 'x', userId: 'u-1', ownerId: 'u-1' }],
+        };
+        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        gen.setSchemas([usersWithOwnedPosts, postsOwnerOnly]);
+        const routes = await gen.generate(['users', 'posts']);
+
+        const res = await invokePost(routes, { query: `{ users { id posts { id } } }` });
+
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0].extensions.code).toBe('UNAUTHENTICATED');
+        expect(res.body.data.users[0].posts).toBeNull();
+    });
+});

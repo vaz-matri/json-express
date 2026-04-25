@@ -21,6 +21,8 @@ import {
     resolveOwnerField,
     resolveUserId,
     ownsRecord,
+    stripDeniedReadFields,
+    stripDeniedWriteFields,
 } from '@json-express/core';
 
 function denyResponse(verdict: { code: 'UNAUTHENTICATED' | 'FORBIDDEN'; reason: string }): JsonResponse {
@@ -157,19 +159,20 @@ export class RestApiGenerator implements IApiGenerator {
                         embed: _embed ? String(_embed).split(',').map(s => s.trim()) : undefined
                     };
 
+                    let data: any[];
                     if (needsOwnerCheck(readRule)) {
                         // Force owner clause to overwrite any client-supplied value for the owner field —
                         // clients must not be able to query around their own ownership.
-                        cleanQuery[ownerField] = resolveUserId(verdict.user);
-                        const data = await this.db.search(collection, cleanQuery, options);
-                        return { statusCode: 200, body: data };
+                        cleanQuery[ownerField] = resolveUserId(verdict.user) as any;
+                        data = await this.db.search(collection, cleanQuery, options);
+                    } else {
+                        const hasQuery = Object.keys(cleanQuery).length > 0;
+                        data = hasQuery
+                            ? await this.db.search(collection, cleanQuery, options)
+                            : await this.db.getAll(collection, options);
                     }
-
-                    const hasQuery = Object.keys(cleanQuery).length > 0;
-                    const data = hasQuery
-                        ? await this.db.search(collection, cleanQuery, options)
-                        : await this.db.getAll(collection, options);
-                    return { statusCode: 200, body: data };
+                    const projected = data.map((r: any) => stripDeniedReadFields(r, access, verdict.user));
+                    return { statusCode: 200, body: projected };
                 }
             }, readRule));
 
@@ -197,7 +200,7 @@ export class RestApiGenerator implements IApiGenerator {
                             // Return 404 (not 403) so callers can't probe for IDs they don't own.
                             return notFound(collection, id);
                         }
-                        return { statusCode: 200, body: record };
+                        return { statusCode: 200, body: stripDeniedReadFields(record, access, verdict.user) };
                     } catch {
                         return notFound(collection, id);
                     }
@@ -216,13 +219,15 @@ export class RestApiGenerator implements IApiGenerator {
                     const verdict = evaluateAccess(createRule, req.headers['x-user-payload']);
                     if (!verdict.allowed) return denyResponse(verdict);
 
+                    let body: any = stripDeniedWriteFields(req.body, access, verdict.user, 'create');
+
                     if (needsOwnerCheck(createRule)) {
                         // Auto-stamp the caller as owner; overwrite any client-supplied value.
-                        req.body[ownerField] = resolveUserId(verdict.user);
+                        body[ownerField] = resolveUserId(verdict.user);
                     }
 
-                    const created = await this.db.create(collection, req.body);
-                    return { statusCode: 201, body: created };
+                    const created = await this.db.create(collection, body);
+                    return { statusCode: 201, body: stripDeniedReadFields(created, access, verdict.user) };
                 }
             }, createRule));
 
@@ -250,10 +255,12 @@ export class RestApiGenerator implements IApiGenerator {
                         }
                     }
 
+                    const body = stripDeniedWriteFields(req.body, access, verdict.user, 'update');
+
                     try {
-                        const updated = await this.db.update(collection, id, req.body);
+                        const updated = await this.db.update(collection, id, body);
                         if (!updated) return notFound(collection, id);
-                        return { statusCode: 200, body: updated };
+                        return { statusCode: 200, body: stripDeniedReadFields(updated, access, verdict.user) };
                     } catch {
                         return notFound(collection, id);
                     }

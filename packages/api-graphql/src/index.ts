@@ -31,6 +31,8 @@ import {
     resolveUserId,
     ownsRecord,
     verifyJwt,
+    getFieldRule,
+    stripDeniedWriteFields,
 } from '@json-express/core';
 
 interface ResolverContext {
@@ -199,29 +201,63 @@ export class GraphQLApiGenerator implements IApiGenerator {
                                 if (!targetType) continue;
 
                                 const isMany = opts.type === 'one-to-many' || opts.type === 'many-to-many';
+                                const targetAccess = schemaMap.get(opts.target)?.access;
+                                const targetReadRule = targetAccess?.read;
+                                const targetTypeName = toTypeName(opts.target);
+                                const targetOwnerField = resolveOwnerField(targetAccess);
 
                                 fields[fieldName] = {
                                     type: isMany ? new GraphQLList(targetType) : targetType,
-                                    resolve: async (parent: any) => {
+                                    resolve: async (parent: any, _args: any, ctx: ResolverContext) => {
+                                        // Enforce target collection's read rule on relation traversal.
+                                        const verdict = evaluateAccess(targetReadRule, ctx?.userPayload);
+                                        if (!verdict.allowed) {
+                                            // Throw so graphql-js nulls the relation field; the parent stays.
+                                            throw new GraphQLError(`${verdict.reason} (${targetTypeName}.read via ${typeName}.${fieldName})`, {
+                                                extensions: { code: verdict.code },
+                                            });
+                                        }
+
                                         if (isMany) {
-                                            // Reverse FK: the child records on opts.target carry a column
-                                            // pointing back at parent.id. Use the explicit foreignKey
-                                            // if provided, else fall back to `${parentSingular}Id`.
                                             const fkField = opts.foreignKey ?? `${toSingular(collection)}Id`;
-                                            return await db.search(opts.target, { [fkField]: parent.id });
+                                            const filter: Record<string, any> = { [fkField]: parent.id };
+                                            if (needsOwnerCheck(targetReadRule)) {
+                                                // Owner-scoped target: only return target rows the caller owns.
+                                                filter[targetOwnerField] = resolveUserId(verdict.user);
+                                            }
+                                            return await db.search(opts.target, filter);
                                         }
                                         const fkField = opts.foreignKey ?? `${fieldName}Id`;
                                         const fkValue = parent[fkField];
                                         if (!fkValue) return null;
-                                        try {
-                                            return await db.getById(opts.target, String(fkValue));
-                                        } catch {
+                                        const record = await db.getById(opts.target, String(fkValue)).catch(() => null);
+                                        if (!record) return null;
+                                        if (needsOwnerCheck(targetReadRule) && !ownsRecord(record, targetOwnerField, verdict.user)) {
+                                            // Pretend the relation doesn't exist when the caller doesn't own it.
                                             return null;
                                         }
+                                        return record;
                                     },
                                 };
                             } else {
-                                fields[fieldName] = { type: scalarFor(fieldDef.type) };
+                                const fieldReadRule = getFieldRule(modelSchema.access, fieldName, 'read');
+                                if (fieldReadRule !== undefined) {
+                                    const accessForField = modelSchema.access;
+                                    const accessOwnerField = resolveOwnerField(accessForField);
+                                    fields[fieldName] = {
+                                        type: scalarFor(fieldDef.type),
+                                        resolve: (parent: any, _args: any, ctx: ResolverContext) => {
+                                            const v = evaluateAccess(fieldReadRule, ctx?.userPayload);
+                                            if (!v.allowed) return null;
+                                            if (needsOwnerCheck(fieldReadRule) && !ownsRecord(parent, accessOwnerField, v.user)) {
+                                                return null;
+                                            }
+                                            return parent[fieldName];
+                                        },
+                                    };
+                                } else {
+                                    fields[fieldName] = { type: scalarFor(fieldDef.type) };
+                                }
                             }
                         }
 
@@ -340,11 +376,12 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 resolve: async (_: any, { input }: any, ctx: ResolverContext) => {
                     const user = enforceAccess(createAccessRule, ctx, typeName, 'create');
                     const validated = runValidation(createRule, input, typeName);
+                    let body: any = stripDeniedWriteFields(validated, access, user, 'create');
                     if (needsOwnerCheck(createAccessRule)) {
                         // Auto-stamp caller as owner; overwrites any client-supplied value.
-                        validated[ownerField] = resolveUserId(user);
+                        body[ownerField] = resolveUserId(user);
                     }
-                    return db.create(collection, validated);
+                    return db.create(collection, body);
                 },
             };
 
@@ -362,7 +399,8 @@ export class GraphQLApiGenerator implements IApiGenerator {
                         throw notFoundError(typeName, id);
                     }
                     const validated = runValidation(updateRule, input, typeName);
-                    return db.update(collection, id, validated);
+                    const body = stripDeniedWriteFields(validated, access, user, 'update');
+                    return db.update(collection, id, body);
                 },
             };
 

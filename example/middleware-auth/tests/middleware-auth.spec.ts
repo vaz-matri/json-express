@@ -216,3 +216,87 @@ test.describe('Schema-Driven RBAC — notes (owner row-level security)', () => {
         expect(response.status()).toBe(200);
     });
 });
+
+test.describe('Schema-Driven RBAC — notes (field-level access)', () => {
+    test.describe.configure({ mode: 'serial' });
+
+    // Same `sub` so the row-level owner check passes; the role claim is what
+    // the field-level rule keys on.
+    const userToken = jwt.sign({ sub: 'user-a' }, SECRET, { expiresIn: '1h' });
+    const adminToken = jwt.sign({ sub: 'user-a', role: 'admin' }, SECRET, { expiresIn: '1h' });
+
+    test('non-admin owner reading own note has adminNotes omitted', async ({ request }) => {
+        const response = await request.get('/notes/n-a-1', {
+            headers: { Authorization: `Bearer ${userToken}` }
+        });
+        expect(response.status()).toBe(200);
+        const body = await response.json();
+        expect(body.id).toBe('n-a-1');
+        expect(body.ownerId).toBe('user-a');
+        expect(body.adminNotes).toBeUndefined();   // omitted (not null)
+    });
+
+    test('admin owner reading own note sees adminNotes', async ({ request }) => {
+        const response = await request.get('/notes/n-a-1', {
+            headers: { Authorization: `Bearer ${adminToken}` }
+        });
+        expect(response.status()).toBe(200);
+        const body = await response.json();
+        expect(body.adminNotes).toBe('ADMIN-ONLY a-1');
+    });
+
+    test('non-admin GET /notes list omits adminNotes from every record', async ({ request }) => {
+        const response = await request.get('/notes', {
+            headers: { Authorization: `Bearer ${userToken}` }
+        });
+        expect(response.status()).toBe(200);
+        const body = await response.json();
+        expect(body.every((n: any) => n.adminNotes === undefined)).toBe(true);
+    });
+
+    test('non-admin POST with adminNotes silently strips the field', async ({ request }) => {
+        const createRes = await request.post('/notes', {
+            headers: { Authorization: `Bearer ${userToken}` },
+            data: { title: 'Strip Test', body: 'hi', adminNotes: 'forged' }
+        });
+        expect(createRes.status()).toBe(201);
+        const created = await createRes.json();
+        expect(created.adminNotes).toBeUndefined();   // not echoed back to non-admin
+
+        // Verify the field never made it to storage by reading as admin.
+        const readBackId = created.id;
+        const readRes = await request.get(`/notes/${readBackId}`, {
+            headers: { Authorization: `Bearer ${adminToken}` }
+        });
+        const readBack = await readRes.json();
+        expect(readBack.adminNotes).toBeUndefined();   // never persisted
+        expect(readBack.title).toBe('Strip Test');
+    });
+
+    test('admin POST with adminNotes retains the field', async ({ request }) => {
+        const createRes = await request.post('/notes', {
+            headers: { Authorization: `Bearer ${adminToken}` },
+            data: { title: 'Admin Note', body: 'with admin field', adminNotes: 'kept' }
+        });
+        expect(createRes.status()).toBe(201);
+        const created = await createRes.json();
+        expect(created.adminNotes).toBe('kept');
+    });
+
+    test('non-admin PATCH with adminNotes leaves the existing value untouched', async ({ request }) => {
+        // Update title via non-admin caller; smuggled adminNotes should be stripped.
+        const patchRes = await request.patch('/notes/n-a-1', {
+            headers: { Authorization: `Bearer ${userToken}` },
+            data: { title: 'Renamed by user', adminNotes: 'hijack' }
+        });
+        expect(patchRes.status()).toBe(200);
+
+        // Read back as admin to verify adminNotes is unchanged.
+        const readRes = await request.get('/notes/n-a-1', {
+            headers: { Authorization: `Bearer ${adminToken}` }
+        });
+        const body = await readRes.json();
+        expect(body.title).toBe('Renamed by user');
+        expect(body.adminNotes).toBe('ADMIN-ONLY a-1');   // original value preserved
+    });
+});
