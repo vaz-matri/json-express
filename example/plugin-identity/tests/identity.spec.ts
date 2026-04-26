@@ -125,3 +125,73 @@ test.describe('plugin-identity — logout', () => {
         expect(res.status()).toBe(200);
     });
 });
+
+// ─────────────────────────  Phase 2  ─────────────────────────
+// Email-dependent endpoints use plaintext tokens that are only sent via email.
+// We can't recover them from the running webServer's stdout in Playwright, so the
+// deep flows are exhaustively unit-tested in packages/plugin-identity/tests/email.test.ts.
+// Here we only confirm the endpoints are mounted (the same HTTP plumbing as the proven flows)
+// and exercise change-password end-to-end (no email needed — auth header is enough).
+
+test.describe('plugin-identity — email-dependent endpoints are mounted', () => {
+    test('POST /auth/verify exists (returns 400 without a token, not 404)', async ({ request }) => {
+        const res = await post(request, '/auth/verify', {});
+        expect(res.status()).toBe(400);
+    });
+
+    test('POST /auth/password/forgot exists (returns 400 without an email)', async ({ request }) => {
+        const res = await post(request, '/auth/password/forgot', {});
+        expect(res.status()).toBe(400);
+    });
+
+    test('POST /auth/password/forgot is anti-enumerating (200 for unknown email)', async ({ request }) => {
+        const res = await post(request, '/auth/password/forgot', { email: 'nobody@test.local' });
+        expect(res.status()).toBe(200);
+    });
+
+    test('POST /auth/password/reset exists (returns 400 without a token)', async ({ request }) => {
+        const res = await post(request, '/auth/password/reset', { newPassword: 'whatever-12' });
+        expect(res.status()).toBe(400);
+    });
+});
+
+test.describe('plugin-identity — change-password (authenticated, no email)', () => {
+    const cpUser = { email: 'change-pw@example.com', password: 'initial-password-12' };
+    let cpToken = '';
+
+    test('register a fresh user for change-password tests', async ({ request }) => {
+        const res = await post(request, '/auth/register', cpUser);
+        expect(res.status()).toBe(201);
+        cpToken = (await res.json()).accessToken;
+        expect(typeof cpToken).toBe('string');
+    });
+
+    test('rejects unauthenticated callers with 401', async ({ request }) => {
+        const res = await post(request, '/auth/password/change', {
+            currentPassword: cpUser.password, newPassword: 'new-password-12',
+        });
+        expect(res.status()).toBe(401);
+    });
+
+    test('rejects when currentPassword is wrong', async ({ request }) => {
+        const res = await post(request, '/auth/password/change',
+            { currentPassword: 'wrong-pw-1234', newPassword: 'new-password-12' },
+            cpToken
+        );
+        expect(res.status()).toBe(401);
+    });
+
+    test('changes password — old password no longer logs in, new one does', async ({ request }) => {
+        const res = await post(request, '/auth/password/change',
+            { currentPassword: cpUser.password, newPassword: 'new-password-12' },
+            cpToken
+        );
+        expect(res.status()).toBe(200);
+
+        const oldLogin = await post(request, '/auth/login', cpUser);
+        expect(oldLogin.status()).toBe(401);
+
+        const newLogin = await post(request, '/auth/login', { email: cpUser.email, password: 'new-password-12' });
+        expect(newLogin.status()).toBe(200);
+    });
+});

@@ -1,5 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import jwt from 'jsonwebtoken';
+import { createServer, type Server } from 'http';
+import { generateKeyPairSync, randomUUID, type KeyObject } from 'crypto';
+import type { AddressInfo } from 'net';
 import { GraphQLApiGenerator } from '../src/index';
 import type { IConfigProvider, IDatabaseAdapter, ModelSchema } from '@json-express/core';
 
@@ -22,14 +25,23 @@ const passingSchema = {
     safeParse: (input: any) => ({ success: true, data: { ...input, normalized: true } }),
 };
 
-function makeConfig(rules: any[], opts: { authSecret?: string } = {}): IConfigProvider {
+function makeConfig(
+    rules: any[],
+    opts: { authSecret?: string; authJwksUri?: string; authAudience?: string } = {}
+): IConfigProvider {
     return {
         get: (key: string, def?: any) => {
             if (key === 'validation.rules') return rules;
             if (key === 'auth.secret') return opts.authSecret ?? def;
+            if (key === 'auth.jwksUri') return opts.authJwksUri ?? def;
+            if (key === 'auth.audience') return opts.authAudience ?? def;
             return def;
         },
-        has: (key: string) => key === 'auth.secret' && !!opts.authSecret,
+        has: (key: string) => (
+            (key === 'auth.secret' && !!opts.authSecret)
+            || (key === 'auth.jwksUri' && !!opts.authJwksUri)
+            || (key === 'auth.audience' && !!opts.authAudience)
+        ),
         set: () => {},
     };
 }
@@ -1055,5 +1067,123 @@ describe('api-graphql — Custom field shape validation', () => {
         // Auto-generated `albums` query should still work.
         const res = await invokePost(routes, { query: `{ albums { id } }` });
         expect(res.body.errors).toBeUndefined();
+    });
+});
+
+// ─────────────────────────  JWKS soft-decode  ─────────────────────────
+//
+// /graphql is a single endpoint that doesn't gate on the auth middleware — instead
+// it soft-decodes the Bearer token and exposes the payload through ctx.userPayload
+// so resolvers can run evaluateAccess. These tests prove the JWKS-mode wiring works
+// end-to-end through the handler, complementing the unit coverage in core/jwt.test.ts.
+
+interface TestJwks {
+    server: Server;
+    url: string;
+    privateKey: KeyObject;
+    kid: string;
+}
+
+async function startJwksServerForGraphql(): Promise<TestJwks> {
+    const { publicKey, privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
+    const kid = randomUUID();
+    const jwk = {
+        ...publicKey.export({ format: 'jwk' }),
+        kid,
+        alg: 'RS256',
+        use: 'sig',
+    };
+    const server = createServer((req, res) => {
+        if (req.url === '/.well-known/jwks.json') {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ keys: [jwk] }));
+            return;
+        }
+        res.writeHead(404);
+        res.end();
+    });
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    const port = (server.address() as AddressInfo).port;
+    return { server, url: `http://127.0.0.1:${port}/.well-known/jwks.json`, privateKey, kid };
+}
+
+describe('api-graphql — JWKS soft-decode', () => {
+    let jwks: TestJwks;
+
+    beforeAll(async () => { jwks = await startJwksServerForGraphql(); });
+    afterAll(async () => { await new Promise<void>((resolve) => jwks.server.close(() => resolve())); });
+
+    const adminProtectedAlbums: ModelSchema = {
+        name: 'albums',
+        fields: {
+            id: { type: 'id', options: {} } as any,
+            title: { type: 'string', options: {} } as any,
+        },
+        access: { read: 'admin' },
+    };
+
+    it('admin role embedded in an RS256 token unlocks an admin-gated query', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({
+            database: db,
+            configProvider: makeConfig([], { authJwksUri: jwks.url }),
+        });
+        gen.setSchemas([adminProtectedAlbums]);
+        const routes = await gen.generate(['albums']);
+        const token = jwt.sign(
+            { sub: 'jwks-admin', role: 'admin' },
+            jwks.privateKey,
+            { algorithm: 'RS256', keyid: jwks.kid }
+        );
+        const res = await invokePost(
+            routes,
+            { query: `{ albums { id } }` },
+            { authorization: `Bearer ${token}` }
+        );
+        expect(res.body.errors).toBeUndefined();
+    });
+
+    it('a token signed with a foreign key is rejected (resolvers see anonymous)', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({
+            database: db,
+            configProvider: makeConfig([], { authJwksUri: jwks.url }),
+        });
+        gen.setSchemas([adminProtectedAlbums]);
+        const routes = await gen.generate(['albums']);
+        const { privateKey: foreign } = generateKeyPairSync('rsa', { modulusLength: 2048 });
+        const token = jwt.sign(
+            { sub: 'forged', role: 'admin' },
+            foreign,
+            { algorithm: 'RS256', keyid: jwks.kid }
+        );
+        const res = await invokePost(
+            routes,
+            { query: `{ albums { id } }` },
+            { authorization: `Bearer ${token}` }
+        );
+        // Soft-decode failed → anonymous → admin gate denies → GraphQL error code present
+        expect(res.body.errors?.[0]?.extensions?.code).toBe('UNAUTHENTICATED');
+    });
+
+    it('audience mismatch is rejected when auth.audience is set', async () => {
+        const db = new InMemoryAdapter();
+        const gen = new GraphQLApiGenerator({
+            database: db,
+            configProvider: makeConfig([], { authJwksUri: jwks.url, authAudience: 'my-api' }),
+        });
+        gen.setSchemas([adminProtectedAlbums]);
+        const routes = await gen.generate(['albums']);
+        const wrongAud = jwt.sign(
+            { sub: 'a', role: 'admin' },
+            jwks.privateKey,
+            { algorithm: 'RS256', keyid: jwks.kid, audience: 'other-api' }
+        );
+        const res = await invokePost(
+            routes,
+            { query: `{ albums { id } }` },
+            { authorization: `Bearer ${wrongAud}` }
+        );
+        expect(res.body.errors?.[0]?.extensions?.code).toBe('UNAUTHENTICATED');
     });
 });

@@ -1,0 +1,27 @@
+[
+    {
+        "id": 1,
+        "title": "Morning Coffee",
+        "body": "Nothing beats a fresh cup of coffee to start the day."
+    },
+    {
+        "id": 2,
+        "title": "Weekend Plans",
+        "body": "I'm planning to go hiking this Saturday if the weather stays clear."
+    },
+    {
+        "id": 3,
+        "title": "New Book Alert",
+        "body": "Just started reading a new sci-fi novel and I can't put it down."
+    },
+    {
+        "id": 4,
+        "title": "Coding Milestone",
+        "body": "Finally fixed that bug that was bothering me all week!"
+    },
+    {
+        "id": 5,
+        "title": "Simple Pleasures",
+        "body": "Watching the sunset from the balcony is the best part of my evening."
+    }
+]

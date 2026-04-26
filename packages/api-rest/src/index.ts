@@ -63,9 +63,12 @@ export class RestApiGenerator implements IApiGenerator {
         route.metadata = route.metadata || {};
 
         const authSecret = this.config?.get<string>('auth.secret');
+        const authJwksUri = this.config?.get<string>('auth.jwksUri');
+        const authConfigured = (typeof authSecret === 'string' && authSecret.length > 0)
+            || (typeof authJwksUri === 'string' && authJwksUri.length > 0);
         // 'public' rules opt the route out of the auth gate so anonymous traffic isn't 401'd
         // before the handler runs. The handler still re-evaluates the rule for defense in depth.
-        if (authSecret && opRule !== 'public') {
+        if (authConfigured && opRule !== 'public') {
             const rawExclude = this.config?.get<string | string[]>('auth.exclude', []);
             const excludePaths = Array.isArray(rawExclude) ? rawExclude : (typeof rawExclude === 'string' ? rawExclude.split(',').map(s => s.trim()) : []);
 

@@ -4,10 +4,11 @@ import type {
     IConfigProvider,
     ILogger,
     IDatabaseAdapter,
+    IEmailProvider,
     ITransport,
     ModelSchema,
 } from '@json-express/core';
-import { ConsoleLogger, type JsonExpressKernel } from '@json-express/core';
+import { ConsoleLogger, createJwtVerifier, type JsonExpressKernel } from '@json-express/core';
 import { identitySchemas } from './schemas';
 import { hashPassword } from './crypto';
 import { type JwtIssuerConfig } from './jwt-issuer';
@@ -15,14 +16,40 @@ import { makeLoginHandler } from './handlers/login';
 import { makeRegisterHandler } from './handlers/register';
 import { makeRefreshHandler } from './handlers/refresh';
 import { makeLogoutHandler } from './handlers/logout';
+import { makeVerifyHandler } from './handlers/verify';
+import { makeVerifyResendHandler } from './handlers/verify-resend';
+import { makeForgotPasswordHandler } from './handlers/forgot-password';
+import { makeResetPasswordHandler } from './handlers/reset-password';
+import { makeChangePasswordHandler } from './handlers/change-password';
 
-export { identitySchemas, userModel, roleModel, refreshTokenModel } from './schemas';
-export { hashPassword, verifyPassword, generateRefreshToken, hashRefreshToken } from './crypto';
+export {
+    identitySchemas,
+    userModel,
+    roleModel,
+    refreshTokenModel,
+    emailVerificationTokenModel,
+    passwordResetTokenModel,
+} from './schemas';
+export {
+    hashPassword,
+    verifyPassword,
+    generateRefreshToken,
+    hashRefreshToken,
+    generateRandomToken,
+    hashRandomToken,
+} from './crypto';
 export { signAccessToken, type IssuedTokenPayload, type JwtIssuerConfig } from './jwt-issuer';
+export { verificationEmail, passwordResetEmail, type EmailTemplateContext } from './email-templates';
 
 const DEFAULT_TOKEN_TTL = '1h';
 const DEFAULT_REFRESH_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const DEFAULT_VERIFY_TTL_MS = 24 * 60 * 60 * 1000;       // 24 hours
+const DEFAULT_RESET_TTL_MS = 30 * 60 * 1000;              // 30 minutes
 const DEFAULT_ROLE = 'user';
+const DEFAULT_APP_NAME = 'JSON Express';
+const DEFAULT_VERIFY_URL = 'http://localhost:3000/auth/verify';
+const DEFAULT_RESET_URL = 'http://localhost:3000/auth/password/reset';
+const DEFAULT_MIN_PASSWORD_LENGTH = 8;
 const ADMIN_EMAIL = 'admin@local';
 
 function parseDurationMs(value: string | undefined, fallback: number): number {
@@ -66,11 +93,17 @@ export class IdentityPlugin implements IPlugin {
             );
         }
 
-        // 2. Resolve runtime deps.
         const db = kernel.container.resolve<IDatabaseAdapter>('database');
         const transport = kernel.container.resolve<ITransport>('transport');
 
+        // Email provider is optional — verification + password-reset endpoints only mount when present.
+        const emailProvider: IEmailProvider | null = kernel.container.hasRegistration('emailProvider')
+            ? kernel.container.resolve<IEmailProvider>('emailProvider')
+            : null;
+
         const secret = configProvider.get<string | undefined>('auth.secret', undefined);
+        const jwksUri = configProvider.get<string | undefined>('auth.jwksUri', undefined);
+        const algorithms = configProvider.get<string[] | undefined>('auth.algorithms', undefined);
         if (!secret || typeof secret !== 'string') {
             throw new Error(
                 '@json-express/plugin-identity requires JEX__AUTH__SECRET to be set so it can sign access tokens.'
@@ -82,24 +115,54 @@ export class IdentityPlugin implements IPlugin {
             configProvider.get<string | undefined>('auth.refreshTtl', undefined),
             DEFAULT_REFRESH_TTL_MS
         );
+        const verifyTtlMs = parseDurationMs(
+            configProvider.get<string | undefined>('auth.verifyTtl', undefined),
+            DEFAULT_VERIFY_TTL_MS
+        );
+        const resetTtlMs = parseDurationMs(
+            configProvider.get<string | undefined>('auth.resetTtl', undefined),
+            DEFAULT_RESET_TTL_MS
+        );
         const issuer = configProvider.get<string | undefined>('auth.issuer', undefined);
         const audience = configProvider.get<string | string[] | undefined>('auth.audience', undefined);
         const allowRegistration = configProvider.get<boolean>('auth.allowRegistration', true);
         const defaultRole = configProvider.get<string>('auth.defaultRole', DEFAULT_ROLE);
+        const requireVerifiedEmail = configProvider.get<boolean>('auth.requireVerifiedEmail', false);
+        const minPasswordLength = configProvider.get<number>('auth.minPasswordLength', DEFAULT_MIN_PASSWORD_LENGTH);
+        const appName = configProvider.get<string>('auth.email.appName', DEFAULT_APP_NAME);
+        const verifyUrl = configProvider.get<string>('auth.email.verifyUrl', DEFAULT_VERIFY_URL);
+        const resetUrl = configProvider.get<string>('auth.email.resetUrl', DEFAULT_RESET_URL);
+        const fromAddress = configProvider.get<string | undefined>('auth.email.from', undefined);
 
         const issuerConfig: JwtIssuerConfig = { secret, ttl, issuer, audience };
 
-        // 3. Auto-seed the admin user on first boot (idempotent).
+        // Verifier for change-password — bypasses middleware composition the same
+        // way the rest of /auth/* does. Mirrors the config middleware-auth uses,
+        // so a JWKS-backed project still validates change-password tokens correctly.
+        const verifier = createJwtVerifier({
+            secret,
+            jwksUri,
+            audience,
+            issuer,
+            algorithms,
+        });
+
         await this.seedAdminIfEmpty(db);
 
-        // 4. Mount auth routes directly via the transport. These are intentionally
-        //    public — gating /login behind the auth middleware would be a chicken-
-        //    and-egg problem. Routes registered here bypass the kernel's middleware
-        //    composition step, which is the desired behavior.
+        // Mount auth routes directly via the transport. These are intentionally
+        // public — gating /login behind the auth middleware would be a chicken-
+        // and-egg problem. Routes registered here bypass the kernel's middleware
+        // composition step, which is the desired behavior.
         transport.registerRoute({
             method: 'POST',
             path: '/auth/login',
-            handler: makeLoginHandler({ db, issuer: issuerConfig, refreshTtlMs, logger: this.logger }),
+            handler: makeLoginHandler({
+                db,
+                issuer: issuerConfig,
+                refreshTtlMs,
+                requireVerifiedEmail,
+                logger: this.logger,
+            }),
         });
         transport.registerRoute({
             method: 'POST',
@@ -110,6 +173,13 @@ export class IdentityPlugin implements IPlugin {
                 refreshTtlMs,
                 allowRegistration,
                 defaultRole,
+                minPasswordLength,
+                requireVerifiedEmail,
+                emailProvider,
+                appName,
+                verifyUrl: emailProvider ? verifyUrl : null,
+                fromAddress,
+                verifyTtlMs,
                 logger: this.logger,
             }),
         });
@@ -124,9 +194,72 @@ export class IdentityPlugin implements IPlugin {
             handler: makeLogoutHandler({ db, logger: this.logger }),
         });
 
-        this.logger.info('Identity routes mounted', {
-            routes: ['POST /auth/login', 'POST /auth/register', 'POST /auth/refresh', 'POST /auth/logout'],
+        const mounted: string[] = [
+            'POST /auth/login',
+            'POST /auth/register',
+            'POST /auth/refresh',
+            'POST /auth/logout',
+        ];
+
+        if (emailProvider) {
+            transport.registerRoute({
+                method: 'POST',
+                path: '/auth/verify',
+                handler: makeVerifyHandler({ db, logger: this.logger }),
+            });
+            transport.registerRoute({
+                method: 'POST',
+                path: '/auth/verify/resend',
+                handler: makeVerifyResendHandler({
+                    db,
+                    email: emailProvider,
+                    appName,
+                    verifyUrl,
+                    fromAddress,
+                    verifyTtlMs,
+                    logger: this.logger,
+                }),
+            });
+            transport.registerRoute({
+                method: 'POST',
+                path: '/auth/password/forgot',
+                handler: makeForgotPasswordHandler({
+                    db,
+                    email: emailProvider,
+                    appName,
+                    resetUrl,
+                    fromAddress,
+                    resetTtlMs,
+                    logger: this.logger,
+                }),
+            });
+            transport.registerRoute({
+                method: 'POST',
+                path: '/auth/password/reset',
+                handler: makeResetPasswordHandler({ db, minPasswordLength, logger: this.logger }),
+            });
+            mounted.push(
+                'POST /auth/verify',
+                'POST /auth/verify/resend',
+                'POST /auth/password/forgot',
+                'POST /auth/password/reset',
+            );
+        } else {
+            this.logger.info(
+                'Email provider not registered — verification and password-reset endpoints disabled. ' +
+                'Install @json-express/email-console (or another email-* plugin) to enable.'
+            );
+        }
+
+        // change-password is always available — it doesn't depend on email.
+        transport.registerRoute({
+            method: 'POST',
+            path: '/auth/password/change',
+            handler: makeChangePasswordHandler({ db, verifier, minPasswordLength, logger: this.logger }),
         });
+        mounted.push('POST /auth/password/change');
+
+        this.logger.info('Identity routes mounted', { routes: mounted });
     }
 
     public async onReady(_kernel: JsonExpressKernel, _configProvider: IConfigProvider): Promise<void> {
@@ -155,6 +288,7 @@ export class IdentityPlugin implements IPlugin {
             email: ADMIN_EMAIL,
             passwordHash,
             role: 'admin',
+            emailVerified: true,
             createdAt: new Date().toISOString(),
         });
         this.adminPassword = password;

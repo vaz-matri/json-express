@@ -7,6 +7,7 @@ export const userModel: ModelSchema = defineModel({
         email: types.string({ unique: true }),
         passwordHash: types.string(),
         role: types.string({ default: 'user' }),
+        emailVerified: types.boolean({ default: false }),
         createdAt: types.date(),
     },
     access: {
@@ -53,4 +54,44 @@ export const refreshTokenModel: ModelSchema = defineModel({
     },
 });
 
-export const identitySchemas: ModelSchema[] = [userModel, roleModel, refreshTokenModel];
+export const emailVerificationTokenModel: ModelSchema = defineModel({
+    name: 'emailVerificationTokens',
+    fields: {
+        id: types.id(),
+        userId: types.string(),
+        tokenHash: types.string(),
+        expiresAt: types.date(),
+        createdAt: types.date(),
+    },
+    access: {
+        read: 'admin',
+        create: 'admin',
+        update: 'admin',
+        delete: 'admin',
+    },
+});
+
+export const passwordResetTokenModel: ModelSchema = defineModel({
+    name: 'passwordResetTokens',
+    fields: {
+        id: types.id(),
+        userId: types.string(),
+        tokenHash: types.string(),
+        expiresAt: types.date(),
+        createdAt: types.date(),
+    },
+    access: {
+        read: 'admin',
+        create: 'admin',
+        update: 'admin',
+        delete: 'admin',
+    },
+});
+
+export const identitySchemas: ModelSchema[] = [
+    userModel,
+    roleModel,
+    refreshTokenModel,
+    emailVerificationTokenModel,
+    passwordResetTokenModel,
+];

@@ -252,6 +252,9 @@ importers:
       '@json-express/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@json-express/email-console':
+        specifier: workspace:*
+        version: link:../../packages/email-console
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../../packages/middleware-auth
@@ -319,6 +322,9 @@ importers:
 
   examples/login:
     dependencies:
+      '@json-express/adapter-json':
+        specifier: workspace:*
+        version: link:../../packages/adapter-json
       '@json-express/cli':
         specifier: workspace:*
         version: link:../../packages/cli
@@ -328,6 +334,9 @@ importers:
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../../packages/middleware-auth
+      '@json-express/plugin-identity':
+        specifier: workspace:*
+        version: link:../../packages/plugin-identity
 
   packages/adapter-json:
     dependencies:
@@ -451,6 +460,12 @@ importers:
     dependencies:
       '@json-express/core':
         specifier: workspace:^
+        version: link:../core
+
+  packages/email-console:
+    dependencies:
+      '@json-express/core':
+        specifier: workspace:*
         version: link:../core
 
   packages/logger-console:

@@ -1,0 +1,29 @@
+[
+  {
+    "email": "admin@local",
+    "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$LAyF+mmF+jdkNdBm/LX8ZQ$1OajHyZAHG5MU3gWaenGpWNAGv9eaHI6INdZe8DpPzo",
+    "role": "admin",
+    "createdAt": "2026-04-26T16:30:35.838Z",
+    "id": "113f6640-ba4b-4f12-b218-e17ee8386f74"
+  },
+  {
+    "email": "user@gmail.com",
+    "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$ip/kdmcHDFmHYd0XHz2n1w$sMzAwUwvdS3dp/wiP3BUcLYJakUel9tv8MOP/nogsd8",
+    "role": "user",
+    "createdAt": "2026-04-26T16:42:53.570Z",
+    "id": "2ff75c66-510a-471c-8f37-decf7a531d04"
+  },
+  {
+    "email": "user2@gmail.com",
+    "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$+S5RnUn6yemKNCaiLNWAxQ$77tz6NscyhnZHhrSOCKFpImr3SJs9zpIR5pR906OmdM",
+    "role": "user",
+    "createdAt": "2026-04-26T16:50:11.379Z",
+    "id": "d8c71925-4534-45ba-9a72-4ab668deae1a"
+  },
+  {
+    "email": "user2@gmail.com",
+    "password": "password",
+    "role": "admin",
+    "id": "d09b1c2b-7a65-426a-be95-68b42636211a"
+  }
+]

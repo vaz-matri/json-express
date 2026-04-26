@@ -4,6 +4,7 @@ export interface IssuedTokenPayload {
     sub: string;
     role: string;
     email: string;
+    emailVerified?: boolean;
 }
 
 export interface JwtIssuerConfig {

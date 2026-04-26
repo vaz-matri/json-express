@@ -175,3 +175,27 @@ export interface IDocProvider {
 export interface IIdGenerator {
     generate(): string | number;
 }
+
+/**
+ * 13. The Email Provider Contract
+ * Sends transactional email on behalf of plugins (e.g. verification + password reset).
+ * The default implementation (`@json-express/email-console`) logs the message
+ * instead of sending — keeping local dev free of SMTP credentials.
+ */
+export interface EmailMessage {
+    to: string | string[];
+    /** Falls back to the provider's configured default `from` if omitted. */
+    from?: string;
+    subject: string;
+    /** At least one of `text` or `html` must be set. Providers should accept either. */
+    text?: string;
+    html?: string;
+    replyTo?: string;
+    headers?: Record<string, string>;
+}
+
+export interface IEmailProvider {
+    send(message: EmailMessage): Promise<void>;
+    /** Optional health check, mirrors `IDatabaseAdapter.isHealthy`. */
+    isHealthy?(): Promise<boolean>;
+}

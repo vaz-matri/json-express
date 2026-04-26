@@ -71,10 +71,16 @@ async function bootHarness(configOverrides: Record<string, any> = {}): Promise<H
 }
 
 describe('IdentityPlugin — provideSchemas', () => {
-    it('contributes users, roles, refreshTokens', () => {
+    it('contributes users, roles, refreshTokens, emailVerificationTokens, passwordResetTokens', () => {
         const plugin = new IdentityPlugin({});
         const names = plugin.provideSchemas().map(s => s.name);
-        expect(names).toEqual(['users', 'roles', 'refreshTokens']);
+        expect(names).toEqual([
+            'users',
+            'roles',
+            'refreshTokens',
+            'emailVerificationTokens',
+            'passwordResetTokens',
+        ]);
     });
 });
 

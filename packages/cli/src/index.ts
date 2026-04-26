@@ -46,6 +46,7 @@ export const startServer = async () => {
     const availableLoggers = installedDeps.filter(d => d.includes('logger-'));
     const availableDocs = installedDeps.filter(d => d.includes('docs-'));
     const availableIds = installedDeps.filter(d => d.includes('id-'));
+    const availableEmails = installedDeps.filter(d => d.includes('email-'));
     const availablePlugins = installedDeps.filter(d => d.includes('plugin-'));
 
     // --- Parse CLI Execution Flags ---
@@ -232,6 +233,18 @@ export const startServer = async () => {
         console.log(`🔌 Registered documentation provider: ${activeDocs}`);
     } catch (e: any) {
         console.error(`❌ Failed to load documentation provider ${activeDocs}:`, e?.message || e);
+    }
+
+    // ✅ Resolve and register the Email Provider (opt-in — no default)
+    if (availableEmails.length > 0) {
+        try {
+            const activeEmail = await resolvePlugin('email', availableEmails, availableEmails[0]);
+            const emailInstance = await loadPluginInstance(activeEmail, [{ configProvider, logger: loggerInstance }]);
+            kernel.registerEmailProvider(emailInstance);
+            console.log(`🔌 Registered email provider: ${activeEmail}`);
+        } catch (e: any) {
+            console.error(`❌ Failed to load email provider:`, e?.message || e);
+        }
     }
 
     // ✅ Load and register all discovered Lifecycle Plugins

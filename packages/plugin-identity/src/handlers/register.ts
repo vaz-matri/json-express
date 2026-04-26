@@ -1,6 +1,7 @@
-import type { IDatabaseAdapter, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
+import type { IDatabaseAdapter, IEmailProvider, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
 import { signAccessToken, type JwtIssuerConfig } from '../jwt-issuer';
-import { generateRefreshToken, hashPassword, hashRefreshToken } from '../crypto';
+import { generateRandomToken, hashPassword, hashRandomToken } from '../crypto';
+import { verificationEmail } from '../email-templates';
 
 interface RegisterDeps {
     db: IDatabaseAdapter;
@@ -8,6 +9,13 @@ interface RegisterDeps {
     refreshTtlMs: number;
     allowRegistration: boolean;
     defaultRole: string;
+    minPasswordLength: number;
+    requireVerifiedEmail: boolean;
+    emailProvider: IEmailProvider | null;
+    appName: string;
+    verifyUrl: string | null;
+    fromAddress?: string;
+    verifyTtlMs: number;
     logger: ILogger;
 }
 
@@ -21,14 +29,12 @@ export function makeRegisterHandler(deps: RegisterDeps) {
         if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
             return { statusCode: 400, body: { error: 'email and password are required' } };
         }
-        if (password.length < 8) {
-            return { statusCode: 400, body: { error: 'password must be at least 8 characters' } };
+        if (password.length < deps.minPasswordLength) {
+            return { statusCode: 400, body: { error: `password must be at least ${deps.minPasswordLength} characters` } };
         }
 
         const existing = await deps.db.search('users', { email });
         if (existing && existing.length > 0) {
-            // Same shape as a 400 to avoid enumeration via differing status codes,
-            // but we still need to tell the user something useful — generic message.
             return { statusCode: 409, body: { error: 'Account already exists' } };
         }
 
@@ -37,19 +43,64 @@ export function makeRegisterHandler(deps: RegisterDeps) {
             email,
             passwordHash,
             role: deps.defaultRole,
+            emailVerified: false,
             createdAt: new Date().toISOString(),
         });
 
+        // Fire-and-forget the verification email (best-effort).
+        if (deps.emailProvider && deps.verifyUrl) {
+            const token = generateRandomToken();
+            await deps.db.create('emailVerificationTokens', {
+                userId: String(user.id),
+                tokenHash: hashRandomToken(token),
+                expiresAt: new Date(Date.now() + deps.verifyTtlMs).toISOString(),
+                createdAt: new Date().toISOString(),
+            });
+            try {
+                await deps.emailProvider.send(verificationEmail({
+                    appName: deps.appName,
+                    to: user.email,
+                    from: deps.fromAddress,
+                    actionUrl: deps.verifyUrl,
+                    token,
+                }));
+            } catch (e: any) {
+                deps.logger.error('Failed to send verification email', { userId: user.id, error: e?.message });
+            }
+        }
+
+        // Strict mode: don't issue tokens. The user must verify first via the email link.
+        if (deps.requireVerifiedEmail) {
+            deps.logger.info('User registered (strict — awaiting verification)', { userId: user.id });
+            return {
+                statusCode: 201,
+                body: {
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        role: user.role ?? deps.defaultRole,
+                        emailVerified: false,
+                    },
+                    message: 'Verification email sent. Please verify before logging in.',
+                },
+            };
+        }
+
         const accessToken = signAccessToken(
-            { sub: String(user.id), role: user.role ?? deps.defaultRole, email: user.email },
+            {
+                sub: String(user.id),
+                role: user.role ?? deps.defaultRole,
+                email: user.email,
+                emailVerified: false,
+            },
             deps.issuer
         );
 
-        const refreshToken = generateRefreshToken();
+        const refreshToken = generateRandomToken();
         const expiresAt = new Date(Date.now() + deps.refreshTtlMs).toISOString();
         await deps.db.create('refreshTokens', {
             userId: String(user.id),
-            tokenHash: hashRefreshToken(refreshToken),
+            tokenHash: hashRandomToken(refreshToken),
             expiresAt,
             revoked: false,
             createdAt: new Date().toISOString(),
@@ -61,7 +112,12 @@ export function makeRegisterHandler(deps: RegisterDeps) {
             body: {
                 accessToken,
                 refreshToken,
-                user: { id: user.id, email: user.email, role: user.role ?? deps.defaultRole },
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    role: user.role ?? deps.defaultRole,
+                    emailVerified: false,
+                },
             },
         };
     };

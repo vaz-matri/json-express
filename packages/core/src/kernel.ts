@@ -10,7 +10,8 @@ import type {
     IPlugin,
     ILogger,
     IDocProvider,
-    IIdGenerator
+    IIdGenerator,
+    IEmailProvider
 } from './types';
 import { ConsoleLogger } from './logger';
 import { randomUUID } from 'crypto';
@@ -87,6 +88,10 @@ export class JsonExpressKernel {
 
     public registerDocProvider(provider: IDocProvider) {
         this.container.register({ docProvider: asValue(provider) });
+    }
+
+    public registerEmailProvider(provider: IEmailProvider) {
+        this.container.register({ emailProvider: asValue(provider) });
     }
 
     // --- THE BOOT SEQUENCE ---

@@ -1,5 +1,5 @@
 import type { IDatabaseAdapter, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
-import { hashRefreshToken } from '../crypto';
+import { hashRandomToken } from '../crypto';
 
 interface LogoutDeps {
     db: IDatabaseAdapter;
@@ -10,7 +10,7 @@ export function makeLogoutHandler(deps: LogoutDeps) {
     return async (req: JsonRequest): Promise<JsonResponse> => {
         const { refreshToken } = req.body ?? {};
         if (typeof refreshToken === 'string' && refreshToken) {
-            const tokenHash = hashRefreshToken(refreshToken);
+            const tokenHash = hashRandomToken(refreshToken);
             const matches = await deps.db.search('refreshTokens', { tokenHash });
             const record = matches?.[0];
             if (record && !record.revoked) {

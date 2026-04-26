@@ -20,17 +20,22 @@ export async function verifyPassword(hash: string, plaintext: string): Promise<b
     }
 }
 
-export function generateRefreshToken(): string {
+export function generateRandomToken(): string {
     // 32 bytes → 43-char base64url. Plenty of entropy, URL-safe.
     return randomBytes(32).toString('base64url');
 }
 
-export function hashRefreshToken(token: string): string {
-    // SHA-256 is appropriate here: refresh tokens are high-entropy random strings,
-    // not user-chosen secrets, so we don't need argon2's slow KDF — we just need
-    // a deterministic one-way mapping for storage so a DB leak can't replay tokens.
+export function hashRandomToken(token: string): string {
+    // SHA-256 is appropriate here: these are high-entropy random strings (refresh,
+    // verification, password-reset tokens), not user-chosen secrets, so we don't
+    // need argon2's slow KDF — we just need a deterministic one-way mapping for
+    // storage so a DB leak can't replay tokens.
     return createHash('sha256').update(token).digest('hex');
 }
+
+// Back-compat aliases — preserved so existing call sites keep working without churn.
+export const generateRefreshToken = generateRandomToken;
+export const hashRefreshToken = hashRandomToken;
 
 export function safeCompareHex(a: string, b: string): boolean {
     if (a.length !== b.length) return false;

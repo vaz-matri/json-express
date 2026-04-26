@@ -1,6 +1,6 @@
 import type { IDatabaseAdapter, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
 import { signAccessToken, type JwtIssuerConfig } from '../jwt-issuer';
-import { generateRefreshToken, hashRefreshToken } from '../crypto';
+import { generateRandomToken, hashRandomToken } from '../crypto';
 
 interface RefreshDeps {
     db: IDatabaseAdapter;
@@ -18,7 +18,7 @@ export function makeRefreshHandler(deps: RefreshDeps) {
             return { statusCode: 400, body: { error: 'refreshToken is required' } };
         }
 
-        const tokenHash = hashRefreshToken(refreshToken);
+        const tokenHash = hashRandomToken(refreshToken);
         const matches = await deps.db.search('refreshTokens', { tokenHash });
         const record = matches?.[0];
         if (!record || record.revoked || new Date(record.expiresAt).getTime() < Date.now()) {
@@ -35,18 +35,23 @@ export function makeRefreshHandler(deps: RefreshDeps) {
         // Rotation: revoke the used token, issue a new pair.
         await deps.db.update('refreshTokens', String(record.id), { revoked: true });
 
-        const newRefresh = generateRefreshToken();
+        const newRefresh = generateRandomToken();
         const newExpiresAt = new Date(Date.now() + deps.refreshTtlMs).toISOString();
         await deps.db.create('refreshTokens', {
             userId: String(user.id),
-            tokenHash: hashRefreshToken(newRefresh),
+            tokenHash: hashRandomToken(newRefresh),
             expiresAt: newExpiresAt,
             revoked: false,
             createdAt: new Date().toISOString(),
         });
 
         const accessToken = signAccessToken(
-            { sub: String(user.id), role: user.role ?? 'user', email: user.email },
+            {
+                sub: String(user.id),
+                role: user.role ?? 'user',
+                email: user.email,
+                emailVerified: !!user.emailVerified,
+            },
             deps.issuer
         );
 
@@ -56,7 +61,12 @@ export function makeRefreshHandler(deps: RefreshDeps) {
             body: {
                 accessToken,
                 refreshToken: newRefresh,
-                user: { id: user.id, email: user.email, role: user.role ?? 'user' },
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    role: user.role ?? 'user',
+                    emailVerified: !!user.emailVerified,
+                },
             },
         };
     };

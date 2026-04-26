@@ -1,11 +1,12 @@
 import type { IDatabaseAdapter, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
 import { signAccessToken, type JwtIssuerConfig } from '../jwt-issuer';
-import { generateRefreshToken, hashRefreshToken, verifyPassword } from '../crypto';
+import { generateRandomToken, hashRandomToken, verifyPassword } from '../crypto';
 
 interface LoginDeps {
     db: IDatabaseAdapter;
     issuer: JwtIssuerConfig;
     refreshTtlMs: number;
+    requireVerifiedEmail: boolean;
     logger: ILogger;
 }
 
@@ -36,16 +37,26 @@ export function makeLoginHandler(deps: LoginDeps) {
             return GENERIC_AUTH_ERROR;
         }
 
+        if (deps.requireVerifiedEmail && !user.emailVerified) {
+            deps.logger.warn('Login blocked — email not verified', { userId: user.id });
+            return { statusCode: 403, body: { error: 'Email not verified' } };
+        }
+
         const accessToken = signAccessToken(
-            { sub: String(user.id), role: user.role ?? 'user', email: user.email },
+            {
+                sub: String(user.id),
+                role: user.role ?? 'user',
+                email: user.email,
+                emailVerified: !!user.emailVerified,
+            },
             deps.issuer
         );
 
-        const refreshToken = generateRefreshToken();
+        const refreshToken = generateRandomToken();
         const expiresAt = new Date(Date.now() + deps.refreshTtlMs).toISOString();
         await deps.db.create('refreshTokens', {
             userId: String(user.id),
-            tokenHash: hashRefreshToken(refreshToken),
+            tokenHash: hashRandomToken(refreshToken),
             expiresAt,
             revoked: false,
             createdAt: new Date().toISOString(),
@@ -57,7 +68,12 @@ export function makeLoginHandler(deps: LoginDeps) {
             body: {
                 accessToken,
                 refreshToken,
-                user: { id: user.id, email: user.email, role: user.role ?? 'user' },
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    role: user.role ?? 'user',
+                    emailVerified: !!user.emailVerified,
+                },
             },
         };
     };

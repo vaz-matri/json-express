@@ -1,0 +1,16 @@
+{
+    "name": "examples-login",
+    "version": "1.0.0",
+    "description": "Login page example",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/core": "workspace:*",
+        "@json-express/cli": "workspace:*",
+        "@json-express/middleware-auth": "workspace:*",
+        "@json-express/plugin-identity": "workspace:*",
+        "@json-express/adapter-json": "workspace:*"
+    }
+}
