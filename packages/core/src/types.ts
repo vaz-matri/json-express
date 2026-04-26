@@ -126,6 +126,13 @@ export interface ISeeder {
  */
 export interface IPlugin {
     name: string;
+    /**
+     * Optional: contribute additional schemas to the project before the
+     * database/api generators receive them. Called by the CLI synchronously
+     * after user-defined schemas are loaded; user-defined names win on
+     * collision (the plugin's contribution is silently skipped with a warning).
+     */
+    provideSchemas?(): ModelSchema[];
     onRegister?(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
     onBoot(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
     onReady?(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;

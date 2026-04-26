@@ -235,13 +235,34 @@ export const startServer = async () => {
     }
 
     // ✅ Load and register all discovered Lifecycle Plugins
+    const registeredPlugins: any[] = [];
     for (const pluginName of availablePlugins) {
         try {
             const plugin = await loadPluginInstance(pluginName, [{ configProvider, logger: loggerInstance }]);
             kernel.registerPlugin(plugin);
+            registeredPlugins.push(plugin);
             console.log(`🔌 Registered lifecycle plugin: ${pluginName}`);
         } catch (e: any) {
             console.error(`❌ Failed to load plugin ${pluginName}:`, e?.message || e);
+        }
+    }
+
+    // ✅ Gather plugin-contributed schemas (e.g. plugin-identity ships users/roles).
+    // User-defined schemas win on collision — silently skip the plugin's version.
+    for (const plugin of registeredPlugins) {
+        if (typeof plugin.provideSchemas !== 'function') continue;
+        const provided = plugin.provideSchemas();
+        if (!Array.isArray(provided)) continue;
+        for (const schema of provided) {
+            if (schemas.some(existing => existing.name === schema.name)) {
+                console.warn(`⚠️  Plugin '${plugin.name}' contributes schema '${schema.name}' but it already exists — keeping user-defined version.`);
+                continue;
+            }
+            schemas.push(schema);
+            if (!collections.includes(schema.name)) {
+                collections.push(schema.name);
+            }
+            console.log(`🧬 Plugin '${plugin.name}' contributed schema: ${schema.name}`);
         }
     }
 

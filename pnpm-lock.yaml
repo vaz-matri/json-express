@@ -244,6 +244,25 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-health
 
+  example/plugin-identity:
+    dependencies:
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/middleware-auth':
+        specifier: workspace:*
+        version: link:../../packages/middleware-auth
+      '@json-express/plugin-identity':
+        specifier: workspace:*
+        version: link:../../packages/plugin-identity
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.42.1
+        version: 1.59.1
+
   example/seeder-faker:
     dependencies:
       '@json-express/cli':
@@ -488,6 +507,31 @@ importers:
       '@json-express/core':
         specifier: workspace:*
         version: link:../core
+
+  packages/plugin-identity:
+    dependencies:
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../core
+      '@json-express/middleware-auth':
+        specifier: workspace:*
+        version: link:../middleware-auth
+      argon2:
+        specifier: ^0.41.1
+        version: 0.41.1
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.3
+    devDependencies:
+      '@json-express/adapter-memory':
+        specifier: workspace:*
+        version: link:../adapter-memory
+      '@types/jsonwebtoken':
+        specifier: ^9.0.4
+        version: 9.0.10
+      awilix:
+        specifier: ^10.0.1
+        version: 10.0.2
 
   packages/seeder-faker:
     dependencies:
@@ -761,6 +805,10 @@ packages:
   '@oxc-project/types@0.122.0':
     resolution: {integrity: sha512-oLAl5kBpV4w69UtFZ9xqcmTi+GENWOcPF7FCrczTiBbmC0ibXxCwyvZGbO39rCVEuLGAZM84DH0pUIyyv/YJzA==}
 
+  '@phc/format@1.0.0':
+    resolution: {integrity: sha512-m7X9U6BG2+J+R1lSOdCiITLLrxm+cWlNI3HUFA92oLO77ObGNzaKdh8pMLqdZcshtkKuV84olNNXDfMc4FezBQ==}
+    engines: {node: '>=10'}
+
   '@pinojs/redact@0.4.0':
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
 
@@ -1022,6 +1070,10 @@ packages:
 
   application-config-path@0.1.1:
     resolution: {integrity: sha512-zy9cHePtMP0YhwG+CfHm0bgwdnga2X3gZexpdCwEj//dpb+TKajtiC8REEUJUSq6Ab4f9cgNy2l8ObXzCXFkEw==}
+
+  argon2@0.41.1:
+    resolution: {integrity: sha512-dqCW8kJXke8Ik+McUcMDltrbuAWETPyU6iq+4AhxqKphWi7pChB/Zgd/Tp/o8xRLbg8ksMj46F/vph9wnxpTzQ==}
+    engines: {node: '>=16.17.0'}
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -1655,6 +1707,14 @@ packages:
 
   no-case@3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
+
+  node-addon-api@8.7.0:
+    resolution: {integrity: sha512-9MdFxmkKaOYVTV+XVRG8ArDwwQ77XIgIPyKASB1k3JPq3M8fGQQQE3YpMOrKm6g//Ktx8ivZr8xo1Qmtqub+GA==}
+    engines: {node: ^18 || ^20 || >= 21}
+
+  node-gyp-build@4.8.4:
+    resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
+    hasBin: true
 
   object-inspect@1.13.4:
     resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
@@ -2334,6 +2394,8 @@ snapshots:
 
   '@oxc-project/types@0.122.0': {}
 
+  '@phc/format@1.0.0': {}
+
   '@pinojs/redact@0.4.0': {}
 
   '@playwright/test@1.59.1':
@@ -2575,6 +2637,12 @@ snapshots:
   ansis@4.2.0: {}
 
   application-config-path@0.1.1: {}
+
+  argon2@0.41.1:
+    dependencies:
+      '@phc/format': 1.0.0
+      node-addon-api: 8.7.0
+      node-gyp-build: 4.8.4
 
   argparse@2.0.1: {}
 
@@ -3222,6 +3290,10 @@ snapshots:
     dependencies:
       lower-case: 2.0.2
       tslib: 2.8.1
+
+  node-addon-api@8.7.0: {}
+
+  node-gyp-build@4.8.4: {}
 
   object-inspect@1.13.4: {}
 

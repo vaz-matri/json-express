@@ -53,7 +53,7 @@ export function createJwtVerifier(config: JwtVerifierConfig): JwtVerifier {
     }
 
     const baseOptions: jwt.VerifyOptions = {};
-    if (config.audience !== undefined) baseOptions.audience = config.audience;
+    if (config.audience !== undefined) baseOptions.audience = config.audience as jwt.VerifyOptions['audience'];
     if (config.issuer !== undefined) baseOptions.issuer = config.issuer;
 
     if (hasSecret) {
