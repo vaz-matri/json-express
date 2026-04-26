@@ -21,11 +21,12 @@ The `api-rest` and `api-graphql` generators read this header to evaluate per-col
 
 ## Configuration
 
-All options are set via `.env` using the `JEX` namespace (double underscore creates nested blocks):
+All options are set via `.env` using the `JEX` namespace (double underscore creates nested blocks). Pick **exactly one** of `auth.secret` or `auth.jwksUri` — the middleware throws at boot if both are set.
+
+### Symmetric (HMAC, e.g. tokens you mint yourself)
 
 ```env
-# Required — HMAC secret used by jsonwebtoken to verify every token.
-# When omitted, authentication is bypassed entirely and a warning is logged.
+# HMAC secret used by jsonwebtoken to verify every token.
 JEX__AUTH__SECRET=your-hmac-secret
 
 # Optional — comma-separated or array of path prefixes the middleware should skip.
@@ -33,12 +34,31 @@ JEX__AUTH__SECRET=your-hmac-secret
 JEX__AUTH__EXCLUDE=/docs,/health,/login
 ```
 
+### Asymmetric (JWKS, e.g. Auth0 / Firebase / Supabase / any OIDC provider)
+
+```env
+# Public JWKS endpoint of your identity provider. The middleware fetches and
+# caches the signing keys, then verifies RS256 tokens against them — no secret
+# is shared with your app.
+JEX__AUTH__JWKS_URI=https://dev-xxx.us.auth0.com/.well-known/jwks.json
+
+# Optional — strictly validated by jsonwebtoken when set.
+JEX__AUTH__AUDIENCE=my-json-express-api
+JEX__AUTH__ISSUER=https://dev-xxx.us.auth0.com/
+```
+
+### Full key reference
+
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `auth.secret` | `string` | — | Shared secret for `jsonwebtoken.verify`. If unset, the middleware logs a warning and calls `next()` without authentication. |
+| `auth.secret` | `string` | — | Shared HMAC secret. Mutually exclusive with `auth.jwksUri`. |
+| `auth.jwksUri` | `string` | — | Public JWKS endpoint URL for asymmetric verification. Mutually exclusive with `auth.secret`. |
+| `auth.audience` | `string \| string[]` | — | Optional. When set, every token's `aud` claim must match. |
+| `auth.issuer` | `string` | — | Optional. When set, every token's `iss` claim must match. |
+| `auth.algorithms` | `string[]` | `['HS256']` for secret, `['RS256']` for jwksUri | Pinned allow-list of accepted algorithms. Prevents the `alg: none` attack and guards against JWKS providers that mix algorithms. |
 | `auth.exclude` | `string \| string[]` | `[]` | Path prefixes that bypass the Bearer-token check. Matched via `path.startsWith(prefix)`. |
 
-The REST API generator attaches the `'auth'` middleware automatically to every route it produces when `auth.secret` is set — except for routes whose collection declares `access.{op}: 'public'` (see below).
+If neither `auth.secret` nor `auth.jwksUri` is set, the middleware logs a warning and calls `next()` without authentication. The REST API generator attaches the `'auth'` middleware automatically to every route it produces when **either** key is set — except for routes whose collection declares `access.{op}: 'public'` (see below).
 
 ---
 
