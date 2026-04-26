@@ -24,6 +24,7 @@ import type {
     AccessOp,
     GraphQLFieldsBlock,
     TypeRegistry,
+    JwtVerifier,
 } from '@json-express/core';
 import {
     ConsoleLogger,
@@ -32,7 +33,7 @@ import {
     resolveOwnerField,
     resolveUserId,
     ownsRecord,
-    verifyJwt,
+    createJwtVerifier,
     getFieldRule,
     stripDeniedWriteFields,
 } from '@json-express/core';
@@ -523,7 +524,23 @@ export class GraphQLApiGenerator implements IApiGenerator {
         // express per-op rules. Instead the route is left open and the handler does an
         // unconditional soft-decode of the Bearer token, populating user context for the
         // resolvers. Resolvers remain the source of truth via evaluateAccess.
-        const authSecret = this.config?.get<string>('auth.secret');
+        const authSecret = this.config?.get<string | undefined>('auth.secret', undefined);
+        const authJwksUri = this.config?.get<string | undefined>('auth.jwksUri', undefined);
+        const authAudience = this.config?.get<string | string[] | undefined>('auth.audience', undefined);
+        const authIssuer = this.config?.get<string | undefined>('auth.issuer', undefined);
+        const authAlgorithms = this.config?.get<string[] | undefined>('auth.algorithms', undefined);
+
+        const hasSecret = typeof authSecret === 'string' && authSecret.length > 0;
+        const hasJwks = typeof authJwksUri === 'string' && authJwksUri.length > 0;
+        const verifier: JwtVerifier | null = (hasSecret || hasJwks)
+            ? createJwtVerifier({
+                secret: authSecret,
+                jwksUri: authJwksUri,
+                audience: authAudience,
+                issuer: authIssuer,
+                algorithms: authAlgorithms,
+            })
+            : null;
 
         routes.push({
             method: 'POST',
@@ -545,8 +562,8 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 delete req.headers['x-user-payload'];
                 delete req.headers['X-User-Payload'];
 
-                if (authSecret) {
-                    const verified = verifyJwt(req.headers['authorization'], authSecret);
+                if (verifier) {
+                    const verified = await verifier(req.headers['authorization']);
                     if (verified) req.headers['x-user-payload'] = verified;
                 }
 

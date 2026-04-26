@@ -1,9 +1,9 @@
-import type { IMiddleware, JsonRequest, JsonResponse, IConfigProvider, ILogger } from '@json-express/core';
-import { ConsoleLogger, verifyJwt } from '@json-express/core';
+import type { IMiddleware, JsonRequest, JsonResponse, IConfigProvider, ILogger, JwtVerifier } from '@json-express/core';
+import { ConsoleLogger, createJwtVerifier } from '@json-express/core';
 
 export class AuthMiddleware implements IMiddleware {
     public readonly name = 'auth';
-    private secret: string | null = null;
+    private verifier: JwtVerifier | null = null;
     private excludePaths: string[] = [];
     private logger: ILogger;
 
@@ -11,12 +11,22 @@ export class AuthMiddleware implements IMiddleware {
         this.logger = logger?.child({ component: 'Auth' }) ?? new ConsoleLogger({ context: { component: 'Auth' } });
         if (!configProvider) return;
 
-        // Extract secret
-        this.secret = configProvider.get<string>('auth.secret', null as any);
+        const secret = configProvider.get<string | undefined>('auth.secret', undefined);
+        const jwksUri = configProvider.get<string | undefined>('auth.jwksUri', undefined);
+        const audience = configProvider.get<string | string[] | undefined>('auth.audience', undefined);
+        const issuer = configProvider.get<string | undefined>('auth.issuer', undefined);
+        const algorithms = configProvider.get<string[] | undefined>('auth.algorithms', undefined);
+
+        const hasSecret = typeof secret === 'string' && secret.length > 0;
+        const hasJwks = typeof jwksUri === 'string' && jwksUri.length > 0;
+
+        if (hasSecret || hasJwks) {
+            this.verifier = createJwtVerifier({ secret, jwksUri, audience, issuer, algorithms });
+        }
 
         // Extract and format exclude paths (handles either array or comma-separated string)
         const rawExclude = configProvider.get<string | string[]>('auth.exclude', []);
-        
+
         if (Array.isArray(rawExclude)) {
             this.excludePaths = rawExclude;
         } else if (typeof rawExclude === 'string') {
@@ -30,9 +40,9 @@ export class AuthMiddleware implements IMiddleware {
         delete req.headers['x-user-payload'];
         delete req.headers['X-User-Payload'];
 
-        // 1. If no secret is configured, bypass authentication entirely
-        if (!this.secret) {
-            this.logger.warn('JEX_AUTH_SECRET is missing. Authentication bypassed.');
+        // 1. If no verifier is configured, bypass authentication entirely
+        if (!this.verifier) {
+            this.logger.warn('Auth not configured (neither auth.secret nor auth.jwksUri). Authentication bypassed.');
             return next();
         }
 
@@ -52,7 +62,7 @@ export class AuthMiddleware implements IMiddleware {
         }
 
         // 4. Verify token via the shared core primitive
-        const userPayload = verifyJwt(authHeader, this.secret);
+        const userPayload = await this.verifier(authHeader);
         if (!userPayload) {
             this.logger.warn('Rejected — invalid or expired token');
             return {
