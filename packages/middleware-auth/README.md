@@ -118,7 +118,7 @@ export default defineModel({
 | `undefined` | No authorization check. Auth middleware still runs if `auth.secret` is set. |
 | `'public'` | Anonymous traffic allowed. REST routes have the `'auth'` middleware stripped entirely. |
 | `string` / `string[]` | Requires a verified JWT whose `role` claim matches (intersection for arrays). |
-| `'owner'` | Reserved for row-level security. Not implemented — throws at runtime. |
+| `'owner'` | Row-level security. Caller must own the record — owner field defaults to `ownerId` (override via `access.ownerField`). Mismatches return `404` (not `403`) to prevent existence leaks. |
 
 On denial, generators return:
 
