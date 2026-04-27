@@ -159,6 +159,14 @@ export class JsonExpressKernel {
             throw new Error("❌ Missing core plugins! Ensure Database, ApiGenerator, and Transport are registered.");
         }
 
+        // 2.5 Hand the database adapter the runtime context for model hooks
+        if (typeof db.setHookContext === 'function') {
+            const email = this.container.hasRegistration('emailProvider')
+                ? this.container.resolve<IEmailProvider>('emailProvider')
+                : undefined;
+            db.setHookContext({ db, email, logger: this.logger });
+        }
+
         // 3. Ask the API Generator to create abstract route definitions
         const generatedRoutes = await apiGenerator.generate(collections);
 

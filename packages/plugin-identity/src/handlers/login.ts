@@ -42,6 +42,11 @@ export function makeLoginHandler(deps: LoginDeps) {
             return { statusCode: 403, body: { error: 'Email not verified' } };
         }
 
+        if (user.requirePasswordReset) {
+            deps.logger.warn('Login blocked — password reset required', { userId: user.id });
+            return { statusCode: 403, body: { error: 'PASSWORD_RESET_REQUIRED' } };
+        }
+
         const accessToken = signAccessToken(
             {
                 sub: String(user.id),

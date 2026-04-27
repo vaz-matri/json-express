@@ -1,5 +1,5 @@
 import { TypeDefinition } from './types';
-import { JsonRequest, JsonResponse, IDatabaseAdapter } from '../types';
+import { JsonRequest, JsonResponse, IDatabaseAdapter, IEmailProvider, ILogger } from '../types';
 
 export interface RouteContext {
     db: IDatabaseAdapter;
@@ -24,9 +24,21 @@ export type CustomEndpointHandler = (
     ctx: RouteContext
 ) => Promise<JsonResponse | void> | JsonResponse | void;
 
+/**
+ * Context object handed to model hooks at execution time. Adapters build this
+ * from the active database, the optional email provider, and the kernel logger
+ * so hooks can perform side-effects (writes, emails) without resolving the
+ * IoC container themselves.
+ */
+export interface HookContext {
+    db: IDatabaseAdapter;
+    email?: IEmailProvider;
+    logger: ILogger;
+}
+
 export interface ModelHooks<T = any> {
-    beforeCreate?: (data: Partial<T>) => Promise<Partial<T>> | Partial<T>;
-    afterCreate?: (data: T) => Promise<void> | void;
+    beforeCreate?: (data: Partial<T>, ctx: HookContext) => Promise<Partial<T>> | Partial<T>;
+    afterCreate?: (data: T, ctx: HookContext) => Promise<void> | void;
     // We will expand these lifecycles as needed
 }
 

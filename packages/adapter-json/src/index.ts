@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, writeFileSync, renameSync, accessSync, existsSync, mkdirSync, constants } from 'fs';
 import { join, extname } from 'path';
-import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator } from '@json-express/core';
+import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, ModelSchema, HookContext } from '@json-express/core';
 import { ConsoleLogger } from '@json-express/core';
 
 export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
@@ -11,6 +11,8 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     private config?: IConfigProvider;
     private logger: ILogger;
     private idGenerator?: IIdGenerator;
+    private schemas: ModelSchema[] = [];
+    private hookContext?: HookContext;
 
     constructor({ configProvider, logger, idGenerator }: { configProvider?: IConfigProvider; logger?: ILogger; idGenerator?: IIdGenerator } = {}) {
         this.config = configProvider;
@@ -18,6 +20,14 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
         this.logger = logger?.child({ component: 'DB-Json' }) ?? new ConsoleLogger({ context: { component: 'DB-Json' } });
         this.idGenerator = idGenerator;
         this._scanAndLoad();
+    }
+
+    public setSchemas(schemas: ModelSchema[]) {
+        this.schemas = schemas;
+    }
+
+    public setHookContext(ctx: HookContext) {
+        this.hookContext = ctx;
     }
 
     // --- File Discovery & Initial Load ---
@@ -184,12 +194,25 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
             this.filePaths[collection] = join(dataDir, `${collection}.json`);
         }
 
-        const newId = data.id !== undefined ? data.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);
-        const newItem = { ...data, id: newId };
+        const schema = this.schemas.find(s => s.name === collection);
+        const ctx = this.hookContext ?? { db: this, logger: this.logger };
+
+        let payload = data;
+        if (schema?.hooks?.beforeCreate) {
+            payload = (await schema.hooks.beforeCreate(payload, ctx)) ?? payload;
+        }
+
+        const newId = payload.id !== undefined ? payload.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);
+        const newItem = { ...payload, id: newId };
         this.store[collection].push(newItem);
 
         this.logger.info(`Created in '${collection}'`, { id: newItem.id });
         this._persist(collection);
+
+        if (schema?.hooks?.afterCreate) {
+            await schema.hooks.afterCreate(newItem, ctx);
+        }
+
         return newItem;
     }
 

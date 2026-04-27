@@ -1,5 +1,5 @@
 import type { JsonExpressKernel } from './kernel';
-import type { ModelSchema } from './schema/model';
+import type { ModelSchema, HookContext } from './schema/model';
 
 /**
  * 1. The Generic Request & Response
@@ -49,7 +49,16 @@ export interface QueryOptions {
 
 export interface IDatabaseAdapter {
     setSchemas?(schemas: ModelSchema[]): void;
-    
+
+    /**
+     * Receive the runtime context that will be handed to model hooks
+     * (`beforeCreate`, `afterCreate`). The kernel calls this once during boot,
+     * after all plugins have registered, so the adapter can pass `db`, the
+     * optional email provider, and a logger into hooks without touching the
+     * IoC container itself.
+     */
+    setHookContext?(ctx: HookContext): void;
+
     getAll<T = any>(collection: string, options?: QueryOptions): Promise<T[]>;
 
     getById<T = any>(collection: string, id: string, options?: QueryOptions): Promise<T>;

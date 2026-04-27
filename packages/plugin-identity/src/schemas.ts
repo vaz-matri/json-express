@@ -1,4 +1,5 @@
 import { defineModel, types, type ModelSchema } from '@json-express/core';
+import { userBeforeCreate, userAfterCreate } from './user-hooks';
 
 export const userModel: ModelSchema = defineModel({
     name: 'users',
@@ -8,6 +9,7 @@ export const userModel: ModelSchema = defineModel({
         passwordHash: types.string(),
         role: types.string({ default: 'user' }),
         emailVerified: types.boolean({ default: false }),
+        requirePasswordReset: types.boolean({ default: false }),
         createdAt: types.date(),
     },
     access: {
@@ -18,6 +20,10 @@ export const userModel: ModelSchema = defineModel({
         fields: {
             passwordHash: { read: 'admin', update: 'admin', create: 'admin' },
         },
+    },
+    hooks: {
+        beforeCreate: userBeforeCreate,
+        afterCreate: userAfterCreate,
     },
 });
 

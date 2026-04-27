@@ -1,4 +1,4 @@
-import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, QueryOptions, ModelSchema } from '@json-express/core';
+import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, QueryOptions, ModelSchema, HookContext } from '@json-express/core';
 import { ConsoleLogger } from '@json-express/core';
 
 function toSingular(name: string): string {
@@ -13,6 +13,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     private logger: ILogger;
     private idGenerator?: IIdGenerator;
     private schemas: ModelSchema[] = [];
+    private hookContext?: HookContext;
 
     constructor({ configProvider, logger, idGenerator }: { configProvider?: IConfigProvider; logger?: ILogger; idGenerator?: IIdGenerator } = {}) {
         this.config = configProvider;
@@ -22,6 +23,10 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
 
     public setSchemas(schemas: ModelSchema[]) {
         this.schemas = schemas;
+    }
+
+    public setHookContext(ctx: HookContext) {
+        this.hookContext = ctx;
     }
 
     public loadData(initialData: Record<string, any[]>) {
@@ -115,11 +120,24 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
             this.store[collection] = [];
         }
 
-        const newId = data.id !== undefined ? data.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);
-        const newItem = { ...data, id: newId };
+        const schema = this.schemas.find(s => s.name === collection);
+        const ctx = this.hookContext ?? { db: this, logger: this.logger };
+
+        let payload = data;
+        if (schema?.hooks?.beforeCreate) {
+            payload = (await schema.hooks.beforeCreate(payload, ctx)) ?? payload;
+        }
+
+        const newId = payload.id !== undefined ? payload.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);
+        const newItem = { ...payload, id: newId };
         this.store[collection].push(newItem);
 
         this.logger.info(`Created in '${collection}'`, { id: newItem.id });
+
+        if (schema?.hooks?.afterCreate) {
+            await schema.hooks.afterCreate(newItem, ctx);
+        }
+
         return newItem as T;
     }
 

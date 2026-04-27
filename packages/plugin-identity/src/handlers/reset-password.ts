@@ -34,7 +34,7 @@ export function makeResetPasswordHandler(deps: ResetPasswordDeps) {
         }
 
         const passwordHash = await hashPassword(newPassword);
-        await deps.db.update('users', String(user.id), { passwordHash });
+        await deps.db.update('users', String(user.id), { passwordHash, requirePasswordReset: false });
 
         // Defense: a successful reset implies the old credentials may have been compromised.
         // Revoke every refresh token currently issued for this user — they must re-login everywhere.
