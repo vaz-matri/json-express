@@ -142,12 +142,25 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async update<T = any>(collection: string, id: string, data: any): Promise<T> {
+        const schema = this.schemas.find(s => s.name === collection);
+        const ctx = this.hookContext ?? { db: this, logger: this.logger };
+
+        let patch = data;
+        if (schema?.hooks?.beforeUpdate) {
+            patch = (await schema.hooks.beforeUpdate(patch, ctx)) ?? patch;
+        }
+
         const { item, index } = this.findById(collection, id);
 
-        const updatedItem = { ...item, ...data, id };
+        const updatedItem = { ...item, ...patch, id };
         this.store[collection][index] = updatedItem;
 
         this.logger.info(`Updated '${id}' in '${collection}'`, { id });
+
+        if (schema?.hooks?.afterUpdate) {
+            await schema.hooks.afterUpdate(updatedItem, patch, ctx);
+        }
+
         return updatedItem as T;
     }
 

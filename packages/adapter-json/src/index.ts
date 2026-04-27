@@ -217,13 +217,26 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     }
 
     public async update(collection: string, id: string, data: any): Promise<any> {
+        const schema = this.schemas.find(s => s.name === collection);
+        const ctx = this.hookContext ?? { db: this, logger: this.logger };
+
+        let patch = data;
+        if (schema?.hooks?.beforeUpdate) {
+            patch = (await schema.hooks.beforeUpdate(patch, ctx)) ?? patch;
+        }
+
         const { item, index } = this.findById(collection, id);
 
-        const updatedItem = { ...item, ...data, id };
+        const updatedItem = { ...item, ...patch, id };
         this.store[collection][index] = updatedItem;
 
         this.logger.info(`Updated '${id}' in '${collection}'`, { id });
         this._persist(collection);
+
+        if (schema?.hooks?.afterUpdate) {
+            await schema.hooks.afterUpdate(updatedItem, patch, ctx);
+        }
+
         return updatedItem;
     }
 

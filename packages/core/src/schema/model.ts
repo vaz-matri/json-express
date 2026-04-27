@@ -39,15 +39,21 @@ export interface HookContext {
 export interface ModelHooks<T = any> {
     beforeCreate?: (data: Partial<T>, ctx: HookContext) => Promise<Partial<T>> | Partial<T>;
     afterCreate?: (data: T, ctx: HookContext) => Promise<void> | void;
+    beforeUpdate?: (patch: Partial<T>, ctx: HookContext) => Promise<Partial<T>> | Partial<T>;
+    afterUpdate?: (updated: T, patch: Partial<T>, ctx: HookContext) => Promise<void> | void;
     // We will expand these lifecycles as needed
 }
 
-export type AccessRule = 'public' | 'owner' | string | string[];
+export type AccessRule = 'public' | 'owner' | false | string | string[];
 
 /**
  * Per-field access overrides, evaluated against the authenticated caller.
  * Only restricts further than the op-level rule — a field absent from
  * `AuthRules.fields` is governed entirely by the op-level rule.
+ *
+ * Pass `false` for an op to deny that op for everyone — useful for fields
+ * that must only be mutated through dedicated workflows (e.g. `passwordHash`
+ * via /auth/password/change), never via generic CRUD.
  */
 export interface FieldAccess {
     read?: AccessRule;

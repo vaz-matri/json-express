@@ -1,5 +1,5 @@
 import { defineModel, types, type ModelSchema } from '@json-express/core';
-import { userBeforeCreate, userAfterCreate } from './user-hooks';
+import { userBeforeCreate, userAfterCreate, userBeforeUpdate, userAfterUpdate } from './user-hooks';
 
 export const userModel: ModelSchema = defineModel({
     name: 'users',
@@ -18,12 +18,16 @@ export const userModel: ModelSchema = defineModel({
         update: 'owner',
         delete: 'admin',
         fields: {
-            passwordHash: { read: 'admin', update: 'admin', create: 'admin' },
+            // passwordHash must only be mutated via /auth/password/{change,reset} —
+            // never via generic CRUD. `update: false` strips it from PATCH bodies.
+            passwordHash: { read: 'admin', create: 'admin', update: false },
         },
     },
     hooks: {
         beforeCreate: userBeforeCreate,
         afterCreate: userAfterCreate,
+        beforeUpdate: userBeforeUpdate,
+        afterUpdate: userAfterUpdate,
     },
 });
 

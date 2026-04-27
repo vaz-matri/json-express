@@ -117,6 +117,7 @@ function isFieldAllowed(
     user: Record<string, any> | null
 ): boolean {
     if (rule === undefined) return true;
+    if (rule === false) return false;
     if (rule === 'public') return true;
     if (rule === 'owner') {
         // Field-level owner rule defers to the parent record's ownership.
