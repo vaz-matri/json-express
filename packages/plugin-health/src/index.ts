@@ -1,17 +1,17 @@
-import type { IPlugin, IConfigProvider, JsonRequest, JsonResponse, ITransport, IDatabaseAdapter, ILogger } from '@json-express/core';
+import type { IPlugin, IConfigProvider, JsonRequest, JsonResponse, IDatabaseAdapter, ILogger } from '@json-express/core';
+import type { JsonExpressKernel } from '@json-express/core';
 
 export class HealthPlugin implements IPlugin {
     name = 'health';
 
-    async onBoot(kernel: any, configProvider: IConfigProvider) {
+    async onBoot(kernel: JsonExpressKernel, configProvider: IConfigProvider) {
         const logger: ILogger = kernel.container.resolve('logger').child({ component: 'Health' });
 
         try {
-            const transport = kernel.container.resolve('transport') as ITransport;
             const db = kernel.container.resolve('database') as IDatabaseAdapter;
 
             // --- /health endpoint ---
-            transport.registerRoute({
+            kernel.registerRoute({
                 method: 'GET',
                 path: '/health',
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
@@ -41,7 +41,7 @@ export class HealthPlugin implements IPlugin {
             });
 
             // --- /info endpoint ---
-            transport.registerRoute({
+            kernel.registerRoute({
                 method: 'GET',
                 path: '/info',
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {

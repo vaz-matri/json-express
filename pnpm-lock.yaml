@@ -331,6 +331,9 @@ importers:
       '@json-express/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@json-express/docs-swagger':
+        specifier: workspace:*
+        version: link:../../packages/docs-swagger
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../../packages/middleware-auth

@@ -5,7 +5,6 @@ import type {
     ILogger,
     IDatabaseAdapter,
     IEmailProvider,
-    ITransport,
     ModelSchema,
 } from '@json-express/core';
 import { ConsoleLogger, createJwtVerifier, type JsonExpressKernel } from '@json-express/core';
@@ -94,7 +93,6 @@ export class IdentityPlugin implements IPlugin {
         }
 
         const db = kernel.container.resolve<IDatabaseAdapter>('database');
-        const transport = kernel.container.resolve<ITransport>('transport');
 
         // Email provider is optional — verification + password-reset endpoints only mount when present.
         const emailProvider: IEmailProvider | null = kernel.container.hasRegistration('emailProvider')
@@ -149,11 +147,11 @@ export class IdentityPlugin implements IPlugin {
 
         await this.seedAdminIfEmpty(db);
 
-        // Mount auth routes directly via the transport. These are intentionally
-        // public — gating /login behind the auth middleware would be a chicken-
-        // and-egg problem. Routes registered here bypass the kernel's middleware
-        // composition step, which is the desired behavior.
-        transport.registerRoute({
+        // Mount auth routes via the kernel's central registry. These are
+        // intentionally public — gating /login behind the auth middleware
+        // would be a chicken-and-egg problem. Routes registered here declare
+        // no `middlewares`, so kernel.registerRoute does not compose any.
+        kernel.registerRoute({
             method: 'POST',
             path: '/auth/login',
             handler: makeLoginHandler({
@@ -164,7 +162,7 @@ export class IdentityPlugin implements IPlugin {
                 logger: this.logger,
             }),
         });
-        transport.registerRoute({
+        kernel.registerRoute({
             method: 'POST',
             path: '/auth/register',
             handler: makeRegisterHandler({
@@ -183,12 +181,12 @@ export class IdentityPlugin implements IPlugin {
                 logger: this.logger,
             }),
         });
-        transport.registerRoute({
+        kernel.registerRoute({
             method: 'POST',
             path: '/auth/refresh',
             handler: makeRefreshHandler({ db, issuer: issuerConfig, refreshTtlMs, logger: this.logger }),
         });
-        transport.registerRoute({
+        kernel.registerRoute({
             method: 'POST',
             path: '/auth/logout',
             handler: makeLogoutHandler({ db, logger: this.logger }),
@@ -202,12 +200,12 @@ export class IdentityPlugin implements IPlugin {
         ];
 
         if (emailProvider) {
-            transport.registerRoute({
+            kernel.registerRoute({
                 method: 'POST',
                 path: '/auth/verify',
                 handler: makeVerifyHandler({ db, logger: this.logger }),
             });
-            transport.registerRoute({
+            kernel.registerRoute({
                 method: 'POST',
                 path: '/auth/verify/resend',
                 handler: makeVerifyResendHandler({
@@ -220,7 +218,7 @@ export class IdentityPlugin implements IPlugin {
                     logger: this.logger,
                 }),
             });
-            transport.registerRoute({
+            kernel.registerRoute({
                 method: 'POST',
                 path: '/auth/password/forgot',
                 handler: makeForgotPasswordHandler({
@@ -233,7 +231,7 @@ export class IdentityPlugin implements IPlugin {
                     logger: this.logger,
                 }),
             });
-            transport.registerRoute({
+            kernel.registerRoute({
                 method: 'POST',
                 path: '/auth/password/reset',
                 handler: makeResetPasswordHandler({ db, minPasswordLength, logger: this.logger }),
@@ -252,7 +250,7 @@ export class IdentityPlugin implements IPlugin {
         }
 
         // change-password is always available — it doesn't depend on email.
-        transport.registerRoute({
+        kernel.registerRoute({
             method: 'POST',
             path: '/auth/password/change',
             handler: makeChangePasswordHandler({ db, verifier, minPasswordLength, logger: this.logger }),

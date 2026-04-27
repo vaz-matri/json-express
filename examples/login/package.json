@@ -11,6 +11,7 @@
         "@json-express/cli": "workspace:*",
         "@json-express/middleware-auth": "workspace:*",
         "@json-express/plugin-identity": "workspace:*",
-        "@json-express/adapter-json": "workspace:*"
+        "@json-express/adapter-json": "workspace:*",
+        "@json-express/docs-swagger": "workspace:*"
     }
 }

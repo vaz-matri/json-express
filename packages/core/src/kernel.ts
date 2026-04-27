@@ -26,6 +26,7 @@ class DefaultIdGenerator implements IIdGenerator {
 export class JsonExpressKernel {
     public container: AwilixContainer;
     public context: Map<string, any> = new Map();
+    public readonly routes: RouteDefinition[] = [];
     private middlewares: Map<string, IMiddleware> = new Map();
     private seeders: ISeeder[] = [];
     private plugins: IPlugin[] = [];
@@ -94,6 +95,26 @@ export class JsonExpressKernel {
         this.container.register({ emailProvider: asValue(provider) });
     }
 
+    // --- ROUTE REGISTRATION ---
+
+    public registerRoute(route: RouteDefinition) {
+        if (route.middlewares && route.middlewares.length > 0) {
+            const assignedMiddlewares = route.middlewares.map(name => {
+                const mw = this.middlewares.get(name);
+                if (!mw) {
+                    throw new Error(`❌ Middleware '${name}' is required by route ${route.path} but was not registered.`);
+                }
+                return mw;
+            });
+            route.handler = composeMiddlewares(route.handler, assignedMiddlewares);
+        }
+
+        this.routes.push(route);
+
+        const transport = this.container.resolve<ITransport>('transport');
+        transport.registerRoute(route);
+    }
+
     // --- THE BOOT SEQUENCE ---
 
     public async boot(collections: Array<string>, port: number = 3000, seedOptions?: { enable?: boolean, force?: boolean }) {
@@ -139,21 +160,11 @@ export class JsonExpressKernel {
         }
 
         // 3. Ask the API Generator to create abstract route definitions
-        const routes = await apiGenerator.generate(collections);
+        const generatedRoutes = await apiGenerator.generate(collections);
 
-        // 4. Pass those generated routes to the Transport Server
-        for (const route of routes) {
-            if (route.middlewares && route.middlewares.length > 0) {
-                const assignedMiddlewares = route.middlewares.map(name => {
-                    const mw = this.middlewares.get(name);
-                    if (!mw) {
-                        throw new Error(`❌ Middleware '${name}' is required by route ${route.path} but was not registered.`);
-                    }
-                    return mw;
-                });
-                route.handler = composeMiddlewares(route.handler, assignedMiddlewares);
-            }
-            transport.registerRoute(route);
+        // 4. Pass those generated routes through the kernel's central registry
+        for (const route of generatedRoutes) {
+            this.registerRoute(route);
         }
 
         // 4.5 Execute Seeders if explicitly enabled by CLI or configuration
@@ -181,23 +192,23 @@ export class JsonExpressKernel {
                 const docsPath = rawDocsPath.endsWith('/') ? rawDocsPath.slice(0, -1) : rawDocsPath;
 
                 // HTML Home Page
-                transport.registerRoute({
+                this.registerRoute({
                     method: 'GET',
                     path: docsPath,
                     handler: async (req) => ({
                         statusCode: 200,
                         headers: { 'Content-Type': 'text/html' },
-                        body: docProvider.renderDocumentation(routes, docsPath, req)
+                        body: docProvider.renderDocumentation(this.routes, docsPath, req)
                     })
                 });
 
                 // JSON Manifest
-                transport.registerRoute({
+                this.registerRoute({
                     method: 'GET',
                     path: `${docsPath}/json`,
                     handler: async (req) => ({
                         statusCode: 200,
-                        body: docProvider.getManifest(routes, req)
+                        body: docProvider.getManifest(this.routes, req)
                     })
                 });
 
