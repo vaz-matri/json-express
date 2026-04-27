@@ -136,10 +136,13 @@ export class RestApiGenerator implements IApiGenerator {
 
         // --- Core Auto-Generated Standard Routes --- //
         for (const collection of collections) {
+            const schema = schemaMap.get(collection);
+            if (schema?.exposeApi === false) continue;
+
             const basePath = `${prefix}/${collection}`;
             const itemPath = `${prefix}/${collection}/:id`;
 
-            const access = schemaMap.get(collection)?.access;
+            const access = schema?.access;
             const readRule = access?.read;
             const createRule = access?.create;
             const updateRule = access?.update;

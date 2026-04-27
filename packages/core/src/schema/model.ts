@@ -117,6 +117,11 @@ export interface ModelConfig<TFields extends Record<string, TypeDefinition> = an
     hooks?: ModelHooks;
     access?: AuthRules;
     graphql?: ModelGraphQLBlock;
+    /**
+     * Set to false to prevent auto-generating REST and GraphQL APIs for this model.
+     * Default: true
+     */
+    exposeApi?: boolean;
 }
 
 export interface ModelSchema<TFields extends Record<string, TypeDefinition> = any> extends ModelConfig<TFields> {

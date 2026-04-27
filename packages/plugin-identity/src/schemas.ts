@@ -38,6 +38,7 @@ export const roleModel: ModelSchema = defineModel({
 
 export const refreshTokenModel: ModelSchema = defineModel({
     name: 'refreshTokens',
+    exposeApi: false,
     fields: {
         id: types.id(),
         userId: types.string(),
@@ -56,6 +57,7 @@ export const refreshTokenModel: ModelSchema = defineModel({
 
 export const emailVerificationTokenModel: ModelSchema = defineModel({
     name: 'emailVerificationTokens',
+    exposeApi: false,
     fields: {
         id: types.id(),
         userId: types.string(),
@@ -73,6 +75,7 @@ export const emailVerificationTokenModel: ModelSchema = defineModel({
 
 export const passwordResetTokenModel: ModelSchema = defineModel({
     name: 'passwordResetTokens',
+    exposeApi: false,
     fields: {
         id: types.id(),
         userId: types.string(),
