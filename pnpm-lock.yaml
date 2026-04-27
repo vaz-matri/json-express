@@ -471,6 +471,12 @@ importers:
         specifier: workspace:*
         version: link:../core
 
+  packages/kv-memory:
+    dependencies:
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/logger-console:
     dependencies:
       '@json-express/core':
@@ -550,6 +556,12 @@ importers:
       awilix:
         specifier: ^10.0.1
         version: 10.0.2
+
+  packages/queue-memory:
+    dependencies:
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/seeder-faker:
     dependencies:

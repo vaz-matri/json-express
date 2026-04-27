@@ -208,3 +208,42 @@ export interface IEmailProvider {
     /** Optional health check, mirrors `IDatabaseAdapter.isHealthy`. */
     isHealthy?(): Promise<boolean>;
 }
+
+/**
+ * 14. The Key-Value Store Contract
+ * High-performance ephemeral storage with TTL semantics. Used for short-lived
+ * tokens (refresh / verification / password-reset), rate-limit counters, and
+ * other transient state that should not pollute the relational database.
+ */
+export interface KvSetOptions {
+    /** Time-To-Live in milliseconds */
+    ttlMs?: number;
+}
+
+export interface IKvStore {
+    get<T = any>(key: string): Promise<T | null>;
+    set(key: string, value: any, options?: KvSetOptions): Promise<void>;
+    delete(key: string): Promise<void>;
+    /** Optional health check */
+    isHealthy?(): Promise<boolean>;
+}
+
+/**
+ * 15. The Distributed Task Queue Contract
+ * Moves long-running tasks (emails, data crunching, heavy webhooks) off the
+ * main HTTP thread to dedicated background workers.
+ */
+export interface JobOptions {
+    /** Run after X milliseconds */
+    delay?: number;
+    /** Distributed cron schedule */
+    cron?: string;
+}
+
+export interface IQueueAdapter {
+    /** Pushes a job onto the queue (Non-blocking) */
+    enqueue(queueName: string, jobName: string, payload: any, options?: JobOptions): Promise<string>;
+
+    /** Registers a worker to process jobs off the queue */
+    registerWorker(queueName: string, handler: (job: { name: string, payload: any }) => Promise<void>): void;
+}

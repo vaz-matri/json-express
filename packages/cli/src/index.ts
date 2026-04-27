@@ -47,6 +47,8 @@ export const startServer = async () => {
     const availableDocs = installedDeps.filter(d => d.includes('docs-'));
     const availableIds = installedDeps.filter(d => d.includes('id-'));
     const availableEmails = installedDeps.filter(d => d.includes('email-'));
+    const availableKvStores = installedDeps.filter(d => d.includes('kv-'));
+    const availableQueues = installedDeps.filter(d => d.includes('queue-'));
     const availablePlugins = installedDeps.filter(d => d.includes('plugin-'));
 
     // --- Parse CLI Execution Flags ---
@@ -244,6 +246,30 @@ export const startServer = async () => {
             console.log(`🔌 Registered email provider: ${activeEmail}`);
         } catch (e: any) {
             console.error(`❌ Failed to load email provider:`, e?.message || e);
+        }
+    }
+
+    // ✅ Resolve and register the KV Store (opt-in — no default)
+    if (availableKvStores.length > 0) {
+        try {
+            const activeKv = await resolvePlugin('kv', availableKvStores, availableKvStores[0]);
+            const kvInstance = await loadPluginInstance(activeKv, [{ configProvider, logger: loggerInstance }]);
+            kernel.registerKvStore(kvInstance);
+            console.log(`🔌 Registered KV store: ${activeKv}`);
+        } catch (e: any) {
+            console.error(`❌ Failed to load KV store:`, e?.message || e);
+        }
+    }
+
+    // ✅ Resolve and register the Task Queue (opt-in — no default)
+    if (availableQueues.length > 0) {
+        try {
+            const activeQueue = await resolvePlugin('queue', availableQueues, availableQueues[0]);
+            const queueInstance = await loadPluginInstance(activeQueue, [{ configProvider, logger: loggerInstance }]);
+            kernel.registerQueue(queueInstance);
+            console.log(`🔌 Registered task queue: ${activeQueue}`);
+        } catch (e: any) {
+            console.error(`❌ Failed to load task queue:`, e?.message || e);
         }
     }
 

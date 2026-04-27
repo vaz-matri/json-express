@@ -11,7 +11,9 @@ import type {
     ILogger,
     IDocProvider,
     IIdGenerator,
-    IEmailProvider
+    IEmailProvider,
+    IKvStore,
+    IQueueAdapter
 } from './types';
 import { ConsoleLogger } from './logger';
 import { randomUUID } from 'crypto';
@@ -93,6 +95,14 @@ export class JsonExpressKernel {
 
     public registerEmailProvider(provider: IEmailProvider) {
         this.container.register({ emailProvider: asValue(provider) });
+    }
+
+    public registerKvStore(store: IKvStore) {
+        this.container.register({ kvStore: asValue(store) });
+    }
+
+    public registerQueue(queue: IQueueAdapter) {
+        this.container.register({ queue: asValue(queue) });
     }
 
     // --- ROUTE REGISTRATION ---
