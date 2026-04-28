@@ -340,6 +340,9 @@ importers:
       '@json-express/docs-swagger':
         specifier: workspace:*
         version: link:../../packages/docs-swagger
+      '@json-express/kv-memory':
+        specifier: workspace:*
+        version: link:../../packages/kv-memory
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../../packages/middleware-auth

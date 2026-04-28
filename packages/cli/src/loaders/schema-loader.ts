@@ -34,7 +34,9 @@ function inferSchemaFromJson(name: string, data: any[]): ModelSchema {
         }
     }
     
-    return defineModel({ name, fields });
+    const model = defineModel({ name, fields });
+    (model as any).__inferred = true;
+    return model;
 }
 
 export async function loadSchemasAndData(cwd: string): Promise<{ schemas: ModelSchema[], initialData: Record<string, any[]> }> {

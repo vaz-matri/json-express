@@ -10,9 +10,13 @@ const DEFAULT_RESET_URL = 'http://localhost:3000/auth/password/reset';
 const ARGON2_PREFIX = '$argon2';
 
 export async function userBeforeCreate(data: any, _ctx: HookContext): Promise<any> {
+    if (typeof data.password === 'string' && data.password) {
+        data.passwordHash = await hashPassword(data.password);
+        delete data.password;
+    }
+
     if (typeof data.passwordHash === 'string' && data.passwordHash && !data.passwordHash.startsWith(ARGON2_PREFIX)) {
         data.passwordHash = await hashPassword(data.passwordHash);
-        return data;
     }
 
     if (data.requirePasswordReset === true && !data.passwordHash) {
@@ -78,6 +82,11 @@ export async function userAfterCreate(data: any, ctx: HookContext): Promise<void
 }
 
 export async function userBeforeUpdate(patch: any, _ctx: HookContext): Promise<any> {
+    if (typeof patch.password === 'string' && patch.password) {
+        patch.passwordHash = await hashPassword(patch.password);
+        delete patch.password;
+    }
+
     if (typeof patch.passwordHash === 'string'
         && patch.passwordHash
         && !patch.passwordHash.startsWith(ARGON2_PREFIX)) {

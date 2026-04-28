@@ -293,8 +293,15 @@ export const startServer = async () => {
         const provided = plugin.provideSchemas();
         if (!Array.isArray(provided)) continue;
         for (const schema of provided) {
-            if (schemas.some(existing => existing.name === schema.name)) {
-                console.warn(`⚠️  Plugin '${plugin.name}' contributes schema '${schema.name}' but it already exists — keeping user-defined version.`);
+            const existingIdx = schemas.findIndex(existing => existing.name === schema.name);
+            if (existingIdx !== -1) {
+                const existing = schemas[existingIdx];
+                if ((existing as any).__inferred) {
+                    schemas[existingIdx] = schema;
+                    console.log(`🧬 Plugin '${plugin.name}' contributed schema: ${schema.name} (replaced JSON inferred schema)`);
+                } else {
+                    console.warn(`⚠️  Plugin '${plugin.name}' contributes schema '${schema.name}' but it already exists — keeping user-defined version.`);
+                }
                 continue;
             }
             schemas.push(schema);
