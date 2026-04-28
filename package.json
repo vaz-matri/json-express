@@ -8,7 +8,9 @@
     "dev": "pnpm -r --parallel run dev",
     "test": "vitest run",
     "e2e": "pnpm --filter './example/**' test",
-    "publish:all": "pnpm -r publish --access public"
+    "publish:all": "pnpm -r publish --access public",
+    "docs:dev": "pnpm --filter @json-express/docs run dev",
+    "docs:build": "pnpm --filter @json-express/docs run build"
   },
   "devDependencies": {
     "@json-express/core": "workspace:^",
