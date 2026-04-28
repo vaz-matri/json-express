@@ -17,7 +17,7 @@ export interface NumberOptions extends BaseOptions {
     max?: number;
 }
 
-export interface RelationOptions {
+export interface RelationOptions extends BaseOptions {
     target: string;
     type: 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
     foreignKey?: string; // The field on this record that holds the FK value (e.g. 'artistId')

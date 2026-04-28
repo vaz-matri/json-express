@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync, writeFileSync, renameSync, accessSync, existsSync, mkdirSync, constants } from 'fs';
 import { join, extname } from 'path';
-import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, ModelSchema, HookContext } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/core';
+import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, ModelSchema, HookContext, TypeDefinition } from '@json-express/core';
+import { ConsoleLogger, UniqueConstraintError } from '@json-express/core';
 
 export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     private store: Record<string, any[]> = {};
@@ -67,6 +67,25 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
                 }
             } catch (e) {
                 this.logger.warn(`Skipping unreadable file: ${dirent.name}`);
+            }
+        }
+    }
+
+    private enforceUniqueConstraints(collection: string, payload: any, excludeId?: string) {
+        const schema = this.schemas.find(s => s.name === collection);
+        if (!schema) return;
+
+        const items = this.store[collection] || [];
+        for (const [fieldName, fieldDefRaw] of Object.entries(schema.fields)) {
+            const fieldDef = fieldDefRaw as TypeDefinition;
+            if (fieldDef.options?.unique && payload[fieldName] !== undefined) {
+                const isDuplicate = items.some(item => 
+                    item[fieldName] === payload[fieldName] && 
+                    (excludeId ? String(item.id) !== String(excludeId) : true)
+                );
+                if (isDuplicate) {
+                    throw new UniqueConstraintError(collection, fieldName, payload[fieldName]);
+                }
             }
         }
     }
@@ -202,6 +221,8 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
             payload = (await schema.hooks.beforeCreate(payload, ctx)) ?? payload;
         }
 
+        this.enforceUniqueConstraints(collection, payload);
+
         const newId = payload.id !== undefined ? payload.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);
         const newItem = { ...payload, id: newId };
         this.store[collection].push(newItem);
@@ -224,6 +245,8 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
         if (schema?.hooks?.beforeUpdate) {
             patch = (await schema.hooks.beforeUpdate(patch, ctx)) ?? patch;
         }
+
+        this.enforceUniqueConstraints(collection, patch, id);
 
         const { item, index } = this.findById(collection, id);
 

@@ -232,8 +232,15 @@ export class RestApiGenerator implements IApiGenerator {
                         body[ownerField] = resolveUserId(verdict.user);
                     }
 
-                    const created = await this.db.create(collection, body);
-                    return { statusCode: 201, body: stripDeniedReadFields(created, access, verdict.user) };
+                    try {
+                        const created = await this.db.create(collection, body);
+                        return { statusCode: 201, body: stripDeniedReadFields(created, access, verdict.user) };
+                    } catch (e: any) {
+                        if (e && e.name === 'UniqueConstraintError') {
+                            return { statusCode: 400, body: { error: e.message } };
+                        }
+                        throw e;
+                    }
                 }
             }, createRule));
 
@@ -267,7 +274,10 @@ export class RestApiGenerator implements IApiGenerator {
                         const updated = await this.db.update(collection, id, body);
                         if (!updated) return notFound(collection, id);
                         return { statusCode: 200, body: stripDeniedReadFields(updated, access, verdict.user) };
-                    } catch {
+                    } catch (e: any) {
+                        if (e && e.name === 'UniqueConstraintError') {
+                            return { statusCode: 400, body: { error: e.message } };
+                        }
                         return notFound(collection, id);
                     }
                 }

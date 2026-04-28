@@ -1,5 +1,5 @@
-import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, QueryOptions, ModelSchema, HookContext } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/core';
+import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, QueryOptions, ModelSchema, HookContext, TypeDefinition } from '@json-express/core';
+import { ConsoleLogger, UniqueConstraintError } from '@json-express/core';
 
 function toSingular(name: string): string {
     if (name.endsWith('ies')) return name.slice(0, -3) + 'y';
@@ -39,6 +39,25 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
             });
         }
         this.store = initialData;
+    }
+
+    private enforceUniqueConstraints(collection: string, payload: any, excludeId?: string) {
+        const schema = this.schemas.find(s => s.name === collection);
+        if (!schema) return;
+
+        const items = this.store[collection] || [];
+        for (const [fieldName, fieldDefRaw] of Object.entries(schema.fields)) {
+            const fieldDef = fieldDefRaw as TypeDefinition;
+            if (fieldDef.options?.unique && payload[fieldName] !== undefined) {
+                const isDuplicate = items.some(item => 
+                    item[fieldName] === payload[fieldName] && 
+                    (excludeId ? String(item.id) !== String(excludeId) : true)
+                );
+                if (isDuplicate) {
+                    throw new UniqueConstraintError(collection, fieldName, payload[fieldName]);
+                }
+            }
+        }
     }
 
     private findById(collection: string, id: string) {
@@ -128,6 +147,8 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
             payload = (await schema.hooks.beforeCreate(payload, ctx)) ?? payload;
         }
 
+        this.enforceUniqueConstraints(collection, payload);
+
         const newId = payload.id !== undefined ? payload.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);
         const newItem = { ...payload, id: newId };
         this.store[collection].push(newItem);
@@ -149,6 +170,8 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
         if (schema?.hooks?.beforeUpdate) {
             patch = (await schema.hooks.beforeUpdate(patch, ctx)) ?? patch;
         }
+
+        this.enforceUniqueConstraints(collection, patch, id);
 
         const { item, index } = this.findById(collection, id);
 

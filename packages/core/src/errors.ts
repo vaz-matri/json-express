@@ -10,3 +10,17 @@ export class JsonExpressError extends Error {
         Object.setPrototypeOf(this, new.target.prototype); // Restore prototype chain
     }
 }
+
+export class UniqueConstraintError extends JsonExpressError {
+    public collection: string;
+    public field: string;
+    public value: any;
+
+    constructor(collection: string, field: string, value: any) {
+        super(`Unique constraint violated: ${collection}.${field} already exists.`, 400, { collection, field, value });
+        this.name = 'UniqueConstraintError';
+        this.collection = collection;
+        this.field = field;
+        this.value = value;
+    }
+}
