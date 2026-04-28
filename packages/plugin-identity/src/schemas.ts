@@ -24,9 +24,9 @@ export const userModel: ModelSchema = defineModel({
         fields: {
             // passwordHash must only be mutated via /auth/password/{change,reset} —
             // never via generic CRUD. `update: false` strips it from PATCH bodies.
-            passwordHash: { read: 'admin', create: 'admin', update: false },
+            passwordHash: { read: false, create: 'admin', update: false },
             // tokenVersion is internal session-invalidation state — never client-mutable.
-            tokenVersion: { read: 'admin', create: false, update: false },
+            tokenVersion: { read: false, create: false, update: false },
         },
     },
     hooks: {
