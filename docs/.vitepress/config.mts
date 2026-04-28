@@ -2,16 +2,34 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: "JSONExpress",
-  description: "Enterprise Headless CMS Meta-Framework",
+  description: "From JSON to Enterprise REST & GraphQL API in 0 seconds. Open-source Node.js meta-framework with pluggable databases, identity management, and 23 modular packages.",
   cleanUrls: true,
   sitemap: {
     hostname: 'https://json-express.dev'
   },
   head: [
     ['meta', { name: 'theme-color', content: '#2aa198' }],
+    ['meta', { name: 'keywords', content: 'JSONExpress, Node.js API framework, REST API generator, GraphQL API generator, headless CMS, TypeScript backend, JSON to API, pluggable database, Express.js alternative, Fastify framework' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: 'JSONExpress - Enterprise Headless CMS' }],
-    ['meta', { property: 'og:description', content: 'A blazingly fast, highly pluggable meta-framework for Node.js' }]
+    ['meta', { property: 'og:site_name', content: 'JSONExpress' }],
+    ['meta', { property: 'og:title', content: 'JSONExpress — From JSON to Enterprise API in 0 Seconds' }],
+    ['meta', { property: 'og:description', content: 'Open-source Node.js meta-framework that turns raw JSON files into production-ready REST & GraphQL APIs with built-in identity, security, and 23 pluggable packages.' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: 'JSONExpress — From JSON to Enterprise API in 0 Seconds' }],
+    ['meta', { name: 'twitter:description', content: 'Drop a JSON file → get REST & GraphQL. Scale to TypeScript when you need identity, hooks, and field-level security.' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' }],
+    ['script', { type: 'application/ld+json' }, JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "JSONExpress",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Cross-platform",
+      "description": "Open-source Node.js meta-framework that generates REST and GraphQL APIs from JSON files and TypeScript schemas.",
+      "url": "https://json-express.dev",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    })]
   ],
   markdown: {
     theme: {
@@ -22,7 +40,18 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/guide/getting-started' }
+      { text: 'Guide', link: '/guide/getting-started' },
+      { text: 'Ecosystem', link: '/packages/core' },
+      {
+        text: 'Quick Links',
+        items: [
+          { text: 'Zero-Config JSON Mode', link: '/guide/json-mode' },
+          { text: 'Schemas & Models', link: '/guide/schemas' },
+          { text: 'Identity & Auth', link: '/plugins/identity' },
+          { text: 'REST API Generator', link: '/packages/api-rest' },
+          { text: 'GraphQL API Generator', link: '/packages/api-graphql' },
+        ]
+      }
     ],
 
     sidebar: [
