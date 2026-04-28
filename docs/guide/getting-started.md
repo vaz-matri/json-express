@@ -1,3 +1,8 @@
+---
+title: Getting Started with JSON Express
+description: Learn how to initialize a JSON Express enterprise application, define your first schema, and auto-generate APIs.
+---
+
 # Getting Started
 
 Welcome to JSON Express!
