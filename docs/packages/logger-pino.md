@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/logger-pino package."
 
 # @json-express/logger-pino
 
-> Official package for Logger Pino integration in JSON Express.
+> Official package for Logger Pino integration in JSONExpress.
 
 ## Installation
 

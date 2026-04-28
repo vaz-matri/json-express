@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/adapter-json package.
 
 # @json-express/adapter-json
 
-> Official package for Adapter Json integration in JSON Express.
+> Official package for Adapter Json integration in JSONExpress.
 
 ## Installation
 

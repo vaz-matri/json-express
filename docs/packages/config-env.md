@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/config-env package."
 
 # @json-express/config-env
 
-> Official package for Config Env integration in JSON Express.
+> Official package for Config Env integration in JSONExpress.
 
 ## Installation
 

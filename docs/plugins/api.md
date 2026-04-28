@@ -1,15 +1,15 @@
 ---
 title: API Generation (REST & GraphQL)
-description: Learn how JSON Express automatically generates secure REST and GraphQL endpoints directly from your database schemas.
+description: Learn how JSONExpress automatically generates secure REST and GraphQL endpoints directly from your database schemas.
 ---
 
 # API Generation
 
 In a traditional Node.js application, developers waste countless hours writing repetitive routing controllers, serialization logic, and validation schemas. 
 
-JSON Express eliminates this completely. The framework uses specialized **API Generators** (`IApiGenerator`) to read your declarative `defineModel` schemas and dynamically compile production-ready network endpoints.
+JSONExpress eliminates this completely. The framework uses specialized **API Generators** (`IApiGenerator`) to read your declarative `defineModel` schemas and dynamically compile production-ready network endpoints.
 
-JSON Express ships with two official generators:
+JSONExpress ships with two official generators:
 1. **`@json-express/api-rest`**
 2. **`@json-express/api-graphql`**
 
@@ -50,7 +50,7 @@ GET /artists/1?_embed=albums
 
 If your frontend team prefers GraphQL, simply swap in `@json-express/api-graphql`. 
 
-This generator completely bypasses traditional REST routing. Instead, it parses your JSON Express schemas and compiles them into a strict, unified GraphQL Schema Definition Language (SDL) graph.
+This generator completely bypasses traditional REST routing. Instead, it parses your JSONExpress schemas and compiles them into a strict, unified GraphQL Schema Definition Language (SDL) graph.
 
 ### Auto-Generated Queries & Mutations
 For an `albums` model, the generator automatically creates:
@@ -60,7 +60,7 @@ For an `albums` model, the generator automatically creates:
 ### Resolving the N+1 Problem
 A common pitfall in GraphQL is the N+1 query problem, where fetching a list of 50 albums and their associated artists results in 51 separate database queries.
 
-The JSON Express GraphQL generator automatically intercepts deeply nested GraphQL AST queries and translates them into `QueryOptions.expand` arrays. This means the Database Adapter performs a highly optimized, single-pass resolution, completely eliminating the N+1 problem.
+The JSONExpress GraphQL generator automatically intercepts deeply nested GraphQL AST queries and translates them into `QueryOptions.expand` arrays. This means the Database Adapter performs a highly optimized, single-pass resolution, completely eliminating the N+1 problem.
 
 ---
 

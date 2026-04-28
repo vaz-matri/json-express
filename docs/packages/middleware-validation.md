@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/middleware-validation
 
 # @json-express/middleware-validation
 
-> Official package for Middleware Validation integration in JSON Express.
+> Official package for Middleware Validation integration in JSONExpress.
 
 ## Installation
 

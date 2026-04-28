@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/cli package."
 
 # @json-express/cli
 
-> Official package for Cli integration in JSON Express.
+> Official package for Cli integration in JSONExpress.
 
 ## Installation
 

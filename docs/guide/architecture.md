@@ -1,11 +1,11 @@
 ---
 title: Enterprise Architecture
-description: Understand the mental model, execution pipeline, and plugin architecture of the JSON Express meta-framework.
+description: Understand the mental model, execution pipeline, and plugin architecture of the JSONExpress meta-framework.
 ---
 
 # Enterprise Architecture
 
-To truly master JSON Express, you must first understand what it is. **JSON Express is not just an HTTP server.** It is a declarative, schema-driven meta-framework designed to eliminate boilerplate backend code while maintaining enterprise-grade extensibility.
+To truly master JSONExpress, you must first understand what it is. **JSONExpress is not just an HTTP server.** It is a declarative, schema-driven meta-framework designed to eliminate boilerplate backend code while maintaining enterprise-grade extensibility.
 
 Instead of writing hundreds of repetitive routes, controllers, and services, you simply define **Models**. The framework's kernel then passes these models through a highly optimized pipeline to auto-generate secure, production-ready APIs.
 

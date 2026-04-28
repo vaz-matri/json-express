@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/plugin-health package
 
 # @json-express/plugin-health
 
-> Official package for Plugin Health integration in JSON Express.
+> Official package for Plugin Health integration in JSONExpress.
 
 ## Installation
 

@@ -1,13 +1,13 @@
 ---
 title: Zero-Config JSON Mode
-description: Learn how JSON Express infers strict schemas and generates APIs directly from raw JSON files in zero seconds.
+description: Learn how JSONExpress infers strict schemas and generates APIs directly from raw JSON files in zero seconds.
 ---
 
 # Zero-Config JSON Mode
 
-JSON Express earned its name because of its most powerful prototyping feature: **Zero-Config JSON Inference**.
+JSONExpress earned its name because of its most powerful prototyping feature: **Zero-Config JSON Inference**.
 
-When building a new application, you often don't know exactly what your schema looks like yet. Writing TypeScript interfaces and database migrations upfront slows you down. With JSON Express, you can bypass all of that and start immediately.
+When building a new application, you often don't know exactly what your schema looks like yet. Writing TypeScript interfaces and database migrations upfront slows you down. With JSONExpress, you can bypass all of that and start immediately.
 
 ## The Magic of `/data`
 
@@ -19,7 +19,7 @@ Let's say you drop a file called `posts.json` into `/data/posts.json` with the f
 [
   {
     "id": "1",
-    "title": "Welcome to JSON Express",
+    "title": "Welcome to JSONExpress",
     "published": true,
     "views": 150
   }
@@ -27,7 +27,7 @@ Let's say you drop a file called `posts.json` into `/data/posts.json` with the f
 ```
 
 ### What happens next?
-When you start the JSON Express server, the Kernel's **Schema Loader** detects `posts.json`. Because no corresponding TypeScript model exists, the Kernel automatically:
+When you start the JSONExpress server, the Kernel's **Schema Loader** detects `posts.json`. Because no corresponding TypeScript model exists, the Kernel automatically:
 1.  **Infers the Schema:** It inspects the first object in the array and dynamically generates a strict `ModelSchema` in memory. It sees that `"title"` is a `string`, `"published"` is a `boolean`, and `"views"` is a `number`.
 2.  **Assigns the ID:** It identifies `"id"` and automatically configures it as the primary key.
 3.  **Generates the API:** It passes this inferred schema to the API Generators.

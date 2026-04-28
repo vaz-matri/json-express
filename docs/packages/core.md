@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/core package."
 
 # @json-express/core
 
-> Official package for Core integration in JSON Express.
+> Official package for Core integration in JSONExpress.
 
 ## Installation
 

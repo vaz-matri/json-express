@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/seeder-faker package.
 
 # @json-express/seeder-faker
 
-> Official package for Seeder Faker integration in JSON Express.
+> Official package for Seeder Faker integration in JSONExpress.
 
 ## Installation
 

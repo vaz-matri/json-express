@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/docs-swagger package.
 
 # @json-express/docs-swagger
 
-> Official package for Docs Swagger integration in JSON Express.
+> Official package for Docs Swagger integration in JSONExpress.
 
 ## Installation
 

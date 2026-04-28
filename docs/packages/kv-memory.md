@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/kv-memory package."
 
 # @json-express/kv-memory
 
-> Official package for Kv Memory integration in JSON Express.
+> Official package for Kv Memory integration in JSONExpress.
 
 ## Installation
 

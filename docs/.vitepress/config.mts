@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: "JSON Express",
+  title: "JSONExpress",
   description: "Enterprise Headless CMS Meta-Framework",
   cleanUrls: true,
   sitemap: {
@@ -10,7 +10,7 @@ export default defineConfig({
   head: [
     ['meta', { name: 'theme-color', content: '#2aa198' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: 'JSON Express - Enterprise Headless CMS' }],
+    ['meta', { property: 'og:title', content: 'JSONExpress - Enterprise Headless CMS' }],
     ['meta', { property: 'og:description', content: 'A blazingly fast, highly pluggable meta-framework for Node.js' }]
   ],
   markdown: {

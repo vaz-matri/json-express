@@ -1,15 +1,15 @@
 ---
 layout: home
-title: JSON Express - Enterprise Headless CMS Meta-Framework
+title: JSONExpress - Enterprise Headless CMS Meta-Framework
 description: Go from a pure JSON file to an Enterprise GraphQL and REST API in 0 seconds. A blazingly fast, highly pluggable meta-framework for Node.js.
 
 hero:
-  name: "JSON Express"
+  name: "JSONExpress"
   text: "The Next-Gen API Engine"
   tagline: "Go from a pure JSON file to an Enterprise GraphQL and REST API in 0 seconds. Scale to strict TypeScript models, native identity management, and pluggable databases when you need it."
   image:
     src: /logo.png # (Placeholder, we can add a real logo later)
-    alt: JSON Express Logo
+    alt: JSONExpress Logo
   actions:
     - theme: brand
       text: Get Started in 1 Minute
@@ -43,7 +43,7 @@ features:
 
 ## Show, Don't Tell
 
-Building an enterprise-grade backend shouldn't require thousands of lines of boilerplate. With JSON Express, you declaratively define your data, and the kernel handles the routing, database joins, and security.
+Building an enterprise-grade backend shouldn't require thousands of lines of boilerplate. With JSONExpress, you declaratively define your data, and the kernel handles the routing, database joins, and security.
 
 ### 1. Define your Model
 Create a simple TypeScript file to enforce strict validation and security rules.
@@ -68,7 +68,7 @@ export default defineModel({
 ```
 
 ### 2. Instantly Get Production APIs
-The moment you save, JSON Express generates a fully functional REST and GraphQL engine, strictly enforcing your access rules.
+The moment you save, JSONExpress generates a fully functional REST and GraphQL engine, strictly enforcing your access rules.
 
 ```http
 # REST Example (Resolving Relations)
@@ -88,7 +88,7 @@ query {
 
 ## The Pluggable Ecosystem
 
-JSON Express is a **Meta-Framework**. Its true power lies in its modular architecture. You only install the pieces you need, keeping your deployment blazingly fast and perfectly tailored to your infrastructure.
+JSONExpress is a **Meta-Framework**. Its true power lies in its modular architecture. You only install the pieces you need, keeping your deployment blazingly fast and perfectly tailored to your infrastructure.
 
 *   **Transports:** `@json-express/transport-express`, `@json-express/transport-fastify`
 *   **Databases:** `@json-express/adapter-memory`, `@json-express/adapter-json`, *(Postgres & MySQL coming soon)*
@@ -100,7 +100,7 @@ JSON Express is a **Meta-Framework**. Its true power lies in its modular archite
 
 ## Frequently Asked Questions
 
-**Is JSON Express a Database?**<br/>
+**Is JSONExpress a Database?**<br/>
 No. It is a highly optimized execution engine that sits between your HTTP server and your database. It translates network requests into database commands using Adapters.
 
 **Can I write custom Express/Fastify routes?**<br/>

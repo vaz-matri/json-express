@@ -1,13 +1,13 @@
 ---
-title: Getting Started with JSON Express
-description: Learn how to initialize a JSON Express enterprise application, define your first schema, and auto-generate APIs.
+title: Getting Started with JSONExpress
+description: Learn how to initialize a JSONExpress enterprise application, define your first schema, and auto-generate APIs.
 ---
 
 # Getting Started
 
-Welcome to JSON Express!
+Welcome to JSONExpress!
 
-JSON Express is an enterprise-grade meta-framework that turns standard JSON files or TypeScript models into a robust, high-performance Headless CMS.
+JSONExpress is an enterprise-grade meta-framework that turns standard JSON files or TypeScript models into a robust, high-performance Headless CMS.
 
 ## Installation
 

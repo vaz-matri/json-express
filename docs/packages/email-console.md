@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/email-console package
 
 # @json-express/email-console
 
-> Official package for Email Console integration in JSON Express.
+> Official package for Email Console integration in JSONExpress.
 
 ## Installation
 

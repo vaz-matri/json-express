@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/transport-express pac
 
 # @json-express/transport-express
 
-> Official package for Transport Express integration in JSON Express.
+> Official package for Transport Express integration in JSONExpress.
 
 ## Installation
 

@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/plugin-devcert packag
 
 # @json-express/plugin-devcert
 
-> Official package for Plugin Devcert integration in JSON Express.
+> Official package for Plugin Devcert integration in JSONExpress.
 
 ## Installation
 

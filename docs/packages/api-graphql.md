@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/api-graphql package."
 
 # @json-express/api-graphql
 
-> Official package for Api Graphql integration in JSON Express.
+> Official package for Api Graphql integration in JSONExpress.
 
 ## Installation
 

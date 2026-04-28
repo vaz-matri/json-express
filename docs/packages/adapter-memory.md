@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/adapter-memory packag
 
 # @json-express/adapter-memory
 
-> Official package for Adapter Memory integration in JSON Express.
+> Official package for Adapter Memory integration in JSONExpress.
 
 ## Installation
 

@@ -1,17 +1,17 @@
 ---
 title: Database Adapters & Compliance
-description: Learn how JSON Express connects to different databases and how to build your own adapter using the Compliance Suite.
+description: Learn how JSONExpress connects to different databases and how to build your own adapter using the Compliance Suite.
 ---
 
 # Database Adapters
 
-JSON Express is strictly **database agnostic**. 
+JSONExpress is strictly **database agnostic**. 
 
 The core framework never writes a single SQL query or direct database command. Instead, all database interactions are abstracted through the `IDatabaseAdapter` interface. This architectural decision means you can prototype your application using local memory, and swap to an enterprise MySQL or PostgreSQL database later without changing a single line of your application code.
 
 ## Available Adapters
 
-JSON Express provides two lightweight adapters out of the box for rapid development:
+JSONExpress provides two lightweight adapters out of the box for rapid development:
 
 1. **`@json-express/adapter-memory`**: A blazing fast, zero-dependency adapter that stores data in RAM. Perfect for automated testing and local scaffolding. Data is lost when the server restarts.
 2. **`@json-express/adapter-json`**: A file-based adapter that reads and writes to `.json` files in your `/data` directory. It uses atomic, debounced file-system writes to ensure your data persists across server restarts without corrupting files.
@@ -43,7 +43,7 @@ The adapter must check the schema for `beforeCreate`, `afterCreate`, `beforeUpda
 
 ## The Adapter Compliance Suite
 
-Because the responsibilities of an adapter are so strict, JSON Express ships with a formal **Compliance Suite**. 
+Because the responsibilities of an adapter are so strict, JSONExpress ships with a formal **Compliance Suite**. 
 
 If you are writing a new adapter, you do not need to guess if you implemented it correctly. You simply import the compliance suite into your testing framework (e.g., Vitest or Jest) and pass it an instance of your adapter.
 
@@ -53,7 +53,7 @@ import { test } from 'vitest';
 import { runAdapterComplianceTests } from '@json-express/core';
 import { PostgresAdapter } from '../src/index';
 
-test('Postgres Adapter complies with JSON Express core contracts', async () => {
+test('Postgres Adapter complies with JSONExpress core contracts', async () => {
     // The compliance suite handles its own assertions!
     await runAdapterComplianceTests(
         // Setup function
@@ -78,4 +78,4 @@ When you run the test, the suite will automatically:
 3. Attempt to insert duplicate records to assert that your adapter correctly throws a `UniqueConstraintError`.
 4. Ensure your adapter supports partial updates.
 
-If your adapter passes the compliance suite, you can confidently publish it to NPM knowing it will work flawlessly inside any JSON Express application.
+If your adapter passes the compliance suite, you can confidently publish it to NPM knowing it will work flawlessly inside any JSONExpress application.

@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/api-rest package."
 
 # @json-express/api-rest
 
-> Official package for Api Rest integration in JSON Express.
+> Official package for Api Rest integration in JSONExpress.
 
 ## Installation
 

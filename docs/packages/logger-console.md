@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/logger-console packag
 
 # @json-express/logger-console
 
-> Official package for Logger Console integration in JSON Express.
+> Official package for Logger Console integration in JSONExpress.
 
 ## Installation
 

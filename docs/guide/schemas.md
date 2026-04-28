@@ -1,11 +1,11 @@
 ---
 title: Schemas & Models
-description: Learn how to declaratively define database models, relations, and access control rules in JSON Express.
+description: Learn how to declaratively define database models, relations, and access control rules in JSONExpress.
 ---
 
 # Schemas & Models
 
-At the heart of JSON Express is the **Model Schema**. Instead of manually writing database migrations, SQL queries, and REST controllers, you simply define a declarative schema. The framework handles the rest.
+At the heart of JSONExpress is the **Model Schema**. Instead of manually writing database migrations, SQL queries, and REST controllers, you simply define a declarative schema. The framework handles the rest.
 
 ## Defining a Model
 
@@ -44,7 +44,7 @@ All field types accept a `BaseOptions` object which includes powerful constraint
 
 ## Relational Data
 
-JSON Express provides a robust relational engine. You can define relations natively within your schemas using `types.relation()`.
+JSONExpress provides a robust relational engine. You can define relations natively within your schemas using `types.relation()`.
 
 ```typescript
 // models/posts.ts
@@ -93,7 +93,7 @@ export default defineModel({
 ```
 
 ### The `owner` Rule
-If an access rule is set to `'owner'`, JSON Express performs automatic ownership enforcement.
+If an access rule is set to `'owner'`, JSONExpress performs automatic ownership enforcement.
 1. **On Create:** It automatically injects the ID of the currently authenticated user into the record.
 2. **On Read/Update:** It intercepts the request and ensures the client can only access records where the `ownerField` matches their JWT payload ID.
 
@@ -120,7 +120,7 @@ export default defineModel({
 ## Common Questions
 
 ### How do I use JSON files instead of TypeScript?
-If you are rapidly prototyping, you can drop a `.json` file into the `/data` directory (e.g., `/data/products.json`). The JSON Express CLI will automatically infer a basic schema from the JSON structure at boot time!
+If you are rapidly prototyping, you can drop a `.json` file into the `/data` directory (e.g., `/data/products.json`). The JSONExpress CLI will automatically infer a basic schema from the JSON structure at boot time!
 
 ### Can a plugin override a schema?
 Yes. Plugins (like `@json-express/plugin-identity`) can inject their own highly-secure schemas into the framework. Plugin schemas will safely overwrite any inferred JSON schemas of the same name.

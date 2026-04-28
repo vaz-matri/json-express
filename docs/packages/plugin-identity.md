@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/plugin-identity packa
 
 # @json-express/plugin-identity
 
-> Official package for Plugin Identity integration in JSON Express.
+> Official package for Plugin Identity integration in JSONExpress.
 
 ## Installation
 

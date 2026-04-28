@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/docs-light package."
 
 # @json-express/docs-light
 
-> Official package for Docs Light integration in JSON Express.
+> Official package for Docs Light integration in JSONExpress.
 
 ## Installation
 

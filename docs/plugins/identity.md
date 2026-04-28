@@ -1,11 +1,11 @@
 ---
 title: Identity & Auth Plugin
-description: Secure your JSON Express APIs with enterprise-grade identity management, Argon2 password hashing, and asymmetric JWT validation.
+description: Secure your JSONExpress APIs with enterprise-grade identity management, Argon2 password hashing, and asymmetric JWT validation.
 ---
 
 # Identity & Auth
 
-The `@json-express/plugin-identity` package transforms JSON Express from an open API into a highly secure, zero-trust backend. It provides automated user provisioning, state-of-the-art password hashing, and highly configurable JWT workflows out of the box.
+The `@json-express/plugin-identity` package transforms JSONExpress from an open API into a highly secure, zero-trust backend. It provides automated user provisioning, state-of-the-art password hashing, and highly configurable JWT workflows out of the box.
 
 ## Core Features
 
@@ -57,7 +57,7 @@ export default {
 ### The `tokenVersion` Pattern (Instant Revocation)
 Traditional JWTs cannot be revoked without a centralized blacklist, defeating the purpose of stateless authentication. 
 
-JSON Express solves this using the `tokenVersion` pattern. Every user record has an integer `tokenVersion` (which is excluded from REST responses). When a JWT is issued, this integer is stamped inside the payload. 
+JSONExpress solves this using the `tokenVersion` pattern. Every user record has an integer `tokenVersion` (which is excluded from REST responses). When a JWT is issued, this integer is stamped inside the payload. 
 
 If a user's account is compromised, an admin simply increments their `tokenVersion` in the database. The `middleware-auth` instantly rejects all previously issued JWTs because their stamped version no longer matches the database version.
 
@@ -85,4 +85,4 @@ ROOT_ADMIN_PASSWORD="super-secure-initial-password"
 Refresh tokens, email verification tokens, and password reset tokens are **not** stored in your primary database (MySQL, Postgres, etc.). They are highly ephemeral and are stored exclusively in the `IKvStore` (e.g., `@json-express/kv-redis`). This prevents your primary database from filling up with expired garbage data and offloads TTL-expiration to native Redis commands.
 
 ### Can I use Auth0 or Firebase instead?
-Yes. If you provide a `jwksUri` in the configuration, JSON Express will bypass the local `/auth/login` strategy entirely and act as a pure Resource Server, trusting the JWTs issued by your external Identity Provider.
+Yes. If you provide a `jwksUri` in the configuration, JSONExpress will bypass the local `/auth/login` strategy entirely and act as a pure Resource Server, trusting the JWTs issued by your external Identity Provider.

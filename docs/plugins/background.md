@@ -1,13 +1,13 @@
 ---
 title: KV & Queues (Background Services)
-description: Learn how to offload heavy tasks and manage ephemeral data using JSON Express's high-performance KV stores and Task Queues.
+description: Learn how to offload heavy tasks and manage ephemeral data using JSONExpress's high-performance KV stores and Task Queues.
 ---
 
 # KV & Queues (Background Services)
 
 Enterprise applications cannot rely solely on a primary relational database. If you store short-lived JWT refresh tokens in MySQL, your tables will bloat with expired garbage. If you send emails synchronously during an HTTP request, your users will experience massive latency spikes.
 
-To solve this, JSON Express introduces two dedicated background subsystems: the **Key-Value Store** and the **Task Queue**.
+To solve this, JSONExpress introduces two dedicated background subsystems: the **Key-Value Store** and the **Task Queue**.
 
 ## 1. The Key-Value Store (`IKvStore`)
 
@@ -27,7 +27,7 @@ await ctx.kvStore.set(`reset-token:${tokenHash}`, { userId: user.id }, {
 });
 ```
 
-Because JSON Express offloads password reset links and JWT refresh tokens to the KV store, your primary database remains incredibly clean and performant.
+Because JSONExpress offloads password reset links and JWT refresh tokens to the KV store, your primary database remains incredibly clean and performant.
 
 ---
 
@@ -67,7 +67,7 @@ export function setupWorkers(queue: IQueueAdapter) {
             const { email } = job.payload;
             
             // Perform the slow network operation here!
-            await myEmailProvider.send(email, "Welcome to JSON Express!");
+            await myEmailProvider.send(email, "Welcome to JSONExpress!");
         }
     });
 }

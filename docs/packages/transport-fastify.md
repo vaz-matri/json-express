@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/transport-fastify pac
 
 # @json-express/transport-fastify
 
-> Official package for Transport Fastify integration in JSON Express.
+> Official package for Transport Fastify integration in JSONExpress.
 
 ## Installation
 

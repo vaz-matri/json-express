@@ -7,7 +7,7 @@ description: Learn how to intercept database operations and trigger asynchronous
 
 While the API Generator handles all standard CRUD operations automatically, enterprise applications inevitably require custom business logic. You might need to hash a password before it saves to the database, or send a welcome email immediately after a user registers.
 
-JSON Express handles this cleanly using **Schema Lifecycle Hooks**.
+JSONExpress handles this cleanly using **Schema Lifecycle Hooks**.
 
 ## The Lifecycle
 

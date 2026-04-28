@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/middleware-auth packa
 
 # @json-express/middleware-auth
 
-> Official package for Middleware Auth integration in JSON Express.
+> Official package for Middleware Auth integration in JSONExpress.
 
 ## Installation
 

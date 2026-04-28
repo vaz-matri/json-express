@@ -5,7 +5,7 @@ description: "Official documentation for the @json-express/queue-memory package.
 
 # @json-express/queue-memory
 
-> Official package for Queue Memory integration in JSON Express.
+> Official package for Queue Memory integration in JSONExpress.
 
 ## Installation
 
