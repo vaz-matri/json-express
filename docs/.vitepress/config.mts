@@ -3,6 +3,12 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "JSON Express",
   description: "Enterprise Headless CMS Meta-Framework",
+  markdown: {
+    theme: {
+      light: 'solarized-light',
+      dark: 'solarized-dark'
+    }
+  },
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
