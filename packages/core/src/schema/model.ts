@@ -1,5 +1,5 @@
 import { TypeDefinition } from './types';
-import { JsonRequest, JsonResponse, IDatabaseAdapter, IEmailProvider, ILogger } from '../types';
+import { JsonRequest, JsonResponse, IDatabaseAdapter, IEmailProvider, ILogger, IKvStore, IQueueAdapter } from '../types';
 
 export interface RouteContext {
     db: IDatabaseAdapter;
@@ -33,6 +33,8 @@ export type CustomEndpointHandler = (
 export interface HookContext {
     db: IDatabaseAdapter;
     email?: IEmailProvider;
+    kvStore?: IKvStore;
+    queue?: IQueueAdapter;
     logger: ILogger;
 }
 

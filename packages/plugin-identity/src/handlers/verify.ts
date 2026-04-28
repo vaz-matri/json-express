@@ -1,9 +1,14 @@
-import type { IDatabaseAdapter, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
+import type { IDatabaseAdapter, IKvStore, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
 import { hashRandomToken } from '../crypto';
 
 interface VerifyDeps {
     db: IDatabaseAdapter;
+    kvStore: IKvStore;
     logger: ILogger;
+}
+
+interface VerifyRecord {
+    userId: string;
 }
 
 const GENERIC_ERROR = { statusCode: 400, body: { error: 'Invalid or expired verification token' } } as const;
@@ -16,9 +21,8 @@ export function makeVerifyHandler(deps: VerifyDeps) {
         }
 
         const tokenHash = hashRandomToken(token);
-        const matches = await deps.db.search('emailVerificationTokens', { tokenHash });
-        const record = matches?.[0];
-        if (!record || new Date(record.expiresAt).getTime() < Date.now()) {
+        const record = await deps.kvStore.get<VerifyRecord>(`ev:${tokenHash}`);
+        if (!record) {
             deps.logger.warn('Verify failed — token unknown or expired');
             return GENERIC_ERROR;
         }
@@ -26,11 +30,12 @@ export function makeVerifyHandler(deps: VerifyDeps) {
         const user = await deps.db.getById('users', record.userId).catch(() => null);
         if (!user) {
             deps.logger.warn('Verify failed — user no longer exists', { userId: record.userId });
+            await deps.kvStore.delete(`ev:${tokenHash}`);
             return GENERIC_ERROR;
         }
 
         await deps.db.update('users', String(user.id), { emailVerified: true });
-        await deps.db.delete('emailVerificationTokens', String(record.id));
+        await deps.kvStore.delete(`ev:${tokenHash}`);
 
         deps.logger.info('Email verified', { userId: user.id });
         return {

@@ -1,9 +1,10 @@
-import type { IDatabaseAdapter, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
+import type { IDatabaseAdapter, IKvStore, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
 import { signAccessToken, type JwtIssuerConfig } from '../jwt-issuer';
 import { generateRandomToken, hashRandomToken, verifyPassword } from '../crypto';
 
 interface LoginDeps {
     db: IDatabaseAdapter;
+    kvStore: IKvStore;
     issuer: JwtIssuerConfig;
     refreshTtlMs: number;
     requireVerifiedEmail: boolean;
@@ -58,14 +59,12 @@ export function makeLoginHandler(deps: LoginDeps) {
         );
 
         const refreshToken = generateRandomToken();
-        const expiresAt = new Date(Date.now() + deps.refreshTtlMs).toISOString();
-        await deps.db.create('refreshTokens', {
-            userId: String(user.id),
-            tokenHash: hashRandomToken(refreshToken),
-            expiresAt,
-            revoked: false,
-            createdAt: new Date().toISOString(),
-        });
+        const tokenHash = hashRandomToken(refreshToken);
+        await deps.kvStore.set(
+            `rt:${tokenHash}`,
+            { userId: String(user.id), version: user.tokenVersion ?? 0 },
+            { ttlMs: deps.refreshTtlMs }
+        );
 
         deps.logger.info('Login success', { userId: user.id });
         return {

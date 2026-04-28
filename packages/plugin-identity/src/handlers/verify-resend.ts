@@ -1,9 +1,10 @@
-import type { IDatabaseAdapter, IEmailProvider, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
+import type { IDatabaseAdapter, IEmailProvider, IKvStore, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
 import { generateRandomToken, hashRandomToken } from '../crypto';
 import { verificationEmail } from '../email-templates';
 
 interface VerifyResendDeps {
     db: IDatabaseAdapter;
+    kvStore: IKvStore;
     email: IEmailProvider;
     appName: string;
     verifyUrl: string;
@@ -24,12 +25,11 @@ export function makeVerifyResendHandler(deps: VerifyResendDeps) {
         const user = matches?.[0];
         if (user && !user.emailVerified) {
             const token = generateRandomToken();
-            await deps.db.create('emailVerificationTokens', {
-                userId: String(user.id),
-                tokenHash: hashRandomToken(token),
-                expiresAt: new Date(Date.now() + deps.verifyTtlMs).toISOString(),
-                createdAt: new Date().toISOString(),
-            });
+            await deps.kvStore.set(
+                `ev:${hashRandomToken(token)}`,
+                { userId: String(user.id) },
+                { ttlMs: deps.verifyTtlMs }
+            );
             try {
                 await deps.email.send(verificationEmail({
                     appName: deps.appName,

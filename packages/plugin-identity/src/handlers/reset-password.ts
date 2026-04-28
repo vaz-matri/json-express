@@ -1,10 +1,15 @@
-import type { IDatabaseAdapter, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
+import type { IDatabaseAdapter, IKvStore, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
 import { hashPassword, hashRandomToken } from '../crypto';
 
 interface ResetPasswordDeps {
     db: IDatabaseAdapter;
+    kvStore: IKvStore;
     minPasswordLength: number;
     logger: ILogger;
+}
+
+interface ResetRecord {
+    userId: string;
 }
 
 const GENERIC_ERROR = { statusCode: 400, body: { error: 'Invalid or expired reset token' } } as const;
@@ -20,9 +25,8 @@ export function makeResetPasswordHandler(deps: ResetPasswordDeps) {
         }
 
         const tokenHash = hashRandomToken(token);
-        const matches = await deps.db.search('passwordResetTokens', { tokenHash });
-        const record = matches?.[0];
-        if (!record || new Date(record.expiresAt).getTime() < Date.now()) {
+        const record = await deps.kvStore.get<ResetRecord>(`prt:${tokenHash}`);
+        if (!record) {
             deps.logger.warn('Reset failed — token unknown or expired');
             return GENERIC_ERROR;
         }
@@ -30,25 +34,23 @@ export function makeResetPasswordHandler(deps: ResetPasswordDeps) {
         const user = await deps.db.getById('users', record.userId).catch(() => null);
         if (!user) {
             deps.logger.warn('Reset failed — user no longer exists', { userId: record.userId });
+            await deps.kvStore.delete(`prt:${tokenHash}`);
             return GENERIC_ERROR;
         }
 
         const passwordHash = await hashPassword(newPassword);
-        await deps.db.update('users', String(user.id), { passwordHash, requirePasswordReset: false });
-
-        // Defense: a successful reset implies the old credentials may have been compromised.
-        // Revoke every refresh token currently issued for this user — they must re-login everywhere.
-        const sessions = await deps.db.search('refreshTokens', { userId: String(user.id) });
-        for (const s of sessions ?? []) {
-            if (!s.revoked) {
-                await deps.db.update('refreshTokens', String(s.id), { revoked: true });
-            }
-        }
+        // Bump tokenVersion to invalidate every outstanding refresh token issued
+        // before this reset — they'll fail the version check in /auth/refresh.
+        await deps.db.update('users', String(user.id), {
+            passwordHash,
+            requirePasswordReset: false,
+            tokenVersion: (user.tokenVersion ?? 0) + 1,
+        });
 
         // Single-use: consume the reset token.
-        await deps.db.delete('passwordResetTokens', String(record.id));
+        await deps.kvStore.delete(`prt:${tokenHash}`);
 
-        deps.logger.info('Password reset complete', { userId: user.id, sessionsRevoked: sessions?.length ?? 0 });
+        deps.logger.info('Password reset complete', { userId: user.id });
         return { statusCode: 200, body: { ok: true } };
     };
 }

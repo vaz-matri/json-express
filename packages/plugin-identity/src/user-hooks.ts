@@ -23,32 +23,58 @@ export async function userBeforeCreate(data: any, _ctx: HookContext): Promise<an
     return data;
 }
 
-export async function userAfterCreate(data: any, ctx: HookContext): Promise<void> {
-    if (data.requirePasswordReset !== true) return;
+async function deliverAdminResetEmail(
+    flow: 'create' | 'update',
+    target: { id: any; email: string },
+    token: string,
+    ctx: HookContext,
+): Promise<void> {
+    const userId = String(target.id);
 
-    const token = generateRandomToken();
-    await ctx.db.create('passwordResetTokens', {
-        userId: String(data.id),
-        tokenHash: hashRandomToken(token),
-        expiresAt: new Date(Date.now() + DEFAULT_RESET_TTL_MS).toISOString(),
-        createdAt: new Date().toISOString(),
-    });
+    if (!ctx.kvStore) {
+        ctx.logger.error('Admin-flow reset email skipped — kvStore missing from HookContext', { userId, flow });
+        return;
+    }
+
+    await ctx.kvStore.set(
+        `prt:${hashRandomToken(token)}`,
+        { userId },
+        { ttlMs: DEFAULT_RESET_TTL_MS },
+    );
+
+    if (ctx.queue) {
+        await ctx.queue.enqueue('emails', 'sendPasswordReset', {
+            email: target.email,
+            token,
+            userId,
+        });
+        ctx.logger.info(`Queued admin-${flow === 'create' ? 'provisioned' : 'triggered'} reset email`, { userId });
+        return;
+    }
 
     if (ctx.email) {
+        // No queue installed: fall back to a synchronous send so the flow still works in dev.
         try {
             await ctx.email.send(passwordResetEmail({
                 appName: DEFAULT_APP_NAME,
-                to: data.email,
+                to: target.email,
                 actionUrl: DEFAULT_RESET_URL,
                 token,
             }));
-            ctx.logger.info('Sent admin-provisioned reset email', { userId: data.id });
+            ctx.logger.info(`Sent admin-${flow === 'create' ? 'provisioned' : 'triggered'} reset email (sync fallback)`, { userId });
         } catch (e: any) {
-            ctx.logger.error('Failed to send admin-provisioned reset email', { userId: data.id, error: e?.message });
+            ctx.logger.error('Failed to send admin-flow reset email', { userId, error: e?.message });
         }
-    } else {
-        ctx.logger.warn('Admin-provisioned user created with requirePasswordReset, but no email provider — token stored, but no email sent', { userId: data.id });
+        return;
     }
+
+    ctx.logger.warn('Admin flipped requirePasswordReset, but no queue or email provider — token stored, no email sent', { userId });
+}
+
+export async function userAfterCreate(data: any, ctx: HookContext): Promise<void> {
+    if (data.requirePasswordReset !== true) return;
+    const token = generateRandomToken();
+    await deliverAdminResetEmail('create', { id: data.id, email: data.email }, token, ctx);
 }
 
 export async function userBeforeUpdate(patch: any, _ctx: HookContext): Promise<any> {
@@ -64,28 +90,6 @@ export async function userAfterUpdate(updated: any, patch: any, ctx: HookContext
     // Fire only when *this* patch flips the flag on, so subsequent patches
     // on the same user don't re-send the email while the flag is still true.
     if (patch.requirePasswordReset !== true) return;
-
     const token = generateRandomToken();
-    await ctx.db.create('passwordResetTokens', {
-        userId: String(updated.id),
-        tokenHash: hashRandomToken(token),
-        expiresAt: new Date(Date.now() + DEFAULT_RESET_TTL_MS).toISOString(),
-        createdAt: new Date().toISOString(),
-    });
-
-    if (ctx.email) {
-        try {
-            await ctx.email.send(passwordResetEmail({
-                appName: DEFAULT_APP_NAME,
-                to: updated.email,
-                actionUrl: DEFAULT_RESET_URL,
-                token,
-            }));
-            ctx.logger.info('Sent admin-triggered reset email', { userId: updated.id });
-        } catch (e: any) {
-            ctx.logger.error('Failed to send admin-triggered reset email', { userId: updated.id, error: e?.message });
-        }
-    } else {
-        ctx.logger.warn('Admin flipped requirePasswordReset, but no email provider — token stored, but no email sent', { userId: updated.id });
-    }
+    await deliverAdminResetEmail('update', { id: updated.id, email: updated.email }, token, ctx);
 }

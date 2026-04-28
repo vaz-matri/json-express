@@ -10,6 +10,10 @@ export const userModel: ModelSchema = defineModel({
         role: types.string({ default: 'user' }),
         emailVerified: types.boolean({ default: false }),
         requirePasswordReset: types.boolean({ default: false }),
+        // Bumped on password reset/change to invalidate all outstanding refresh
+        // tokens in O(1) — refresh handler rejects tokens whose embedded
+        // version no longer matches the user's current version.
+        tokenVersion: types.number({ default: 0 }),
         createdAt: types.date(),
     },
     access: {
@@ -21,6 +25,8 @@ export const userModel: ModelSchema = defineModel({
             // passwordHash must only be mutated via /auth/password/{change,reset} —
             // never via generic CRUD. `update: false` strips it from PATCH bodies.
             passwordHash: { read: 'admin', create: 'admin', update: false },
+            // tokenVersion is internal session-invalidation state — never client-mutable.
+            tokenVersion: { read: 'admin', create: false, update: false },
         },
     },
     hooks: {
@@ -46,65 +52,7 @@ export const roleModel: ModelSchema = defineModel({
     },
 });
 
-export const refreshTokenModel: ModelSchema = defineModel({
-    name: 'refreshTokens',
-    exposeApi: false,
-    fields: {
-        id: types.id(),
-        userId: types.string(),
-        tokenHash: types.string(),
-        expiresAt: types.date(),
-        revoked: types.boolean({ default: false }),
-        createdAt: types.date(),
-    },
-    access: {
-        read: 'admin',
-        create: 'admin',
-        update: 'admin',
-        delete: 'admin',
-    },
-});
-
-export const emailVerificationTokenModel: ModelSchema = defineModel({
-    name: 'emailVerificationTokens',
-    exposeApi: false,
-    fields: {
-        id: types.id(),
-        userId: types.string(),
-        tokenHash: types.string(),
-        expiresAt: types.date(),
-        createdAt: types.date(),
-    },
-    access: {
-        read: 'admin',
-        create: 'admin',
-        update: 'admin',
-        delete: 'admin',
-    },
-});
-
-export const passwordResetTokenModel: ModelSchema = defineModel({
-    name: 'passwordResetTokens',
-    exposeApi: false,
-    fields: {
-        id: types.id(),
-        userId: types.string(),
-        tokenHash: types.string(),
-        expiresAt: types.date(),
-        createdAt: types.date(),
-    },
-    access: {
-        read: 'admin',
-        create: 'admin',
-        update: 'admin',
-        delete: 'admin',
-    },
-});
-
 export const identitySchemas: ModelSchema[] = [
     userModel,
     roleModel,
-    refreshTokenModel,
-    emailVerificationTokenModel,
-    passwordResetTokenModel,
 ];

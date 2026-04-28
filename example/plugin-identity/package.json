@@ -11,6 +11,8 @@
         "@json-express/cli": "workspace:*",
         "@json-express/middleware-auth": "workspace:*",
         "@json-express/email-console": "workspace:*",
+        "@json-express/kv-memory": "workspace:*",
+        "@json-express/queue-memory": "workspace:*",
         "@json-express/plugin-identity": "workspace:*"
     },
     "devDependencies": {

@@ -1,12 +1,18 @@
-import type { IDatabaseAdapter, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
+import type { IDatabaseAdapter, IKvStore, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
 import { signAccessToken, type JwtIssuerConfig } from '../jwt-issuer';
 import { generateRandomToken, hashRandomToken } from '../crypto';
 
 interface RefreshDeps {
     db: IDatabaseAdapter;
+    kvStore: IKvStore;
     issuer: JwtIssuerConfig;
     refreshTtlMs: number;
     logger: ILogger;
+}
+
+interface RefreshSession {
+    userId: string;
+    version: number;
 }
 
 const GENERIC_REFRESH_ERROR = { statusCode: 401, body: { error: 'Invalid or expired refresh token' } } as const;
@@ -19,31 +25,37 @@ export function makeRefreshHandler(deps: RefreshDeps) {
         }
 
         const tokenHash = hashRandomToken(refreshToken);
-        const matches = await deps.db.search('refreshTokens', { tokenHash });
-        const record = matches?.[0];
-        if (!record || record.revoked || new Date(record.expiresAt).getTime() < Date.now()) {
-            deps.logger.warn('Refresh failed — token unknown/revoked/expired');
+        const session = await deps.kvStore.get<RefreshSession>(`rt:${tokenHash}`);
+        if (!session) {
+            deps.logger.warn('Refresh failed — token unknown or expired');
             return GENERIC_REFRESH_ERROR;
         }
 
-        const user = await deps.db.getById('users', record.userId).catch(() => null);
+        const user = await deps.db.getById('users', session.userId).catch(() => null);
         if (!user) {
-            deps.logger.warn('Refresh failed — user no longer exists', { userId: record.userId });
+            deps.logger.warn('Refresh failed — user no longer exists', { userId: session.userId });
+            await deps.kvStore.delete(`rt:${tokenHash}`);
             return GENERIC_REFRESH_ERROR;
         }
 
-        // Rotation: revoke the used token, issue a new pair.
-        await deps.db.update('refreshTokens', String(record.id), { revoked: true });
+        // Token-version check: a password reset/change since this token was issued
+        // bumps user.tokenVersion. Mismatched tokens are cryptographically dead.
+        if ((user.tokenVersion ?? 0) !== session.version) {
+            deps.logger.warn('Refresh failed — tokenVersion mismatch (password reset/change)', { userId: user.id });
+            await deps.kvStore.delete(`rt:${tokenHash}`);
+            return GENERIC_REFRESH_ERROR;
+        }
+
+        // Rotation: invalidate the used token, issue a new pair.
+        await deps.kvStore.delete(`rt:${tokenHash}`);
 
         const newRefresh = generateRandomToken();
-        const newExpiresAt = new Date(Date.now() + deps.refreshTtlMs).toISOString();
-        await deps.db.create('refreshTokens', {
-            userId: String(user.id),
-            tokenHash: hashRandomToken(newRefresh),
-            expiresAt: newExpiresAt,
-            revoked: false,
-            createdAt: new Date().toISOString(),
-        });
+        const newHash = hashRandomToken(newRefresh);
+        await deps.kvStore.set(
+            `rt:${newHash}`,
+            { userId: String(user.id), version: user.tokenVersion ?? 0 },
+            { ttlMs: deps.refreshTtlMs }
+        );
 
         const accessToken = signAccessToken(
             {

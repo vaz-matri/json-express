@@ -1,10 +1,11 @@
-import type { IDatabaseAdapter, IEmailProvider, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
+import type { IDatabaseAdapter, IEmailProvider, IKvStore, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
 import { signAccessToken, type JwtIssuerConfig } from '../jwt-issuer';
 import { generateRandomToken, hashPassword, hashRandomToken } from '../crypto';
 import { verificationEmail } from '../email-templates';
 
 interface RegisterDeps {
     db: IDatabaseAdapter;
+    kvStore: IKvStore;
     issuer: JwtIssuerConfig;
     refreshTtlMs: number;
     allowRegistration: boolean;
@@ -50,12 +51,11 @@ export function makeRegisterHandler(deps: RegisterDeps) {
         // Fire-and-forget the verification email (best-effort).
         if (deps.emailProvider && deps.verifyUrl) {
             const token = generateRandomToken();
-            await deps.db.create('emailVerificationTokens', {
-                userId: String(user.id),
-                tokenHash: hashRandomToken(token),
-                expiresAt: new Date(Date.now() + deps.verifyTtlMs).toISOString(),
-                createdAt: new Date().toISOString(),
-            });
+            await deps.kvStore.set(
+                `ev:${hashRandomToken(token)}`,
+                { userId: String(user.id) },
+                { ttlMs: deps.verifyTtlMs }
+            );
             try {
                 await deps.emailProvider.send(verificationEmail({
                     appName: deps.appName,
@@ -97,14 +97,11 @@ export function makeRegisterHandler(deps: RegisterDeps) {
         );
 
         const refreshToken = generateRandomToken();
-        const expiresAt = new Date(Date.now() + deps.refreshTtlMs).toISOString();
-        await deps.db.create('refreshTokens', {
-            userId: String(user.id),
-            tokenHash: hashRandomToken(refreshToken),
-            expiresAt,
-            revoked: false,
-            createdAt: new Date().toISOString(),
-        });
+        await deps.kvStore.set(
+            `rt:${hashRandomToken(refreshToken)}`,
+            { userId: String(user.id), version: user.tokenVersion ?? 0 },
+            { ttlMs: deps.refreshTtlMs }
+        );
 
         deps.logger.info('User registered', { userId: user.id });
         return {

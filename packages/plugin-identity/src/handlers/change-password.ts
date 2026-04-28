@@ -52,17 +52,14 @@ export function makeChangePasswordHandler(deps: ChangePasswordDeps) {
         }
 
         const passwordHash = await hashPassword(newPassword);
-        await deps.db.update('users', String(user.id), { passwordHash });
+        // Bump tokenVersion alongside the password so every outstanding refresh
+        // token fails the version check on /auth/refresh — every device must re-login.
+        await deps.db.update('users', String(user.id), {
+            passwordHash,
+            tokenVersion: (user.tokenVersion ?? 0) + 1,
+        });
 
-        // Per Phase 2 default: revoke ALL refresh tokens — every device must re-login.
-        const sessions = await deps.db.search('refreshTokens', { userId: String(user.id) });
-        for (const s of sessions ?? []) {
-            if (!s.revoked) {
-                await deps.db.update('refreshTokens', String(s.id), { revoked: true });
-            }
-        }
-
-        deps.logger.info('Password changed', { userId: user.id, sessionsRevoked: sessions?.length ?? 0 });
+        deps.logger.info('Password changed', { userId: user.id });
         return { statusCode: 200, body: { ok: true } };
     };
 }

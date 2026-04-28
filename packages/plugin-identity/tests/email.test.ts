@@ -4,6 +4,7 @@ import type {
     IConfigProvider,
     IDatabaseAdapter,
     IEmailProvider,
+    IKvStore,
     ITransport,
     EmailMessage,
     JsonRequest,
@@ -12,7 +13,10 @@ import type {
 } from '@json-express/core';
 import { JsonExpressKernel, ConsoleLogger } from '@json-express/core';
 import { MemoryDatabaseAdapter } from '@json-express/adapter-memory';
+import { MemoryKvStore } from '@json-express/kv-memory';
+import { MemoryQueueAdapter } from '@json-express/queue-memory';
 import { IdentityPlugin, signAccessToken } from '../src/index';
+import { hashRandomToken } from '../src/crypto';
 
 const SECRET = 'email-flow-test-secret';
 
@@ -62,6 +66,7 @@ function makeConfig(overrides: Record<string, any> = {}): IConfigProvider {
 interface Harness {
     plugin: IdentityPlugin;
     db: IDatabaseAdapter;
+    kvStore: IKvStore;
     transport: FakeTransport;
     email: RecordingEmailProvider;
     config: IConfigProvider;
@@ -71,11 +76,15 @@ async function bootHarness(configOverrides: Record<string, any> = {}): Promise<H
     const kernel = new JsonExpressKernel();
     const config = makeConfig(configOverrides);
     const db = new MemoryDatabaseAdapter({ logger: new ConsoleLogger({ silent: true } as any) });
+    const kvStore = new MemoryKvStore({ configProvider: config });
+    const queue = new MemoryQueueAdapter({ configProvider: config });
     const transport = new FakeTransport();
     const email = new RecordingEmailProvider();
 
     kernel.registerConfigProvider(config);
     kernel.registerDatabase(db);
+    kernel.registerKvStore(kvStore);
+    kernel.registerQueue(queue);
     kernel.registerTransport(transport);
     kernel.registerEmailProvider(email);
     kernel.container.register({
@@ -85,7 +94,7 @@ async function bootHarness(configOverrides: Record<string, any> = {}): Promise<H
     const plugin = new IdentityPlugin({ configProvider: config });
     await plugin.onBoot(kernel, config);
 
-    return { plugin, db, transport, email, config };
+    return { plugin, db, kvStore, transport, email, config };
 }
 
 /** Pulls the `?token=<value>` out of the body of the most recent recorded email. */
@@ -111,7 +120,7 @@ describe('IdentityPlugin — registration sends verification email when provider
         expect(paths).toContain('POST /auth/password/change');
     });
 
-    it('sends verification email and creates a token row on register', async () => {
+    it('sends verification email and stores a KV entry on register', async () => {
         const res = await h.transport.invoke('POST', '/auth/register', {
             email: 'alice@example.com',
             password: 'password-1234',
@@ -123,8 +132,8 @@ describe('IdentityPlugin — registration sends verification email when provider
         expect(sent.to).toBe('alice@example.com');
         expect(sent.subject).toContain('Verify');
         expect(sent.subject).toContain('TestApp');
-        const tokens = await h.db.getAll('emailVerificationTokens');
-        expect(tokens).toHaveLength(1);
+        const token = tokenFrom(h.email.sent[0]);
+        expect(await h.kvStore.get(`ev:${hashRandomToken(token)}`)).not.toBeNull();
     });
 
     it('verifies the email when /auth/verify consumes the token', async () => {

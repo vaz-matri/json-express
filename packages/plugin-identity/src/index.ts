@@ -5,11 +5,14 @@ import type {
     ILogger,
     IDatabaseAdapter,
     IEmailProvider,
+    IKvStore,
+    IQueueAdapter,
     ModelSchema,
 } from '@json-express/core';
 import { ConsoleLogger, createJwtVerifier, type JsonExpressKernel } from '@json-express/core';
 import { identitySchemas } from './schemas';
 import { hashPassword } from './crypto';
+import { passwordResetEmail } from './email-templates';
 import { type JwtIssuerConfig } from './jwt-issuer';
 import { makeLoginHandler } from './handlers/login';
 import { makeRegisterHandler } from './handlers/register';
@@ -25,9 +28,6 @@ export {
     identitySchemas,
     userModel,
     roleModel,
-    refreshTokenModel,
-    emailVerificationTokenModel,
-    passwordResetTokenModel,
 } from './schemas';
 export {
     hashPassword,
@@ -94,9 +94,23 @@ export class IdentityPlugin implements IPlugin {
 
         const db = kernel.container.resolve<IDatabaseAdapter>('database');
 
+        // KV store is required — refresh / verify / reset tokens live there.
+        if (!kernel.container.hasRegistration('kvStore')) {
+            throw new Error(
+                '@json-express/plugin-identity requires an IKvStore. ' +
+                'Install @json-express/kv-memory (dev) or @json-express/kv-redis (prod).'
+            );
+        }
+        const kvStore = kernel.container.resolve<IKvStore>('kvStore');
+
         // Email provider is optional — verification + password-reset endpoints only mount when present.
         const emailProvider: IEmailProvider | null = kernel.container.hasRegistration('emailProvider')
             ? kernel.container.resolve<IEmailProvider>('emailProvider')
+            : null;
+
+        // Queue is optional — admin-flow emails fall back to a synchronous send when missing.
+        const queue: IQueueAdapter | null = kernel.container.hasRegistration('queue')
+            ? kernel.container.resolve<IQueueAdapter>('queue')
             : null;
 
         const secret = configProvider.get<string | undefined>('auth.secret', undefined);
@@ -147,6 +161,28 @@ export class IdentityPlugin implements IPlugin {
 
         await this.seedAdminIfEmpty(db);
 
+        // Background email worker — only registered when both queue and email
+        // provider are present. Hooks enqueue jobs here so admin-flow HTTP
+        // responses don't block on SMTP.
+        if (queue && emailProvider) {
+            queue.registerWorker('emails', async (job) => {
+                if (job.name === 'sendPasswordReset') {
+                    try {
+                        await emailProvider.send(passwordResetEmail({
+                            appName,
+                            to: job.payload.email,
+                            from: fromAddress,
+                            actionUrl: resetUrl,
+                            token: job.payload.token,
+                        }));
+                        this.logger.info('Sent queued admin-provisioned reset email', { userId: job.payload.userId });
+                    } catch (e: any) {
+                        this.logger.error('Failed to send queued admin-provisioned reset email', { userId: job.payload.userId, error: e?.message });
+                    }
+                }
+            });
+        }
+
         // Mount auth routes via the kernel's central registry. These are
         // intentionally public — gating /login behind the auth middleware
         // would be a chicken-and-egg problem. Routes registered here declare
@@ -156,6 +192,7 @@ export class IdentityPlugin implements IPlugin {
             path: '/auth/login',
             handler: makeLoginHandler({
                 db,
+                kvStore,
                 issuer: issuerConfig,
                 refreshTtlMs,
                 requireVerifiedEmail,
@@ -167,6 +204,7 @@ export class IdentityPlugin implements IPlugin {
             path: '/auth/register',
             handler: makeRegisterHandler({
                 db,
+                kvStore,
                 issuer: issuerConfig,
                 refreshTtlMs,
                 allowRegistration,
@@ -184,12 +222,12 @@ export class IdentityPlugin implements IPlugin {
         kernel.registerRoute({
             method: 'POST',
             path: '/auth/refresh',
-            handler: makeRefreshHandler({ db, issuer: issuerConfig, refreshTtlMs, logger: this.logger }),
+            handler: makeRefreshHandler({ db, kvStore, issuer: issuerConfig, refreshTtlMs, logger: this.logger }),
         });
         kernel.registerRoute({
             method: 'POST',
             path: '/auth/logout',
-            handler: makeLogoutHandler({ db, logger: this.logger }),
+            handler: makeLogoutHandler({ kvStore, logger: this.logger }),
         });
 
         const mounted: string[] = [
@@ -203,13 +241,14 @@ export class IdentityPlugin implements IPlugin {
             kernel.registerRoute({
                 method: 'POST',
                 path: '/auth/verify',
-                handler: makeVerifyHandler({ db, logger: this.logger }),
+                handler: makeVerifyHandler({ db, kvStore, logger: this.logger }),
             });
             kernel.registerRoute({
                 method: 'POST',
                 path: '/auth/verify/resend',
                 handler: makeVerifyResendHandler({
                     db,
+                    kvStore,
                     email: emailProvider,
                     appName,
                     verifyUrl,
@@ -223,6 +262,7 @@ export class IdentityPlugin implements IPlugin {
                 path: '/auth/password/forgot',
                 handler: makeForgotPasswordHandler({
                     db,
+                    kvStore,
                     email: emailProvider,
                     appName,
                     resetUrl,
@@ -234,7 +274,7 @@ export class IdentityPlugin implements IPlugin {
             kernel.registerRoute({
                 method: 'POST',
                 path: '/auth/password/reset',
-                handler: makeResetPasswordHandler({ db, minPasswordLength, logger: this.logger }),
+                handler: makeResetPasswordHandler({ db, kvStore, minPasswordLength, logger: this.logger }),
             });
             mounted.push(
                 'POST /auth/verify',

@@ -174,7 +174,13 @@ export class JsonExpressKernel {
             const email = this.container.hasRegistration('emailProvider')
                 ? this.container.resolve<IEmailProvider>('emailProvider')
                 : undefined;
-            db.setHookContext({ db, email, logger: this.logger });
+            const kvStore = this.container.hasRegistration('kvStore')
+                ? this.container.resolve<IKvStore>('kvStore')
+                : undefined;
+            const queue = this.container.hasRegistration('queue')
+                ? this.container.resolve<IQueueAdapter>('queue')
+                : undefined;
+            db.setHookContext({ db, email, kvStore, queue, logger: this.logger });
         }
 
         // 3. Ask the API Generator to create abstract route definitions

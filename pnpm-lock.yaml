@@ -255,12 +255,18 @@ importers:
       '@json-express/email-console':
         specifier: workspace:*
         version: link:../../packages/email-console
+      '@json-express/kv-memory':
+        specifier: workspace:*
+        version: link:../../packages/kv-memory
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../../packages/middleware-auth
       '@json-express/plugin-identity':
         specifier: workspace:*
         version: link:../../packages/plugin-identity
+      '@json-express/queue-memory':
+        specifier: workspace:*
+        version: link:../../packages/queue-memory
     devDependencies:
       '@playwright/test':
         specifier: ^1.42.1
@@ -550,6 +556,12 @@ importers:
       '@json-express/adapter-memory':
         specifier: workspace:*
         version: link:../adapter-memory
+      '@json-express/kv-memory':
+        specifier: workspace:*
+        version: link:../kv-memory
+      '@json-express/queue-memory':
+        specifier: workspace:*
+        version: link:../queue-memory
       '@types/jsonwebtoken':
         specifier: ^9.0.4
         version: 9.0.10

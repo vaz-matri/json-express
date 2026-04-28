@@ -1,9 +1,10 @@
-import type { IDatabaseAdapter, IEmailProvider, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
+import type { IDatabaseAdapter, IEmailProvider, IKvStore, ILogger, JsonRequest, JsonResponse } from '@json-express/core';
 import { generateRandomToken, hashRandomToken } from '../crypto';
 import { passwordResetEmail } from '../email-templates';
 
 interface ForgotPasswordDeps {
     db: IDatabaseAdapter;
+    kvStore: IKvStore;
     email: IEmailProvider;
     appName: string;
     resetUrl: string;
@@ -23,12 +24,11 @@ export function makeForgotPasswordHandler(deps: ForgotPasswordDeps) {
         const user = matches?.[0];
         if (user) {
             const token = generateRandomToken();
-            await deps.db.create('passwordResetTokens', {
-                userId: String(user.id),
-                tokenHash: hashRandomToken(token),
-                expiresAt: new Date(Date.now() + deps.resetTtlMs).toISOString(),
-                createdAt: new Date().toISOString(),
-            });
+            await deps.kvStore.set(
+                `prt:${hashRandomToken(token)}`,
+                { userId: String(user.id) },
+                { ttlMs: deps.resetTtlMs }
+            );
             try {
                 await deps.email.send(passwordResetEmail({
                     appName: deps.appName,

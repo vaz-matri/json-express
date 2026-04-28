@@ -3,6 +3,7 @@ import { createContainer, asValue } from 'awilix';
 import type {
     IConfigProvider,
     IDatabaseAdapter,
+    IKvStore,
     ITransport,
     JsonRequest,
     JsonResponse,
@@ -10,7 +11,10 @@ import type {
 } from '@json-express/core';
 import { JsonExpressKernel, ConsoleLogger, createJwtVerifier } from '@json-express/core';
 import { MemoryDatabaseAdapter } from '@json-express/adapter-memory';
+import { MemoryKvStore } from '@json-express/kv-memory';
+import { MemoryQueueAdapter } from '@json-express/queue-memory';
 import { IdentityPlugin } from '../src/index';
+import { hashRandomToken } from '../src/crypto';
 
 const SECRET = 'flow-test-secret';
 
@@ -47,6 +51,7 @@ interface Harness {
     kernel: JsonExpressKernel;
     config: IConfigProvider;
     db: IDatabaseAdapter;
+    kvStore: IKvStore;
     transport: FakeTransport;
 }
 
@@ -54,10 +59,14 @@ async function bootHarness(configOverrides: Record<string, any> = {}): Promise<H
     const kernel = new JsonExpressKernel();
     const config = makeConfig(configOverrides);
     const db = new MemoryDatabaseAdapter({ logger: new ConsoleLogger({ silent: true } as any) });
+    const kvStore = new MemoryKvStore({ configProvider: config });
+    const queue = new MemoryQueueAdapter({ configProvider: config });
     const transport = new FakeTransport();
 
     kernel.registerConfigProvider(config);
     kernel.registerDatabase(db);
+    kernel.registerKvStore(kvStore);
+    kernel.registerQueue(queue);
     kernel.registerTransport(transport);
     // The peer-dep check looks for 'middleware:auth' — register a stub.
     kernel.container.register({
@@ -67,20 +76,14 @@ async function bootHarness(configOverrides: Record<string, any> = {}): Promise<H
     const plugin = new IdentityPlugin({ configProvider: config });
     await plugin.onBoot(kernel, config);
 
-    return { plugin, kernel, config, db, transport };
+    return { plugin, kernel, config, db, kvStore, transport };
 }
 
 describe('IdentityPlugin — provideSchemas', () => {
-    it('contributes users, roles, refreshTokens, emailVerificationTokens, passwordResetTokens', () => {
+    it('contributes users and roles only — token tables now live in the KV store', () => {
         const plugin = new IdentityPlugin({});
         const names = plugin.provideSchemas().map(s => s.name);
-        expect(names).toEqual([
-            'users',
-            'roles',
-            'refreshTokens',
-            'emailVerificationTokens',
-            'passwordResetTokens',
-        ]);
+        expect(names).toEqual(['users', 'roles']);
     });
 });
 
@@ -94,9 +97,21 @@ describe('IdentityPlugin — peer-dep + config errors', () => {
         await expect(plugin.onBoot(kernel, config)).rejects.toThrow(/middleware-auth/);
     });
 
+    it('throws when kvStore is not registered', async () => {
+        const kernel = new JsonExpressKernel();
+        kernel.registerDatabase(new MemoryDatabaseAdapter({}));
+        kernel.registerTransport(new FakeTransport());
+        kernel.container.register({
+            'middleware:auth': asValue({ name: 'auth', handle: async (_r: any, n: any) => n() }),
+        });
+        const plugin = new IdentityPlugin({ configProvider: makeConfig() });
+        await expect(plugin.onBoot(kernel, makeConfig())).rejects.toThrow(/IKvStore/);
+    });
+
     it('throws when auth.secret is unset', async () => {
         const kernel = new JsonExpressKernel();
         kernel.registerDatabase(new MemoryDatabaseAdapter({}));
+        kernel.registerKvStore(new MemoryKvStore({}));
         kernel.registerTransport(new FakeTransport());
         kernel.container.register({
             'middleware:auth': asValue({ name: 'auth', handle: async (_r: any, n: any) => n() }),
@@ -241,15 +256,23 @@ describe('IdentityPlugin — refresh', () => {
     });
 
     it('rejects expired tokens', async () => {
-        const { transport, db } = await bootHarness({ 'auth.refreshTtl': '1ms' });
+        // 1ms TTL — by the time we poll the kvStore, the entry is dead.
+        const { transport } = await bootHarness({ 'auth.refreshTtl': '1ms' });
         const reg = await transport.invoke('POST', '/auth/register', {
             email: 'dan@example.com', password: 'password-1234',
         });
-        // Force-expire by mutating the stored row (simpler than waiting).
-        const stored = (await db.search('refreshTokens', { userId: String(reg.body.user.id) }))[0];
-        await db.update('refreshTokens', String(stored.id), {
-            expiresAt: new Date(Date.now() - 1000).toISOString(),
+        await new Promise(resolve => setTimeout(resolve, 10));
+        const res = await transport.invoke('POST', '/auth/refresh', { refreshToken: reg.body.refreshToken });
+        expect(res.statusCode).toBe(401);
+    });
+
+    it('rejects refresh tokens issued before a password change (tokenVersion mismatch)', async () => {
+        const { transport, db } = await bootHarness();
+        const reg = await transport.invoke('POST', '/auth/register', {
+            email: 'frank@example.com', password: 'original-pw-12345',
         });
+        // Simulate a password change by bumping tokenVersion directly.
+        await db.update('users', String(reg.body.user.id), { tokenVersion: 1 });
         const res = await transport.invoke('POST', '/auth/refresh', { refreshToken: reg.body.refreshToken });
         expect(res.statusCode).toBe(401);
     });
