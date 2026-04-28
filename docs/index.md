@@ -4,20 +4,22 @@ layout: home
 hero:
   name: "JSON Express"
   text: "Enterprise Headless CMS"
-  tagline: "A blazingly fast, highly pluggable meta-framework for Node.js"
+  tagline: "Go from a pure JSON file to an Enterprise GraphQL/REST API in 0 seconds."
   actions:
     - theme: brand
       text: Get Started
       link: /guide/getting-started
     - theme: alt
-      text: View Architecture
-      link: /guide/architecture
+      text: Zero-Config JSON Mode
+      link: /guide/json-mode
 
 features:
+  - title: Zero-Config JSON Inference
+    details: Drop a pure JSON file into your data folder. The framework will automatically infer a strict schema and instantly generate a production API.
+  - title: Eject to TypeScript
+    details: Prototype with JSON, then smoothly scale to TypeScript schemas when you need lifecycle hooks, relations, or field-level security.
   - title: Pluggable Adapters
-    details: Swap between Memory, JSON files, MySQL, or Postgres without rewriting your application logic.
-  - title: Auto-Generated APIs
-    details: Define your schema once and instantly get both REST and GraphQL endpoints out of the box.
+    details: Swap between JSON files, Memory, MySQL, or Postgres without rewriting a single line of your application logic.
   - title: Enterprise Security
-    details: Built-in Identity management with field-level access control, Argon2 hashing, and JWT flows.
+    details: Built-in Identity management with field-level access control, Argon2 hashing, and instant JWT revocation.
 ---

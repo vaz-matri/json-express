@@ -30,6 +30,7 @@ export default defineConfig({
         text: 'Introduction',
         items: [
           { text: 'Getting Started', link: '/guide/getting-started' },
+          { text: 'Zero-Config JSON Mode', link: '/guide/json-mode' },
           { text: 'Enterprise Architecture', link: '/guide/architecture' }
         ]
       },
