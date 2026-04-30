@@ -1,259 +1,131 @@
 ---
 layout: home
-title: JSONExpress — From JSON to Enterprise API in 0 Seconds
-description: The open-source Node.js meta-framework that turns raw JSON files into production-ready REST and GraphQL APIs with built-in identity, security, and pluggable databases.
+title: JSONExpress — Stack-Agnostic, TypeScript-Native Headless API Framework
+description: A rapid JSON to API generator that scales from an instant mock API to a production-grade, swappable database TypeScript backend.
 
 hero:
   name: "JSONExpress"
-  text: "JSON → API"
-  tagline: "Drop a JSON file. Get REST & GraphQL. Scale using TypeScript when you're ready."
+  text: "JSON → Production"
+  tagline: "The definitive stack agnostic backend framework. Instant JSON mock APIs that seamlessly graduate to modular TypeScript backends."
   actions:
     - theme: brand
-      text: ⚡ Get Started in 60 Seconds
+      text: ⚡ Start Building Now
       link: /guide/getting-started
     - theme: alt
       text: 📖 Read the Architecture
       link: /guide/architecture
 
 features:
-  - icon: 📄
-    title: Zero-Config JSON Mode
-    details: Drop a .json file into /data and get a full CRUD API instantly — no code, no config, no database setup required.
+  - icon: ⚡
+    title: JSON to API Generator
+    details: The ultimate JSONPlaceholder alternative with persistence. Drop a JSON file to get a fake REST API with database capabilities instantly.
     link: /guide/json-mode
     linkText: Learn more →
-  - icon: 🔀
-    title: Dual API Generation
-    details: One schema, two protocols. Automatically generate both REST endpoints and a fully-typed GraphQL API with N+1 optimization.
-    link: /plugins/api
-    linkText: Learn more →
-  - icon: 🛡️
-    title: Zero-Knowledge Identity
-    details: Enterprise auth with Argon2 hashing, JWT revocation via tokenVersion, and asymmetric JWKS support for Auth0 & Cognito.
-    link: /plugins/identity
-    linkText: Learn more →
-  - icon: 🔌
-    title: 23 Pluggable Packages
-    details: Swap databases, transports, loggers, and queues without changing your application code. Install only what you need.
-    link: /packages/core
-    linkText: Explore ecosystem →
   - icon: 🏗️
-    title: Progressive Disclosure
-    details: Prototype with JSON in minutes. Eject to strict TypeScript schemas when you need hooks, relations, and field-level security.
-    link: /guide/schemas
-    linkText: Learn more →
-  - icon: ✅
-    title: Adapter Compliance Suite
-    details: Build your own database adapter and verify it passes every contract using our automated test harness.
+    title: Swappable Database Backend
+    details: Replace Express with Fastify or migrate MongoDB to PostgreSQL without rewriting a single line of business logic.
     link: /guide/adapters
+    linkText: Learn more →
+  - icon: 🔓
+    title: No Framework Lock-In
+    details: A headless CMS without framework lock-in. Consume your stack-agnostic APIs using Vue, SvelteKit, React Native, or vanilla HTML.
+    link: /guide/architecture
     linkText: Learn more →
 ---
 
-## How It Works — 3 Steps
+## The Prototyping to Production Continuum
 
-From an empty folder to a production-grade API in under a minute.
+The biggest trap in modern software engineering is throwaway code. JSONExpress provides **rapid backend development for frontend developers** without forcing you to abandon your initial work.
 
 <div class="steps-grid">
 <div class="step-card">
 <div class="step-number">1</div>
-<h3>Drop a JSON File</h3>
-<p>Create <code>data/posts.json</code> with your seed data. No schema, no database, no config file needed.</p>
+<h3>The Instant Mock API</h3>
+<p>Frontend teams shouldn't wait weeks. JSONExpress is a <strong>JSONPlaceholder alternative with persistence</strong>. Drop a JSON file to generate a <strong>fake REST API with database</strong> capabilities. Real CRUD, zero config.</p>
 </div>
 <div class="step-card">
 <div class="step-number">2</div>
-<h3>Boot the Server</h3>
-<p>Run <code>npx json-express</code>. The Kernel infers the schema, wires the database, and generates the API.</p>
+<h3>TypeScript API Builder</h3>
+<p>When you achieve product-market fit, eject from JSON mode. Use our <strong>TypeScript API builder</strong> to enforce strict validation and auto-generate GraphQL resolvers. The fastest path from <strong>idea to MVP to production backend</strong>.</p>
 </div>
 <div class="step-card">
 <div class="step-number">3</div>
-<h3>Ship It</h3>
-<p>Your REST and GraphQL endpoints are live. <code>GET</code>, <code>POST</code>, <code>PATCH</code>, <code>DELETE</code> — all ready.</p>
+<h3>The Replaceable Stack</h3>
+<p>Avoid technical debt. Our <strong>swappable database TypeScript backend</strong> lets you seamlessly <strong>replace Express with Fastify</strong> and <strong>migrate MongoDB to PostgreSQL</strong> without rewriting your application's logic.</p>
 </div>
 </div>
 
 
 
-## Define Once, Generate Everything
+## The Enterprise Extensibility Ecosystem
 
-Write a 15-line TypeScript model. Get enterprise-grade REST, GraphQL, validation, and security for free.
-
-```typescript
-// models/users.ts — Your entire backend definition
-import { defineModel, types } from '@json-express/core';
-
-export default defineModel({
-    name: 'users',
-    access: {
-        read: 'public',
-        create: 'admin',         // Only admins can create users
-        update: 'owner'          // Only the user can edit themselves
-    },
-    fields: {
-        id: types.id(),
-        email: types.string({ unique: true }),
-        role: types.string({ default: 'user' }),
-        passwordHash: types.string({ access: { read: false } })
-        // ↑ This field is physically impossible to query via REST or GraphQL
-    }
-});
-```
-
-```graphql
-# What you get — automatically generated GraphQL
-query {
-  users(limit: 10, where: { role: "admin" }) {
-    id
-    email
-    role
-    # passwordHash → does not exist in the schema
-  }
-}
-
-# REST equivalents also auto-generated:
-# GET    /users?role=admin&_limit=10
-# POST   /users        → 403 unless JWT role === "admin"
-# PATCH  /users/1      → 403 unless JWT sub === record.userId
-```
-
-
-
-## Enterprise Architecture — 5 Stage Boot Pipeline
-
-Every JSONExpress application follows a strict, deterministic lifecycle.
-
-<div class="pipeline">
-<div class="pipeline-stage">
-<div class="stage-icon">⚙️</div>
-<h4>Configure</h4>
-<p>Load .env, YAML, or TypeScript config files</p>
-</div>
-<div class="pipeline-arrow">→</div>
-<div class="pipeline-stage">
-<div class="stage-icon">🔍</div>
-<h4>Discover</h4>
-<p>CLI scans package.json and auto-discovers plugins</p>
-</div>
-<div class="pipeline-arrow">→</div>
-<div class="pipeline-stage">
-<div class="stage-icon">🧬</div>
-<h4>Schema</h4>
-<p>Merge TypeScript models with inferred JSON schemas</p>
-</div>
-<div class="pipeline-arrow">→</div>
-<div class="pipeline-stage">
-<div class="stage-icon">🔗</div>
-<h4>Generate</h4>
-<p>Compile routes, autowire middleware, enforce access</p>
-</div>
-<div class="pipeline-arrow">→</div>
-<div class="pipeline-stage">
-<div class="stage-icon">🚀</div>
-<h4>Serve</h4>
-<p>Bind routes to Express or Fastify and start listening</p>
-</div>
-</div>
-
-
-
-## The Complete Ecosystem — 23 Packages
-
-Every package is independently installable. Use only what you need.
+JSONExpress is more than a schema parser; it is a sprawling, independently installable micro-ecosystem designed to handle every aspect of modern backend engineering.
 
 <div class="eco-grid">
 <div class="eco-category">
-<h3>🧠 Core & CLI</h3>
-<a href="/packages/core" class="eco-pkg">@json-express/core</a>
-<a href="/packages/cli" class="eco-pkg">@json-express/cli</a>
-<a href="/packages/config" class="eco-pkg">@json-express/config</a>
-<a href="/packages/config-env" class="eco-pkg">@json-express/config-env</a>
+<h3>🛡️ Security, Auth & Validation</h3>
+<p>Our <code>middleware-auth</code> and <code>plugin-identity</code> packages enforce secure Argon2 hashing and JWKS validation. Paired with <code>middleware-validation</code>, your endpoints are strictly typed and defended.</p>
 </div>
 <div class="eco-category">
-<h3>🌐 Transports</h3>
-<a href="/packages/transport-express" class="eco-pkg">@json-express/transport-express</a>
-<a href="/packages/transport-fastify" class="eco-pkg">@json-express/transport-fastify</a>
+<h3>🌐 Transport Layer & Loggers</h3>
+<p>Swap your server via our transport layer. Use <code>transport-express</code> or upgrade to <code>transport-fastify</code> for performance. Track requests using <code>logger-pino</code> or <code>logger-console</code>.</p>
 </div>
 <div class="eco-category">
-<h3>🗄️ Database Adapters</h3>
-<a href="/packages/adapter-json" class="eco-pkg">@json-express/adapter-json</a>
-<a href="/packages/adapter-memory" class="eco-pkg">@json-express/adapter-memory</a>
+<h3>⏳ Queues & KV Stores</h3>
+<p>Offload heavy processing to distributed workers using <code>queue-bullmq</code> or handle locally via <code>queue-memory</code>. Manage ephemeral caching using our <code>kv-redis</code> and <code>kv-memory</code> stores.</p>
 </div>
 <div class="eco-category">
-<h3>⚡ API Generators</h3>
-<a href="/packages/api-rest" class="eco-pkg">@json-express/api-rest</a>
-<a href="/packages/api-graphql" class="eco-pkg">@json-express/api-graphql</a>
-</div>
-<div class="eco-category">
-<h3>🛡️ Security</h3>
-<a href="/packages/middleware-auth" class="eco-pkg">@json-express/middleware-auth</a>
-<a href="/packages/middleware-validation" class="eco-pkg">@json-express/middleware-validation</a>
-<a href="/packages/plugin-identity" class="eco-pkg">@json-express/plugin-identity</a>
-</div>
-<div class="eco-category">
-<h3>🔧 Plugins</h3>
-<a href="/packages/plugin-health" class="eco-pkg">@json-express/plugin-health</a>
-<a href="/packages/plugin-devcert" class="eco-pkg">@json-express/plugin-devcert</a>
-<a href="/packages/docs-swagger" class="eco-pkg">@json-express/docs-swagger</a>
-<a href="/packages/docs-light" class="eco-pkg">@json-express/docs-light</a>
-</div>
-<div class="eco-category">
-<h3>⏳ Background Services</h3>
-<a href="/packages/kv-memory" class="eco-pkg">@json-express/kv-memory</a>
-<a href="/packages/kv-redis" class="eco-pkg">@json-express/kv-redis</a>
-<a href="/packages/queue-memory" class="eco-pkg">@json-express/queue-memory</a>
-<a href="/packages/queue-bullmq" class="eco-pkg">@json-express/queue-bullmq</a>
-<a href="/packages/email-console" class="eco-pkg">@json-express/email-console</a>
-</div>
-<div class="eco-category">
-<h3>🛠️ Utilities</h3>
-<a href="/packages/logger-pino" class="eco-pkg">@json-express/logger-pino</a>
-<a href="/packages/logger-console" class="eco-pkg">@json-express/logger-console</a>
-<a href="/packages/seeder-faker" class="eco-pkg">@json-express/seeder-faker</a>
+<h3>🔧 Docs, Seeders & Email</h3>
+<p>Auto-generate OpenAPI specs with <code>docs-swagger</code>. Populate testing databases using <code>seeder-faker</code>, and test outbound communications safely using <code>email-console</code>.</p>
 </div>
 </div>
 
 
 
-## Why JSONExpress?
+## Built For Frontend Teams and Startup Founders
 
-Compare JSONExpress to what you're already using.
-
-| Feature | JSONExpress | JSON Server | Strapi | Hand-coded |
-|---|---|---|---|---|
-| Zero-config JSON API | ✅ | ✅ | ❌ | ❌ |
-| TypeScript Schema Ejection | ✅ | ❌ | ❌ | ✅ |
-| GraphQL + REST (simultaneous) | ✅ | ❌ | ✅ | ❌ |
-| Field-Level Access Control | ✅ | ❌ | ✅ | Manual |
-| Pluggable Database Adapters | ✅ | ❌ | ✅ | Manual |
-| Swap Express ↔ Fastify | ✅ | ❌ | ❌ | ❌ |
-| Argon2 + JWT out of the box | ✅ | ❌ | ✅ | Manual |
-| N+1 Query Resolution | ✅ | ❌ | ❌ | Manual |
-| Adapter Compliance Suite | ✅ | ❌ | ❌ | ❌ |
-
-
-
-## Security Built Into the DNA
-
-Not bolted on as an afterthought. Every layer enforces your rules.
+We built JSONExpress specifically for the teams that move the fastest, but get penalized the hardest by traditional backend constraints.
 
 <div class="security-grid">
 <div class="security-card">
-<div class="security-icon">🔐</div>
-<h4>Zero-Knowledge Passwords</h4>
-<p>Plain-text passwords never touch your database. Argon2 hashing is enforced via <code>beforeCreate</code> hooks in the <a href="/packages/plugin-identity">Identity Plugin</a>.</p>
+<div class="security-icon">🏢</div>
+<h4>Digital Agencies & Freelancers</h4>
+<p>Instantly spin up a <strong>mock API generator typescript</strong> environment. When clients demand specific databases for compliance, use our <strong>TypeScript API builder swappable database</strong> architecture to comply without rewrites.</p>
 </div>
 <div class="security-card">
-<div class="security-icon">🚫</div>
-<h4>Field-Level Stripping</h4>
-<p>Mark any field as <code>access: { read: false }</code> and the <a href="/packages/api-rest">REST</a> and <a href="/packages/api-graphql">GraphQL</a> generators will physically delete it from every response.</p>
+<div class="security-icon">🚀</div>
+<h4>Startup MVPs & Innovation Teams</h4>
+<p>Don't waste runway writing boilerplate CRUD operations. If you are evaluating <strong>Payload CMS vs custom backend</strong> approaches, JSONExpress gives you headless CMS speed with custom backend freedom.</p>
 </div>
-<div class="security-card">
-<div class="security-icon">⏱️</div>
-<h4>Instant JWT Revocation</h4>
-<p>Increment <code>tokenVersion</code> in the database. All previously issued tokens are instantly rejected by the <a href="/packages/middleware-auth">Auth Middleware</a>.</p>
 </div>
-<div class="security-card">
-<div class="security-icon">🧹</div>
-<h4>Anti-Spoofing Headers</h4>
-<p>The Auth middleware always deletes <code>x-user-payload</code> from incoming requests before re-injecting the cryptographically verified payload.</p>
+
+
+
+## Omnichannel Protocol Delivery
+
+JSONExpress operates as a multi-protocol engine. Today, it functions as a seamless **REST to GraphQL backend generator**, instantly compiling your schema into predictable REST routes and optimized GraphQL Graphs. Tomorrow, the exact same schema can expose data over **gRPC, tRPC, or WebSockets**—eliminating the need to rewrite resolvers or database queries.
+
+
+
+## A Headless CMS Without Framework Lock-In
+
+The developer experience you deserve, without the bloated GUI, massive dependency trees, and proprietary ecosystems of traditional content managers.
+
+<div class="steps-grid">
+<div class="step-card">
+<div class="step-number">🔓</div>
+<h3>True Infrastructure Agnosticism</h3>
+<p>Unlike platforms that trap you in Next.js, JSONExpress is a <strong>headless CMS without framework lock-in</strong>. Consume your <strong>stack agnostic backend framework</strong> APIs using Vue, SvelteKit, React Native, or vanilla HTML.</p>
+</div>
+<div class="step-card">
+<div class="step-number">🛠️</div>
+<h3>The Open-Source Alternative</h3>
+<p>A lightweight, <strong>Strapi alternative stack agnostic</strong> solution. Built as a <strong>TypeScript headless CMS</strong>, offering compile-time safety and intellisense without the 1500+ dependency bloat found in alternatives.</p>
+</div>
+<div class="step-card">
+<div class="step-number">🌍</div>
+<h3>Self-Hosted Data Sovereignty</h3>
+<p>JSONExpress is a true <strong>Contentful self-hosted alternative</strong>. Deploy your architecture anywhere—from a $5 VPS to a global Kubernetes cluster. Maintain 100% control over your database and infrastructure costs.</p>
 </div>
 </div>
 
@@ -262,52 +134,30 @@ Not bolted on as an afterthought. Every layer enforces your rules.
 ## Frequently Asked Questions
 
 <details class="faq-item">
-<summary>What is JSONExpress?</summary>
-<p>JSONExpress is an open-source Node.js meta-framework that automatically generates production-ready REST and GraphQL APIs from raw JSON files or declarative TypeScript schemas. It provides built-in identity management, field-level security, and pluggable database adapters.</p>
+<summary>What makes JSONExpress different from other rapid backend tools?</summary>
+<p>Most tools are either static mock APIs that cannot hold state, or heavy enterprise systems that require days to configure. JSONExpress is a <strong>headless CMS with replaceable database</strong> architecture. It acts as a <strong>JSON to API generator</strong> on day one, and a highly optimized enterprise server on day one hundred.</p>
 </details>
 
 <details class="faq-item">
-<summary>Is JSONExpress a database?</summary>
-<p>No. JSONExpress is an execution engine that sits between your HTTP server and your database. It uses the <code>IDatabaseAdapter</code> interface to communicate with any database — RAM, JSON files, PostgreSQL, or MySQL — without coupling to any specific driver.</p>
+<summary>How exactly does the swappable database feature work?</summary>
+<p>JSONExpress uses the Repository Pattern heavily to decouple your logic from the driver. Your models don't know if they are talking to a JSON file or a SQL database. This means you can literally <strong>migrate MongoDB to PostgreSQL</strong> by changing one string in your configuration.</p>
 </details>
 
 <details class="faq-item">
-<summary>Can I use JSONExpress with Auth0 or Firebase?</summary>
-<p>Yes. The <a href="/packages/middleware-auth">Auth Middleware</a> supports both symmetric HMAC secrets (for local JWT signing) and asymmetric JWKS endpoints (for Auth0, AWS Cognito, and Firebase). Simply provide your <code>jwksUri</code> in the configuration.</p>
-</details>
-
-<details class="faq-item">
-<summary>How does JSONExpress solve the GraphQL N+1 problem?</summary>
-<p>The <a href="/packages/api-graphql">GraphQL Generator</a> intercepts deeply nested AST queries and translates them into flat <code>QueryOptions.expand</code> arrays. The Database Adapter then resolves all relations in a single optimized pass instead of issuing N+1 separate queries.</p>
-</details>
-
-<details class="faq-item">
-<summary>Can I run REST and GraphQL at the same time?</summary>
-<p>Yes. Mount the <a href="/packages/api-rest">REST Generator</a> and the <a href="/packages/api-graphql">GraphQL Generator</a> simultaneously. Both share the same schemas, database adapter, and security rules.</p>
-</details>
-
-<details class="faq-item">
-<summary>Can I swap from Express to Fastify?</summary>
-<p>Yes. Replace <code>@json-express/transport-express</code> with <code>@json-express/transport-fastify</code> in your <code>package.json</code>. Because all route handlers use the abstract <code>JsonRequest</code> and <code>JsonResponse</code> interfaces, your application code requires zero changes.</p>
-</details>
-
-<details class="faq-item">
-<summary>How do I build a custom database adapter?</summary>
-<p>Implement the <code>IDatabaseAdapter</code> interface from <a href="/packages/core">@json-express/core</a>, then verify your implementation by running the built-in <a href="/guide/adapters">Adapter Compliance Suite</a>. If it passes, your adapter is guaranteed to work with every JSONExpress plugin.</p>
+<summary>Is this really a Contentful self-hosted alternative?</summary>
+<p>Yes. If you are tired of arbitrary API limits and paying thousands of dollars a month just to deliver JSON payloads to your frontend, JSONExpress provides the same underlying capability (a robust, schema-driven API) entirely under your control, functioning as a powerful <strong>TypeScript headless CMS</strong>.</p>
 </details>
 
 
 
 <div class="cta-section">
-<h2>Ready to Build?</h2>
-<p class="section-subtitle">Get your first API running in under 60 seconds.</p>
+<h2>Start Your Idea to Production Journey</h2>
+<p class="section-subtitle">The definitive <strong>rapid backend development from JSON</strong> tool is here.</p>
 <div class="cta-install">
-<code>npm install @json-express/cli && npx json-express</code>
+<code>npm install @json-express/core @json-express/cli</code>
 </div>
 <div class="cta-buttons">
-<a href="/guide/getting-started" class="cta-btn cta-primary">Get Started</a>
-<a href="/guide/json-mode" class="cta-btn cta-secondary">Try JSON Mode</a>
-<a href="/guide/architecture" class="cta-btn cta-secondary">Read Architecture</a>
+<a href="/guide/getting-started" class="cta-btn cta-primary">Read the Documentation</a>
 </div>
 </div>
 
