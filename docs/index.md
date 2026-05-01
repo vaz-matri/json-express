@@ -1,131 +1,170 @@
 ---
 layout: home
-title: JSONExpress — Stack-Agnostic, TypeScript-Native Headless API Framework
-description: A rapid JSON to API generator that scales from an instant mock API to a production-grade, swappable database TypeScript backend.
+title: JSONExpress — Instant REST & GraphQL API from a JSON File
+description: Open-source Node.js meta-framework. Drop a JSON file, get REST + GraphQL in seconds. Swap in Postgres, Fastify, or Auth0 when you're ready. MIT licensed, TypeScript-native. 23 modular packages.
 
 hero:
   name: "JSONExpress"
-  text: "JSON → Production"
-  tagline: "The definitive stack agnostic backend framework. Instant JSON mock APIs that seamlessly graduate to modular TypeScript backends."
+  text: "Drop a JSON file. Get an API."
+  tagline: "Instant REST + GraphQL from a JSON file. Swap in Postgres, Fastify, or Auth0 when you outgrow it — no rewrites, same config. MIT licensed, TypeScript-native."
   actions:
     - theme: brand
-      text: ⚡ Start Building Now
-      link: /guide/getting-started
+      text: ⚡ Get Started in 60 Seconds
+      link: /getting-started
     - theme: alt
-      text: 📖 Read the Architecture
-      link: /guide/architecture
+      text: View on GitHub
+      link: https://github.com/vaz-matri/json-express
 
 features:
   - icon: ⚡
-    title: JSON to API Generator
-    details: The ultimate JSONPlaceholder alternative with persistence. Drop a JSON file to get a fake REST API with database capabilities instantly.
-    link: /guide/json-mode
+    title: Zero-Config JSON Mode
+    details: Drop a JSON file and get a full CRUD REST API in seconds. No schemas, no config, no boilerplate. The fastest path to a running API.
+    link: /json-mode
     linkText: Learn more →
-  - icon: 🏗️
-    title: Swappable Database Backend
-    details: Replace Express with Fastify or migrate MongoDB to PostgreSQL without rewriting a single line of business logic.
-    link: /guide/adapters
+  - icon: 🔄
+    title: Swap Any Layer
+    details: Change your database, HTTP server, or API protocol with one line of config. Express → Fastify, REST → GraphQL, memory → file persistence. Your code never changes.
+    link: /adapters
     linkText: Learn more →
   - icon: 🔓
     title: No Framework Lock-In
-    details: A headless CMS without framework lock-in. Consume your stack-agnostic APIs using Vue, SvelteKit, React Native, or vanilla HTML.
-    link: /guide/architecture
+    details: Not tied to Next.js, Express, or any frontend. Works with Vue, Svelte, React Native, or vanilla HTML. 23 independently installable packages, MIT licensed.
+    link: /architecture
     linkText: Learn more →
 ---
 
+<div class="badge-row">
+  <a href="https://github.com/vaz-matri/json-express" target="_blank">
+    <img alt="GitHub stars"
+      src="https://img.shields.io/github/stars/vaz-matri/json-express?style=flat-square&color=2aa198&label=GitHub%20Stars">
+  </a>
+  <a href="https://www.npmjs.com/package/@json-express/core" target="_blank">
+    <img alt="npm downloads"
+      src="https://img.shields.io/npm/dm/@json-express/core?style=flat-square&color=268bd2&label=Monthly%20Downloads">
+  </a>
+  <img alt="License"
+    src="https://img.shields.io/badge/license-MIT-859900?style=flat-square">
+  <img alt="TypeScript"
+    src="https://img.shields.io/badge/TypeScript-native-2aa198?style=flat-square">
+</div>
+
+
+
 ## The Prototyping to Production Continuum
 
-The biggest trap in modern software engineering is throwaway code. JSONExpress provides **rapid backend development for frontend developers** without forcing you to abandon your initial work.
+The biggest trap in backend development is throwaway code — tools that are great on day one but force a rewrite the moment your needs grow. JSONExpress is built around a single idea: **every layer is an explicit, swappable dependency**.
 
 <div class="steps-grid">
 <div class="step-card">
 <div class="step-number">1</div>
 <h3>The Instant Mock API</h3>
-<p>Frontend teams shouldn't wait weeks. JSONExpress is a <strong>JSONPlaceholder alternative with persistence</strong>. Drop a JSON file to generate a <strong>fake REST API with database</strong> capabilities. Real CRUD, zero config.</p>
+<p>Drop a JSON file and get a full CRUD API in seconds. No config, no TypeScript required. Real endpoints, real HTTP — just working.</p>
 </div>
 <div class="step-card">
 <div class="step-number">2</div>
-<h3>TypeScript API Builder</h3>
-<p>When you achieve product-market fit, eject from JSON mode. Use our <strong>TypeScript API builder</strong> to enforce strict validation and auto-generate GraphQL resolvers. The fastest path from <strong>idea to MVP to production backend</strong>.</p>
+<h3>TypeScript Schema Mode</h3>
+<p>When you need types, validation, and field-level security, define a <code>defineModel()</code> schema. REST and GraphQL are generated automatically. Nothing from step 1 changes.</p>
 </div>
 <div class="step-card">
 <div class="step-number">3</div>
 <h3>The Replaceable Stack</h3>
-<p>Avoid technical debt. Our <strong>swappable database TypeScript backend</strong> lets you seamlessly <strong>replace Express with Fastify</strong> and <strong>migrate MongoDB to PostgreSQL</strong> without rewriting your application's logic.</p>
+<p>Swap <code>adapter-memory</code> for <code>adapter-json</code> for file persistence. Add <code>plugin-identity</code> for full auth. Change one line in your config — your schemas and hooks never touch.</p>
 </div>
 </div>
 
 
 
-## The Enterprise Extensibility Ecosystem
+## How the Modular Architecture Works
 
-JSONExpress is more than a schema parser; it is a sprawling, independently installable micro-ecosystem designed to handle every aspect of modern backend engineering.
+One schema definition. Every layer is independently swappable.
+
+<div class="arch-diagram">
+  <div class="arch-layer">
+    <div class="arch-label">Your Data</div>
+    <div class="arch-boxes">
+      <div class="arch-box schema">posts.json <span>or</span> defineModel()</div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓ choose your database</div>
+  <div class="arch-layer">
+    <div class="arch-label">Adapter Layer</div>
+    <div class="arch-boxes">
+      <div class="arch-box active">adapter-memory</div>
+      <div class="arch-box active">adapter-json</div>
+      <div class="arch-box muted">adapter-postgres ↗</div>
+      <div class="arch-box muted">adapter-mongo ↗</div>
+      <div class="arch-box muted">adapter-sqlite ↗</div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓ choose your protocol</div>
+  <div class="arch-layer">
+    <div class="arch-label">API Layer</div>
+    <div class="arch-boxes">
+      <div class="arch-box active">api-rest</div>
+      <div class="arch-box active">api-graphql</div>
+      <div class="arch-box muted">api-trpc ↗</div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓ choose your server</div>
+  <div class="arch-layer">
+    <div class="arch-label">Transport Layer</div>
+    <div class="arch-boxes">
+      <div class="arch-box active">transport-express</div>
+      <div class="arch-box active">transport-fastify</div>
+      <div class="arch-box muted">transport-h3 ↗</div>
+    </div>
+  </div>
+</div>
+<p class="arch-note">
+  ↗ on the roadmap &nbsp;|&nbsp;
+  Swap any layer by changing one line in your config.
+  Your schemas, hooks, and business logic never change.
+</p>
+
+
+
+## The Ecosystem
+
+23 independently installable packages. Install only what you need.
 
 <div class="eco-grid">
 <div class="eco-category">
-<h3>🛡️ Security, Auth & Validation</h3>
-<p>Our <code>middleware-auth</code> and <code>plugin-identity</code> packages enforce secure Argon2 hashing and JWKS validation. Paired with <code>middleware-validation</code>, your endpoints are strictly typed and defended.</p>
+<h3>🛡️ Security & Auth</h3>
+<p><code>plugin-identity</code> gives you register, login, refresh tokens, password reset, and email verification — all from one <code>npm install</code>. Argon2id hashing, JWKS support for Auth0/Firebase/Cognito, anti-enumeration on every endpoint.</p>
 </div>
 <div class="eco-category">
-<h3>🌐 Transport Layer & Loggers</h3>
-<p>Swap your server via our transport layer. Use <code>transport-express</code> or upgrade to <code>transport-fastify</code> for performance. Track requests using <code>logger-pino</code> or <code>logger-console</code>.</p>
+<h3>🌐 Transport & Servers</h3>
+<p>Start with <code>transport-express</code>. Swap to <code>transport-fastify</code> for higher throughput. One config line change — every route, schema, and middleware carries over automatically.</p>
 </div>
 <div class="eco-category">
-<h3>⏳ Queues & KV Stores</h3>
-<p>Offload heavy processing to distributed workers using <code>queue-bullmq</code> or handle locally via <code>queue-memory</code>. Manage ephemeral caching using our <code>kv-redis</code> and <code>kv-memory</code> stores.</p>
+<h3>🗄️ Database Adapters</h3>
+<p><code>adapter-memory</code> for blazing-fast ephemeral storage (~500K RPS read). <code>adapter-json</code> for file-system persistence with atomic writes. Postgres and MongoDB on the roadmap.</p>
 </div>
 <div class="eco-category">
-<h3>🔧 Docs, Seeders & Email</h3>
-<p>Auto-generate OpenAPI specs with <code>docs-swagger</code>. Populate testing databases using <code>seeder-faker</code>, and test outbound communications safely using <code>email-console</code>.</p>
+<h3>🔧 Docs, Seeders & Logging</h3>
+<p>Auto-generate OpenAPI specs with <code>docs-swagger</code>. Populate test databases with <code>seeder-faker</code>. Structured logging via <code>logger-pino</code> with automatic <code>traceId</code> injection.</p>
 </div>
 </div>
-
-
-
-## Built For Frontend Teams and Startup Founders
-
-We built JSONExpress specifically for the teams that move the fastest, but get penalized the hardest by traditional backend constraints.
-
-<div class="security-grid">
-<div class="security-card">
-<div class="security-icon">🏢</div>
-<h4>Digital Agencies & Freelancers</h4>
-<p>Instantly spin up a <strong>mock API generator typescript</strong> environment. When clients demand specific databases for compliance, use our <strong>TypeScript API builder swappable database</strong> architecture to comply without rewrites.</p>
-</div>
-<div class="security-card">
-<div class="security-icon">🚀</div>
-<h4>Startup MVPs & Innovation Teams</h4>
-<p>Don't waste runway writing boilerplate CRUD operations. If you are evaluating <strong>Payload CMS vs custom backend</strong> approaches, JSONExpress gives you headless CMS speed with custom backend freedom.</p>
-</div>
-</div>
-
-
-
-## Omnichannel Protocol Delivery
-
-JSONExpress operates as a multi-protocol engine. Today, it functions as a seamless **REST to GraphQL backend generator**, instantly compiling your schema into predictable REST routes and optimized GraphQL Graphs. Tomorrow, the exact same schema can expose data over **gRPC, tRPC, or WebSockets**—eliminating the need to rewrite resolvers or database queries.
 
 
 
 ## A Headless CMS Without Framework Lock-In
 
-The developer experience you deserve, without the bloated GUI, massive dependency trees, and proprietary ecosystems of traditional content managers.
-
 <div class="steps-grid">
 <div class="step-card">
 <div class="step-number">🔓</div>
-<h3>True Infrastructure Agnosticism</h3>
-<p>Unlike platforms that trap you in Next.js, JSONExpress is a <strong>headless CMS without framework lock-in</strong>. Consume your <strong>stack agnostic backend framework</strong> APIs using Vue, SvelteKit, React Native, or vanilla HTML.</p>
+<h3>Not Tied to Next.js</h3>
+<p>Payload requires Next.js. JSONExpress works with any frontend — Vue, Svelte, React Native, vanilla HTML, or no frontend at all. Your backend is your backend.</p>
 </div>
 <div class="step-card">
 <div class="step-number">🛠️</div>
-<h3>The Open-Source Alternative</h3>
-<p>A lightweight, <strong>Strapi alternative stack agnostic</strong> solution. Built as a <strong>TypeScript headless CMS</strong>, offering compile-time safety and intellisense without the 1500+ dependency bloat found in alternatives.</p>
+<h3>MIT, No Restrictions</h3>
+<p>Strapi and Directus have moved some features behind paid plans. JSONExpress is MIT licensed with no revenue caps, no feature gates, and no SaaS upsell.</p>
 </div>
 <div class="step-card">
 <div class="step-number">🌍</div>
-<h3>Self-Hosted Data Sovereignty</h3>
-<p>JSONExpress is a true <strong>Contentful self-hosted alternative</strong>. Deploy your architecture anywhere—from a $5 VPS to a global Kubernetes cluster. Maintain 100% control over your database and infrastructure costs.</p>
+<h3>Self-Host Anywhere</h3>
+<p>Deploy to a $5 VPS, a Kubernetes cluster, or AWS Amplify. No vendor lock-in, no cloud dependency. You own your data and your infrastructure.</p>
 </div>
 </div>
 
@@ -134,30 +173,31 @@ The developer experience you deserve, without the bloated GUI, massive dependenc
 ## Frequently Asked Questions
 
 <details class="faq-item">
-<summary>What makes JSONExpress different from other rapid backend tools?</summary>
-<p>Most tools are either static mock APIs that cannot hold state, or heavy enterprise systems that require days to configure. JSONExpress is a <strong>headless CMS with replaceable database</strong> architecture. It acts as a <strong>JSON to API generator</strong> on day one, and a highly optimized enterprise server on day one hundred.</p>
+<summary>What makes JSONExpress different from json-server?</summary>
+<p>json-server is excellent for a 30-second prototype, but it stops there — no TypeScript schemas, no real authentication, no path to a production database. JSONExpress gives you the same zero-config start, and then lets you add persistence, auth, GraphQL, and real databases without rewriting anything. A <code>db.json</code> file from json-server is already valid input for JSONExpress.</p>
 </details>
 
 <details class="faq-item">
-<summary>How exactly does the swappable database feature work?</summary>
-<p>JSONExpress uses the Repository Pattern heavily to decouple your logic from the driver. Your models don't know if they are talking to a JSON file or a SQL database. This means you can literally <strong>migrate MongoDB to PostgreSQL</strong> by changing one string in your configuration.</p>
+<summary>How does the swappable database work?</summary>
+<p>Every database adapter implements the same <code>IDatabaseAdapter</code> interface from <code>@json-express/core</code>. Your schemas, hooks, and access control rules are defined against this interface — not against any specific database. Swap the adapter, and everything else carries over. There is no ORM magic, no migration scripts for the schema layer.</p>
 </details>
 
 <details class="faq-item">
-<summary>Is this really a Contentful self-hosted alternative?</summary>
-<p>Yes. If you are tired of arbitrary API limits and paying thousands of dollars a month just to deliver JSON payloads to your frontend, JSONExpress provides the same underlying capability (a robust, schema-driven API) entirely under your control, functioning as a powerful <strong>TypeScript headless CMS</strong>.</p>
+<summary>Is JSONExpress production-ready?</summary>
+<p>It is production-ready for solo developers and small teams who are comfortable managing their own infrastructure. The auth system (<code>plugin-identity</code>) is production-grade — Argon2id, refresh token rotation, JWKS, anti-enumeration. The two available database adapters (memory and JSON file) are suitable for low-to-medium traffic. Postgres and MongoDB adapters are on the roadmap.</p>
 </details>
 
 
 
 <div class="cta-section">
-<h2>Start Your Idea to Production Journey</h2>
-<p class="section-subtitle">The definitive <strong>rapid backend development from JSON</strong> tool is here.</p>
+<h2>Start in 30 Seconds</h2>
+<p class="section-subtitle">Install the CLI, drop a JSON file, and you have a running API.</p>
 <div class="cta-install">
-<code>npm install @json-express/core @json-express/cli</code>
+<code>npm install @json-express/cli</code>
 </div>
 <div class="cta-buttons">
-<a href="/guide/getting-started" class="cta-btn cta-primary">Read the Documentation</a>
+<a href="/getting-started" class="cta-btn cta-primary">Read the Docs</a>
+<a href="https://github.com/vaz-matri/json-express" class="cta-btn cta-secondary">View on GitHub</a>
 </div>
 </div>
 
@@ -165,29 +205,29 @@ The developer experience you deserve, without the bloated GUI, massive dependenc
 <div class="footer-grid">
 <div class="footer-col">
 <h4>JSONExpress</h4>
-<p class="footer-tagline">From JSON to Enterprise API in 0 seconds. Open-source Node.js meta-framework.</p>
+<p class="footer-tagline">Open-source Node.js meta-framework. Drop a JSON file, get an API. MIT licensed.</p>
 </div>
 <div class="footer-col">
 <h4>Learn</h4>
-<a href="/guide/getting-started">Getting Started</a>
-<a href="/guide/json-mode">Zero-Config JSON Mode</a>
-<a href="/guide/architecture">Architecture</a>
-<a href="/guide/schemas">Schemas & Models</a>
-<a href="/guide/hooks">Hooks & Security</a>
+<a href="/getting-started">Getting Started</a>
+<a href="/json-mode">Zero-Config JSON Mode</a>
+<a href="/architecture">Architecture</a>
+<a href="/schemas">Schemas & Models</a>
+<a href="/hooks">Hooks & Security</a>
 </div>
 <div class="footer-col">
 <h4>Ecosystem</h4>
-<a href="/packages/core">Core</a>
-<a href="/packages/api-rest">REST Generator</a>
-<a href="/packages/api-graphql">GraphQL Generator</a>
-<a href="/packages/plugin-identity">Identity Plugin</a>
-<a href="/packages/middleware-auth">Auth Middleware</a>
+<a href="/core">Core</a>
+<a href="/api-rest">REST Generator</a>
+<a href="/api-graphql">GraphQL Generator</a>
+<a href="/plugin-identity">Identity Plugin</a>
+<a href="/middleware-auth">Auth Middleware</a>
 </div>
 <div class="footer-col">
 <h4>Community</h4>
-<a href="https://github.com/vazmat/json-express">GitHub</a>
-<a href="https://github.com/vazmat/json-express/issues">Issues</a>
-<a href="https://github.com/vazmat/json-express/discussions">Discussions</a>
+<a href="https://github.com/vaz-matri/json-express">GitHub</a>
+<a href="https://github.com/vaz-matri/json-express/issues">Issues</a>
+<a href="https://github.com/vaz-matri/json-express/discussions">Discussions</a>
 </div>
 </div>
 <div class="footer-bottom">
@@ -197,24 +237,20 @@ The developer experience you deserve, without the bloated GUI, massive dependenc
 
 <style>
 /* ═══════════════ SCOPED LANDING STYLES ═══════════════ */
-/* Force content width to match the VitePress hero/features container */
 .VPHome .vp-doc {
   max-width: 1152px !important;
   margin: 0 auto !important;
   padding: 0 24px !important;
 }
-/* Kill VitePress default bottom margin on home page */
 .VPHome {
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
 }
-/* Remove default VitePress h2 border-top dividers on landing page */
 .VPHome .vp-doc h2 {
   border-top: none !important;
   margin-top: 4rem;
   padding-top: 0 !important;
 }
-/* Force comparison table to fill the full container width */
 .VPHome .vp-doc table {
   width: 100% !important;
   display: table !important;
@@ -227,6 +263,15 @@ The developer experience you deserve, without the bloated GUI, massive dependenc
 .VPHome .vp-doc table td:first-child {
   text-align: left;
   width: 35%;
+}
+
+/* ═══════════════ BADGES ═══════════════ */
+.badge-row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 1rem 0 2rem;
+  flex-wrap: wrap;
 }
 
 /* ═══════════════ STEPS GRID ═══════════════ */
@@ -263,38 +308,49 @@ The developer experience you deserve, without the bloated GUI, massive dependenc
 .step-card h3 { margin: 0 0 0.5rem !important; font-size: 1.15rem; border: none !important; padding: 0 !important; }
 .step-card p { font-size: 0.95rem; color: var(--vp-c-text-2); margin: 0; }
 
-/* ═══════════════ ARCHITECTURE PIPELINE ═══════════════ */
-.pipeline {
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-  margin-top: 1.5rem;
-}
-.pipeline-stage {
-  flex: 1;
-  min-width: 100px;
-  text-align: center;
+/* ═══════════════ ARCHITECTURE DIAGRAM ═══════════════ */
+.arch-diagram {
   background: var(--vp-c-bg-alt);
   border: 1px solid var(--vp-c-border);
   border-radius: 12px;
-  padding: 1.25rem 0.75rem;
-  transition: border-color 0.25s, transform 0.25s;
+  padding: 2rem;
+  margin: 1.5rem 0;
 }
-.pipeline-stage:hover {
+.arch-layer { margin-bottom: 0.5rem; }
+.arch-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--vp-c-text-3);
+  margin-bottom: 0.5rem;
+}
+.arch-boxes { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.arch-box {
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-border);
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.85rem;
+}
+.arch-box.active {
   border-color: var(--solarized-cyan);
-  transform: translateY(-2px);
-}
-.stage-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
-.pipeline-stage h4 { margin: 0 0 0.35rem !important; font-size: 0.95rem; border: none !important; padding: 0 !important; }
-.pipeline-stage p { font-size: 0.8rem; color: var(--vp-c-text-2); margin: 0; }
-.pipeline-arrow {
-  font-size: 1.4rem;
   color: var(--solarized-cyan);
-  display: flex;
-  align-items: center;
-  font-weight: 700;
+}
+.arch-box.muted { opacity: 0.5; }
+.arch-box.schema { border-color: var(--solarized-yellow); }
+.arch-box span { opacity: 0.5; margin: 0 0.3rem; }
+.arch-arrow {
+  text-align: center;
+  color: var(--vp-c-text-3);
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+}
+.arch-note {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--vp-c-text-3);
+  margin-top: 1rem;
 }
 
 /* ═══════════════ ECOSYSTEM GRID ═══════════════ */
@@ -313,45 +369,6 @@ The developer experience you deserve, without the bloated GUI, massive dependenc
 }
 .eco-category:hover { border-color: var(--solarized-cyan); }
 .eco-category h3 { margin: 0 0 0.75rem !important; font-size: 1.05rem; border: none !important; padding: 0 !important; }
-.eco-pkg {
-  display: block;
-  font-family: var(--vp-font-family-mono);
-  font-size: 0.85rem;
-  padding: 0.35rem 0.5rem;
-  margin-bottom: 0.3rem;
-  border-radius: 6px;
-  color: var(--vp-c-text-1);
-  text-decoration: none;
-  transition: background 0.2s, color 0.2s;
-}
-.eco-pkg:hover {
-  background: var(--solarized-cyan);
-  color: #002b36;
-}
-
-/* ═══════════════ SECURITY GRID ═══════════════ */
-.security-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-  margin-top: 1.5rem;
-}
-.security-card {
-  background: var(--vp-c-bg-alt);
-  border: 1px solid var(--vp-c-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  transition: border-color 0.25s, transform 0.25s;
-}
-.security-card:hover {
-  border-color: var(--solarized-cyan);
-  transform: translateY(-2px);
-}
-.security-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
-.security-card h4 { margin: 0 0 0.5rem !important; font-size: 1.1rem; border: none !important; padding: 0 !important; }
-.security-card p { font-size: 0.95rem; color: var(--vp-c-text-2); margin: 0; }
-.security-card a { color: var(--solarized-cyan); text-decoration: none; }
-.security-card a:hover { text-decoration: underline; }
 
 /* ═══════════════ FAQ ═══════════════ */
 .faq-item {
@@ -492,9 +509,6 @@ The developer experience you deserve, without the bloated GUI, massive dependenc
 /* ═══════════════ RESPONSIVE ═══════════════ */
 @media (max-width: 768px) {
   .steps-grid { grid-template-columns: 1fr; }
-  .security-grid { grid-template-columns: 1fr; }
-  .pipeline { flex-direction: column; align-items: center; }
-  .pipeline-arrow { transform: rotate(90deg); padding: 0; }
   .eco-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
 }
