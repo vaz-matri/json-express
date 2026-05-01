@@ -26,5 +26,21 @@
   },
   "files": [
     "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "cli",
+    "command-line",
+    "scaffolding",
+    "auto-discovery"
   ]
 }

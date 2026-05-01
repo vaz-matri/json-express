@@ -24,5 +24,22 @@
   },
   "files": [
     "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "faker",
+    "seed-data",
+    "mock-data",
+    "test-data",
+    "faker-js"
   ]
 }

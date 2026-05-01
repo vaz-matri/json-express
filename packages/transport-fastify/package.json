@@ -27,5 +27,21 @@
   "dependencies": {
     "fastify": "^5.3.3",
     "@json-express/core": "workspace:*"
-  }
+  },
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "fastify",
+    "fastify-plugin",
+    "high-performance",
+    "transport"
+  ]
 }

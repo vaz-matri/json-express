@@ -27,5 +27,20 @@
   },
   "files": [
     "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "logging",
+    "console-logger",
+    "zero-dependency"
   ]
 }

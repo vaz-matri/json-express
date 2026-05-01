@@ -27,5 +27,21 @@
   },
   "files": [
     "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "dotenv",
+    "environment-variables",
+    "twelve-factor",
+    "spring-boot"
   ]
 }
