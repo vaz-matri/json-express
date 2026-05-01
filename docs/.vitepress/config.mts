@@ -3,9 +3,10 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "JSONExpress",
   description: "From JSON to Enterprise REST & GraphQL API in 0 seconds. Open-source Node.js meta-framework with pluggable databases, identity management, and 23 modular packages.",
+  base: '/docs/',
   cleanUrls: true,
   sitemap: {
-    hostname: 'https://json-express.dev'
+    hostname: 'https://jsonexpress.com/docs'
   },
   head: [
     ['meta', { name: 'theme-color', content: '#2aa198' }],
@@ -27,7 +28,7 @@ export default defineConfig({
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Cross-platform",
       "description": "Open-source Node.js meta-framework that generates REST and GraphQL APIs from JSON files and TypeScript schemas.",
-      "url": "https://json-express.dev",
+      "url": "https://jsonexpress.com",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     })]
   ],
