@@ -9,6 +9,7 @@ export default defineConfig({
     hostname: 'https://jsonexpress.com/docs'
   },
   head: [
+    ['meta', { name: 'google-site-verification', content: 'FqePtk21d7xIR5ykuGM0Q9I3pU0i5gr9rdHlbTjCsn4' }],
     ['meta', { name: 'theme-color', content: '#2aa198' }],
     ['meta', { name: 'keywords', content: 'JSONExpress, Node.js API framework, REST API generator, GraphQL API generator, headless CMS, TypeScript backend, JSON to API, pluggable database, Express.js alternative, Fastify framework' }],
     ['meta', { property: 'og:type', content: 'website' }],
