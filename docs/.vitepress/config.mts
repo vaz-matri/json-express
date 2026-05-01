@@ -19,6 +19,7 @@ export default defineConfig({
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: 'JSONExpress — From JSON to Enterprise API in 0 Seconds' }],
     ['meta', { name: 'twitter:description', content: 'Drop a JSON file → get REST & GraphQL. Scale to TypeScript when you need identity, hooks, and field-level security.' }],
+    ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
     ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' }],
@@ -42,6 +43,8 @@ export default defineConfig({
     }
   },
   themeConfig: {
+    logo: '/logo.svg',
+
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Docs', link: '/getting-started' },

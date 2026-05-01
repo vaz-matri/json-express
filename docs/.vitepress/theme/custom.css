@@ -81,7 +81,7 @@
 
   /* Buttons */
   --vp-button-brand-text: var(--solarized-base03);
-  
+
   --vp-button-alt-border: var(--solarized-base02);
   --vp-button-alt-text: var(--solarized-base0);
   --vp-button-alt-bg: var(--solarized-base02);
@@ -96,10 +96,16 @@
   border-bottom: 1px solid var(--vp-c-border);
 }
 
-/* Elegant Hero Text */
-.VPHero .name,
+/* Hero name: override gradient clip with solid body-text color */
+:root {
+  --vp-home-hero-name-color: var(--vp-c-text-1);
+}
+
+/* Hero text slot: cyan accent */
 .VPHero .text {
-  color: var(--solarized-blue);
+  color: var(--solarized-cyan);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 800;
 }
 
 /* Feature Cards */

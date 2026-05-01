@@ -512,4 +512,8 @@ One schema definition. Every layer is independently swappable.
   .eco-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
 }
+
+.image-container {
+  justify-content: flex-end;
+}
 </style>

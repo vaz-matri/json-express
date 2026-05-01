@@ -1,0 +1,56 @@
+<svg viewBox="0 0 360 340" width="480" height="453" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="h_r1"><rect x="40" y="20"  width="280" height="44"/></clipPath>
+    <clipPath id="h_r2"><rect x="40" y="76"  width="280" height="44"/></clipPath>
+    <clipPath id="h_r3"><rect x="40" y="132" width="280" height="44"/></clipPath>
+    <clipPath id="h_r4"><rect x="40" y="188" width="280" height="44"/></clipPath>
+    <clipPath id="h_r5"><rect x="40" y="244" width="280" height="44"/></clipPath>
+  </defs>
+
+  <style>
+    .row {
+      animation: slideIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    #row1 { animation-delay: 0.05s; }
+    #row2 { animation-delay: 0.18s; }
+    #row3 { animation-delay: 0.31s; }
+    #row4 { animation-delay: 0.44s; }
+    #row5 { animation-delay: 0.57s; }
+
+    @keyframes slideIn {
+      from { transform: translateX(60px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    .progress-fill {
+      animation: growBar 0.9s ease-out 0.85s both;
+    }
+    @keyframes growBar {
+      from { width: 0; }
+      to   { width: 280px; }
+    }
+  </style>
+
+  <g id="row1" class="row" clip-path="url(#h_r1)">
+    <rect x="40" y="20" width="280" height="40" rx="10" fill="#2a9d8f"/>
+  </g>
+
+  <g id="row2" class="row" clip-path="url(#h_r2)">
+    <rect x="40" y="76" width="280" height="40" rx="10" fill="#2a9d8f"/>
+  </g>
+
+  <g id="row3" class="row" clip-path="url(#h_r3)">
+    <rect x="40" y="132" width="280" height="40" rx="10" fill="#e8dfc8"/>
+  </g>
+
+  <g id="row4" class="row" clip-path="url(#h_r4)">
+    <rect x="40" y="188" width="280" height="40" rx="10" fill="#e8dfc8"/>
+  </g>
+
+  <g id="row5" class="row" clip-path="url(#h_r5)">
+    <rect x="40" y="244" width="280" height="40" rx="10" fill="#2a9d8f"/>
+  </g>
+
+  <rect x="40" y="300" width="280" height="18" rx="9" fill="#2a9d8f" opacity="0.15"/>
+  <rect class="progress-fill" x="40" y="300" height="18" rx="9" fill="#2a9d8f" opacity="0.45"/>
+</svg>

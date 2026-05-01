@@ -1,0 +1,10 @@
+<svg viewBox="0 0 120 74" width="120" height="74" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="json-express logo">
+  
+  <rect x="0" y="0" width="72" height="20" rx="6" fill="#14532d"></rect>
+  <rect x="78" y="0" width="42" height="20" rx="6" fill="#a3e635"></rect>
+  
+  <rect x="0" y="27" width="42" height="20" rx="6" fill="#a3e635"></rect>
+  <rect x="48" y="27" width="72" height="20" rx="6" fill="#14532d"></rect>
+  
+  <rect x="0" y="54" width="120" height="20" rx="6" fill="#14532d" opacity="0.18"></rect>
+</svg>

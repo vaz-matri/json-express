@@ -1,0 +1,19 @@
+<svg viewBox="0 0 280 220" width="280" height="220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="json-express hero mark">
+  
+  
+
+  
+  <rect x="50" y="34" width="62" height="30" rx="9" fill="#a3e635" opacity="0.4"></rect>
+  <rect x="120" y="34" width="110" height="30" rx="9" fill="#14532d" opacity="0.3"></rect>
+
+  
+  <rect x="50" y="74" width="110" height="30" rx="9" fill="#14532d"></rect>
+  <rect x="168" y="74" width="62" height="30" rx="9" fill="#a3e635"></rect>
+
+  
+  <rect x="50" y="114" width="62" height="30" rx="9" fill="#a3e635"></rect>
+  <rect x="120" y="114" width="110" height="30" rx="9" fill="#14532d" opacity="0.18"></rect>
+
+  
+  <rect x="50" y="154" width="180" height="30" rx="9" fill="#14532d" opacity="0.1"></rect>
+</svg>
