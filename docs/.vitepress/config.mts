@@ -3,16 +3,16 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "JSONExpress",
   description: "From JSON to Enterprise REST & GraphQL API in 0 seconds. Open-source Node.js meta-framework with pluggable databases, identity management, and 23 modular packages.",
-  base: '/docs/',
   cleanUrls: true,
   sitemap: {
-    hostname: 'https://jsonexpress.com/docs'
+    hostname: 'https://jsonexpress.com'
   },
   head: [
     ['meta', { name: 'google-site-verification', content: 'FqePtk21d7xIR5ykuGM0Q9I3pU0i5gr9rdHlbTjCsn4' }],
     ['meta', { name: 'theme-color', content: '#2aa198' }],
     ['meta', { name: 'keywords', content: 'JSONExpress, Node.js API framework, REST API generator, GraphQL API generator, headless CMS, TypeScript backend, JSON to API, pluggable database, Express.js alternative, Fastify framework' }],
     ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:url', content: 'https://jsonexpress.com/docs' }],
     ['meta', { property: 'og:site_name', content: 'JSONExpress' }],
     ['meta', { property: 'og:title', content: 'JSONExpress — From JSON to Enterprise API in 0 Seconds' }],
     ['meta', { property: 'og:description', content: 'Open-source Node.js meta-framework that turns raw JSON files into production-ready REST & GraphQL APIs with built-in identity, security, and 23 pluggable packages.' }],
