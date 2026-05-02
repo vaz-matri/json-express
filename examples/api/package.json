@@ -1,5 +1,5 @@
 {
-    "name": "examples-login",
+    "name": "api",
     "version": "1.0.0",
     "description": "Login page example",
     "scripts": {
@@ -12,10 +12,6 @@
         "@json-express/logger-console": "workspace:*",
         "@json-express/adapter-json": "workspace:*",
         "@json-express/api-rest": "workspace:*",
-        "@json-express/transport-express": "workspace:*",
-        "@json-express/middleware-auth": "workspace:*",
-        "@json-express/plugin-identity": "workspace:*",
-        "@json-express/docs-swagger": "workspace:*",
-        "@json-express/kv-memory": "workspace:*"
+        "@json-express/transport-express": "workspace:*"
     }
 }

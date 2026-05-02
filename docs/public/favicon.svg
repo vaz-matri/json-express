@@ -7,8 +7,8 @@
   <rect x="4" y="10" width="8" height="4" rx="2" fill="#e8dfc8"></rect>
   <rect x="14" y="10" width="14" height="4" rx="2" fill="#2a9d8f"></rect>
 
-    <rect x="4" y="15" width="14" height="4" rx="2" fill="#2a9d8f"></rect>
-    <rect x="20" y="16" width="8" height="4" rx="2" fill="#e8dfc8"></rect>
+  <rect x="4" y="15" width="14" height="4" rx="2" fill="#2a9d8f"></rect>
+  <rect x="20" y="16" width="8" height="4" rx="2" fill="#e8dfc8"></rect>
 
-  <rect x="4" y="22" width="24" height="2" rx="2" fill="#2a9d8f" opacity="0.15"></rect>
+  <rect x="4" y="22" width="24" height="2" rx="1" fill="#e8dfc8"></rect>
 </svg>

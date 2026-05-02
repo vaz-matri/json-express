@@ -9,5 +9,5 @@
  <rect x="0" y="38" width="54" height="10" rx="6" fill="#2a9d8f"></rect>
  <rect x="60" y="38" width="20" height="10" rx="6" fill="#e8dfc8"></rect>
 
-  <rect x="0" y="54" width="80" height="5" rx="6" fill="#2a9d8f" opacity="0.15"></rect>
+  <rect x="0" y="54" width="80" height="5" rx="3" fill="#e8dfc8"></rect>
 </svg>

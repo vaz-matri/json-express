@@ -8,3 +8,4 @@ export * from './errors';
 export * from './schema';
 export * from './auth';
 export * from './testing/adapter-compliance';
+export { startServer } from './runner';

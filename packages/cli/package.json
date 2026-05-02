@@ -1,30 +1,23 @@
 {
   "name": "@json-express/cli",
   "version": "2.0.0-alpha.0",
-  "description": "The command line interface for JSON Express",
+  "description": "Developer workflow utility for JSON Express (scaffold projects, export collections to typed models). The server itself runs via the json-express binary shipped by @json-express/core.",
   "type": "module",
   "bin": {
-    "json-express": "./bin/exec.js"
+    "jex": "./bin/jex.js"
   },
   "scripts": {
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "@json-express/adapter-memory": "workspace:*",
-    "@json-express/api-rest": "workspace:*",
-    "@json-express/config-env": "workspace:*",
-    "@json-express/core": "workspace:*",
-    "@json-express/docs-light": "workspace:*",
-    "@json-express/logger-console": "workspace:*",
-    "@json-express/transport-express": "workspace:*",
-    "jiti": "^2.6.1",
-    "prompts": "^2.4.2"
+    "commander": "^12.1.0"
   },
   "devDependencies": {
-    "@types/prompts": "^2.4.9"
+      "@types/node": "^25.6.0"
   },
   "files": [
+    "bin",
     "dist"
   ],
   "keywords": [
@@ -41,6 +34,6 @@
     "cli",
     "command-line",
     "scaffolding",
-    "auto-discovery"
+    "developer-tools"
   ]
 }
