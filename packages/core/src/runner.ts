@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { createRequire } from 'module';
 import { pathToFileURL } from 'url';
 import { JsonExpressKernel } from './kernel';
@@ -61,18 +61,51 @@ const resolveActive = (
     return null;
 };
 
+const discoverPluginsRecursively = (cwd: string): string[] => {
+    const visited = new Set<string>();
+    const allDiscovered = new Set<string>();
+
+    const crawl = (pkgDir: string) => {
+        const pkgPath = join(pkgDir, 'package.json');
+        if (!existsSync(pkgPath)) return;
+
+        const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+        const deps = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies })
+            .filter(dep => dep.startsWith('@json-express/') || dep.includes('json-express-'));
+
+        for (const dep of deps) {
+            if (visited.has(dep)) continue;
+            visited.add(dep);
+            allDiscovered.add(dep);
+
+            try {
+                // Resolve where this plugin actually lives in node_modules
+                const req = createRequire(join(pkgDir, 'package.json'));
+                const resolvedEntry = req.resolve(dep);
+                
+                // Walk up the tree to find this plugin's package.json directory
+                let currentDir = dirname(resolvedEntry);
+                while (currentDir !== '/' && !existsSync(join(currentDir, 'package.json'))) {
+                    currentDir = dirname(currentDir);
+                }
+
+                // Recursively crawl its dependencies
+                crawl(currentDir);
+            } catch (e) {
+                // Silently ignore if a package fails to resolve
+            }
+        }
+    };
+
+    crawl(cwd);
+    return Array.from(allDiscovered);
+};
+
 export const startServer = async () => {
     const cwd = process.cwd();
 
-    // 1. Auto-Discovery: scan local package.json for json-express plugins
-    const pkgPath = join(cwd, 'package.json');
-    let installedDeps: string[] = [];
-
-    if (existsSync(pkgPath)) {
-        const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
-        installedDeps = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies })
-            .filter(dep => dep.startsWith('@json-express/') || dep.includes('json-express-'));
-    }
+    // 1. Auto-Discovery: Dynamically crawl local and transitive json-express plugins
+    const installedDeps = discoverPluginsRecursively(cwd);
 
     // 2. Discover and instantiate the Config Provider FIRST so JEX.* values
     //    can drive plugin selection in subsequent steps.
