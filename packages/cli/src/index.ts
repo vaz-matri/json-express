@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { runExportSchema } from './commands/export';
 import { runInit } from './commands/init';
+import { runConfigure } from './commands/configure';
 
 const program = new Command();
 
@@ -13,6 +14,11 @@ program
     .command('init [name]')
     .description('Scaffold a new JSON Express project (writes package.json pointing to @json-express/boot)')
     .action((name?: string) => runInit(process.cwd(), name));
+
+program
+    .command('configure')
+    .description('Interactively pick which @json-express/* plugin to use per category and save to .env')
+    .action(() => runConfigure(process.cwd()));
 
 program
     .command('export <collection>')

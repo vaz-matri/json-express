@@ -11,10 +11,12 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "commander": "^12.1.0"
+    "commander": "^12.1.0",
+    "prompts": "^2.4.2"
   },
   "devDependencies": {
-      "@types/node": "^25.6.0"
+    "@types/node": "^25.6.0",
+    "@types/prompts": "^2.4.9"
   },
   "files": [
     "bin",
