@@ -1,0 +1,10 @@
+{
+    "name": "test-preset",
+    "scripts": {
+        "serve": "json-express",
+        "preset": "json-express --preset-init"
+    },
+    "dependencies": {
+        "@json-express/preset-ecommerce": "workspace:*"
+    }
+}

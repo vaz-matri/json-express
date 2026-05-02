@@ -58,14 +58,14 @@
   to   { width: 280px; x: 40px;  }
 }
 
-.r1a { animation: shrink 1.8s 0s   cubic-bezier(0.4,0,0.2,1) both; }
-.r1b { animation: grow-x 1.8s 0s   cubic-bezier(0.4,0,0.2,1) both; }
-.r3a { animation: shrink 1.8s 2s   cubic-bezier(0.4,0,0.2,1) both; }
-.r3b { animation: grow-x 1.8s 2s   cubic-bezier(0.4,0,0.2,1) both; }
-.r2a { animation: shrink 1.8s 3.5s cubic-bezier(0.4,0,0.2,1) both; }
-.r2b { animation: grow-x 1.8s 3.5s cubic-bezier(0.4,0,0.2,1) both; }
-.r4a { animation: shrink 1.8s 5s   cubic-bezier(0.4,0,0.2,1) both; }
-.r4b { animation: grow-x 1.8s 5s   cubic-bezier(0.4,0,0.2,1) both; }
-.r5a { animation: shrink 1.8s 6.5s cubic-bezier(0.4,0,0.2,1) both; }
-.r5b { animation: grow-x 1.8s 6.5s cubic-bezier(0.4,0,0.2,1) both; }
+.r1a { animation: shrink 5s 40s   cubic-bezier(0.4,0,0.2,1) both; }
+.r1b { animation: grow-x 5s 40s   cubic-bezier(0.4,0,0.2,1) both; }
+.r3a { animation: shrink 5s 10s   cubic-bezier(0.4,0,0.2,1) both; }
+.r3b { animation: grow-x 5s 10s   cubic-bezier(0.4,0,0.2,1) both; }
+.r2a { animation: shrink 5s 2s cubic-bezier(0.4,0,0.2,1) both; }
+.r2b { animation: grow-x 5s 2s cubic-bezier(0.4,0,0.2,1) both; }
+.r4a { animation: shrink 5s 20s   cubic-bezier(0.4,0,0.2,1) both; }
+.r4b { animation: grow-x 5s 20s   cubic-bezier(0.4,0,0.2,1) both; }
+.r5a { animation: shrink 5s 30s cubic-bezier(0.4,0,0.2,1) both; }
+.r5b { animation: grow-x 5s 30s cubic-bezier(0.4,0,0.2,1) both; }
 </style>

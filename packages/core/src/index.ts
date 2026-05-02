@@ -8,3 +8,4 @@ export * from './schema';
 export * from './auth';
 export * from './testing/adapter-compliance';
 export { startServer } from './runner';
+export { runPresetInit } from './preset-init';

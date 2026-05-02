@@ -3,16 +3,9 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "serve": "json-express",
-        "test": "playwright test"
+        "serve": "json-express"
     },
     "dependencies": {
-        "@json-express/core": "workspace:*",
-        "@json-express/config-env": "workspace:*",
-        "@json-express/adapter-memory": "workspace:*",
-        "@json-express/api-rest": "workspace:*",
-        "@json-express/transport-express": "workspace:*",
-        "@json-express/logger-console": "workspace:*",
-        "@json-express/docs-light": "workspace:*"
+        "@json-express/boot": "workspace:*"
     }
 }
