@@ -7,14 +7,14 @@
 Skip the backend bottleneck and go from prototype to MVP launch faster.
 **JSON Express v2.0** is a highly modular, pluggable Meta-Framework. It instantly converts your JSON files into a complete server, providing the practical infrastructure you need until your dedicated backend is ready.
 
-visit[jsonexpress.com](https://jsonexpress.com)
+visit [jsonexpress.com](https://jsonexpress.com)
 
 ## ✨ Features
 - **Schema-Driven Engine** - Define strongly-typed data models using `defineModel` for the ultimate Code-First experience. Drop TypeScript files into `/models` and JSON Express transpiles them at runtime with zero-config via `jiti`!
 - **Data & Logic Separation** - Strictly separates your definition schemas (`/models/albums.ts`) from your permanent disk storage (`/data/albums.json`).
 - **REST Joins** - The Memory database automatically resolves relationships natively! Use `?_expand=artistId` directly in HTTP requests to join objects securely.
-- **Custom Endpoints** - Extend your models immediately using the `endpoints: {}` block in schemas, or drop global API routes straight into a root `/routes` directory. 
-- **The `export` Command** - Start hacking in raw JSON. When you need relationships, run `json-express export albums` to instantly scaffold a strict, typed schema blueprint from your unstructured data.
+- **Custom Endpoints** - Extend your models immediately using the `endpoints: {}` block in schemas, or drop global API routes straight into a root `/routes` directory.
+- **Offline Tooling** - Use `npx jex export albums` to scaffold a strict, typed schema blueprint from your unstructured JSON.
 - **Microkernel Architecture** - Pluggable design! Swap out the Database, Transport (Express/Fastify), or API paradigm without breaking your logic.
 - **Deep Observability** - Fully correlated tracing via `AsyncLocalStorage` seamlessly connecting every Request → Middleware → API → Database call across the framework.
 
@@ -22,102 +22,121 @@ visit[jsonexpress.com](https://jsonexpress.com)
 
 ## 🚀 Installation & Quick Start
 
-You can run JSON Express globally for instant prototyping, or install it locally to customize your stack.
+JSON Express ships two installation paths so you can choose how much to wire up yourself.
 
-### Option A: The Global Quick-Start (Zero Config)
-Get up and running in seconds without installing anything in your project.
+### Path A — Beginner: `@json-express/boot` (Batteries Included)
 
-```bash
-# 1. Boilerplate your folder structure
-$ mkdir -p my-api/data my-api/models && cd my-api
-
-# 2. Start hacking your data
-$ echo '[{"id": "1", "name": "The Marshall Mathers LP", "artist": "Eminem"}]' > data/albums.json
-
-# 3. Run JSON Express via npx!
-$ npx @json-express/cli
-```
-
-### Option B: The Schema-Driven Experience
-When you're ready to add relations or webhooks to your data, scaffold a TypeScript schema natively without configuring TSC!
+A single meta-package bundles the recommended default stack so you can boot a working server immediately.
 
 ```bash
-# Export the raw JSON into a typed schema instantly:
-$ npx @json-express/cli export albums
-
-# Edit your new strongly-typed model:
-# (Inside models/albums.ts)
-import { defineModel, types } from '@json-express/core';
-
-export default defineModel('albums', {
-    fields: {
-        name: types.string(),
-        artistId: types.relation({ target: 'artists', type: 'many-to-one' })
-    },
-    endpoints: {
-        'GET /stats': async (req, res, ctx) => {
-             res.send({ status: 'album stats go here' });
-        }
-    }
-});
+npm install @json-express/boot
 ```
+
+In `package.json`:
+```json
+{
+  "scripts": { "start": "json-express" },
+  "dependencies": { "@json-express/boot": "*" }
+}
+```
+
+Drop a JSON file in and run:
+```bash
+mkdir data && echo '[{"id":"1","title":"Hello"}]' > data/posts.json
+npm run start    # serves GET/POST/PATCH/DELETE /posts on :3000
+```
+
+### Path B — Expert: `@json-express/core` + Specific Plugins
+
+Install only the layers you want — `core` plus a config module, an adapter, an API generator, a transport, and a logger.
+
+```bash
+npm install @json-express/core @json-express/config-env \
+            @json-express/adapter-memory @json-express/api-rest \
+            @json-express/transport-fastify @json-express/logger-pino
+```
+
+`npm run start` and the engine auto-discovers everything you installed.
+
+---
+
+## 🧩 Infrastructure as Dependencies
+
+JSON Express's defining philosophy: **your application's infrastructure is defined entirely through composition in `package.json` dependencies.** You never write a `server.ts` or wire an IoC container — to swap a layer, install a different plugin.
+
+- Want Fastify instead of Express? `npm install @json-express/transport-fastify`.
+- Want JSON-file persistence instead of in-memory? `npm install @json-express/adapter-json`.
+- Conflicts (two transports installed, etc.) are resolved either by setting `JEX.TRANSPORT=<package-name>` in `.env`, or by running the interactive wizard: `npx jex configure`.
 
 ---
 
 ## 🧠 How It Works Behind the Scenes
 
-JSON Express v2 is built on a "Headless Microkernel" architecture. The `@json-express/core` package contains **zero** HTTP or database logic. It acts purely as an orchestrator using an Inversion of Control (IoC) container.
+JSON Express v2 is built on a "Headless Microkernel" architecture. The `@json-express/core` package contains **zero** HTTP or database logic — it acts as an orchestrator using an Inversion of Control (IoC) container, and ships the `json-express` binary that boots your server.
 
-When you start the CLI, the Kernel boots in phases:
-1. **Configuration:** Loads environment variables and config files.
-2. **Auto-Discovery:** Scans your `package.json` to see which plugins you have installed.
-3. **Registration:** Binds the Logger, Database, API Generator, and Server Transport layers together.
-4. **Boot:** The Database parses your data, the API Generator builds the routes, and the Transport server starts listening!
+When you run `json-express`, the kernel boots in phases:
+1. **Configuration:** Auto-discovers the installed `config-*` module and loads `.env`.
+2. **Auto-Discovery:** Scans your `package.json` for the rest of the installed `@json-express/*` plugins.
+3. **Registration:** Binds the Logger, Database, API Generator, and Server Transport into the IoC container.
+4. **Boot:** The Database parses your data, the API Generator builds the routes, and the Transport server starts listening.
 
-### The Default Stack ("Batteries Included")
-If you run the CLI without installing any custom plugins, it automatically falls back to its highly-capable default stack:
+The runtime is non-interactive — if multiple plugins are installed in the same category and no `JEX.<CATEGORY>` env value is set, `core` errors out with a clear message. Use `npx jex configure` (see below) to write the choice to `.env`.
+
+### The Default Stack
+
+`@json-express/boot` bundles the recommended set:
+- **Config:** [`@json-express/config-env`](./packages/config-env)
 - **Logger:** [`@json-express/logger-console`](./packages/logger-console)
 - **Server:** [`@json-express/transport-express`](./packages/transport-express)
 - **API:** [`@json-express/api-rest`](./packages/api-rest)
 - **Database:** [`@json-express/adapter-memory`](./packages/adapter-memory)
-- **Config:** [`@json-express/config-env`](./packages/config-env)
+- **Docs:** [`@json-express/docs-light`](./packages/docs-light)
 
-### 🔄 How to Override Defaults
-To change the framework's behavior, **you just install the plugin you want.** The CLI's Auto-Discovery engine handles the rest!
+---
 
-*Example: Swapping Express for Fastify*
+## 🛠 Developer Tooling: `jex`
+
+The `@json-express/cli` package ships an offline `jex` binary for project workflows. It does **not** start the server — that's `json-express` from `@json-express/core`.
+
 ```bash
-# Install the fastify transport plugin
-npm install @json-express/transport-fastify
+npx jex init my-app          # scaffold a new project pointing to @json-express/boot
+npx jex configure            # pick a plugin per category and save to .env
+npx jex export albums        # turn data/albums.json into a typed model under models/
 ```
-The next time you run `npx json-express`, the CLI detects Fastify, silently unloads the default Express plugin, and boots your server using Fastify. No code changes required!
 
-*(If you install two conflicting plugins, the interactive CLI will pause and ask you which one you prefer!)*
+Recommended as a `devDependency` or invoked via `npx`.
 
 ---
 
 ## 🧩 The Ecosystem (Mix & Match)
 
 ### 🛠️ Core & Tooling
-* **[`@json-express/core`](./packages/core/ReadMe.md)** - The headless Microkernel and IoC container.
-* **[`@json-express/cli`](./packages/cli/ReadMe.md)** - The command-line runner and auto-discovery engine.
+* **[`@json-express/core`](./packages/core)** - Kernel + IoC container + Auto-Discovery Orchestrator. Provides the `json-express` binary.
+* **[`@json-express/boot`](./packages/boot)** - "Batteries Included" preset bundling the recommended default stack.
+* **[`@json-express/cli`](./packages/cli)** - Offline developer utility exposing the `jex` binary (`init`, `configure`, `export`).
+
+### ⚙️ Configuration
+* **[`@json-express/config-env`](./packages/config-env)** *(Default)* - Twelve-Factor `.env` configuration provider.
 
 ### 🌐 Transports (Server Layer)
-* **[`@json-express/transport-express`](./packages/transport-express/ReadMe.md)** *(Default)* - Express.js server.
-* **[`@json-express/transport-fastify`](./packages/transport-fastify/ReadMe.md)** - High-performance Fastify server.
-* *(Upcoming)* `@json-express/transport-h3` - Lightweight, edge-ready h3 server.
+* **[`@json-express/transport-express`](./packages/transport-express)** *(Default)* - Express.js server.
+* **[`@json-express/transport-fastify`](./packages/transport-fastify)** - High-performance Fastify server.
 
 ### 🔌 API Paradigms
-* **[`@json-express/api-rest`](./packages/api-rest/ReadMe.md)** *(Default)* - Standardized RESTful routes (`GET`, `POST`, `PATCH`, `DELETE`).
-* *(Upcoming)* `@json-express/api-graphql` - Generates a GraphQL schema and resolvers.
+* **[`@json-express/api-rest`](./packages/api-rest)** *(Default)* - Standardized RESTful routes (`GET`, `POST`, `PATCH`, `DELETE`).
+* **[`@json-express/api-graphql`](./packages/api-graphql)** - Generates a GraphQL schema and resolvers.
 
 ### 🗄️ Adapters (Database Layer)
-* **[`@json-express/adapter-memory`](./packages/adapter-memory/ReadMe.md)** *(Default)* - Fast, in-memory local JSON file storage.
-* *(Upcoming)* `@json-express/adapter-mongodb` - Persists your data to MongoDB.
+* **[`@json-express/adapter-memory`](./packages/adapter-memory)** *(Default)* - Fast, in-memory storage.
+* **[`@json-express/adapter-json`](./packages/adapter-json)** - Persists each collection as a JSON file on disk.
 
 ### 📊 Loggers (Observability Layer)
-* **[`@json-express/logger-console`](./packages/logger-console/ReadMe.md)** *(Default)* - Zero-dependency standard output logging.
-* **[`@json-express/logger-pino`](./packages/logger-pino/ReadMe.md)** - Enterprise high-performance structured JSON logging.
+* **[`@json-express/logger-console`](./packages/logger-console)** *(Default)* - Zero-dependency standard output logging.
+* **[`@json-express/logger-pino`](./packages/logger-pino)** - Enterprise high-performance structured JSON logging.
+
+### 📚 Documentation Providers
+* **[`@json-express/docs-light`](./packages/docs-light)** *(Default)* - Lightweight HTML manifest at `/docs`.
+* **[`@json-express/docs-swagger`](./packages/docs-swagger)** - Interactive Swagger UI at `/docs`.
 
 ---
 

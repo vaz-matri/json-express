@@ -22,4 +22,4 @@ This package ships **no application code** — its only purpose is to declare th
 ## When to use this vs. core directly
 
 - **Beginner / quickstart:** install `@json-express/boot`. You get a complete working stack out of the box.
-- **Expert:** install `@json-express/core` plus only the specific plugins you want (e.g. `@json-express/transport-fastify`, `@json-express/adapter-mongodb`). The `json-express` binary auto-discovers whichever plugins are present.
+- **Expert:** install `@json-express/core` plus only the specific plugins you want (e.g. `@json-express/transport-fastify`, `@json-express/adapter-json`). The `json-express` binary auto-discovers whichever plugins are present.
