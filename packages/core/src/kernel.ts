@@ -15,7 +15,6 @@ import type {
     IKvStore,
     IQueueAdapter
 } from './types';
-import { ConsoleLogger } from './logger';
 import { randomUUID } from 'crypto';
 import { composeMiddlewares } from './pipeline';
 
@@ -32,16 +31,9 @@ export class JsonExpressKernel {
     private middlewares: Map<string, IMiddleware> = new Map();
     private seeders: ISeeder[] = [];
     private plugins: IPlugin[] = [];
-    private logger: ILogger;
 
     constructor() {
-        // 1. Initialize Default Logger
-        this.logger = new ConsoleLogger();
-
-        // 2. Initialize the Dependency Injection Container
         this.container = createContainer();
-
-        // 3. Register the default ID Generator immediately
         this.container.register({
             idGenerator: asValue(new DefaultIdGenerator())
         });
@@ -70,7 +62,6 @@ export class JsonExpressKernel {
     }
 
     public registerLogger(logger: ILogger) {
-        this.logger = logger;
         this.container.register({ logger: asValue(logger) });
     }
 
@@ -134,10 +125,10 @@ export class JsonExpressKernel {
         const env = process.env.NODE_ENV || 'development'
         this.container.register({ NODE_ENV: asValue(env) })
 
-        // Ensure logger is registered in the container as 'logger' for other plugins to resolve
         if (!this.container.hasRegistration('logger')) {
-            this.container.register({ logger: asValue(this.logger) });
+            throw new Error("❌ No logger registered! Call kernel.registerLogger(...) before boot(), or install an @json-express/logger-* plugin.");
         }
+        const logger = this.container.resolve<ILogger>('logger');
 
         // Resolve ConfigProvider or provide an empty fallback
         let configProvider: IConfigProvider
@@ -180,7 +171,7 @@ export class JsonExpressKernel {
             const queue = this.container.hasRegistration('queue')
                 ? this.container.resolve<IQueueAdapter>('queue')
                 : undefined;
-            db.setHookContext({ db, email, kvStore, queue, logger: this.logger });
+            db.setHookContext({ db, email, kvStore, queue, logger });
         }
 
         // 3. Ask the API Generator to create abstract route definitions

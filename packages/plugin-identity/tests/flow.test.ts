@@ -9,7 +9,8 @@ import type {
     JsonResponse,
     RouteDefinition,
 } from '@json-express/core';
-import { JsonExpressKernel, ConsoleLogger, createJwtVerifier } from '@json-express/core';
+import { JsonExpressKernel, createJwtVerifier } from '@json-express/core';
+import { ConsoleLogger } from '@json-express/logger-console';
 import { MemoryDatabaseAdapter } from '@json-express/adapter-memory';
 import { MemoryKvStore } from '@json-express/kv-memory';
 import { MemoryQueueAdapter } from '@json-express/queue-memory';

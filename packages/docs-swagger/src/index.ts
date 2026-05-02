@@ -7,13 +7,13 @@ import type {
 } from '@json-express/core';
 
 export class SwaggerDocProvider implements IDocProvider {
-    private logger?: ILogger;
+    private logger: ILogger;
     private configProvider?: IConfigProvider;
 
-    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
-        this.logger = logger?.child({ component: 'Docs-Swagger' });
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
+        this.logger = logger.child({ component: 'Docs-Swagger' });
         this.configProvider = configProvider;
-        this.logger?.info('Interactive Swagger documentation provider initialized.');
+        this.logger.info('Interactive Swagger documentation provider initialized.');
     }
 
     public renderTitle(): string {

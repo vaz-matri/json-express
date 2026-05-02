@@ -15,7 +15,6 @@ import type {
     AccessRule
 } from '@json-express/core';
 import {
-    ConsoleLogger,
     evaluateAccess,
     needsOwnerCheck,
     resolveOwnerField,
@@ -46,11 +45,11 @@ export class RestApiGenerator implements IApiGenerator {
     constructor({ database, configProvider, logger }: {
         database: IDatabaseAdapter;
         configProvider?: IConfigProvider;
-        logger?: ILogger;
+        logger: ILogger;
     }) {
         this.db = database;
         this.config = configProvider;
-        this.logger = logger?.child({ component: 'API-REST' }) ?? new ConsoleLogger({ context: { component: 'API-REST' } });
+        this.logger = logger.child({ component: 'API-REST' });
     }
 
     public setSchemas(schemas: ModelSchema[]) {

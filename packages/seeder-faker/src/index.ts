@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import type { ISeeder, IDatabaseAdapter, IConfigProvider, ILogger } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/core';
 
 export interface FakerConfig {
     mode?: 'auto' | 'manual';
@@ -13,9 +12,9 @@ export class FakerSeeder implements ISeeder {
     private config: FakerConfig;
     private logger: ILogger;
 
-    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
         this.config = configProvider?.get<FakerConfig>('faker', {}) || {};
-        this.logger = logger?.child({ component: 'Faker' }) ?? new ConsoleLogger({ context: { component: 'Faker' } });
+        this.logger = logger.child({ component: 'Faker' });
     }
 
     private getDefaultSchema() {

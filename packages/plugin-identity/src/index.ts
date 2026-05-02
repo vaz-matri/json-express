@@ -9,7 +9,7 @@ import type {
     IQueueAdapter,
     ModelSchema,
 } from '@json-express/core';
-import { ConsoleLogger, createJwtVerifier, type JsonExpressKernel } from '@json-express/core';
+import { createJwtVerifier, type JsonExpressKernel } from '@json-express/core';
 import { identitySchemas } from './schemas';
 import { hashPassword } from './crypto';
 import { passwordResetEmail } from './email-templates';
@@ -74,9 +74,8 @@ export class IdentityPlugin implements IPlugin {
     private logger: ILogger;
     private adminPassword: string | null = null;
 
-    constructor({ configProvider: _config, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
-        this.logger = logger?.child({ component: 'Identity' })
-            ?? new ConsoleLogger({ context: { component: 'Identity' } });
+    constructor({ configProvider: _config, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
+        this.logger = logger.child({ component: 'Identity' });
     }
 
     public provideSchemas(): ModelSchema[] {

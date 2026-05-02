@@ -1,5 +1,5 @@
 import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, QueryOptions, ModelSchema, HookContext, TypeDefinition } from '@json-express/core';
-import { ConsoleLogger, UniqueConstraintError } from '@json-express/core';
+import { UniqueConstraintError } from '@json-express/core';
 
 function toSingular(name: string): string {
     if (name.endsWith('ies')) return name.slice(0, -3) + 'y';
@@ -15,9 +15,9 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
     private schemas: ModelSchema[] = [];
     private hookContext?: HookContext;
 
-    constructor({ configProvider, logger, idGenerator }: { configProvider?: IConfigProvider; logger?: ILogger; idGenerator?: IIdGenerator } = {}) {
+    constructor({ configProvider, logger, idGenerator }: { configProvider?: IConfigProvider; logger: ILogger; idGenerator?: IIdGenerator }) {
         this.config = configProvider;
-        this.logger = logger?.child({ component: 'DB-Memory' }) ?? new ConsoleLogger({ context: { component: 'DB-Memory' } });
+        this.logger = logger.child({ component: 'DB-Memory' });
         this.idGenerator = idGenerator;
     }
 

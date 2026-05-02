@@ -27,7 +27,6 @@ import type {
     JwtVerifier,
 } from '@json-express/core';
 import {
-    ConsoleLogger,
     evaluateAccess,
     needsOwnerCheck,
     resolveOwnerField,
@@ -148,13 +147,11 @@ export class GraphQLApiGenerator implements IApiGenerator {
     }: {
         database: IDatabaseAdapter;
         configProvider?: IConfigProvider;
-        logger?: ILogger;
+        logger: ILogger;
     }) {
         this.db = database;
         this.config = configProvider;
-        this.logger =
-            logger?.child({ component: 'API-GraphQL' }) ??
-            new ConsoleLogger({ context: { component: 'API-GraphQL' } });
+        this.logger = logger.child({ component: 'API-GraphQL' });
     }
 
     public setSchemas(schemas: ModelSchema[]) {

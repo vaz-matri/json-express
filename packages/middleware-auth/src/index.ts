@@ -1,5 +1,5 @@
 import type { IMiddleware, JsonRequest, JsonResponse, IConfigProvider, ILogger, JwtVerifier } from '@json-express/core';
-import { ConsoleLogger, createJwtVerifier } from '@json-express/core';
+import { createJwtVerifier } from '@json-express/core';
 
 export class AuthMiddleware implements IMiddleware {
     public readonly name = 'auth';
@@ -7,8 +7,8 @@ export class AuthMiddleware implements IMiddleware {
     private excludePaths: string[] = [];
     private logger: ILogger;
 
-    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger }) {
-        this.logger = logger?.child({ component: 'Auth' }) ?? new ConsoleLogger({ context: { component: 'Auth' } });
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
+        this.logger = logger.child({ component: 'Auth' });
         if (!configProvider) return;
 
         const secret = configProvider.get<string | undefined>('auth.secret', undefined);

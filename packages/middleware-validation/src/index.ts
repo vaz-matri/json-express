@@ -1,6 +1,5 @@
 import type { ZodSchema } from 'zod';
 import type { IMiddleware, JsonRequest, JsonResponse, IConfigProvider, ILogger } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/core';
 
 export interface ValidationRule {
     method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | '*';
@@ -14,8 +13,8 @@ export class ValidationMiddleware implements IMiddleware {
     private rules: ValidationRule[] = [];
     private logger: ILogger;
 
-    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger }) {
-        this.logger = logger?.child({ component: 'Validation' }) ?? new ConsoleLogger({ context: { component: 'Validation' } });
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
+        this.logger = logger.child({ component: 'Validation' });
         if (!configProvider) return;
         
         const configRules = configProvider.get<ValidationRule[]>('validation.rules', []);

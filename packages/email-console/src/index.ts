@@ -1,5 +1,4 @@
 import type { IEmailProvider, EmailMessage, IConfigProvider, ILogger } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/core';
 
 const DEFAULT_FROM = 'no-reply@localhost';
 
@@ -7,9 +6,8 @@ export class ConsoleEmailProvider implements IEmailProvider {
     private logger: ILogger;
     private defaultFrom: string;
 
-    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
-        this.logger = logger?.child({ component: 'Email-Console' })
-            ?? new ConsoleLogger({ context: { component: 'Email-Console' } });
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
+        this.logger = logger.child({ component: 'Email-Console' });
         this.defaultFrom = configProvider?.get<string>('email.from', DEFAULT_FROM) ?? DEFAULT_FROM;
     }
 

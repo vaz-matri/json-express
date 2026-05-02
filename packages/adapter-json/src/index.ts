@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync, writeFileSync, renameSync, accessSync, existsSync, mkdirSync, constants } from 'fs';
 import { join, extname } from 'path';
 import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, ModelSchema, HookContext, TypeDefinition } from '@json-express/core';
-import { ConsoleLogger, UniqueConstraintError } from '@json-express/core';
+import { UniqueConstraintError } from '@json-express/core';
 
 export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     private store: Record<string, any[]> = {};
@@ -14,10 +14,10 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     private schemas: ModelSchema[] = [];
     private hookContext?: HookContext;
 
-    constructor({ configProvider, logger, idGenerator }: { configProvider?: IConfigProvider; logger?: ILogger; idGenerator?: IIdGenerator } = {}) {
+    constructor({ configProvider, logger, idGenerator }: { configProvider?: IConfigProvider; logger: ILogger; idGenerator?: IIdGenerator }) {
         this.config = configProvider;
         this.cwd = process.cwd();
-        this.logger = logger?.child({ component: 'DB-Json' }) ?? new ConsoleLogger({ context: { component: 'DB-Json' } });
+        this.logger = logger.child({ component: 'DB-Json' });
         this.idGenerator = idGenerator;
         this._scanAndLoad();
     }

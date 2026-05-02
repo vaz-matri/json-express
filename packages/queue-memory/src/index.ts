@@ -1,5 +1,4 @@
 import type { IQueueAdapter, JobOptions, IConfigProvider, ILogger } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/core';
 import { randomUUID } from 'crypto';
 
 type Handler = (job: { name: string, payload: any }) => Promise<void>;
@@ -8,9 +7,8 @@ export class MemoryQueueAdapter implements IQueueAdapter {
     private handlers: Map<string, Handler> = new Map();
     private logger: ILogger;
 
-    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
-        this.logger = logger?.child({ component: 'Queue-Memory' })
-            ?? new ConsoleLogger({ context: { component: 'Queue-Memory' } });
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
+        this.logger = logger.child({ component: 'Queue-Memory' });
     }
 
     public async enqueue(queueName: string, jobName: string, payload: any, options?: JobOptions): Promise<string> {

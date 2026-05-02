@@ -309,6 +309,9 @@ importers:
       '@json-express/kv-memory':
         specifier: workspace:*
         version: link:../kv-memory
+      '@json-express/logger-console':
+        specifier: workspace:*
+        version: link:../logger-console
       '@json-express/queue-memory':
         specifier: workspace:*
         version: link:../queue-memory

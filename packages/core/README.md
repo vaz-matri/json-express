@@ -31,8 +31,7 @@ Any official or community plugin must implement one of these core interfaces exp
 
 ### Request Context & Tracing
 The `core` package provides a robust mechanism for request-scoped correlation using Node.js `AsyncLocalStorage`:
-- `RequestContext`: A global utility to store and retrieve `traceId` and `startTime` consistently across the entire framework without parameter drilling.
-- `ConsoleLogger`: The built-in logger that automatically pulls `traceId` from the context for all log entries.
+- `RequestContext`: A global utility to store and retrieve `traceId` and `startTime` consistently across the entire framework without parameter drilling. Logger plugins (e.g. `@json-express/logger-console`, `@json-express/logger-pino`) read this to enrich every log entry with `traceId`.
 
 ### Core Utilities
 The `core` package also exposes vital Twelve-Factor configuration utilities used by other plugins:

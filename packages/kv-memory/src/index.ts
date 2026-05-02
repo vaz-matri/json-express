@@ -1,5 +1,4 @@
 import type { IKvStore, KvSetOptions, IConfigProvider, ILogger } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/core';
 
 interface Entry {
     value: any;
@@ -13,9 +12,8 @@ export class MemoryKvStore implements IKvStore {
     private logger: ILogger;
     private purgeTimer?: NodeJS.Timeout;
 
-    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger?: ILogger } = {}) {
-        this.logger = logger?.child({ component: 'KV-Memory' })
-            ?? new ConsoleLogger({ context: { component: 'KV-Memory' } });
+    constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
+        this.logger = logger.child({ component: 'KV-Memory' });
 
         const purgeIntervalMs = configProvider?.get<number>('kv.purgeIntervalMs', DEFAULT_PURGE_INTERVAL_MS)
             ?? DEFAULT_PURGE_INTERVAL_MS;

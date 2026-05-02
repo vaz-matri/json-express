@@ -33,6 +33,7 @@
   "devDependencies": {
     "@json-express/adapter-memory": "workspace:*",
     "@json-express/kv-memory": "workspace:*",
+    "@json-express/logger-console": "workspace:*",
     "@json-express/queue-memory": "workspace:*",
     "@types/jsonwebtoken": "^9.0.4",
     "awilix": "^10.0.1"
