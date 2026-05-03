@@ -10,7 +10,7 @@ Skip the backend bottleneck and go from prototype to MVP launch faster.
 visit [jsonexpress.com](https://jsonexpress.com)
 
 ## ✨ Features
-- **Schema-Driven Engine** - Define strongly-typed data models using `defineModel` for the ultimate Code-First experience. Drop TypeScript files into `/models` and JSON Express transpiles them at runtime with zero-config via `jiti`!
+- **Schema-Driven Engine** - Define strongly-typed data models using `defineModel` for the ultimate Code-First experience. Use the ergonomic Zod-style fluent API (e.g. `types.string().required()`) or pure JSON. Drop TypeScript files into `/models` and JSON Express transpiles them at runtime with zero-config via `jiti`!
 - **Data & Logic Separation** - Strictly separates your definition schemas (`/models/albums.ts`) from your permanent disk storage (`/data/albums.json`).
 - **REST Joins** - The Memory database automatically resolves relationships natively! Use `?_expand=artistId` directly in HTTP requests to join objects securely.
 - **Custom Endpoints** - Extend your models immediately using the `endpoints: {}` block in schemas, or drop global API routes straight into a root `/routes` directory.

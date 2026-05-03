@@ -36,6 +36,60 @@ When `json-express` starts, the engine boots in phases:
 
 The engine is **non-interactive** — for plugin disambiguation, see [`@json-express/cli`](../cli)'s `jex configure` wizard.
 
+## 🏗️ Schema Definition (Models)
+
+JSON Express is a schema-driven engine. You can define your data models in pure JSON or use the powerful TypeScript API via `defineModel`. 
+
+We support **two API styles** for TypeScript definitions, allowing you to choose between ergonomic Zod-style builders or a declarative Options-Object format.
+
+### 1. The Fluent Zod-Style API (Recommended)
+This provides chainable methods with perfect IDE autocomplete, ideal for TypeScript developers:
+
+```typescript
+import { defineModel, types } from '@json-express/core';
+
+export default defineModel({
+    name: 'product',
+    fields: {
+        name: types.string().required().unique(),
+        price: types.number().required().default(0).min(0),
+        isActive: types.boolean().default(true),
+        brandId: types.relation({ target: 'brand', type: 'many-to-one' }).onDelete('RESTRICT')
+    }
+});
+```
+
+### 2. The Options-Object API
+This maps 1:1 with pure `.json` models, ideal for strict serialization:
+
+```typescript
+import { defineModel, types } from '@json-express/core';
+
+export default defineModel({
+    name: 'product',
+    fields: {
+        name: types.string({ required: true, unique: true }),
+        price: types.number({ required: true, default: 0, min: 0 }),
+        isActive: types.boolean({ default: true }),
+        brandId: types.relation({ target: 'brand', type: 'many-to-one', onDelete: 'RESTRICT' })
+    }
+});
+```
+
+### Supported Properties
+
+Every field type supports the following `BaseOptions`:
+- `required?: boolean`
+- `default?: any`
+- `unique?: boolean`
+- `index?: boolean`
+
+**Specific Types:**
+- `types.string()` supports `maxLength`, `minLength`.
+- `types.number()` supports `min`, `max`.
+- `types.relation({ target, type })` requires `target` (collection name) and `type` (`one-to-many`, `many-to-one`, etc.), and supports `foreignKey`, `onDelete`.
+- `types.boolean()`, `types.date()`, `types.id()` support all `BaseOptions`.
+
 ## 🧩 The Standardized Contracts
 
 Any official or community plugin must implement one of the interfaces exported from `@json-express/core/types`:
