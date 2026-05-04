@@ -89,7 +89,6 @@ export async function loadSchemasAndData(cwd: string): Promise<{ schemas: ModelS
     };
 
     scanJson(dataDir);
-    scanJson(cwd);
 
     return { schemas, initialData };
 }
