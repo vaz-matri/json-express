@@ -53,6 +53,7 @@ export class LightDocProvider implements IDocProvider {
         const displayBaseUrl = hardcodedOverride || dynamicBaseUrl;
 
         const sortedRoutes = [...routes].sort((a, b) => a.path.localeCompare(b.path));
+        const hasHealthRoute = routes.some(r => r.path === '/health');
 
         // Group by resource (extract the first meaningful path segment)
         const groups: Record<string, RouteDefinition[]> = {};
@@ -255,7 +256,7 @@ export class LightDocProvider implements IDocProvider {
             Built with ⚡ by JSON Express v2
             <div class="links">
                 <a href="${path}/json">Raw JSON Manifest</a>
-                <a href="/health">System Health</a>
+                ${hasHealthRoute ? `<a href="/health">System Health</a>` : ''}
             </div>
         </footer>
     </div>

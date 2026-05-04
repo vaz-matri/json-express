@@ -1,8 +1,10 @@
-# File-backed JSON storage
+# JSON file storage example
 
 A minimal JSON Express setup where your collections live as plain `.json` files on disk and survive server restarts.
 
 Drop a JSON array into `data/`, start the server, and you immediately get a REST API for it. Any `POST` / `PATCH` / `DELETE` is written back to the same file.
+
+> New to JSON Express? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
 
 ## Setup
 
@@ -10,7 +12,9 @@ Drop a JSON array into `data/`, start the server, and you immediately get a REST
 npm install @json-express/boot @json-express/adapter-json
 ```
 
-Create a `.env` so the framework knows to use file-backed storage instead of the default in-memory adapter:
+This swaps the default in-memory adapter for [`@json-express/adapter-json`](../../packages/adapter-json/README.md). The rest of the stack (`api-rest`, `transport-express`, `logger-console`, `docs-light`) still comes from [`@json-express/boot`](../../presets/boot/README.md).
+
+Create a `.env` so the framework knows to use file-backed storage instead of the default:
 
 ```env
 jex.adapter=@json-express/adapter-json
@@ -69,3 +73,8 @@ You'll get `/comments` routes automatically on the next start.
 - `package.json` — declares the two dependencies and the `serve` script
 - `.env` — points the framework at `adapter-json`
 - `data/` — your JSON collections
+
+## See also
+
+- [`@json-express/adapter-json`](../../packages/adapter-json/README.md) — the package's own README, with options and internals
+- [`simple` example](../simple/README.md) — the default in-memory stack, plus the full directory of every other plugin and example
