@@ -56,7 +56,7 @@ const resolveActive = (
 
     fatal([
         `❌ Multiple '@json-express/${category}-*' plugins installed: ${available.join(', ')}.`,
-        `   Set JEX.${category.toUpperCase()}=<package-name> in .env to choose one.`
+        `   Set jex.${category}=<package-name> in .env to choose one.`
     ]);
     return null;
 };
@@ -127,7 +127,7 @@ export const startServer = async () => {
         } else {
             fatal([
                 `❌ Multiple '@json-express/config-*' plugins installed: ${availableConfigs.join(', ')}.`,
-                `   Set JEX.CONFIG=<package-name> in the environment to choose one.`
+                `   Set jex.config=<package-name> in the environment to choose one.`
             ]);
             return;
         }

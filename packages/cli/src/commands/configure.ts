@@ -22,11 +22,11 @@ const CATEGORIES: PluginCategory[] = [
 ];
 
 function setEnvKey(envPath: string, key: string, value: string) {
-    const normalizedKey = `JEX.${key.toUpperCase()}`;
+    const normalizedKey = `jex.${key}`;
     const newLine = `${normalizedKey}=${value}`;
     if (existsSync(envPath)) {
         const existing = readFileSync(envPath, 'utf8');
-        const keyRegex = new RegExp(`^${normalizedKey.replace(/\./g, '\\.')}=.*$`, 'm');
+        const keyRegex = new RegExp(`^${normalizedKey.replace(/\./g, '\\.')}=.*$`, 'mi');
         if (keyRegex.test(existing)) {
             writeFileSync(envPath, existing.replace(keyRegex, newLine), 'utf8');
             return;
@@ -83,7 +83,7 @@ export async function runConfigure(cwd: string) {
         }
 
         setEnvKey(envPath, category.key, response.choice);
-        console.log(`  ✅ JEX.${category.key.toUpperCase()}=${response.choice}`);
+        console.log(`  ✅ jex.${category.key}=${response.choice}`);
         savedCount++;
     }
 

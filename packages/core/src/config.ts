@@ -58,8 +58,10 @@ export function setNestedValue(obj: any, path: string, value: any): void {
 }
 
 /**
- * Converts a flat Record (e.g. process.env) with JEX_ prefixes and dot notation into a nested object.
- * Example: { "JEX_DATABASE.MAX_CONNECTIONS": "100" } => { database: { max_connections: 100 } }
+ * Converts a flat Record (e.g. process.env) with `jex` prefixes and dot notation into a nested object.
+ * Prefix and key casing are both case-insensitive — `jex.database.max_connections` (preferred)
+ * and `JEX__DATABASE__MAX_CONNECTIONS` (cloud-safe) produce the same result.
+ * Example: { "jex.database.max_connections": "100" } => { database: { max_connections: 100 } }
  */
 export function buildNestedConfigFromEnv(envVars: Record<string, string | undefined>, namespace = 'jex'): Record<string, any> {
     const config: Record<string, any> = {};

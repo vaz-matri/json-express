@@ -15,9 +15,9 @@ const PACKAGE_JSON_TEMPLATE = (name: string) => `{
 `;
 
 const ENV_TEMPLATE = `# JSON Express configuration
-# All keys are namespaced under JEX. Use '.' or '__' for nesting.
+# All keys are namespaced under jex. Use '.' or '__' for nesting.
 
-JEX.PORT=3000
+jex.port=3000
 `;
 
 const SAMPLE_DATA = `[
