@@ -88,17 +88,27 @@ export class FastifyTransport implements ITransport {
         });
     }
 
-    public start(port: number): Promise<void> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                await this.fastify.listen({ port, host: '0.0.0.0' });
-                const isHttps = !!this.config?.get('transport.fastify.ssl.key');
-                this.logger.info(`Server listening on ${isHttps ? 'https' : 'http'}://localhost:${port}`);
-                resolve();
-            } catch (err) {
-                reject(err);
+    public async start(port: number): Promise<void> {
+        try {
+            await this.fastify.listen({ port, host: '0.0.0.0' });
+            const isHttps = !!this.config?.get('transport.fastify.ssl.key');
+            this.logger.info(`Server listening on ${isHttps ? 'https' : 'http'}://localhost:${port}`);
+        } catch (err: any) {
+            if (err?.code === 'EADDRINUSE') {
+                this.logger.error(
+                    `Port ${port} is already in use. Refusing to start so the deployment ` +
+                    `platform's port contract isn't broken. Stop the other process ` +
+                    `(\`lsof -i:${port}\`) or set jex.port to a different port.`,
+                    { port, code: err.code }
+                );
+            } else {
+                this.logger.error(
+                    `Server failed to bind to port ${port}: ${err?.message ?? err}`,
+                    { port, code: err?.code }
+                );
             }
-        });
+            throw err;
+        }
     }
 
     public stop(): Promise<void> {

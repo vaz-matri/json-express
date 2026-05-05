@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction, Application } from 'express';
-import type { Server as HttpServer } from 'http';
+import http, { type Server as HttpServer } from 'http';
 import type { Server as HttpsServer } from 'https';
 import https from 'https';
 import { randomUUID } from 'crypto';
@@ -82,7 +82,7 @@ export class ExpressTransport implements ITransport {
     }
 
     public start(port: number): Promise<void> {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             // 404 — catch-all for unknown routes (registered LAST)
             this.app.use((req: Request, res: Response) => {
                 res.status(404).json({
@@ -92,18 +92,37 @@ export class ExpressTransport implements ITransport {
             });
 
             const ssl = this.config?.get<{ key: Buffer | string; cert: Buffer | string }>('express.ssl');
+            const protocol = ssl && ssl.key && ssl.cert ? 'https' : 'http';
 
-            if (ssl && ssl.key && ssl.cert) {
-                this.server = https.createServer(ssl, this.app).listen(port, () => {
-                    this.logger.info(`Server natively listening on https://localhost:${port}`);
-                    resolve();
-                });
-            } else {
-                this.server = this.app.listen(port, () => {
-                    this.logger.info(`Server listening on http://localhost:${port}`);
-                    resolve();
-                });
-            }
+            const onError = (err: NodeJS.ErrnoException) => {
+                if (err.code === 'EADDRINUSE') {
+                    this.logger.error(
+                        `Port ${port} is already in use. Refusing to start so the deployment ` +
+                        `platform's port contract isn't broken. Stop the other process ` +
+                        `(\`lsof -i:${port}\`) or set jex.port to a different port.`,
+                        { port, code: err.code }
+                    );
+                } else {
+                    this.logger.error(
+                        `Server failed to bind to port ${port}: ${err.message}`,
+                        { port, code: err.code }
+                    );
+                }
+                reject(err);
+            };
+
+            const onListening = () => {
+                this.logger.info(`Server listening on ${protocol}://localhost:${port}`);
+                resolve();
+            };
+
+            this.server = protocol === 'https'
+                ? https.createServer(ssl as any, this.app)
+                : http.createServer(this.app);
+
+            this.server.once('error', onError);
+            this.server.once('listening', onListening);
+            this.server.listen(port);
         });
     }
 

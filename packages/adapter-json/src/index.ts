@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync, writeFileSync, renameSync, accessSync, existsSync, mkdirSync, constants } from 'fs';
 import { join, extname } from 'path';
+import { randomUUID } from 'crypto';
 import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, ModelSchema, HookContext, TypeDefinition } from '@json-express/core';
 import { UniqueConstraintError } from '@json-express/core';
 
@@ -53,7 +54,7 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
                 data = data.map(item => {
                     if (item.id === undefined) {
                         modified = true;
-                        return { id: (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`), ...item };
+                        return { id: (this.idGenerator ? this.idGenerator.generate() : randomUUID()), ...item };
                     }
                     return item;
                 });
@@ -223,7 +224,7 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
 
         this.enforceUniqueConstraints(collection, payload);
 
-        const newId = payload.id !== undefined ? payload.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);
+        const newId = payload.id !== undefined ? payload.id : (this.idGenerator ? this.idGenerator.generate() : randomUUID());
         const newItem = { ...payload, id: newId };
         this.store[collection].push(newItem);
 

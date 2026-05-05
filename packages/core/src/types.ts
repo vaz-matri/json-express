@@ -81,6 +81,20 @@ export interface IDatabaseAdapter {
 export interface ITransport {
     registerRoute(route: RouteDefinition): void;
 
+    /**
+     * Bind the underlying server to `port`.
+     *
+     * **Contract**: this Promise MUST reject if the server cannot bind (e.g. `EADDRINUSE`,
+     * `EACCES`, port out of range). Never resolve and then crash asynchronously, and never
+     * silently fall back to a different port — the deployment platform owns the port
+     * contract, and a half-started server breaks load balancers, health checks, and
+     * service-mesh routing.
+     *
+     * On failure, log a structured error (port + cause + remediation hint) before rejecting
+     * so the operator has actionable output in the kernel's "Fatal Error booting" line.
+     *
+     * Conformance is exercised by `runTransportComplianceTests` in `@json-express/core`.
+     */
     start(port: number): Promise<void>;
 
     stop(): Promise<void>;

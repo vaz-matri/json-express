@@ -4,6 +4,21 @@ test.describe('Albums API CRUD', () => {
     test.describe.configure({ mode: 'serial' });
     let albumId: string;
 
+    // SEED — runs first so it observes the boot state from data/albums.json
+    test('should expose the seeded record from data/albums.json', async ({ request }) => {
+        const response = await request.get('/albums');
+        expect(response.ok()).toBeTruthy();
+        expect(response.headers()['content-type']).toContain('application/json');
+
+        const albums = await response.json();
+        expect(Array.isArray(albums)).toBe(true);
+
+        const seeded = albums.find((a: any) => a.name === 'Encore');
+        expect(seeded).toBeDefined();
+        expect(seeded.releaseDate).toBe('12-11-2004');
+        expect(seeded.id).toBeDefined();
+    });
+
     // CREATE
     test('should create a new album', async ({ request }) => {
         const response = await request.post('/albums', {

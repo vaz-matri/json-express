@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, QueryOptions, ModelSchema, HookContext, TypeDefinition } from '@json-express/core';
 import { UniqueConstraintError } from '@json-express/core';
 
@@ -33,7 +34,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
         for (const collection of Object.keys(initialData)) {
             initialData[collection] = initialData[collection].map(item => {
                 if (item.id === undefined) {
-                    return { id: (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`), ...item };
+                    return { id: (this.idGenerator ? this.idGenerator.generate() : randomUUID()), ...item };
                 }
                 return item;
             });
@@ -149,7 +150,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
 
         this.enforceUniqueConstraints(collection, payload);
 
-        const newId = payload.id !== undefined ? payload.id : (this.idGenerator ? this.idGenerator.generate() : `${Date.now()}`);
+        const newId = payload.id !== undefined ? payload.id : (this.idGenerator ? this.idGenerator.generate() : randomUUID());
         const newItem = { ...payload, id: newId };
         this.store[collection].push(newItem);
 
