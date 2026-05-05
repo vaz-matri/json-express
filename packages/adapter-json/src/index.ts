@@ -1,8 +1,14 @@
 import { readFileSync, readdirSync, writeFileSync, renameSync, accessSync, existsSync, mkdirSync, constants } from 'fs';
 import { join, extname } from 'path';
 import { randomUUID } from 'crypto';
-import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, ModelSchema, HookContext, TypeDefinition } from '@json-express/core';
+import type { IDatabaseAdapter, IConfigProvider, ILogger, IIdGenerator, QueryOptions, ModelSchema, HookContext, TypeDefinition } from '@json-express/core';
 import { UniqueConstraintError } from '@json-express/core';
+
+function toSingular(name: string): string {
+    if (name.endsWith('ies')) return name.slice(0, -3) + 'y';
+    if (name.endsWith('s')) return name.slice(0, -1);
+    return name;
+}
 
 export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
     private store: Record<string, any[]> = {};
@@ -156,54 +162,85 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
         // The CLI may call this with pre-parsed data; we ignore it since we self-loaded.
     }
 
-    public async getAll(collection: string): Promise<any[]> {
+    private applyPopulation(item: any, collection: string, options?: QueryOptions): any {
+        const populated = { ...item };
+
+        // 1. Schema-driven expansion (opt-in via _expand).
+        //    Mirrors adapter-memory's contract: many-to-one/one-to-one returns a single
+        //    record (or null); one-to-many/many-to-many returns an array.
+        const schema = this.schemas.find(s => s.name === collection);
+        if (options?.expand?.length && schema) {
+            for (const expandField of options.expand) {
+                const fieldDef = schema.fields[expandField] as TypeDefinition | undefined;
+                if (!fieldDef || fieldDef.type !== 'relation' || !fieldDef.options || !('target' in fieldDef.options)) {
+                    continue;
+                }
+
+                const targetCollection = (fieldDef.options as any).target;
+                const targetItems = this.store[targetCollection] || [];
+                const relationType = (fieldDef.options as any).type;
+
+                if (relationType === 'many-to-one' || relationType === 'one-to-one') {
+                    const fkField = (fieldDef.options as any).foreignKey || `${expandField}Id`;
+                    const fkValue = item[fkField];
+                    if (fkValue) {
+                        const expandedRecord = targetItems.find(t => String(t.id) === String(fkValue));
+                        populated[expandField] = expandedRecord || null;
+                    }
+                } else if (relationType === 'one-to-many' || relationType === 'many-to-many') {
+                    const fkField = (fieldDef.options as any).foreignKey || `${toSingular(collection)}Id`;
+                    populated[expandField] = targetItems.filter(child => String(child[fkField]) === String(item.id));
+                }
+            }
+        }
+
+        // 2. Inline `{ ref, id }` envelope auto-expansion (always-on, legacy behavior
+        //    used by the `json-adv` example for relations declared in JSON without a
+        //    model file). Skipped for any field that step 1 already replaced — the
+        //    expanded record won't match the envelope shape.
+        const refs = this.getRefs(populated);
+        for (const refField of Object.keys(refs)) {
+            const refObjArr: any[] = [];
+            refs[refField].forEach(({ id: refId, ref }) => {
+                const refItems = this.store[ref] || [];
+                if (refId) {
+                    const refObj = refItems.find(i => i.id === refId);
+                    if (refObj) refObjArr.push(refObj);
+                } else {
+                    const relevantItems = refItems.filter(refItem => {
+                        const backRefs = this.getRefs(refItem);
+                        return Object.values(backRefs).some(refArr =>
+                            refArr.some(br => br.ref === collection && br.id === item.id)
+                        );
+                    });
+                    refObjArr.push(...relevantItems);
+                }
+            });
+            populated[refField] = refObjArr;
+        }
+
+        return populated;
+    }
+
+    public async getAll(collection: string, options?: QueryOptions): Promise<any[]> {
         const items = this.store[collection] || [];
         this.logger.info(`Read all from '${collection}'`, { count: items.length });
-
-        return items.map(item => {
-            const clonedItem = { ...item };
-            const refs = this.getRefs(clonedItem);
-
-            for (const refField of Object.keys(refs)) {
-                const refObjArr: any[] = [];
-
-                refs[refField].forEach(({ id: refId, ref }) => {
-                    const refItems = this.store[ref] || [];
-
-                    if (refId) {
-                        const refObj = refItems.find(i => i.id === refId);
-                        if (refObj) refObjArr.push(refObj);
-                    } else {
-                        const relevantItems = refItems.filter(refItem => {
-                            const backRefs = this.getRefs(refItem);
-                            return Object.values(backRefs).some(refArr =>
-                                refArr.some(br => br.ref === collection && br.id === clonedItem.id)
-                            );
-                        });
-                        refObjArr.push(...relevantItems);
-                    }
-                });
-
-                clonedItem[refField] = refObjArr;
-            }
-
-            return clonedItem;
-        });
+        return items.map(item => this.applyPopulation(item, collection, options));
     }
 
-    public async getById(collection: string, id: string): Promise<any> {
+    public async getById(collection: string, id: string, options?: QueryOptions): Promise<any> {
         this.logger.info(`Read '${id}' from '${collection}'`, { id });
         const { item } = this.findById(collection, id);
-        return item;
+        return this.applyPopulation(item, collection, options);
     }
 
-    public async search(collection: string, query: Record<string, any>): Promise<any[]> {
+    public async search(collection: string, query: Record<string, any>, options?: QueryOptions): Promise<any[]> {
         const items = this.store[collection] || [];
         const results = items.filter(item =>
             Object.keys(query).every(key => query[key] === item[key])
         );
         this.logger.info(`Search in '${collection}'`, { count: results.length });
-        return results;
+        return results.map(item => this.applyPopulation(item, collection, options));
     }
 
     public async create(collection: string, data: any): Promise<any> {

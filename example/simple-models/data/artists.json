@@ -1,0 +1,5 @@
+[
+    { "id": "art-1", "name": "The Beatles", "genre": "Rock", "active": false, "foundedYear": 1960, "signedAt": "1962-06-06" },
+    { "id": "art-2", "name": "Daft Punk", "genre": "Electronic", "active": false, "foundedYear": 1993, "signedAt": "1996-04-01" },
+    { "id": "art-3", "name": "Pink Floyd", "genre": "Rock", "active": false, "foundedYear": 1965, "signedAt": "1967-03-01" }
+]

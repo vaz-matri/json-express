@@ -1,0 +1,5 @@
+[
+    { "id": "alb-1", "title": "Abbey Road", "artistId": "art-1", "releaseYear": 1969, "explicit": false },
+    { "id": "alb-2", "title": "Discovery", "artistId": "art-2", "releaseYear": 2001, "explicit": false },
+    { "id": "alb-3", "title": "Wish You Were Here", "artistId": "art-3", "releaseYear": 1975, "explicit": false }
+]

@@ -54,7 +54,9 @@ export async function loadSchemasAndData(cwd: string): Promise<{ schemas: ModelS
                 const schema = mod.default || mod;
 
                 if (schema && typeof schema === 'object' && schema.fields) {
-                    schema.name = basename(filename, extname(filename));
+                    if (!schema.name || schema.name === 'UNNAMED_MODEL') {
+                        schema.name = basename(filename, extname(filename));
+                    }
                     schemas.push(schema);
                 } else {
                     console.warn(`⚠️ Warning: ${filename} must export a valid defineModel() object as default.`);
