@@ -274,7 +274,7 @@ Both packages read the same `auth.*` block. `middleware-auth` only verifies toke
 
 | Key | Type | Default | Effect |
 |---|---|---|---|
-| `https` | boolean | `false` | When `true`, generates a dev cert and writes it to `express.ssl`. |
+| `https` | boolean | `true` | Installing the plugin enables HTTPS by default — it generates a dev cert and writes it to `express.ssl`. Set `false` to keep the dependency installed but boot over plain HTTP. The plugin also short-circuits when `NODE_ENV=production`. |
 
 ### `@json-express/email-console`
 

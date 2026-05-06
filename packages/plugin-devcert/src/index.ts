@@ -1,4 +1,4 @@
-import devcert from 'devcert';
+import * as devcert from 'devcert';
 import type { IPlugin, IConfigProvider, ILogger } from '@json-express/core';
 
 export class DevcertPlugin implements IPlugin {
@@ -13,11 +13,12 @@ export class DevcertPlugin implements IPlugin {
             return;
         }
 
-        // 2. Check if the user really wants HTTPS enabled locally
-        const isHttpsEnabled = configProvider.get<boolean>('https', false);
+        // 2. Installing the plugin opts you in to HTTPS by default.
+        //    Users disable it explicitly with `jex.https=false`.
+        const isHttpsEnabled = configProvider.get<boolean>('https', true);
 
         if (!isHttpsEnabled) {
-            return; // Stay perfectly silent if not explicitly requested
+            return; // Explicitly opted out via jex.https=false
         }
 
         logger.info('HTTPS requested. Checking local DevCert SSL certificates...');
