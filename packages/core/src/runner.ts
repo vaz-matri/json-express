@@ -148,7 +148,7 @@ export const startServer = async () => {
     const availableQueues = installedDeps.filter(d => d.includes('queue-'));
     const availablePlugins = installedDeps.filter(d => d.includes('plugin-'));
 
-    const isForceSeed = process.argv.includes('--seeder');
+    const isAppendSeed = process.argv.includes('--seed-append');
     const isSmartSeed = process.argv.includes('--seed');
 
     // 4. Resolve the active plugin per category (non-interactive)
@@ -204,10 +204,12 @@ export const startServer = async () => {
     }
 
     // 6.4 Seeders
+    const registeredSeeders: any[] = [];
     for (const seederName of availableSeeders) {
         try {
             const seeder = await loadPluginInstance(cwd, seederName, [{ configProvider, logger: loggerInstance }]);
             kernel.registerSeeder(seeder);
+            registeredSeeders.push(seeder);
             console.log(`🔌 Registered seeder: ${seederName}`);
         } catch (e: any) {
             console.error(`❌ Failed to load seeder ${seederName}:`, e?.message || e);
@@ -314,6 +316,13 @@ export const startServer = async () => {
     if (typeof api.setSchemas === 'function') api.setSchemas(schemas);
     kernel.registerApiGenerator(api);
 
+    // Hand the same schema set to seeders that opt-in via setSchemas — must
+    // run after plugin-contributed schemas have been merged so seeders see
+    // the exact same set as db/api.
+    for (const seeder of registeredSeeders) {
+        if (typeof seeder.setSchemas === 'function') seeder.setSchemas(schemas);
+    }
+
     const transport = await loadPluginInstance(cwd, activeTransport, [{ configProvider, logger: loggerInstance }]);
     kernel.registerTransport(transport);
 
@@ -332,5 +341,5 @@ export const startServer = async () => {
     process.on('SIGINT', handleShutdown);
     process.on('SIGTERM', handleShutdown);
 
-    await kernel.boot(collections, port, { enable: isSmartSeed || isForceSeed, force: isForceSeed });
+    await kernel.boot(collections, port, { enable: isSmartSeed || isAppendSeed, force: isAppendSeed });
 };

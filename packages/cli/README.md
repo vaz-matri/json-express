@@ -22,8 +22,8 @@ node /path/to/cli/bin/exec.js
 | Flag | Description |
 |---|---|
 | `--configure` | Run the interactive plugin wizard to (re)select all core layer plugins |
-| `--seed` | Seed the database with generated data if it is empty |
-| `--seeder` | Force-seed the database on every boot regardless of existing data |
+| `--seed` | Seed the database with generated data if a collection is empty (idempotent) |
+| `--seed-append` | Append a fresh batch of generated records on every boot, regardless of existing data |
 
 ---
 

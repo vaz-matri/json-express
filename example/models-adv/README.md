@@ -180,6 +180,39 @@ curl http://localhost:3000/audit-log/list
 
 This pattern — hidden auto-CRUD plus a small allowlist of custom endpoints — is the cleanest way to model an internal collection (audit logs, outboxes, denormalized caches) without giving HTTP clients write access.
 
+## Reading related records — `_expand`
+
+`types.relation(...)` declares a virtual field that's omitted from auto-CRUD responses by default — only the foreign-key column comes through. Pass `_expand=<fieldName>` on any auto-generated `GET` to hydrate the relation inline.
+
+The name in `_expand` is the **relation field**, not the FK column. On `albums.ts` the relation field is `artist`, the FK is `artistId`:
+
+```bash
+# A single album with its artist record inlined
+curl 'http://localhost:3000/albums/alb-1?_expand=artist'
+
+# Every album with its artist
+curl 'http://localhost:3000/albums?_expand=artist'
+
+# Inverse direction — an artist plus the albums that point at them
+curl 'http://localhost:3000/artists/art-1?_expand=albums'
+
+# Multiple relations in one request
+curl 'http://localhost:3000/albums?_expand=artist,producer'
+```
+
+Shape of the expanded value depends on the relation type:
+
+| Relation type | `_expand=field` returns |
+| --- | --- |
+| `many-to-one` | A single object (the parent record) or `null` |
+| `one-to-one` | A single object or `null` |
+| `one-to-many` | An array of children pointing back via the FK |
+| `many-to-many` | An array |
+
+`_expand` accepts a comma-separated list of field names defined on the current model. Nested expansion (e.g. `_expand=artist.albums`) is **not** supported — issue follow-up requests on the expanded record if you need to walk further.
+
+> Without `_expand`, the FK column appears alone and the relation field is left out of the response.
+
 ## What this folder contains
 
 - `package.json` — declares only `@json-express/boot`

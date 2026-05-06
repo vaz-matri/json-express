@@ -136,10 +136,18 @@ export interface IConfigProvider {
 
 /**
  * 8. The Seeder Contract
- * Generates initial data dynamically
+ * Generates initial data dynamically.
+ *
+ * Seeders MAY implement `setSchemas?` to receive the project's loaded model
+ * schemas before `seed()` runs — this enables auto-deriving fake data shapes
+ * and resolving foreign-key relations without requiring the user to spell out
+ * a generator per collection. The kernel calls `setSchemas` once during boot,
+ * after plugin-contributed schemas have been merged, so the seeder sees the
+ * exact same schema set as the database adapter and API generator.
  */
 export interface ISeeder {
     name: string;
+    setSchemas?(schemas: ModelSchema[]): void;
     seed(database: IDatabaseAdapter, isForce: boolean): Promise<void>;
 }
 

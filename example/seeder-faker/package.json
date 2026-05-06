@@ -3,12 +3,13 @@
     "version": "1.0.0",
     "description": "E2E test for seeder-faker — verifies data seeding on boot",
     "scripts": {
+        "pretest": "rm -rf data",
         "serve": "json-express --seed",
         "test": "playwright test"
     },
     "dependencies": {
-        "@json-express/core": "workspace:*",
-        "@json-express/cli": "workspace:*",
-        "@json-express/seeder-faker": "workspace:*"
+        "@json-express/boot": "workspace:*",
+        "@json-express/seeder-faker": "workspace:*",
+        "@json-express/adapter-json": "workspace:*"
     }
 }
