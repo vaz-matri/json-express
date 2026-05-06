@@ -323,6 +323,15 @@ export const startServer = async () => {
         if (typeof seeder.setSchemas === 'function') seeder.setSchemas(schemas);
     }
 
+    // Doc providers receive the same schema set so they can document resources
+    // authoritatively (names, fields, access rules) rather than reverse-engineering
+    // from route paths. Resolved from the container because registerDocProvider
+    // ran earlier in step 6.5, before plugin-contributed schemas were merged.
+    if (kernel.container.hasRegistration('docProvider')) {
+        const docProvider = kernel.container.resolve<any>('docProvider');
+        if (typeof docProvider?.setSchemas === 'function') docProvider.setSchemas(schemas);
+    }
+
     const transport = await loadPluginInstance(cwd, activeTransport, [{ configProvider, logger: loggerInstance }]);
     kernel.registerTransport(transport);
 

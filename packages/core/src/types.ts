@@ -188,8 +188,17 @@ export interface ILogger {
 /**
  * 11. The Documentation Provider Contract
  * Allows plugins to provide a "Home Page" or "Swagger UI" for the API.
+ *
+ * Doc providers MAY implement `setSchemas?` to receive the project's loaded
+ * model schemas before any documentation request is served. The kernel calls
+ * `setSchemas` once during boot, after plugin-contributed schemas have been
+ * merged, so the doc provider sees the exact same schema set as the database
+ * adapter and API generator. This is the source of truth for resource names,
+ * field shapes, and access rules — doc providers should prefer it over
+ * reverse-engineering the same information from `RouteDefinition[]` paths.
  */
 export interface IDocProvider {
+    setSchemas?(schemas: ModelSchema[]): void;
     renderTitle(): string;
     renderDocumentation(routes: RouteDefinition[], path: string, req: JsonRequest): string; // Returns HTML
     /**

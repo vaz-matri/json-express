@@ -1,14 +1,13 @@
 {
     "name": "docs-swagger",
     "version": "1.0.0",
-    "description": "",
+    "description": "E2E test for docs-swagger — verifies Swagger/OpenAPI documentation",
     "scripts": {
         "serve": "json-express",
         "test": "playwright test"
     },
     "dependencies": {
-        "@json-express/core": "workspace:*",
-        "@json-express/cli": "workspace:*",
+        "@json-express/boot": "workspace:*",
         "@json-express/docs-swagger": "workspace:*"
     }
 }

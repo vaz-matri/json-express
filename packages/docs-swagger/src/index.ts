@@ -3,17 +3,23 @@ import type {
     IDocProvider,
     RouteDefinition,
     JsonRequest,
-    ILogger
+    ILogger,
+    ModelSchema
 } from '@json-express/core';
 
 export class SwaggerDocProvider implements IDocProvider {
     private logger: ILogger;
     private configProvider?: IConfigProvider;
+    private schemas: ModelSchema[] = [];
 
     constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
         this.logger = logger.child({ component: 'Docs-Swagger' });
         this.configProvider = configProvider;
         this.logger.info('Interactive Swagger documentation provider initialized.');
+    }
+
+    public setSchemas(schemas: ModelSchema[]): void {
+        this.schemas = schemas;
     }
 
     public renderTitle(): string {
@@ -46,10 +52,95 @@ export class SwaggerDocProvider implements IDocProvider {
     }
 
     /**
-     * Translates JSON Express Routes into OpenAPI 3.0.0 Path Objects
+     * Resolve the resource (collection name) for a given route. Schemas are the
+     * authoritative source: each schema's `name` is the collection segment used
+     * when api-rest mints `${prefix}/${collection}` and `${prefix}/${collection}/:id`.
+     * We pick the longest matching name so an `albums-archive` collection isn't
+     * shadowed by a shorter `albums`.
+     */
+    private resolveResource(route: RouteDefinition): string | undefined {
+        const segments = route.path.split('/').filter(Boolean);
+        if (segments.length === 0) return undefined;
+
+        const schemaNames = this.schemas
+            .map(s => s.name)
+            .sort((a, b) => b.length - a.length);
+
+        for (const name of schemaNames) {
+            if (segments.includes(name)) return name;
+        }
+        return undefined;
+    }
+
+    private capitalize(s: string): string {
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    /**
+     * Convert one ModelSchema into an OpenAPI components.schemas entry.
+     * Only the persisted, framework-known field types — anything exotic
+     * degrades to `string` rather than crashing the spec.
+     */
+    private schemaToOpenApi(schema: ModelSchema): any {
+        const properties: Record<string, any> = {};
+        const required: string[] = [];
+
+        for (const [key, def] of Object.entries(schema.fields || {})) {
+            const fieldDef = def as any;
+            const opts = fieldDef.options || {};
+            let prop: any;
+            switch (fieldDef.type) {
+                case 'string':
+                    prop = { type: 'string' };
+                    if (opts.maxLength) prop.maxLength = opts.maxLength;
+                    if (opts.minLength) prop.minLength = opts.minLength;
+                    break;
+                case 'number':
+                    prop = { type: 'number' };
+                    if (opts.min !== undefined) prop.minimum = opts.min;
+                    if (opts.max !== undefined) prop.maximum = opts.max;
+                    break;
+                case 'boolean':
+                    prop = { type: 'boolean' };
+                    break;
+                case 'date':
+                    prop = { type: 'string', format: 'date-time' };
+                    break;
+                case 'id':
+                    prop = { type: 'string' };
+                    break;
+                case 'relation':
+                    prop = { type: 'string', description: `FK → ${opts.target}` };
+                    break;
+                default:
+                    prop = { type: 'string' };
+            }
+            if (opts.default !== undefined) prop.default = opts.default;
+            properties[key] = prop;
+            if (opts.required) required.push(key);
+        }
+
+        const out: any = { type: 'object', properties };
+        if (required.length) out.required = required;
+        return out;
+    }
+
+    /**
+     * Translates JSON Express Routes into OpenAPI 3.0.0 Path Objects.
+     * Schemas (when provided via setSchemas) drive resource grouping and
+     * request/response body shapes; falls back to per-route inference
+     * when schemas are not available.
      */
     private generateOpenApiSpec(routes: RouteDefinition[], baseUrl: string): any {
         const paths: Record<string, any> = {};
+        const componentSchemas: Record<string, any> = {};
+        const tagSet = new Map<string, string>();
+
+        for (const schema of this.schemas) {
+            const componentName = this.capitalize(schema.name);
+            componentSchemas[componentName] = this.schemaToOpenApi(schema);
+            tagSet.set(componentName, `Operations on the ${schema.name} collection.`);
+        }
 
         for (const route of routes) {
             const method = route.method.toLowerCase();
@@ -57,51 +148,60 @@ export class SwaggerDocProvider implements IDocProvider {
 
             if (!paths[openApiPath]) paths[openApiPath] = {};
 
-            paths[openApiPath][method] = {
+            const resource = this.resolveResource(route);
+            const tag = resource ? this.capitalize(resource) : 'General';
+            if (resource && !tagSet.has(tag)) {
+                tagSet.set(tag, `Operations on the ${resource} collection.`);
+            }
+
+            const op: any = {
                 summary: `Operation on ${route.path}`,
                 description: `Standard ${method.toUpperCase()} endpoint managed by JSON Express.`,
-                tags: [this.extractResource(route.path)],
+                tags: [tag],
                 parameters: this.extractPathParams(route.path),
                 responses: {
                     200: {
                         description: 'Successful operation',
                         content: {
                             'application/json': {
-                                schema: { type: 'object' }
+                                schema: resource && componentSchemas[this.capitalize(resource)]
+                                    ? { $ref: `#/components/schemas/${this.capitalize(resource)}` }
+                                    : { type: 'object' }
                             }
                         }
                     }
                 }
             };
 
-            // 🔐 Security Metadata Interpretation
             if (route.metadata?.isProtected) {
-                paths[openApiPath][method].security = [{ bearerAuth: [] }];
+                op.security = [{ bearerAuth: [] }];
             }
 
-            // 📄 Schema Metadata Interpretation (Zod -> OpenAPI 3)
-            let requestSchema: any = { type: 'object' };
-            if (route.metadata?.schema) {
-                const s = route.metadata.schema;
-                console.log(`[Docs Swagger] Intercepted schema for ${method} ${openApiPath}`, !!s.shape);
-                if (s._def?.typeName === 'ZodObject' || s.shape) {
-                    requestSchema = this.convertZodToOpenApi(s);
-                    console.log(`[Docs Swagger] Converted Schema:`, JSON.stringify(requestSchema));
-                } else {
-                    requestSchema = { type: 'object', description: 'Opaque Schema' };
-                }
-            }
-
-            // Add request body for mutation methods
+            // Request-body shape: prefer the model schema for the resource.
+            // Validation middleware may also attach a Zod schema in metadata —
+            // honor it as an override when present.
             if (['post', 'patch', 'put'].includes(method)) {
-                paths[openApiPath][method].requestBody = {
+                let bodySchema: any = { type: 'object' };
+                const componentName = resource ? this.capitalize(resource) : undefined;
+                if (componentName && componentSchemas[componentName]) {
+                    bodySchema = { $ref: `#/components/schemas/${componentName}` };
+                }
+                if (route.metadata?.schema) {
+                    const s = route.metadata.schema;
+                    if (s._def?.typeName === 'ZodObject' || s.shape) {
+                        bodySchema = this.convertZodToOpenApi(s);
+                    }
+                }
+                op.requestBody = {
                     content: {
                         'application/json': {
-                            schema: requestSchema
+                            schema: bodySchema
                         }
                     }
                 };
             }
+
+            paths[openApiPath][method] = op;
         }
 
         return {
@@ -112,8 +212,10 @@ export class SwaggerDocProvider implements IDocProvider {
                 description: 'Auto-generated interactive API documentation.'
             },
             servers: [{ url: baseUrl }],
+            tags: Array.from(tagSet.entries()).map(([name, description]) => ({ name, description })),
             paths,
             components: {
+                schemas: componentSchemas,
                 securitySchemes: {
                     bearerAuth: {
                         type: 'http',
@@ -143,7 +245,6 @@ export class SwaggerDocProvider implements IDocProvider {
         html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
         *, *:before, *:after { box-sizing: inherit; }
         body { margin: 0; background: #fafafa; }
-        /* Modern aesthetic overrides */
         .swagger-ui .topbar { display: none; }
         .swagger-ui .info { margin: 20px 0; }
     </style>
@@ -176,11 +277,6 @@ export class SwaggerDocProvider implements IDocProvider {
         `;
     }
 
-    private extractResource(path: string): string {
-        const parts = path.split('/');
-        return parts[3] ? parts[3].charAt(0).toUpperCase() + parts[3].slice(1) : 'General';
-    }
-
     private extractPathParams(path: string): any[] {
         const params: any[] = [];
         const matches = path.match(/:[a-zA-Z0-9]+/g);
@@ -199,7 +295,6 @@ export class SwaggerDocProvider implements IDocProvider {
 
     private convertZodToOpenApi(zodSchema: any): any {
         const schema: any = { type: 'object', properties: {}, required: [] };
-        // Fallback for non-zod objects natively mapped
         if (!zodSchema.shape) return schema;
 
         for (const [key, prop] of Object.entries(zodSchema.shape)) {
@@ -217,9 +312,9 @@ export class SwaggerDocProvider implements IDocProvider {
             if (typeName === 'ZodString') schema.properties[key] = { type: 'string' };
             else if (typeName === 'ZodNumber') schema.properties[key] = { type: 'number' };
             else if (typeName === 'ZodBoolean') schema.properties[key] = { type: 'boolean' };
-            else if (typeName === 'ZodArray') schema.properties[key] = { type: 'array', items: {} }; // Basic fallback
+            else if (typeName === 'ZodArray') schema.properties[key] = { type: 'array', items: {} };
             else if (typeName === 'ZodObject') schema.properties[key] = this.convertZodToOpenApi(isOptional ? def.innerType : prop);
-            else schema.properties[key] = { type: 'string' }; // Ultimate fallback for unknowns
+            else schema.properties[key] = { type: 'string' };
         }
 
         if (schema.required.length === 0) delete schema.required;

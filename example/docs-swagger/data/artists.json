@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Eminem",
+    "realName": "Marshall Mathers",
+    "country": "USA",
+    "genres": ["Hip Hop", "Rap"],
+    "active": true,
+    "monthlyListeners": 78500000
+  },
+  {
+    "name": "Pink Floyd",
+    "realName": "Pink Floyd",
+    "country": "UK",
+    "genres": ["Progressive Rock", "Psychedelic Rock"],
+    "active": false,
+    "monthlyListeners": 22300000
+  },
+  {
+    "name": "Daft Punk",
+    "realName": "Thomas Bangalter & Guy-Manuel de Homem-Christo",
+    "country": "France",
+    "genres": ["Electronic", "House"],
+    "active": false,
+    "monthlyListeners": 31200000
+  }
+]

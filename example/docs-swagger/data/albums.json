@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Encore",
+    "artist": "Eminem",
+    "releaseDate": "12-11-2004",
+    "trackCount": 20,
+    "genre": "Hip Hop",
+    "certified": "Platinum"
+  },
+  {
+    "name": "The Dark Side of the Moon",
+    "artist": "Pink Floyd",
+    "releaseDate": "01-03-1973",
+    "trackCount": 10,
+    "genre": "Progressive Rock",
+    "certified": "Diamond"
+  },
+  {
+    "name": "Random Access Memories",
+    "artist": "Daft Punk",
+    "releaseDate": "17-05-2013",
+    "trackCount": 13,
+    "genre": "Electronic",
+    "certified": "Gold"
+  },
+  {
+    "name": "A Night at the Opera",
+    "artist": "Queen",
+    "releaseDate": "21-11-1975",
+    "trackCount": 12,
+    "genre": "Rock",
+    "certified": "Platinum"
+  }
+]
