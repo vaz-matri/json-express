@@ -1,33 +1,42 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const seed: Array<{ id: string; name: string; artist: string }> = JSON.parse(
+    readFileSync(resolve(process.cwd(), 'data/albums.json'), 'utf8')
+);
+const seedAlbum = seed[0];
 
 test.describe('Transport Fastify — CRUD Parity', () => {
     test.describe.configure({ mode: 'serial' });
     let albumId: string;
 
-    // CREATE
-    test('should create a new album via Fastify transport', async ({ request }) => {
-        const response = await request.post('/albums', {
-            data: {
-                name: 'Discovery',
-                releaseDate: '12-03-2001'
-            }
-        });
-        expect(response.status()).toBe(201);
-
-        const body = await response.json();
-        expect(body.name).toBe('Discovery');
-        expect(body.id).toBeDefined();
-        albumId = body.id;
-    });
-
-    // READ (All)
-    test('should fetch all albums', async ({ request }) => {
+    // SEED — runs first so it observes the boot state from data/albums.json
+    test('should expose the seeded album from data/albums.json', async ({ request }) => {
         const response = await request.get('/albums');
         expect(response.ok()).toBeTruthy();
 
         const albums = await response.json();
         expect(Array.isArray(albums)).toBe(true);
-        expect(albums.some((a: any) => a.name === 'Discovery')).toBe(true);
+
+        const seeded = albums.find((a: any) => a.id === seedAlbum.id);
+        expect(seeded).toBeDefined();
+        expect(seeded.name).toBe(seedAlbum.name);
+        expect(seeded.artist).toBe(seedAlbum.artist);
+    });
+
+    // CREATE
+    test('should create a new album via Fastify transport', async ({ request }) => {
+        const response = await request.post('/albums', {
+            data: { name: 'Discovery', artist: 'Daft Punk' }
+        });
+        expect(response.status()).toBe(201);
+
+        const body = await response.json();
+        expect(body.name).toBe('Discovery');
+        expect(body.artist).toBe('Daft Punk');
+        expect(body.id).toBeDefined();
+        albumId = body.id;
     });
 
     // READ (One)
@@ -36,8 +45,9 @@ test.describe('Transport Fastify — CRUD Parity', () => {
         expect(response.ok()).toBeTruthy();
 
         const album = await response.json();
-        expect(album.name).toBe('Discovery');
         expect(album.id).toBe(albumId);
+        expect(album.name).toBe('Discovery');
+        expect(album.artist).toBe('Daft Punk');
     });
 
     // UPDATE
@@ -49,6 +59,7 @@ test.describe('Transport Fastify — CRUD Parity', () => {
 
         const body = await response.json();
         expect(body.name).toBe('Discovery (Anniversary Edition)');
+        expect(body.artist).toBe('Daft Punk');
     });
 
     // DELETE
@@ -56,7 +67,6 @@ test.describe('Transport Fastify — CRUD Parity', () => {
         const response = await request.delete(`/albums/${albumId}`);
         expect(response.status()).toBe(200);
 
-        // Verify deletion
         const getResponse = await request.get(`/albums/${albumId}`);
         expect(getResponse.status()).toBe(404);
     });
