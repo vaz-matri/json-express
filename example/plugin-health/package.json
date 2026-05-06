@@ -1,14 +1,13 @@
 {
     "name": "plugin-health",
     "version": "1.0.0",
-    "description": "",
+    "description": "E2E test for plugin-health — verifies health check endpoint",
     "scripts": {
         "serve": "json-express",
         "test": "playwright test"
     },
     "dependencies": {
-        "@json-express/core": "workspace:*",
-        "@json-express/cli": "workspace:*",
+        "@json-express/boot": "workspace:*",
         "@json-express/plugin-health": "workspace:*"
     }
 }
