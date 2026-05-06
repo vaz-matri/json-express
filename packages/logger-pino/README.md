@@ -4,36 +4,36 @@ High-performance, industry-standard structured logging for JSON Express.
 
 ## 📦 Overview
 
-`@json-express/logger-pino` is the recommended logger for production environments. It provides high-speed, asynchronous, and JSON-structured log output, making it compatible with modern observability stacks like the ELK stack, Splunk, Datadog, and CloudWatch.
+`@json-express/logger-pino` is the recommended logger for production. It produces high-speed, asynchronous, JSON-structured log output that drops straight into modern observability stacks — ELK, Splunk, Datadog, CloudWatch, Loki, and friends.
 
-It leverages [Pino](https://github.com/pinojs/pino) under the hood and implements the JSON Express `ILogger` interface.
+It wraps [Pino](https://github.com/pinojs/pino) and implements the JSON Express `ILogger` interface.
 
 ## 🚀 Key Features
 
-*   **12-Factor Ready**: Streams to Stdout/Stderr by default.
-*   **Pretty Printing**: Uses `pino-pretty` in development for a premium developer experience.
-*   **Enterprise Mode**: Supports direct-to-file logging with automatic path resolution.
-*   **High Performance**: Asynchronous logging to minimize overhead on the framework.
-*   **Request Correlation**: Automatically picks up the framework-wide `traceId` from `RequestContext` and injects it into every log line without manual propagation.
+- **Structured by Default**: One JSON object per line with `level`, `time`, `pid`, `hostname`, `component`, and `msg` — ready to ship to any log aggregator.
+- **Request Correlation**: Reads the framework-wide `traceId` from `RequestContext` and stamps it onto every log line — no manual propagation needed.
+- **High Performance**: Asynchronous file/stream transports keep logging off the request path.
+- **Two Output Modes**: enterprise file mode (default — writes to `./logs/app.log`) or 12-factor stream mode (`stdout`/`stderr`), with optional `pino-pretty` formatting in development.
 
 ## 🛠️ Configuration
 
-You can control the logger via standard JSON Express environment variables (`JEX.*`):
+All settings are JSON Express environment variables. `.` and `__` are interchangeable nesting separators; case is insensitive.
 
 | Key | Default | Description |
 | :--- | :--- | :--- |
-| `JEX.LOG.LEVEL` | `info` | Logging severity (`info`, `debug`, `warn`, `error`). |
-| `JEX.LOG.PRETTY` | `auto` | Set to `true` for pretty terminal output, `false` for raw JSON. |
-| `JEX.LOG.PATH` | `./logs` | Destination for logs. Set to `stdout` or `stderr` for terminal output. |
+| `jex.logger` | _(unset — falls back to console)_ | Set to `@json-express/logger-pino` to activate. |
+| `jex.log.level` | `info` | Logging severity (`info`, `debug`, `warn`, `error`). |
+| `jex.log.path` | `./logs` | Destination directory or file path. Set to `stdout` or `stderr` for terminal output. |
+| `jex.log.pretty` | `true` in `development`, otherwise `false` | Pretty terminal output via `pino-pretty`. Only applies to stream mode (`stdout`/`stderr`). |
 
 ### 🔄 Logging Modes
 
-1.  **File Mode (Default)**: Logs are written to `./logs/app.log` by default. You can override this with a custom path (e.g., `JEX.LOG.PATH=/var/log/my-app`).
-2.  **Stream Mode**: Set `JEX.LOG.PATH=stdout` or `stderr` to pipe logs directly to the terminal. Combined with `JEX.LOG.PRETTY=true`, this provides the best developer experience.
+1. **File Mode (default)** — logs land in `./logs/app.log` as raw JSON. Override the directory with `jex.log.path=./var/server` (becomes `./var/server/app.log`) or pass a full file path with `jex.log.path=/var/log/my-app.log`. Missing directories are created on demand.
+2. **Stream Mode** — set `jex.log.path=stdout` (or `stderr`) to pipe directly to the terminal. Combine with `jex.log.pretty=true` for a colorized, dev-friendly stream.
 
 ## 💻 Manual Usage
 
-If you are building a custom instance of JSON Express without the CLI:
+If you are wiring up a JSON Express kernel without the CLI:
 
 ```typescript
 import { JsonExpressKernel } from '@json-express/core';
@@ -46,3 +46,20 @@ const logger = new PinoLogger({ configProvider: config });
 const kernel = new JsonExpressKernel();
 kernel.registerLogger(logger);
 ```
+
+## 📜 Standardized Interface
+
+```typescript
+export interface ILogger {
+    info(message: string, context?: any): void;
+    warn(message: string, context?: any): void;
+    error(message: string, context?: any): void;
+    debug(message: string, context?: any): void;
+    child(context: any): ILogger;
+}
+```
+
+## See also
+
+- [`example/logger-pino`](../../example/logger-pino/README.md) — runnable example showing structured output and `traceId` correlation
+- [`@json-express/logger-console`](../logger-console/README.md) — the zero-dependency default logger
