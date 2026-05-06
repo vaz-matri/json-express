@@ -1,14 +1,17 @@
 {
     "name": "config",
     "version": "1.0.0",
-    "description": "E2E test for config — verifies advanced jex.config.ts loading and API prefix",
+    "description": "E2E test for config — verifies .env-driven configuration via the default config-env provider",
     "scripts": {
         "serve": "json-express",
         "test": "playwright test"
     },
     "dependencies": {
         "@json-express/core": "workspace:*",
-        "@json-express/cli": "workspace:*",
-        "@json-express/config": "workspace:*"
+        "@json-express/config-env": "workspace:*",
+        "@json-express/adapter-memory": "workspace:*",
+        "@json-express/api-rest": "workspace:*",
+        "@json-express/transport-express": "workspace:*",
+        "@json-express/logger-console": "workspace:*"
     }
 }

@@ -46,8 +46,12 @@ export class LightDocProvider implements IDocProvider {
             || req.hostname
             || 'localhost';
 
-        // Layer 3: API prefix from config
-        const prefix = this.configProvider?.get<string>('api.prefix', '') || '';
+        // Layer 3: API prefix from config — read api.rest.prefix (the key api-rest writes)
+        // and fall back to api.prefix for users who pinned the docs-side key directly.
+        const rawPrefix = this.configProvider?.get<string>('api.rest.prefix')
+            ?? this.configProvider?.get<string>('api.prefix', '')
+            ?? '';
+        const prefix = rawPrefix.endsWith('/') ? rawPrefix.slice(0, -1) : rawPrefix;
 
         const dynamicBaseUrl = `${proto}://${host}${prefix}`;
         const displayBaseUrl = hardcodedOverride || dynamicBaseUrl;

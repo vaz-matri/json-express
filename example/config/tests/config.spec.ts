@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Config — Advanced jex.config.ts with API Prefix', () => {
+test.describe('Config — .env-driven API prefix override', () => {
     test.describe.configure({ mode: 'serial' });
 
     // Without prefix should 404

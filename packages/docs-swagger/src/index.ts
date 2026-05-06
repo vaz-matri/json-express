@@ -38,7 +38,10 @@ export class SwaggerDocProvider implements IDocProvider {
             || (req.headers['host'] as string)
             || req.hostname
             || 'localhost';
-        const prefix = this.configProvider?.get<string>('api.prefix', '') || '';
+        const rawPrefix = this.configProvider?.get<string>('api.rest.prefix')
+            ?? this.configProvider?.get<string>('api.prefix', '')
+            ?? '';
+        const prefix = rawPrefix.endsWith('/') ? rawPrefix.slice(0, -1) : rawPrefix;
         return hardcodedOverride || `${proto}://${host}${prefix}`;
     }
 
