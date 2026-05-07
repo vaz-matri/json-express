@@ -1,0 +1,12 @@
+{
+    "name": "base-url",
+    "version": "1.0.0",
+    "description": "E2E test for base-url — verifies API prefix configured via .env",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*"
+    }
+}
