@@ -1,13 +1,13 @@
 # `@json-express/docs-swagger`
 
-> **Documentation provider plugin for JSON Express v2.**
+> **Documentation provider plugin for JSONExpress v2.**
 > Renders interactive [Swagger UI](https://swagger.io/tools/swagger-ui/) at `/docs` and serves a generated OpenAPI 3.0 specification at `/docs/json`. The spec is built from your model schemas — not by parsing URLs — so resource grouping and component shapes are authoritative.
 
 ---
 
 ## What It Does
 
-This plugin implements the `IDocProvider` interface. When the JSON Express Kernel boots, it:
+This plugin implements the `IDocProvider` interface. When the JSONExpress Kernel boots, it:
 
 1. Receives the project's `ModelSchema[]` via `setSchemas(schemas)` — the same set handed to the database adapter and API generator.
 2. Receives the kernel's `RouteDefinition[]` via `getManifest(routes, req)` and `renderDocumentation(routes, path, req)`.

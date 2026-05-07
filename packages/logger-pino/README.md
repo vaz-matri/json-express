@@ -1,12 +1,12 @@
 # @json-express/logger-pino
 
-High-performance, industry-standard structured logging for JSON Express.
+High-performance, industry-standard structured logging for JSONExpress.
 
 ## 📦 Overview
 
 `@json-express/logger-pino` is the recommended logger for production. It produces high-speed, asynchronous, JSON-structured log output that drops straight into modern observability stacks — ELK, Splunk, Datadog, CloudWatch, Loki, and friends.
 
-It wraps [Pino](https://github.com/pinojs/pino) and implements the JSON Express `ILogger` interface.
+It wraps [Pino](https://github.com/pinojs/pino) and implements the JSONExpress `ILogger` interface.
 
 ## 🚀 Key Features
 
@@ -17,7 +17,7 @@ It wraps [Pino](https://github.com/pinojs/pino) and implements the JSON Express 
 
 ## 🛠️ Configuration
 
-All settings are JSON Express environment variables. `.` and `__` are interchangeable nesting separators; case is insensitive.
+All settings are JSONExpress environment variables. `.` and `__` are interchangeable nesting separators; case is insensitive.
 
 | Key | Default | Description |
 | :--- | :--- | :--- |
@@ -33,7 +33,7 @@ All settings are JSON Express environment variables. `.` and `__` are interchang
 
 ## 💻 Manual Usage
 
-If you are wiring up a JSON Express kernel without the CLI:
+If you are wiring up a JSONExpress kernel without the CLI:
 
 ```typescript
 import { JsonExpressKernel } from '@json-express/core';

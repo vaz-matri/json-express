@@ -18,7 +18,7 @@ export class PinoLogger implements ILogger {
 
         const cwd = process.cwd();
         const config = options.configProvider;
-        
+
         // 1. Resolve Configuration
         const logLevel = config?.get<string>('log.level', 'info') || 'info';
         const logPath = config?.get<string>('log.path', './logs') || './logs';
@@ -48,7 +48,7 @@ export class PinoLogger implements ILogger {
             }
         } else {
             // Enterprise Mode: File-based logging (supports both default and custom paths)
-            const destination = logPath.endsWith('.log') 
+            const destination = logPath.endsWith('.log')
                 ? (logPath.startsWith('/') ? logPath : join(cwd, logPath))
                 : join(cwd, logPath, 'app.log');
 

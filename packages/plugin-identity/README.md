@@ -1,6 +1,6 @@
 # `@json-express/plugin-identity`
 
-> **Local identity plugin for JSON Express v2.**
+> **Local identity plugin for JSONExpress v2.**
 > Auto-injects `users` / `roles` / token schemas, mounts `/auth/*` endpoints, hashes passwords with argon2id, and ships a self-seeding admin account — so you can clone, install, set a secret, and have working auth in two minutes.
 
 ---

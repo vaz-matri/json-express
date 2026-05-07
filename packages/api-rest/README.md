@@ -1,13 +1,13 @@
 # `@json-express/api-rest`
 
-> **REST API generator plugin for JSON Express v2.**
+> **REST API generator plugin for JSONExpress v2.**
 > Automatically generates a full CRUD REST API for every collection registered in the active database adapter—including a universal cross-collection search endpoint.
 
 ---
 
 ## What It Does
 
-This plugin implements the `IApiGenerator` interface. When the JSON Express Kernel boots, it calls `generate(collections)` and this plugin returns a complete set of `RouteDefinition` objects — one for each standard CRUD operation per collection, plus a global `/search` endpoint.
+This plugin implements the `IApiGenerator` interface. When the JSONExpress Kernel boots, it calls `generate(collections)` and this plugin returns a complete set of `RouteDefinition` objects — one for each standard CRUD operation per collection, plus a global `/search` endpoint.
 
 The Transport layer (e.g., `@json-express/transport-express`) then binds these abstract definitions to real HTTP routes.
 
@@ -148,7 +148,7 @@ With prefix `/api/v1`, routes become `/api/v1/users`, `/api/v1/search`, etc.
 
 ## Installation
 
-This plugin is bundled as the default API generator in the JSON Express CLI. To use explicitly:
+This plugin is bundled as the default API generator in the JSONExpress CLI. To use explicitly:
 
 ```bash
 npm install @json-express/api-rest

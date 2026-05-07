@@ -3,12 +3,12 @@ import { join } from 'path';
 
 export function runExportSchema(cwd: string, collectionName: string) {
     console.log(`\n📦 JSON Express — Schema Exporter\n`);
-    
+
     if (!collectionName) {
         console.error('❌ Please provide a collection name. Example: json-express export albums');
         process.exit(1);
     }
-    
+
     // 1. Find Data Source
     let dataPath = join(cwd, 'data', `${collectionName}.json`);
     if (!existsSync(dataPath)) {
@@ -18,13 +18,13 @@ export function runExportSchema(cwd: string, collectionName: string) {
             process.exit(1);
         }
     }
-    
+
     // 2. Read and Infer
     const content = readFileSync(dataPath, 'utf8');
     const parsed = JSON.parse(content);
     const dataArray = Array.isArray(parsed) ? parsed : [parsed];
     const firstRecord = dataArray[0] || {};
-    
+
     // 3. Generate TS Content
     const fieldsGen = Object.keys(firstRecord).map(key => {
         if (key === 'id') return `        id: types.id(),`;
@@ -37,7 +37,7 @@ export function runExportSchema(cwd: string, collectionName: string) {
         }
         return `        ${key}: types.string(), // Detected from typeof: ${typeof val}`;
     }).join('\n');
-    
+
     const tsContent = `import { defineModel, types } from '@json-express/core';
 
 /**
@@ -62,17 +62,17 @@ ${fieldsGen || '        // add custom fields here\n        id: types.id()'}
     if (!existsSync(modelsDir)) {
         mkdirSync(modelsDir);
     }
-    
+
     const outPath = join(modelsDir, `${collectionName}.ts`);
     if (existsSync(outPath)) {
         console.error(`❌ Error: ${outPath} already exists! Cannot overwrite.`);
         process.exit(1);
     }
-    
+
     writeFileSync(outPath, tsContent, 'utf8');
     console.log(`✅ Success! Exported ${collectionName}.json to strongly-typed TypeScript.`);
     console.log(`📂 Created: ./models/${collectionName}.ts`);
-    
+
     // If it was in the root, tell them they can move it to /data
     if (dataPath === join(cwd, `${collectionName}.json`)) {
         console.log(`\n💡 Tip: You should move ./${collectionName}.json into a ./data/ folder to keep your root directory clean!`);

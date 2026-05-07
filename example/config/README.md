@@ -1,8 +1,8 @@
 # Config — the reference example
 
-Every JSON Express plugin reads its settings from a single, shared **config provider**. This example is the canonical reference for that provider: it shows the simplest form (a `.env` file) and documents every other supported file format, every key the framework reads, and which package owns each one.
+Every JSONExpress plugin reads its settings from a single, shared **config provider**. This example is the canonical reference for that provider: it shows the simplest form (a `.env` file) and documents every other supported file format, every key the framework reads, and which package owns each one.
 
-> New to JSON Express? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
+> New to JSONExpress? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
 
 ## The example, end to end
 

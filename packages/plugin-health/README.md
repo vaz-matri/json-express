@@ -1,13 +1,13 @@
 # `@json-express/plugin-health`
 
-> **Advanced health check plugin for JSON Express v2.**
+> **Advanced health check plugin for JSONExpress v2.**
 > Replaces the built-in baseline `/health` endpoint with a deep, database-aware health probe—ideal for Kubernetes liveness/readiness probes and enterprise observability pipelines.
 
 ---
 
 ## How It Works
 
-JSON Express ships with a safe, static baseline `/health` endpoint baked into the CLI:
+JSONExpress ships with a safe, static baseline `/health` endpoint baked into the CLI:
 
 ```json
 { "status": "UP" }
@@ -25,7 +25,7 @@ When you install `@json-express/plugin-health`, the CLI's Auto-Discovery Engine 
 npm install @json-express/plugin-health
 ```
 
-JSON Express will detect this plugin automatically. No registration code required.
+JSONExpress will detect this plugin automatically. No registration code required.
 
 ---
 

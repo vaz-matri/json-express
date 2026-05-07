@@ -1,6 +1,6 @@
 # @json-express/core
 
-The IoC Kernel **and** the Auto-Discovery Engine for [JSON Express](https://github.com/vaz-matri/json-express). Provides the `json-express` binary that runs your server.
+The IoC Kernel **and** the Auto-Discovery Engine for [JSONExpress](https://github.com/vaz-matri/json-express). Provides the `json-express` binary that runs your server.
 
 This package contains **zero** HTTP logic, **zero** database logic, and **zero** CLI prompts. It plays two roles:
 
@@ -38,7 +38,7 @@ The engine is **non-interactive** — for plugin disambiguation, see [`@json-exp
 
 ## 🏗️ Schema Definition (Models)
 
-JSON Express is a schema-driven engine. You can define your data models in pure JSON or use the powerful TypeScript API via `defineModel`.
+JSONExpress is a schema-driven engine. You can define your data models in pure JSON or use the powerful TypeScript API via `defineModel`.
 
 We support **two API styles** for TypeScript definitions, allowing you to choose between ergonomic Zod-style builders or a declarative Options-Object format.
 

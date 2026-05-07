@@ -7,15 +7,11 @@
         "test": "playwright test"
     },
     "dependencies": {
-        "@json-express/core": "workspace:*",
-        "@json-express/cli": "workspace:*",
+        "@json-express/boot": "workspace:*",
         "@json-express/middleware-auth": "workspace:*",
         "@json-express/email-console": "workspace:*",
         "@json-express/kv-memory": "workspace:*",
         "@json-express/queue-memory": "workspace:*",
         "@json-express/plugin-identity": "workspace:*"
-    },
-    "devDependencies": {
-        "@playwright/test": "^1.42.1"
     }
 }

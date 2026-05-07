@@ -1,5 +1,0 @@
-[
-    { "id": "n-a-1", "title": "User A — first", "body": "private to A", "ownerId": "user-a", "adminNotes": "ADMIN-ONLY a-1" },
-    { "id": "n-a-2", "title": "User A — second", "body": "also private to A", "ownerId": "user-a", "adminNotes": "ADMIN-ONLY a-2" },
-    { "id": "n-b-1", "title": "User B — only", "body": "private to B", "ownerId": "user-b", "adminNotes": "ADMIN-ONLY b-1" }
-]

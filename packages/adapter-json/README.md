@@ -1,6 +1,6 @@
 # `@json-express/adapter-json`
 
-> **Persistent JSON file database adapter for JSON Express v2.**
+> **Persistent JSON file database adapter for JSONExpress v2.**
 > A zero-infrastructure, human-readable database that reads from and writes back to your project's `.json` files. Ideal for local development, small tools, and projects where Git-tracked data is a feature, not a compromise.
 
 ---
@@ -23,7 +23,7 @@ On every **mutation** (create, update, delete):
 npm install @json-express/adapter-json
 ```
 
-JSON Express auto-discovers this adapter. No registration code required.
+JSONExpress auto-discovers this adapter. No registration code required.
 
 ---
 
@@ -86,7 +86,7 @@ If any tracked file loses read/write access (e.g. permissions change):
 
 ## Relational Data (`ref` / `id`)
 
-Fully supports the JSON Express relational linking system inherited from `adapter-memory`:
+Fully supports the JSONExpress relational linking system inherited from `adapter-memory`:
 
 ```json
 // albums.json

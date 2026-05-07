@@ -2,7 +2,7 @@
 
 Swaps the default pretty console logger for [Pino](https://getpino.io). You get one JSON object per line, automatic `traceId` correlation across components, and output that drops straight into Datadog, Loki, CloudWatch, or any other log aggregator.
 
-> New to JSON Express? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
+> New to JSONExpress? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
 
 ## Setup
 

@@ -1,6 +1,6 @@
 # `@json-express/cli`
 
-> **The Human Interface for JSON Express v2.**
+> **The Human Interface for JSONExpress v2.**
 > The CLI is the single entry point that orchestrates plugin discovery, conflict resolution, configuration, and server boot. It acts as the bridge between the headless `@json-express/core` kernel and the developer's project.
 
 ---
@@ -36,7 +36,7 @@ npx json-express --configure
 ```
 
 ```
-🔧 JSON Express — Plugin Configuration Wizard
+🔧 JSONExpress — Plugin Configuration Wizard
 
 ? Select adapter plugin: › - Use arrow-keys. Return to submit.
 ❯   @json-express/adapter-memory (default)

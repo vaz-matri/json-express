@@ -2,7 +2,7 @@
 
 Populates your collections with realistic fake data on boot using [`@faker-js/faker`](https://fakerjs.dev). Schema-aware out of the box — drop a model in `models/`, run `--seed`, and you get 10 records with foreign keys auto-resolved across relations.
 
-> New to JSON Express? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
+> New to JSONExpress? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
 
 ## Setup
 

@@ -1,6 +1,6 @@
 # `@json-express/plugin-devcert`
 
-> **Local HTTPS plugin for JSON Express v2.**
+> **Local HTTPS plugin for JSONExpress v2.**
 > Drop it in your deps and your dev server boots over `https://localhost:3000` with a trusted certificate — no flags, no manual cert generation, no `--insecure` curl. Production builds short-circuit safely so you never request a keychain prompt where you shouldn't.
 
 ---
@@ -25,7 +25,7 @@ Without this plugin, your options for local HTTPS are:
 npm install @json-express/plugin-devcert
 ```
 
-JSON Express auto-discovers it. **Installing the plugin enables HTTPS by default** — no `onRegister` call, no flag, no `.env` setting.
+JSONExpress auto-discovers it. **Installing the plugin enables HTTPS by default** — no `onRegister` call, no flag, no `.env` setting.
 
 ---
 

@@ -2,7 +2,7 @@
 
 Adds `/health` and `/info` endpoints to your server — the same shape Kubernetes, ECS, and most uptime checkers expect for liveness and readiness probes.
 
-> New to JSON Express? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
+> New to JSONExpress? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
 
 ## Setup
 

@@ -4,7 +4,7 @@ Generates a self-signed HTTPS certificate for `localhost` so you can develop aga
 
 Useful when your frontend uses APIs that only work over HTTPS (Service Workers, `crypto.subtle`, third-party SDKs that refuse plain HTTP).
 
-> New to JSON Express? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
+> New to JSONExpress? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
 
 ## Setup
 

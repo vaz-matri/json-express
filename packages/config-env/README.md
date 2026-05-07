@@ -1,8 +1,8 @@
 # @json-express/config-env
 
-The default Configuration Provider for [JSON Express](https://github.com/vaz-matri/json-express).
+The default Configuration Provider for [JSONExpress](https://github.com/vaz-matri/json-express).
 
-This lightweight plugin parses `.env` files and translates them into deeply nested configuration objects using JSON Express's "Relaxed Binding" rules.
+This lightweight plugin parses `.env` files and translates them into deeply nested configuration objects using JSONExpress's "Relaxed Binding" rules.
 
 ## 📦 Installation
 Included by default via the `@json-express/cli`.
@@ -33,7 +33,7 @@ jex.database.max_connections=100
 ```
 
 ### 2. The Cloud / Docker Fallback
-Some hosting platforms (AWS, Docker, Kubernetes, systemd) **enforce uppercase** environment variable names and/or **forbid dots (`.`)**. For these cases, JSON Express also accepts the all-uppercase, double-underscore form — case and separator are both flexible, and the parser maps them to the same JSON structure.
+Some hosting platforms (AWS, Docker, Kubernetes, systemd) **enforce uppercase** environment variable names and/or **forbid dots (`.`)**. For these cases, JSONExpress also accepts the all-uppercase, double-underscore form — case and separator are both flexible, and the parser maps them to the same JSON structure.
 
 ```env
 # Deployment-safe equivalent (identical result)

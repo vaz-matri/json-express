@@ -1,6 +1,6 @@
 # `@json-express/email-console`
 
-> **Console email provider for JSON Express v2.**
+> **Console email provider for JSONExpress v2.**
 > Implements `IEmailProvider` by formatting messages and writing them to the configured logger — no SMTP creds, no I/O, no flake. The default for local dev and the unit-test fixture for `plugin-identity`.
 
 ---

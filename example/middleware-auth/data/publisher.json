@@ -1,0 +1,23 @@
+[
+    {
+        "id": "pub-1",
+        "name": "Pragmatic Bookshelf",
+        "country": "US",
+        "foundedYear": 2003,
+        "website": "https://pragprog.com"
+    },
+    {
+        "id": "pub-2",
+        "name": "O'Reilly Media",
+        "country": "US",
+        "foundedYear": 1978,
+        "website": "https://www.oreilly.com"
+    },
+    {
+        "id": "pub-3",
+        "name": "Prentice Hall",
+        "country": "US",
+        "foundedYear": 1913,
+        "website": "https://www.pearson.com"
+    }
+]

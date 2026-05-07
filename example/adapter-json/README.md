@@ -1,10 +1,10 @@
 # JSON file storage example
 
-A minimal JSON Express setup where your collections live as plain `.json` files on disk and survive server restarts.
+A minimal JSONExpress setup where your collections live as plain `.json` files on disk and survive server restarts.
 
 Drop a JSON array into `data/`, start the server, and you immediately get a REST API for it. Any `POST` / `PATCH` / `DELETE` is written back to the same file.
 
-> New to JSON Express? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
+> New to JSONExpress? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
 
 ## Setup
 
@@ -51,7 +51,7 @@ Try it:
 curl http://localhost:3000/notes
 curl -X POST http://localhost:3000/notes \
   -H 'content-type: application/json' \
-  -d '{"title":"Learn JSON Express","done":false}'
+  -d '{"title":"Learn JSONExpress","done":false}'
 ```
 
 Open `data/notes.json` after the `POST` — your new record is there. Restart the server and it's still there.

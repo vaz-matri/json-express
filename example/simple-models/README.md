@@ -2,7 +2,7 @@
 
 Switch from inferred schemas (one JSON file = one collection, types guessed from the first row) to explicit TypeScript model files. You get strict typing, custom field types beyond what inference can detect, constraints, defaults, and relations between collections.
 
-> New to JSON Express? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
+> New to JSONExpress? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
 >
 > Looking for hooks, custom endpoints, or `exposeApi: false`? Those live in the [`models-adv`](../models-adv/README.md) example.
 

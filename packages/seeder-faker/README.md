@@ -1,6 +1,6 @@
 # @json-express/seeder-faker
 
-The official Faker plugin for JSON Express. Drops realistic mock data into your database on boot — schema-aware out of the box, with foreign keys auto-wired across related collections. Zero configuration needed for the common case; full per-collection control available when you want it.
+The official Faker plugin for JSONExpress. Drops realistic mock data into your database on boot — schema-aware out of the box, with foreign keys auto-wired across related collections. Zero configuration needed for the common case; full per-collection control available when you want it.
 
 ## Installation
 
@@ -8,7 +8,7 @@ The official Faker plugin for JSON Express. Drops realistic mock data into your 
 pnpm add @json-express/seeder-faker
 ```
 
-Installing the package is enough — the JSON Express CLI auto-discovers it and registers it as a seeder during the boot sequence.
+Installing the package is enough — the JSONExpress CLI auto-discovers it and registers it as a seeder during the boot sequence.
 
 ## CLI Execution Flags
 
@@ -98,4 +98,4 @@ Resolution order per collection:
 3. Schema registered, `auto !== false` → auto-schema, count = `faker.count ?? 10`.
 4. Nothing matches → falls back to a generic `{ title, createdAt }` record.
 
-> If you start the server with `--seed` in an empty directory, JSON Express normally exits because it has nothing to serve. Configure even one collection here and the framework recognizes the schema, boots cleanly, and serves a 100% mock API.
+> If you start the server with `--seed` in an empty directory, JSONExpress normally exits because it has nothing to serve. Configure even one collection here and the framework recognizes the schema, boots cleanly, and serves a 100% mock API.

@@ -1,6 +1,6 @@
 # @json-express/transport-fastify
 
-High-performance Fastify transport plugin for JSON Express v2.
+High-performance Fastify transport plugin for JSONExpress v2.
 
 ## ✨ Features
 
@@ -18,7 +18,7 @@ npm install @json-express/transport-fastify
 
 ## ⚙️ Configuration
 
-JSON Express will automatically detect and use this transport if it is the only one installed. You can explicitly pin it in your `.env` or config file:
+JSONExpress will automatically detect and use this transport if it is the only one installed. You can explicitly pin it in your `.env` or config file:
 
 ```env
 jex.transport=@json-express/transport-fastify

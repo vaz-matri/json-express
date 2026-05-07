@@ -2,7 +2,7 @@
 
 Swaps the default Express HTTP server for Fastify. Same routes, same JSON files — just a different transport underneath.
 
-> New to JSON Express? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
+> New to JSONExpress? Start with the [**`simple`** example](../simple/README.md) — that's the hub that explains the default stack and links to every other plugin.
 
 ## Setup
 

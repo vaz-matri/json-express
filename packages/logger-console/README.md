@@ -1,17 +1,17 @@
 # @json-express/logger-console
 
-The default, zero-dependency console logger for the JSON Express meta-framework.
+The default, zero-dependency console logger for the JSONExpress meta-framework.
 
 ## 📦 Overview
 
-`@json-express/logger-console` provides the "Batteries Included" logging experience for JSON Express. It is designed to be lightweight, fast, and completely free of external dependencies.
+`@json-express/logger-console` provides the "Batteries Included" logging experience for JSONExpress. It is designed to be lightweight, fast, and completely free of external dependencies.
 
 It implements the `ILogger` interface using standard `console.log`, `console.warn`, and `console.error` methods, making it perfect for development, local testing, and simple deployments.
 
 ## 🚀 Key Features
 
 - **Zero Dependencies**: Keeps your node_modules lean.
-- **Contract Compliant**: Implements the standardized JSON Express `ILogger` interface.
+- **Contract Compliant**: Implements the standardized JSONExpress `ILogger` interface.
 - **Child Logger Support**: Allows components to create scoped loggers with context.
 - **Framework Fallback**: Automatically used by the CLI if no other logger is installed.
 
@@ -23,7 +23,7 @@ While this logger is basic, it respects the following framework-level configurat
 
 ## 💻 Manual Usage
 
-If you are building a custom instance of JSON Express without the CLI:
+If you are building a custom instance of JSONExpress without the CLI:
 
 ```typescript
 import { JsonExpressKernel } from '@json-express/core';

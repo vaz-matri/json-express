@@ -1,6 +1,6 @@
 # @json-express/config
 
-The advanced Configuration Provider for [JSON Express](https://github.com/vaz-matri/json-express).
+The advanced Configuration Provider for [JSONExpress](https://github.com/vaz-matri/json-express).
 
 For power-users and enterprise environments, this plugin allows you to configure your framework using tracked JSON, YAML, or dynamic JS/TS files. It acts as a robust supplement to the default `.env` configuration.
 
