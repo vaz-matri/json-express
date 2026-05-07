@@ -15,7 +15,7 @@ The Transport layer (e.g., `@json-express/transport-express`) then binds these a
 
 ## Generated Endpoints
 
-For every collection (e.g., `users`, `posts`):
+For every collection (e.g., `users`, `posts`) **that declares `fields`**:
 
 | Method | Path | Description |
 |---|---|---|
@@ -24,6 +24,8 @@ For every collection (e.g., `users`, `posts`):
 | `POST` | `/{collection}` | Create a new record. Auto-generates an `id` if not provided. |
 | `PATCH` | `/{collection}/:id` | Partially update a record by ID. |
 | `DELETE` | `/{collection}/:id` | Delete a record by ID. |
+
+Fieldless models (`defineRoutes(...)` or `defineModel({ ... })` without a `fields` block) are skipped from CRUD codegen — they declare behavior only. Their custom endpoints (see below) are still mounted.
 
 Plus a global endpoint across all collections:
 
@@ -82,16 +84,62 @@ The query object is passed directly to `db.search(collection, query)`. Each adap
 
 ---
 
+## Custom Endpoints
+
+Models can extend the generated CRUD with their own routes via the `endpoints` block. Two forms are supported:
+
+**Bare-function form** — quickest:
+
+```ts
+endpoints: {
+    'POST /:id/play': async (req, res, ctx) => { /* ... */ },
+}
+```
+
+**Object form `{ handler, validation }`** — adds per-endpoint body/query validation (read by `@json-express/middleware-validation`):
+
+```ts
+endpoints: {
+    'GET /search': {
+        validation: {
+            query: z.object({ q: z.string().min(2) }),
+        },
+        handler: async (req, res, ctx) => { /* ... */ },
+    },
+}
+```
+
+The plugin also picks up a top-level `endpoints` export from `routes/*.ts` files for global, non-resource routes.
+
+---
+
+## Model-Driven Validation
+
+When a schema declares a `validation` block, this plugin attaches the `validation` middleware to the matching CRUD route(s) and pins the relevant op block in `route.metadata.validation`:
+
+| Slot                         | Route                  | `route.metadata.validation` shape       |
+| ---------------------------- | ---------------------- | --------------------------------------- |
+| `validation.create`          | `POST /{collection}`   | `{ create: { body } }`                  |
+| `validation.update`          | `PATCH /{collection}/:id` | `{ update: { body } }`               |
+| `validation.list`            | `GET /{collection}`    | `{ list: { query } }`                   |
+| custom endpoint `validation` | the route key          | `{ body?, query? }` (no `create` wrap)  |
+
+The middleware itself reads the resolved schemas at boot via `setSchemas` and compiles its own rule table. This plugin's job is purely to attach the middleware to the right routes and stamp the metadata so downstream consumers (e.g. `docs-swagger`) can introspect the validators.
+
+> The legacy `validation.rules` array config (`{ method, path, body, query }`) has been removed. Validation now lives next to the entity in `models/*.ts`.
+
+---
+
 ## Configuration
 
-All options are set via `.env` using the `JEX` namespace:
+All options are set via `.env` using the `jex` or `JEX` namespace:
 
 ```env
 # Global URL prefix for all generated routes
-JEX.API.REST.PREFIX=/api/v1
+jex.api.rest.prefix=/api/v1
 
 # Disable the /search endpoint entirely
-JEX.API.REST.SEARCH=false
+jex.api.rest.search=false
 ```
 
 With prefix `/api/v1`, routes become `/api/v1/users`, `/api/v1/search`, etc.

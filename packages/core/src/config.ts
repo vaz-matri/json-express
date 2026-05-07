@@ -70,7 +70,7 @@ export function buildNestedConfigFromEnv(envVars: Record<string, string | undefi
     // ^${namespace} -> Starts with 'jex'
     // (?:\.|__)     -> Followed EXACTLY by a dot (.) or double underscore (__)
     // (.*)$         -> Captures everything after it
-    // 'i' flag      -> Makes it completely case-insensitive (JEX, jex, Jex)
+    // 'i' flag      -> Makes it completely case-insensitive (jex, JEX, Jex)
     const regex = new RegExp(`^${namespace}(?:\\.|__)(.*)$`, 'i');
 
     for (const [key, value] of Object.entries(envVars)) {
@@ -90,7 +90,7 @@ export function buildNestedConfigFromEnv(envVars: Record<string, string | undefi
         for (let i = 0; i < parts.length - 1; i++) {
             const part = parts[i];
             // Fix: If the intermediate path doesn't exist or is not an object, create it.
-            // This prevents flat keys (like JEX.API) from breaking nested keys (like JEX.API.REST.PREFIX).
+            // This prevents flat keys (like jex.api) from breaking nested keys (like jex.api.rest.prefix).
             if (!current[part] || typeof current[part] !== 'object') {
                 current[part] = {};
             }

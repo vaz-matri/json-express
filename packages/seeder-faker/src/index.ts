@@ -55,6 +55,7 @@ export class FakerSeeder implements ISeeder {
      */
     private getLocalFkMap(schema: ModelSchema): Record<string, string> {
         const map: Record<string, string> = {};
+        if (!schema.fields) return map;
         for (const [fieldName, def] of Object.entries(schema.fields)) {
             const td = def as TypeDefinition;
             if (td.type !== 'relation') continue;
@@ -137,6 +138,7 @@ export class FakerSeeder implements ISeeder {
         const fkMap = this.getLocalFkMap(schema);
         const record: Record<string, any> = {};
 
+        if (!schema.fields) return record;
         for (const [fieldName, def] of Object.entries(schema.fields)) {
             const td = def as TypeDefinition;
             const opts: any = td.options || {};
@@ -187,7 +189,11 @@ export class FakerSeeder implements ISeeder {
         // Build the union of schema-derived and user-listed collection names.
         const targets = new Set<string>();
         if (auto) {
-            for (const s of this.schemas) targets.add(s.name);
+            for (const s of this.schemas) {
+                // Fieldless models declare behavior only — there's nothing to seed.
+                if (!s.fields) continue;
+                targets.add(s.name);
+            }
         }
         for (const k of Object.keys(userCollections)) targets.add(k);
 

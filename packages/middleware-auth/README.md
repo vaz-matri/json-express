@@ -21,17 +21,17 @@ The `api-rest` and `api-graphql` generators read this header to evaluate per-col
 
 ## Configuration
 
-All options are set via `.env` using the `JEX` namespace (double underscore creates nested blocks). Pick **exactly one** of `auth.secret` or `auth.jwksUri` — the middleware throws at boot if both are set.
+All options are set via `.env` using the `jex` or `JEX` namespace (double underscore creates nested blocks). Pick **exactly one** of `auth.secret` or `auth.jwksUri` — the middleware throws at boot if both are set.
 
 ### Symmetric (HMAC, e.g. tokens you mint yourself)
 
 ```env
 # HMAC secret used by jsonwebtoken to verify every token.
-JEX__AUTH__SECRET=your-hmac-secret
+jex__auth__secret=your-hmac-secret
 
 # Optional — comma-separated or array of path prefixes the middleware should skip.
 # Useful for health checks, docs, login endpoints, or making /graphql public.
-JEX__AUTH__EXCLUDE=/docs,/health,/login
+jex_auth_exclude=/docs,/health,/login
 ```
 
 ### Asymmetric (JWKS, e.g. Auth0 / Firebase / Supabase / any OIDC provider)

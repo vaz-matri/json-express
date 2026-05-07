@@ -19,10 +19,51 @@ export interface ResponseHelper {
  * Signature for user-defined custom endpoints
  */
 export type CustomEndpointHandler = (
-    req: JsonRequest, 
-    res: ResponseHelper, 
+    req: JsonRequest,
+    res: ResponseHelper,
     ctx: RouteContext
 ) => Promise<JsonResponse | void> | JsonResponse | void;
+
+/**
+ * Structural validator type — anything with `safeParse` that returns the Zod-shaped
+ * result is accepted. Core never imports Zod; this lets `middleware-validation` use
+ * Zod by default while leaving the door open for `middleware-validation-yup` etc.
+ */
+export interface Validator {
+    safeParse(value: unknown): { success: true; data: any } | { success: false; error: any };
+}
+
+/**
+ * Builder form: receives the auto-derived baseline (built from `fields`) and returns
+ * the final validator. Lets users `.extend(...)` the baseline without restating the
+ * field shape.
+ */
+export type ValidatorBuilder = (baseline: Validator) => Validator;
+
+export type ValidatorOrBuilder = Validator | ValidatorBuilder;
+
+/**
+ * Per-op validation block on a model. CRUD ops are keyed by intent (`create`,
+ * `update`, `list`) rather than `{ method, path }` — the route is implied by the
+ * model. Custom endpoints carry their own `validation` block alongside the handler.
+ */
+export interface ModelValidationBlock {
+    create?: { body?: ValidatorOrBuilder };
+    update?: { body?: ValidatorOrBuilder };
+    list?: { query?: ValidatorOrBuilder };
+}
+
+/**
+ * Object form for custom endpoints. Lets validation sit next to the handler.
+ * The bare-function form (`'POST /:id/play': async (req, res, ctx) => {...}`)
+ * still works as sugar.
+ */
+export interface CustomEndpointDefinition {
+    handler: CustomEndpointHandler;
+    validation?: { body?: ValidatorOrBuilder; query?: ValidatorOrBuilder };
+}
+
+export type CustomEndpointEntry = CustomEndpointHandler | CustomEndpointDefinition;
 
 /**
  * Context object handed to model hooks at execution time. Adapters build this
@@ -132,8 +173,13 @@ export interface ModelGraphQLBlock {
 
 export interface ModelConfig<TFields extends Record<string, TypeDefinition> = any> {
     name?: string;
-    fields: TFields;
-    endpoints?: Record<string, CustomEndpointHandler>;
+    /**
+     * Field definitions for the entity. Optional — fieldless models declare pure
+     * behavior (custom endpoints, validation, hooks) without participating in CRUD
+     * codegen. Useful for feature-modules like `/search`, `/auth/login`, webhooks.
+     */
+    fields?: TFields;
+    endpoints?: Record<string, CustomEndpointEntry>;
     hooks?: ModelHooks;
     access?: AuthRules;
     graphql?: ModelGraphQLBlock;
@@ -142,6 +188,13 @@ export interface ModelConfig<TFields extends Record<string, TypeDefinition> = an
      * Default: true
      */
     exposeApi?: boolean;
+    /**
+     * Per-op input validation. Read by `@json-express/middleware-validation` at boot;
+     * inert metadata when that package is not installed. Each op accepts either a
+     * `Validator` (e.g. a Zod schema) or a `ValidatorBuilder` that receives the
+     * auto-derived baseline (built from `fields`) and returns the final validator.
+     */
+    validation?: ModelValidationBlock;
 }
 
 export interface ModelSchema<TFields extends Record<string, TypeDefinition> = any> extends ModelConfig<TFields> {
@@ -149,16 +202,27 @@ export interface ModelSchema<TFields extends Record<string, TypeDefinition> = an
 }
 
 /**
- * The core identity function used to explicitly define a ModelSchema. 
+ * The core identity function used to explicitly define a ModelSchema.
  * Provides strong typing and autocomplete for Developers.
  */
 export function defineModel<TFields extends Record<string, TypeDefinition>>(
     config: ModelConfig<TFields>
 ): ModelSchema<TFields> {
     return {
-        // A placeholder name. The file scanner module will forcefully override 
+        // A placeholder name. The file scanner module will forcefully override
         // this with the filename (e.g., 'albums') when loaded into the Registry.
         name: config.name || 'UNNAMED_MODEL',
         ...config
     };
+}
+
+/**
+ * Sugar for fieldless route-only models. Equivalent to
+ * `defineModel({ exposeApi: false, ...config })` — exists purely so the file
+ * reads as intent ("this file declares routes, not an entity").
+ */
+export function defineRoutes(
+    config: Omit<ModelConfig, 'fields' | 'exposeApi'>
+): ModelSchema {
+    return defineModel({ ...config, exposeApi: false });
 }

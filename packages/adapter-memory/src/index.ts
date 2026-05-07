@@ -44,7 +44,7 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
 
     private enforceUniqueConstraints(collection: string, payload: any, excludeId?: string) {
         const schema = this.schemas.find(s => s.name === collection);
-        if (!schema) return;
+        if (!schema || !schema.fields) return;
 
         const items = this.store[collection] || [];
         for (const [fieldName, fieldDefRaw] of Object.entries(schema.fields)) {
@@ -74,9 +74,9 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
 
     private applyPopulation(item: any, collection: string, options?: QueryOptions): any {
         if (!options?.expand || options.expand.length === 0) return item;
-        
+
         const schema = this.schemas.find(s => s.name === collection);
-        if (!schema) return item;
+        if (!schema || !schema.fields) return item;
 
         const populated = { ...item };
 

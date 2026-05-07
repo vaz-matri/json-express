@@ -48,9 +48,9 @@ npx json-express --configure
 ? Select transport plugin: › - Use arrow-keys. Return to submit.
 ❯   @json-express/transport-express (default)
 
-✅ Saved: JEX.ADAPTER=@json-express/adapter-memory
-✅ Saved: JEX.API=@json-express/api-rest
-✅ Saved: JEX.TRANSPORT=@json-express/transport-express
+✅ Saved: jex.adapter=@json-express/adapter-memory
+✅ Saved: jex.api=@json-express/api-rest
+✅ Saved: jex.transport=@json-express/transport-express
 
 🚀 Configuration saved. Booting server...
 ```
@@ -69,16 +69,16 @@ You can bypass the Auto-Discovery Engine and explicitly pin any layer to a speci
 
 ```env
 # Force back to the in-memory adapter
-JEX.ADAPTER=@json-express/adapter-memory
+jex.adapter=@json-express/adapter-memory
 
-# Force back to REST 
-JEX.API=@json-express/api-rest
+# Force back to REST
+jex.api=@json-express/api-rest
 
 # Force a specific transport
-JEX.TRANSPORT=@json-express/transport-fastify
+jex.transport=@json-express/transport-fastify
 
 # Pin to the high-performance Pino logger
-JEX.LOGGER=@json-express/logger-pino
+jex.logger=@json-express/logger-pino
 ```
 
 ---
@@ -87,12 +87,12 @@ JEX.LOGGER=@json-express/logger-pino
 
 On boot, the CLI reads the project's `package.json` and auto-discovers all `@json-express/*` packages:
 
-| Situation | Behaviour |
-|---|---|
-| No custom plugin installed | Boots silently with the bundled default |
-| One custom plugin installed | Silently overrides the default with the installed plugin |
-| Two or more of the same category | Pauses and prompts you to choose, saves to `.env` |
-| `JEX.{LAYER}` set in `.env` | Respects the preference — including if it points to the bundled default |
+| Situation                                    | Behaviour |
+|----------------------------------------------|---|
+| No custom plugin installed                   | Boots silently with the bundled default |
+| One custom plugin installed                  | Silently overrides the default with the installed plugin |
+| Two or more of the same category             | Pauses and prompts you to choose, saves to `.env` |
+| `jex.{layer}` or `JEX.{LAYER}` set in `.env` | Respects the preference — including if it points to the bundled default |
 
 ---
 

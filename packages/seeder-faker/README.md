@@ -36,6 +36,8 @@ Without either flag, the framework loads existing data files as-is and does not 
 
 By default (`auto: true`), the seeder reads every model schema the project has loaded — whether from `models/*.ts` (`defineModel`) or inferred from `data/*.json` files — and synthesizes a generator from each field's type. Drop a model in, run `--seed`, get 10 records.
 
+Fieldless models (`defineRoutes(...)` or `defineModel({ ... })` without a `fields` block) are skipped — they declare behavior only, so there's nothing to seed.
+
 Field-type → faker mapping:
 
 | Field type | Output |

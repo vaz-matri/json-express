@@ -21,11 +21,11 @@ npm install @json-express/transport-fastify
 JSON Express will automatically detect and use this transport if it is the only one installed. You can explicitly pin it in your `.env` or config file:
 
 ```env
-JEX.TRANSPORT=@json-express/transport-fastify
+jex.transport=@json-express/transport-fastify
 ```
 
 ### Automated Access Logging & Tracing
-The Fastify transport now automatically performs **post-response access logging** using the framework's configured logger. 
+The Fastify transport now automatically performs **post-response access logging** using the framework's configured logger.
 - It generates a unique `traceId` via `AsyncLocalStorage` for every request.
 - It logs the method, path, status code, and latency (in ms) once the request is complete.
 - **No configuration required.** The old `transport.fastify.logger` flag has been deprecated and superseded by this automated behavior.

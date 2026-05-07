@@ -30,7 +30,7 @@ The mount path is configurable via `jex.docs.path` (default `/docs`).
 
 ## Schema-Driven OpenAPI
 
-For every `ModelSchema` registered with the kernel:
+For every `ModelSchema` registered with the kernel **that declares `fields`**:
 
 - **`components.schemas.<Collection>`** is generated from `schema.fields`. Field-level options become OpenAPI keywords:
   - `types.string({ minLength, maxLength })` → `{ type: 'string', minLength, maxLength }`
@@ -45,15 +45,28 @@ For every `ModelSchema` registered with the kernel:
 
 If a project has no `models/` folder, schemas are inferred from `data/*.json` and the same generation pipeline applies — every demo gets useful Swagger output for free.
 
+Fieldless models (`defineRoutes(...)` or `defineModel({ ... })` without a `fields` block) are skipped from `components.schemas` — there's no entity to describe. Their custom endpoints are still documented via the per-route loop below, with a generic `{ type: 'object' }` request body unless a more specific one is wired in.
+
 ---
 
 ## Inter-Package Integration
 
 Three sanctioned channels (see `context/INTER_PACKAGE_ARCHITECTURE.md`) let other plugins enrich the Swagger output without coupling:
 
-### 1. `route.metadata.schema` — Zod override
+### 1. `route.metadata.validation` — per-op validators
 
-`@json-express/middleware-validation` attaches a Zod schema to mutation routes. When present, this plugin converts it to OpenAPI and uses it **in place of** the model-derived component schema for that single operation. Useful when validation rules are stricter or differently shaped than persisted fields (e.g. a `confirmPassword` field that's never stored).
+`@json-express/api-rest` stamps each generated route with the model's relevant validation block, in the shape the validation middleware understands:
+
+```ts
+// CRUD routes — keyed by op
+route.metadata.validation = { create?: { body }, update?: { body }, list?: { query } };
+// Custom endpoints — flat
+route.metadata.validation = { body?, query? };
+```
+
+When present, this plugin converts the validator to OpenAPI and uses it **in place of** the model-derived component schema for that single operation — useful when validation rules are stricter or differently shaped than persisted fields (e.g. a `confirmPassword` field that's never stored).
+
+> **Status:** the introspection codepath in `docs-swagger` still reads the legacy `route.metadata.schema` key. Until that's migrated to the new `route.metadata.validation` shape above, validators authored in models won't show up as OpenAPI request-body overrides. The component schema (from `fields`) is still emitted correctly.
 
 ### 2. `route.metadata.isProtected` — Bearer auth
 
@@ -67,7 +80,7 @@ Not used by this plugin today — but the door is open for, say, a future `plugi
 
 ## Configuration
 
-All options use the `JEX` namespace:
+All options use the `jex` or `JEX` namespace:
 
 ```env
 # Activate this plugin instead of the default docs-light
@@ -121,9 +134,9 @@ Kernel.boot()
        docProvider.renderDocumentation(routes, '/docs', req) → HTML shell
        docProvider.getManifest(routes, req)                   → OpenAPI 3.0 spec
               │
-              ├─ generate components.schemas from ModelSchema[]
+              ├─ generate components.schemas from ModelSchema[] (skipping fieldless models)
               ├─ for each route: tag by matching path against schema names
-              ├─ honor route.metadata.schema (Zod) as request-body override
+              ├─ honor route.metadata.validation as request-body override (see status note above)
               └─ honor route.metadata.isProtected for security scheme
 ```
 

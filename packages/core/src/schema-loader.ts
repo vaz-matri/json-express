@@ -53,13 +53,14 @@ export async function loadSchemasAndData(cwd: string): Promise<{ schemas: ModelS
                 const mod = await jiti.import(filePath) as any;
                 const schema = mod.default || mod;
 
-                if (schema && typeof schema === 'object' && schema.fields) {
+                const isModelObject = schema && typeof schema === 'object' && (schema.fields || schema.endpoints);
+                if (isModelObject) {
                     if (!schema.name || schema.name === 'UNNAMED_MODEL') {
                         schema.name = basename(filename, extname(filename));
                     }
                     schemas.push(schema);
                 } else {
-                    console.warn(`⚠️ Warning: ${filename} must export a valid defineModel() object as default.`);
+                    console.warn(`⚠️ Warning: ${filename} must export a valid defineModel() or defineRoutes() object as default.`);
                 }
             } catch (e: any) {
                 console.error(`❌ Failed to transpile ${filename}: ${e.message}`);

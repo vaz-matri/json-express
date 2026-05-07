@@ -29,16 +29,16 @@ npx json-express
 
 When `json-express` starts, the engine boots in phases:
 
-1. **Discover the config module first.** It scans `package.json` for `@json-express/config-*` packages and instantiates the config provider before anything else, so `JEX.*` env values can drive plugin selection in subsequent steps. **At least one `config-*` plugin is required** — without it, `core` exits with a clear error.
+1. **Discover the config module first.** It scans `package.json` for `@json-express/config-*` packages and instantiates the config provider before anything else, so `jex.*` or `JEX.*` env values can drive plugin selection in subsequent steps. **At least one `config-*` plugin is required** — without it, `core` exits with a clear error.
 2. **Discover the rest** of the installed `@json-express/*` plugins, bucketed by category prefix: `transport-`, `adapter-`, `api-`, `logger-`, `docs-`, `middleware-`, `seeder-`, `id-`, `email-`, `kv-`, `queue-`, `plugin-`.
-3. **Resolve one plugin per required category.** Required categories are `config-`, `adapter-`, `api-`, `transport-`, `logger-`. If a category has multiple installs and no `JEX.<CATEGORY>` env override, `core` errors out and points the user at `npx jex configure`.
+3. **Resolve one plugin per required category.** Required categories are `config-`, `adapter-`, `api-`, `transport-`, `logger-`. If a category has multiple installs and no `jex.<category>` or `JEX.<CATEGORY>` env override, `core` errors out and points the user at `npx jex configure`.
 4. **Wire everything into the kernel** and call `kernel.boot(...)` — the API generator builds routes, the database loads data, and the transport starts listening.
 
 The engine is **non-interactive** — for plugin disambiguation, see [`@json-express/cli`](../cli)'s `jex configure` wizard.
 
 ## 🏗️ Schema Definition (Models)
 
-JSON Express is a schema-driven engine. You can define your data models in pure JSON or use the powerful TypeScript API via `defineModel`. 
+JSON Express is a schema-driven engine. You can define your data models in pure JSON or use the powerful TypeScript API via `defineModel`.
 
 We support **two API styles** for TypeScript definitions, allowing you to choose between ergonomic Zod-style builders or a declarative Options-Object format.
 
@@ -90,6 +90,65 @@ Every field type supports the following `BaseOptions`:
 - `types.relation({ target, type })` requires `target` (collection name) and `type` (`one-to-many`, `many-to-one`, etc.), and supports `foreignKey`, `onDelete`.
 - `types.boolean()`, `types.date()`, `types.id()` support all `BaseOptions`.
 
+### Per-Model Validation
+
+Models may declare a `validation` block — read by [`@json-express/middleware-validation`](../middleware-validation) at boot, inert metadata when that package isn't installed.
+
+```typescript
+import { defineModel, types } from '@json-express/core';
+import { z } from 'zod';
+
+export default defineModel({
+    fields: {
+        name: types.string({ required: true }),
+        price: types.number({ required: true, min: 0 }),
+    },
+    validation: {
+        create: { body: z.object({ name: z.string().min(2), price: z.number().positive() }) },
+        update: { body: (baseline) => baseline.partial() }, // builder form
+        list:   { query: z.object({ limit: z.coerce.number().int().max(100).optional() }) },
+    },
+});
+```
+
+Each slot accepts a `Validator` (anything with `safeParse`), a `ValidatorBuilder` `(baseline) => Validator` over the auto-derived field baseline, or `{}` to opt into the baseline as-is. Core never imports Zod — the structural `Validator` interface lets a future `middleware-validation-yup` ship without forking.
+
+### Custom Endpoints
+
+The `endpoints` block accepts both the bare-function form and an object form that lets validation sit next to the handler:
+
+```typescript
+endpoints: {
+    'GET /:id/play': async (req, res, ctx) => { /* ... */ },        // sugar
+    'POST /search': {                                                 // object form
+        handler: async (req, res, ctx) => { /* ... */ },
+        validation: {
+            body: z.object({ q: z.string().min(2) }),
+        },
+    },
+}
+```
+
+### Fieldless Route-Only Models — `defineRoutes()`
+
+`fields` is optional. For non-entity routes (`/search`, `/auth/login`, webhooks), use `defineRoutes()` — sugar for `defineModel({ exposeApi: false, ... })`:
+
+```typescript
+import { defineRoutes } from '@json-express/core';
+import { z } from 'zod';
+
+export default defineRoutes({
+    endpoints: {
+        'POST /login': {
+            handler: async (req, res, ctx) => { /* ... */ },
+            validation: { body: z.object({ email: z.string().email(), password: z.string().min(8) }) },
+        },
+    },
+});
+```
+
+The filename is the mount prefix (`models/auth.ts` → `/auth/login`). Fieldless models skip CRUD codegen, schema-derived OpenAPI components, and auto-seeding — they declare behavior only.
+
 ## 🧩 The Standardized Contracts
 
 Any official or community plugin must implement one of the interfaces exported from `@json-express/core/types`:
@@ -100,7 +159,7 @@ Any official or community plugin must implement one of the interfaces exported f
 - `ITransport` (Server Layer)
 - `ILogger` (Observability Layer)
 - `IDocProvider` (Documentation Layer)
-- `IMiddleware` (Interceptor Layer)
+- `IMiddleware` (Interceptor Layer) — implementations may opt into `setSchemas?(schemas)` to receive the loaded model set once at boot. The runner calls it after middlewares are registered; `middleware-validation` uses this to compile its rule table.
 - `ISeeder` (Data Seeding Layer)
 - `IPlugin` (Lifecycle Layer)
 - `IIdGenerator` (ID Layer)
@@ -112,7 +171,7 @@ The `core` package provides a robust mechanism for request-scoped correlation us
 
 ### Core Utilities
 `core` also exposes Twelve-Factor configuration helpers used by other plugins:
-- `buildNestedConfigFromEnv(envVars, namespace)` — converts flat `JEX.*` env vars into a nested config object.
+- `buildNestedConfigFromEnv(envVars, namespace)` — converts flat `jex.*` or `JEX.*` env vars into a nested config object.
 - `getNestedValue(obj, path, default)` / `setNestedValue(obj, path, value)` — dot-notation access.
 - `deepMerge(...objects)` — right-to-left precedence object merge.
 

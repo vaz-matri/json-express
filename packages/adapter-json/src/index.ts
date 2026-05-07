@@ -80,7 +80,7 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
 
     private enforceUniqueConstraints(collection: string, payload: any, excludeId?: string) {
         const schema = this.schemas.find(s => s.name === collection);
-        if (!schema) return;
+        if (!schema || !schema.fields) return;
 
         const items = this.store[collection] || [];
         for (const [fieldName, fieldDefRaw] of Object.entries(schema.fields)) {

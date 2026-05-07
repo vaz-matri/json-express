@@ -1,82 +1,82 @@
 [
   {
-    "name": "tenax terebro",
-    "wizardId": "134b8894-6df7-4358-b1d6-b14c75bec26c",
-    "rarity": "ratione conscendo adeptio",
+    "name": "beatae quibusdam",
+    "wizardId": "fe0b6c8d-e173-4381-9d57-2208451dc8a0",
+    "rarity": "maxime saepe texo cum",
+    "potencyLevel": 3,
+    "bottled": true,
+    "id": "b9e7874b-c971-4320-bc48-a7c8f4e4bfd2"
+  },
+  {
+    "name": "ceno colligo architecto",
+    "wizardId": "6b2cc946-944c-4dd0-a0cd-b89642c24d4f",
+    "rarity": "callide eveniet",
+    "potencyLevel": 3,
+    "bottled": true,
+    "id": "4d901b73-095f-4da2-a8c1-e99b7e851167"
+  },
+  {
+    "name": "architecto torqueo animus",
+    "wizardId": "7b16bf1f-6b9f-4708-b089-88bc9733fc5c",
+    "rarity": "aurum caste facere",
+    "potencyLevel": 6,
+    "bottled": true,
+    "id": "c3b17f97-02cc-40a2-bd66-152117bc9e4f"
+  },
+  {
+    "name": "crepusculum distinctio",
+    "wizardId": "8df4ad0a-34fb-49d8-9ff4-fdef4f35040b",
+    "rarity": "attonbitus distinctio",
     "potencyLevel": 2,
     "bottled": true,
-    "id": "8bbcc24c-ebbd-4c56-aabd-084f8bb31f98"
+    "id": "0fc733e0-6e79-4a51-b1c5-b58ce2ae2785"
   },
   {
-    "name": "vito adflicto vesco",
-    "wizardId": "34ad3fab-61bc-4cb5-873c-32ea1f29da03",
-    "rarity": "non alter",
-    "potencyLevel": 9,
-    "bottled": true,
-    "id": "1a53b6ac-cdf1-41d9-b88f-c3b30cb18c62"
-  },
-  {
-    "name": "suppono votum",
-    "wizardId": "c86f0739-f768-4919-b0b3-99a09a0e8127",
-    "rarity": "deprecator repellat solum",
-    "potencyLevel": 8,
-    "bottled": true,
-    "id": "651bbcd4-92fe-43cb-a612-e82f1a8cd3a3"
-  },
-  {
-    "name": "ventosus iusto",
-    "wizardId": "e25c49a8-e2c3-400f-b81b-be65eca4a909",
-    "rarity": "toties recusandae pectus",
-    "potencyLevel": 5,
-    "bottled": true,
-    "id": "72b07ea3-2a7e-4505-9a56-9cb5197972d3"
-  },
-  {
-    "name": "voluptatem decens",
-    "wizardId": "9b5ed253-549e-4bec-9cbf-f933e9d622ba",
-    "rarity": "dolorem nesciunt",
-    "potencyLevel": 7,
-    "bottled": true,
-    "id": "a83077b5-1bbb-4fbc-baf9-f1af6afccd73"
-  },
-  {
-    "name": "non admitto",
-    "wizardId": "34ad3fab-61bc-4cb5-873c-32ea1f29da03",
-    "rarity": "damnatio ara terminatio",
+    "name": "conculco urbs arbustum",
+    "wizardId": "a5de57cd-c3d5-42ce-a64c-8446014610e6",
+    "rarity": "cerno baiulus crastinus",
     "potencyLevel": 4,
     "bottled": true,
-    "id": "dd7ae0cb-6c72-402f-b1bc-74fd8149cac1"
+    "id": "90a743ff-b22b-4b67-8139-01f0bd64796b"
   },
   {
-    "name": "tendo viriliter",
-    "wizardId": "bcd65e39-a922-4f4e-8086-0ff3aaa1aed7",
-    "rarity": "delicate fugiat aduro tardus",
+    "name": "via callide comitatus",
+    "wizardId": "6b2cc946-944c-4dd0-a0cd-b89642c24d4f",
+    "rarity": "vulgo volutabrum thalassinus",
+    "potencyLevel": 3,
+    "bottled": true,
+    "id": "33749a33-108c-4884-9c71-d01350c84276"
+  },
+  {
+    "name": "cotidie enim",
+    "wizardId": "a3e4001c-6e74-4830-9cca-8c58b2a34390",
+    "rarity": "sopor tabella voco",
+    "potencyLevel": 8,
+    "bottled": true,
+    "id": "1313f032-2f0b-4dbc-a661-699489fc6a6a"
+  },
+  {
+    "name": "subnecto curatio",
+    "wizardId": "e5cdf95c-ec94-487f-b1bd-5cfe10c7ffd4",
+    "rarity": "creber deludo crinis vapulus",
+    "potencyLevel": 3,
+    "bottled": true,
+    "id": "de1d5269-d895-48c1-9103-46f914fee767"
+  },
+  {
+    "name": "cui calco creator eum",
+    "wizardId": "a3e4001c-6e74-4830-9cca-8c58b2a34390",
+    "rarity": "thema amissio appositus claro",
     "potencyLevel": 7,
     "bottled": true,
-    "id": "02781998-8f0c-48a8-b1fd-aae1a66e01ea"
+    "id": "a82b57be-d692-406a-ab62-17a63fd8fcc0"
   },
   {
-    "name": "curiositas decretum creo enim",
-    "wizardId": "5011494c-2511-4f5f-b626-0af297072d5a",
-    "rarity": "conservo solitudo pectus validus",
+    "name": "vestigium cribro tredecim",
+    "wizardId": "8df4ad0a-34fb-49d8-9ff4-fdef4f35040b",
+    "rarity": "aqua deduco",
     "potencyLevel": 9,
     "bottled": true,
-    "id": "4458962c-10c9-48e5-a1d8-9e86cf73fdca"
-  },
-  {
-    "name": "curo versus",
-    "wizardId": "e3d99e22-2519-4ce9-b920-1b1496a5d301",
-    "rarity": "vinitor urbs depromo",
-    "potencyLevel": 7,
-    "bottled": true,
-    "id": "53136dd4-878c-4647-8dc9-ac710899cf2c"
-  },
-  {
-    "name": "auctor cupiditas xiphias demo",
-    "wizardId": "9b5ed253-549e-4bec-9cbf-f933e9d622ba",
-    "rarity": "avaritia tendo usus",
-    "potencyLevel": 5,
-    "bottled": true,
-    "id": "9f4ec9de-3bd8-4fe4-bc4c-851e6f25fbdc"
+    "id": "2987cdd2-d0c9-4cb3-aa29-39cdf334ad74"
   }
 ]

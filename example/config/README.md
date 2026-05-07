@@ -110,17 +110,16 @@ port: 4000
 The most powerful form. Default-export an object — or a function `({ env }) => object` if you need to branch on the environment. Loaded by `@json-express/config` via [`jiti`](https://github.com/unjs/jiti), so TypeScript needs no build step.
 
 ```ts
-import { defaultRules } from './validation-rules';
-
 export default ({ env }) => ({
   api: {
     rest: { prefix: env.NODE_ENV === 'production' ? '/api/v1' : '/api' }
   },
   port: env.PORT ? Number(env.PORT) : 3000,
-  validation: { rules: defaultRules },
   log: { level: env.LOG_LEVEL ?? 'info' }
 });
 ```
+
+> `validation` rules belong in your model files (`models/*.ts → validation`), not in `jex.config.ts`. See [`@json-express/middleware-validation`](/packages/middleware-validation) for the model-driven pattern.
 
 What you get over JSON/YAML:
 
@@ -160,11 +159,11 @@ The merge between layers is a **deep merge**, not a replace. If your base file s
 
 A handful of env vars are read by the runner *before* any config provider loads, so they only work in `process.env` (or the shell) — putting them in `.env` is too late.
 
-| Env var | Purpose |
-|---|---|
-| `JEX.CONFIG` / `JEX_CONFIG` / `JEX__CONFIG` | Picks the config plugin when both `@json-express/config-env` and `@json-express/config` are installed. Value is the package short-name (e.g. `config-env`). |
-| `JEX.<CATEGORY>` (e.g. `JEX.ADAPTER`, `JEX.TRANSPORT`) | Same `jex.<category>=...` selection keys documented below — useful when you can't write a `.env` file (CI, containerized runs). |
-| `NODE_ENV` | Decides which `.env.${env}` and `jex.config.${env}.{ext}` files load. Read by both providers and by every plugin that branches on environment. |
+| Env var                                                | Purpose |
+|--------------------------------------------------------|---|
+| `jex.config` / `jex_config` / `jex__config`            | Picks the config plugin when both `@json-express/config-env` and `@json-express/config` are installed. Value is the package short-name (e.g. `config-env`). |
+| `jex.<category>` (e.g. `jex.adapter`, `jex.transport`) | Same `jex.<category>=...` selection keys documented below — useful when you can't write a `.env` file (CI, containerized runs). |
+| `NODE_ENV`                                             | Decides which `.env.${env}` and `jex.config.${env}.{ext}` files load. Read by both providers and by every plugin that branches on environment. |
 
 ## Full key inventory
 
@@ -266,9 +265,7 @@ Both packages read the same `auth.*` block. `middleware-auth` only verifies toke
 
 ### `@json-express/middleware-validation`
 
-| Key | Type | Default | Effect |
-|---|---|---|---|
-| `validation.rules` | array | `[]` | Validation rules applied per-route. Also read by `api-rest` and `api-graphql` to publish schema metadata. |
+This middleware reads validation rules from each model's `validation` block (`models/*.ts`), not from `jex.config.ts`. It does not consume any `jex.*` keys. See [the package docs](/packages/middleware-validation).
 
 ### `@json-express/plugin-devcert`
 
@@ -307,8 +304,9 @@ Every default in the tables above lives in the **plugin's own constructor**, not
 A few keys are written by one plugin and read by another. This is the [defensive-decoupling pattern](../../context/INTER_PACKAGE_ARCHITECTURE.md): the producer mutates a known key during `onRegister`, and the consumer reads it at boot. Examples:
 
 - `plugin-devcert` writes `express.ssl`; `transport-express` reads it.
-- `middleware-validation` writes `validation.rules`; `api-rest` and `api-graphql` read it.
 - `api-rest` reads `api.rest.prefix`; `docs-light` and `docs-swagger` read the same key so example URLs match the actual mount paths.
+
+> **Note:** Validation no longer flows through config. Each model owns its own `validation` block in `models/*.ts`; `middleware-validation` reads them directly via `setSchemas` at boot. See the [validation transition plan](../../validation-transition-plan.md) for context.
 
 Neither side hard-imports the other — config is the contract.
 

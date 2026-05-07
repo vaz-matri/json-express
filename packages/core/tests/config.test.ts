@@ -21,7 +21,7 @@ describe('Config Utilities', () => {
         // 2. Testing Deep Nesting and Multi-word keys
         it('parses deep nesting and multi-word keys correctly', () => {
             const envMock = {
-                'JEX.TRANSPORT.EXPRESS.LOGGER': 'true',
+                'jex.transport.express.logger': 'true',
                 'JEX__DATABASE__MAX_CONNECTIONS': '100',
                 'jex.api__rest.prefix': '/api/v1',
                 'SOME_OTHER_VAR': 'ignore_me' // Should be completely ignored

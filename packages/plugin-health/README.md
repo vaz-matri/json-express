@@ -97,7 +97,7 @@ If the adapter does **not** implement `isHealthy()`, the plugin gracefully falls
 Disable the `/health` endpoint entirely via `.env`:
 
 ```env
-JEX.TRANSPORT.EXPRESS.HEALTH=false
+jex.transport.express.health=false
 ```
 
 ---

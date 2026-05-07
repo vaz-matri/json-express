@@ -19,7 +19,7 @@ It satisfies the contract just well enough to wire up the real flow end-to-end w
 npm install @json-express/email-console
 ```
 
-The CLI auto-discovers any package matching `@json-express/email-*` in your `package.json` and registers it as the active email provider. If multiple are installed, the standard `JEX.EMAIL=...` selector applies.
+The CLI auto-discovers any package matching `@json-express/email-*` in your `package.json` and registers it as the active email provider. If multiple are installed, the standard `jex.email=...` or `JEX.EMAIL=...` selector applies.
 
 ---
 

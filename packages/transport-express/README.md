@@ -38,24 +38,24 @@ await kernel.boot(['users', 'posts']);
 You can configure this plugin using your `.env` file (via `config-env`) or a `jex.config.*` file (via advanced `config`).
 
 ### Using `.env`
-Remember to use the `JEX_` prefix. Dots (`.`) denote nested objects, and underscores (`_`) are used for multi-word keys.
+Remember to use the `jex_` or `JEX_` prefix. Dots (`.`) denote nested objects, and underscores (`_`) are used for multi-word keys.
 
 ### Using `.env`
-Remember to use the `JEX.` namespace prefix. Dots (`.`) denote nested objects, and underscores (`_`) are used for multi-word keys.
+Remember to use the `jex.` or `JEX.` namespace prefix. Dots (`.`) denote nested objects, and underscores (`_`) are used for multi-word keys.
 
 ### Automated Access Logging & Tracing
-The Express transport now automatically performs **post-response access logging** using the framework's configured logger. 
+The Express transport now automatically performs **post-response access logging** using the framework's configured logger.
 - It generates a unique `traceId` via `AsyncLocalStorage` for every request.
 - It logs the method, path, status code, and latency (in ms) once the request is complete.
-- **No configuration required.** The old `JEX.TRANSPORT.EXPRESS.LOGGER` flag has been deprecated and superseded by this automated behavior.
+- **No configuration required.** The old `jex.transport.express.logger` flag has been deprecated and superseded by this automated behavior.
 
 ### Other Options
 ```env
 # Change the default server port (default: 3000)
-JEX.PORT=8080
+jex.port=8080
 
 # Enable trust proxy for load balancers (default: false)
-JEX.TRANSPORT.EXPRESS.TRUST_PROXY=true
+jex.transport.express.trust_proxy=true
 ```
 
 ### Using `jex.config.json`

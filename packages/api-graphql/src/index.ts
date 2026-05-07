@@ -100,19 +100,6 @@ function scalarFor(type: string): GraphQLScalarType {
 interface ParsableSchema {
     safeParse(input: unknown): { success: boolean; data?: any; error?: { format(): any } };
 }
-interface ValidationRule {
-    method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | '*';
-    path: string | RegExp;
-    body?: ParsableSchema;
-    query?: ParsableSchema;
-}
-
-function matchRule(rule: ValidationRule, method: string, path: string): boolean {
-    const methodOk = rule.method === '*' || rule.method.toUpperCase() === method.toUpperCase();
-    if (!methodOk) return false;
-    if (rule.path instanceof RegExp) return rule.path.test(path);
-    return path === rule.path || path.startsWith(rule.path);
-}
 
 const GRAPHIQL_HTML = `<!DOCTYPE html>
 <html>
@@ -158,7 +145,7 @@ export class GraphQLApiGenerator implements IApiGenerator {
         this.schemas = schemas;
     }
 
-    private buildSchema(collections: string[], rules: ValidationRule[]): GraphQLSchema {
+    private buildSchema(collections: string[]): GraphQLSchema {
         const db = this.db;
         const logger = this.logger;
         const schemaMap = new Map(this.schemas.map((s) => [s.name, s]));
@@ -213,7 +200,18 @@ export class GraphQLApiGenerator implements IApiGenerator {
             }
         };
 
-        for (const collection of collections) {
+        // Collections that should participate in GraphQL codegen.
+        // Fieldless models (defineRoutes / models with only endpoints) and `exposeApi: false`
+        // models declare behavior only — no GraphQL type, input, or root-field is generated.
+        const gqlCollections = collections.filter(c => {
+            const m = schemaMap.get(c);
+            if (!m) return true; // raw JSON collection — gets generic {id,data} treatment
+            if (m.exposeApi === false) return false;
+            if (!m.fields) return false;
+            return true;
+        });
+
+        for (const collection of gqlCollections) {
             const typeName = toTypeName(collection);
             const modelSchema = schemaMap.get(collection);
 
@@ -363,7 +361,7 @@ export class GraphQLApiGenerator implements IApiGenerator {
         const queryFields: Record<string, any> = {};
         const mutationFields: Record<string, any> = {};
 
-        for (const collection of collections) {
+        for (const collection of gqlCollections) {
             const gqlType = typeRegistry.get(collection)!;
             const inputType = inputRegistry.get(collection)!;
             const whereType = whereRegistry.get(collection)!;
@@ -421,15 +419,20 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 };
             }
 
-            const createRule = rules.find((r) => matchRule(r, 'POST', `/${collection}`));
-            const updateRule = rules.find((r) => matchRule(r, 'PATCH', `/${collection}`));
+            // Resolve create/update validators from the model's validation block. Only the
+            // direct-Validator form (`{ body: zodSchema }`) is honored here — builder-form
+            // (`(baseline) => ...`) requires the auto-derived baseline that lives in
+            // `middleware-validation`. For GraphQL, declare a concrete schema directly.
+            const validation = schemaMap.get(collection)?.validation;
+            const createValidator = resolveDirectValidator(validation?.create?.body);
+            const updateValidator = resolveDirectValidator(validation?.update?.body);
 
             mutationFields[`create${typeName}`] = {
                 type: gqlType,
                 args: { input: { type: new GraphQLNonNull(inputType) } },
                 resolve: async (_: any, { input }: any, ctx: ResolverContext) => {
                     const user = enforceAccess(createAccessRule, ctx, typeName, 'create');
-                    const validated = runValidation(createRule, input, typeName);
+                    const validated = runValidation(createValidator, input, typeName);
                     let body: any = stripDeniedWriteFields(validated, access, user, 'create');
                     if (needsOwnerCheck(createAccessRule)) {
                         // Auto-stamp caller as owner; overwrites any client-supplied value.
@@ -452,7 +455,7 @@ export class GraphQLApiGenerator implements IApiGenerator {
                     if (needsOwnerCheck(updateAccessRule) && !ownsRecord(existing, ownerField, user)) {
                         throw notFoundError(typeName, id);
                     }
-                    const validated = runValidation(updateRule, input, typeName);
+                    const validated = runValidation(updateValidator, input, typeName);
                     const body = stripDeniedWriteFields(validated, access, user, 'update');
                     return db.update(collection, id, body);
                 },
@@ -511,8 +514,7 @@ export class GraphQLApiGenerator implements IApiGenerator {
             return [];
         }
 
-        const rules = this.config?.get<ValidationRule[]>('validation.rules', []) ?? [];
-        const schema = this.buildSchema(collections, rules);
+        const schema = this.buildSchema(collections);
         this.logger.info(`GraphQL API ready at POST ${endpoint}`, { collections });
 
         const routes: RouteDefinition[] = [];
@@ -603,9 +605,18 @@ export class GraphQLApiGenerator implements IApiGenerator {
     }
 }
 
-function runValidation(rule: ValidationRule | undefined, input: any, typeName: string): any {
-    if (!rule?.body) return input;
-    const parsed = rule.body.safeParse(input);
+function resolveDirectValidator(entry: unknown): ParsableSchema | undefined {
+    if (!entry) return undefined;
+    if (typeof entry === 'object' && entry !== null && typeof (entry as any).safeParse === 'function') {
+        return entry as ParsableSchema;
+    }
+    // Builder form requires a baseline that core can't compute (no Zod dep). GraphQL skips it.
+    return undefined;
+}
+
+function runValidation(validator: ParsableSchema | undefined, input: any, typeName: string): any {
+    if (!validator) return input;
+    const parsed = validator.safeParse(input);
     if (!parsed.success) {
         throw new GraphQLError(`${typeName} input validation failed`, {
             extensions: {

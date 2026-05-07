@@ -9,7 +9,7 @@ describe('EnvConfigProvider (Integration with Fixtures)', () => {
         const fixturePath = join(__dirname, 'fixtures/basic');
         const provider = new EnvConfigProvider(fixturePath);
 
-        // Assuming basic/.env has JEX.PORT=4000
+        // Assuming basic/.env has jex.port=4000
         expect(provider.get('port')).toBe(4000);
     });
 

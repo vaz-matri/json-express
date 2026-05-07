@@ -82,7 +82,7 @@ const discoverPluginsRecursively = (cwd: string): string[] => {
                 // Resolve where this plugin actually lives in node_modules
                 const req = createRequire(join(pkgDir, 'package.json'));
                 const resolvedEntry = req.resolve(dep);
-                
+
                 // Walk up the tree to find this plugin's package.json directory
                 let currentDir = dirname(resolvedEntry);
                 while (currentDir !== '/' && !existsSync(join(currentDir, 'package.json'))) {
@@ -107,7 +107,7 @@ export const startServer = async () => {
     // 1. Auto-Discovery: Dynamically crawl local and transitive json-express plugins
     const installedDeps = discoverPluginsRecursively(cwd);
 
-    // 2. Discover and instantiate the Config Provider FIRST so JEX.* values
+    // 2. Discover and instantiate the Config Provider FIRST so jex.* values
     //    can drive plugin selection in subsequent steps.
     const availableConfigs = installedDeps.filter(d => d.includes('config-'));
     if (availableConfigs.length === 0) {
@@ -121,7 +121,7 @@ export const startServer = async () => {
     if (availableConfigs.length === 1) {
         configPluginName = availableConfigs[0];
     } else {
-        const envPick = process.env['JEX.CONFIG'] || process.env['JEX_CONFIG'] || process.env['JEX__CONFIG'];
+        const envPick = process.env['jex.config'] || process.env['jex_config'] || process.env['jex__config'];
         if (envPick && availableConfigs.includes(envPick)) {
             configPluginName = envPick;
         } else {
@@ -193,10 +193,12 @@ export const startServer = async () => {
     }
 
     // 6.3 Middlewares
+    const registeredMiddlewares: any[] = [];
     for (const mwName of availableMiddlewares) {
         try {
             const mw = await loadPluginInstance(cwd, mwName, [{ configProvider, logger: loggerInstance }]);
             kernel.registerMiddleware(mw);
+            registeredMiddlewares.push(mw);
             console.log(`🔌 Registered middleware: ${mwName}`);
         } catch (e: any) {
             console.error(`❌ Failed to load middleware ${mwName}:`, e?.message || e);
@@ -321,6 +323,12 @@ export const startServer = async () => {
     // the exact same set as db/api.
     for (const seeder of registeredSeeders) {
         if (typeof seeder.setSchemas === 'function') seeder.setSchemas(schemas);
+    }
+
+    // Hand schemas to middlewares that opt-in via setSchemas.
+    // `middleware-validation` builds its route → validators lookup here.
+    for (const mw of registeredMiddlewares) {
+        if (typeof mw.setSchemas === 'function') mw.setSchemas(schemas);
     }
 
     // Doc providers receive the same schema set so they can document resources

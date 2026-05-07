@@ -57,7 +57,11 @@ export class RestApiGenerator implements IApiGenerator {
         this.schemas = schemas;
     }
 
-    private enrichRoute(route: RouteDefinition, opRule?: AccessRule): RouteDefinition {
+    private enrichRoute(
+        route: RouteDefinition,
+        opRule?: AccessRule,
+        modelValidationOp?: { schema: ModelSchema; op: 'create' | 'update' | 'list' },
+    ): RouteDefinition {
         route.middlewares = route.middlewares || [];
         route.metadata = route.metadata || {};
 
@@ -78,18 +82,14 @@ export class RestApiGenerator implements IApiGenerator {
             }
         }
 
-        const validationRules = this.config?.get<any[]>('validation.rules', []);
-        if (validationRules && validationRules.length > 0) {
-            const matchedRule = validationRules.find(r => {
-                const pathMatch = r.path instanceof RegExp ? r.path.test(route.path) : (route.path === r.path || route.path.startsWith(r.path));
-                const methodMatch = r.method === '*' || r.method.toUpperCase() === route.method.toUpperCase();
-                return pathMatch && methodMatch;
-            });
-
-            if (matchedRule) {
+        // Model-driven validation: if the schema declares a validation block for this op,
+        // attach the `validation` middleware. The middleware itself reads the resolved
+        // schemas at boot via `setSchemas` and matches requests against its compiled rules.
+        if (modelValidationOp) {
+            const opBlock = modelValidationOp.schema.validation?.[modelValidationOp.op];
+            if (opBlock) {
                 if (!route.middlewares.includes('validation')) route.middlewares.push('validation');
-                if (matchedRule.body) route.metadata.schema = matchedRule.body;
-                if (matchedRule.query) route.metadata.querySchema = matchedRule.query;
+                route.metadata.validation = { ...route.metadata.validation, [modelValidationOp.op]: opBlock };
             }
         }
 
@@ -137,6 +137,9 @@ export class RestApiGenerator implements IApiGenerator {
         for (const collection of collections) {
             const schema = schemaMap.get(collection);
             if (schema?.exposeApi === false) continue;
+            // Skip CRUD codegen for fieldless models — they declare behavior only
+            // (custom endpoints, validation, hooks). The endpoint loop below still mounts them.
+            if (schema && !schema.fields) continue;
 
             const basePath = `${prefix}/${collection}`;
             const itemPath = `${prefix}/${collection}/:id`;
@@ -179,7 +182,7 @@ export class RestApiGenerator implements IApiGenerator {
                     const projected = data.map((r: any) => stripDeniedReadFields(r, access, verdict.user));
                     return { statusCode: 200, body: projected };
                 }
-            }, readRule));
+            }, readRule, schema ? { schema, op: 'list' } : undefined));
 
             routes.push(this.enrichRoute({
                 method: 'GET',
@@ -241,7 +244,7 @@ export class RestApiGenerator implements IApiGenerator {
                         throw e;
                     }
                 }
-            }, createRule));
+            }, createRule, schema ? { schema, op: 'create' } : undefined));
 
             routes.push(this.enrichRoute({
                 method: 'PATCH',
@@ -280,7 +283,7 @@ export class RestApiGenerator implements IApiGenerator {
                         return notFound(collection, id);
                     }
                 }
-            }, updateRule));
+            }, updateRule, schema ? { schema, op: 'update' } : undefined));
 
             routes.push(this.enrichRoute({
                 method: 'DELETE',
@@ -317,21 +320,34 @@ export class RestApiGenerator implements IApiGenerator {
         // --- Extensibility 1: Model-Bound Endpoints --- //
         for (const schema of this.schemas) {
             if (schema.endpoints) {
-                for (const [routeKey, handler] of Object.entries(schema.endpoints)) {
+                for (const [routeKey, entry] of Object.entries(schema.endpoints)) {
                     // "GET /stats"
                     const parts = routeKey.split(' ');
                     const method = parts.length > 1 ? parts[0] : 'GET';
                     const pathStr = parts.length > 1 ? parts[1] : parts[0];
-                    const cleanPath = pathStr.startsWith('/') ? pathStr : `/${pathStr}`;
+                    const cleanPath = pathStr === '/' ? '' : (pathStr.startsWith('/') ? pathStr : `/${pathStr}`);
                     const fullPath = `${prefix}/${schema.name}${cleanPath}`;
+
+                    // Accept both the bare-function form and the object form { handler, validation? }.
+                    const handler = typeof entry === 'function' ? entry : entry.handler;
+                    const validation = typeof entry === 'function' ? undefined : entry.validation;
 
                     this.logger.info(`Mapping Model-Bound Endpoint: ${method.toUpperCase()} ${fullPath}`);
 
-                    routes.push(this.enrichRoute({
+                    const route = this.enrichRoute({
                         method: method.toUpperCase() as any,
                         path: fullPath,
                         handler: this.bindCustomEndpoint(handler)
-                    }));
+                    });
+
+                    if (validation && (validation.body || validation.query)) {
+                        route.middlewares = route.middlewares || [];
+                        route.metadata = route.metadata || {};
+                        if (!route.middlewares.includes('validation')) route.middlewares.push('validation');
+                        route.metadata.validation = validation;
+                    }
+
+                    routes.push(route);
                 }
             }
         }
@@ -351,20 +367,32 @@ export class RestApiGenerator implements IApiGenerator {
                     const defaultExport = mod.default || mod;
                     
                     if (defaultExport && defaultExport.endpoints) {
-                        for (const [routeKey, handler] of Object.entries(defaultExport.endpoints)) {
+                        for (const [routeKey, entry] of Object.entries(defaultExport.endpoints) as [string, any][]) {
                             const parts = routeKey.split(' ');
                             const method = parts.length > 1 ? parts[0] : 'GET';
                             const pathStr = parts.length > 1 ? parts[1] : parts[0];
                             const cleanPath = pathStr.startsWith('/') ? pathStr : `/${pathStr}`;
                             const fullPath = `${prefix}${cleanPath}`;
 
+                            const handler = typeof entry === 'function' ? entry : entry.handler;
+                            const validation = typeof entry === 'function' ? undefined : entry.validation;
+
                             this.logger.info(`Mapping Global Endpoint: ${method.toUpperCase()} ${fullPath}`);
 
-                            routes.push(this.enrichRoute({
+                            const route = this.enrichRoute({
                                 method: method.toUpperCase() as any,
                                 path: fullPath,
                                 handler: this.bindCustomEndpoint(handler)
-                            }));
+                            });
+
+                            if (validation && (validation.body || validation.query)) {
+                                route.middlewares = route.middlewares || [];
+                                route.metadata = route.metadata || {};
+                                if (!route.middlewares.includes('validation')) route.middlewares.push('validation');
+                                route.metadata.validation = validation;
+                            }
+
+                            routes.push(route);
                         }
                     }
                 } catch (e: any) {

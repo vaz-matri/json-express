@@ -112,10 +112,15 @@ export interface IApiGenerator {
 /**
  * 6. The Middleware Contract
  * Hooks into the request/response lifecycle for Auth, Rate-Limiting, Validation, etc.
+ *
+ * Middlewares MAY implement `setSchemas?` to receive the project's loaded model
+ * schemas before any request is served. The runner calls this once during boot,
+ * after middlewares are registered. Used by `middleware-validation` to build a
+ * route → validators lookup from each model's `validation` block.
  */
 export interface IMiddleware {
     name: string;
-
+    setSchemas?(schemas: ModelSchema[]): void;
     handle(req: JsonRequest, next: () => Promise<JsonResponse>): Promise<JsonResponse>;
 }
 

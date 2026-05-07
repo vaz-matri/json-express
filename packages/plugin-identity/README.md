@@ -40,29 +40,29 @@ npm install @json-express/email-console
 
 ## Configuration
 
-Set in `.env` (`JEX` namespace; double underscore creates nested blocks):
+Set in `.env` (`jex` or `JEX` namespace; double underscore creates nested blocks):
 
 ```env
 # Required — used to sign issued JWTs. Pair this with the same key in middleware-auth.
-JEX__AUTH__SECRET=a-strong-32-byte-secret
+jex__auth_secret=a-strong-32-byte-secret
 
 # Optional — token lifetimes
-JEX__AUTH__TOKEN_TTL=1h          # access-token TTL (jsonwebtoken duration syntax)
-JEX__AUTH__REFRESH_TTL=30d       # refresh-token rotation window
-JEX__AUTH__VERIFY_TTL=24h        # email verification link TTL
-JEX__AUTH__RESET_TTL=30m         # password-reset link TTL
+jex__auth__token_ttl=1h          # access-token TTL (jsonwebtoken duration syntax)
+jex__auth__refresh__ttl=30d       # refresh-token rotation window
+jex__auth_verify__ttl=24h        # email verification link TTL
+jex__auth_reset__ttl=30m         # password-reset link TTL
 
 # Optional — registration policy
-JEX__AUTH__ALLOW_REGISTRATION=true       # set to 'false' to disable /auth/register
-JEX__AUTH__DEFAULT_ROLE=user             # role assigned to new accounts
-JEX__AUTH__MIN_PASSWORD_LENGTH=8
-JEX__AUTH__REQUIRE_VERIFIED_EMAIL=false  # strict mode (see below)
+jex__auth__allow__registration=true       # set to 'false' to disable /auth/register
+jexx__auth__default__role=user             # role assigned to new accounts
+jex__auth__min_password_length=8
+jex__auth_require_verified_email=false  # strict mode (see below)
 
 # Optional — email branding (only used when an email provider is registered)
-JEX__AUTH__EMAIL__APP_NAME=My App
-JEX__AUTH__EMAIL__VERIFY_URL=https://my-app.example/auth/verify
-JEX__AUTH__EMAIL__RESET_URL=https://my-app.example/auth/password/reset
-JEX__AUTH__EMAIL__FROM=no-reply@my-app.example
+jex__auth__email__app_name=My App
+jex__auth__email__verify_url=https://my-app.example/auth/verify
+jex__auth__email__reset_url=https://my-app.example/auth/password/reset
+jex__auth__email__from=no-reply@my-app.example
 ```
 
 ---

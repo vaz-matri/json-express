@@ -137,6 +137,9 @@ export class SwaggerDocProvider implements IDocProvider {
         const tagSet = new Map<string, string>();
 
         for (const schema of this.schemas) {
+            // Fieldless models declare behavior only — no entity schema to emit.
+            // Their custom endpoints are still documented via the routes loop below.
+            if (!schema.fields) continue;
             const componentName = this.capitalize(schema.name);
             componentSchemas[componentName] = this.schemaToOpenApi(schema);
             tagSet.set(componentName, `Operations on the ${schema.name} collection.`);

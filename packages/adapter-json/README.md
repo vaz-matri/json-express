@@ -48,7 +48,7 @@ If both `adapter-json` and another adapter (e.g. `adapter-memory`) are available
 
 ```env
 # Use in-memory (no disk writes) even if adapter-json is installed
-JEX.ADAPTER=@json-express/adapter-memory
+jex.adapter=@json-express/adapter-memory
 
 # Or run the interactive wizard to select
 # json-express --configure
@@ -118,7 +118,7 @@ Fully supports the JSON Express relational linking system inherited from `adapte
 
 ## 🛡️ Integrated Observability & Auditing
 
-Every database operation is now automatically logged through the framework's centralized logger. 
+Every database operation is now automatically logged through the framework's centralized logger.
 - **Tracing**: All logs are correlated with the framework-wide `traceId`.
 - **Metadata**: It logs the **count** of records found for `getAll`/`search` and the **record ID** for `create`, `update`, and `delete`.
 - **Privacy**: No actual record content (sensitive data) is ever written to the logs.
