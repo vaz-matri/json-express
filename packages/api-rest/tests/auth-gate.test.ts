@@ -2,6 +2,15 @@ import { describe, it, expect } from 'vitest';
 import { RestApiGenerator } from '../src/index';
 import type { IConfigProvider, IDatabaseAdapter, ModelSchema } from '@json-express/core';
 
+
+const mockLogger: any = {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    child: () => mockLogger
+};
+
 class StubAdapter implements IDatabaseAdapter {
     async getAll() { return []; }
     async getById() { throw new Error('not implemented'); }
@@ -32,7 +41,7 @@ const publicSchema: ModelSchema = {
 };
 
 async function generate(config: IConfigProvider, schemas: ModelSchema[]) {
-    const gen = new RestApiGenerator({ database: new StubAdapter(), configProvider: config });
+    const gen = new RestApiGenerator({  database: new StubAdapter(), configProvider: config , logger: mockLogger });
     gen.setSchemas(schemas);
     return gen.generate(schemas.map(s => s.name));
 }

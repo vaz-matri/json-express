@@ -6,7 +6,7 @@
     "prebuild": "pnpm run typecheck",
     "build": "pnpm -r run build",
     "dev": "pnpm -r --parallel run dev",
-    "test": "vitest run",
+    "test": "vitest run --exclude \"example/**\" --exclude \"examples/**\"",
     "e2e": "pnpm --filter './example/**' test",
     "publish:all": "pnpm -r publish --access public",
     "docs:dev": "pnpm --filter @json-express/docs run dev",

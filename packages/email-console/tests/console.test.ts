@@ -2,6 +2,15 @@ import { describe, it, expect, vi } from 'vitest';
 import type { ILogger, IConfigProvider } from '@json-express/core';
 import { ConsoleEmailProvider } from '../src/index';
 
+
+const mockLogger: any = {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    child: () => mockLogger
+};
+
 function fakeLogger(): ILogger & { calls: any[] } {
     const calls: any[] = [];
     const logger: any = {
@@ -71,7 +80,7 @@ describe('ConsoleEmailProvider', () => {
     });
 
     it('isHealthy resolves true', async () => {
-        const provider = new ConsoleEmailProvider({});
+        const provider = new ConsoleEmailProvider({ logger: mockLogger });
         expect(await provider.isHealthy()).toBe(true);
     });
 });

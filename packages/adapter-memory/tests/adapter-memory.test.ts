@@ -2,6 +2,15 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { MemoryDatabaseAdapter } from '../src/index';
 import type { ModelSchema } from '@json-express/core';
 
+
+const mockLogger: any = {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    child: () => mockLogger
+};
+
 // Artist has id (2 chars) that could coincidentally match other numeric fields in albums.
 // This fixture is deliberately crafted so the old value-matching heuristic would produce
 // false positives; only an explicit foreignKey-based filter yields the right result.
@@ -34,7 +43,7 @@ const albums: ModelSchema = {
 let db: MemoryDatabaseAdapter;
 
 beforeEach(() => {
-    db = new MemoryDatabaseAdapter();
+    db = new MemoryDatabaseAdapter({ logger: mockLogger });
     db.setSchemas([artists, albums]);
     db.loadData({
         artists: [
@@ -91,7 +100,7 @@ describe('adapter-memory — one-to-many _expand via foreignKey', () => {
                 } as any,
             },
         };
-        const fallbackDb = new MemoryDatabaseAdapter();
+        const fallbackDb = new MemoryDatabaseAdapter({ logger: mockLogger });
         fallbackDb.setSchemas([artistsNoFk, albums]);
         fallbackDb.loadData({
             artists: [{ id: '1', name: 'The Beatles' }],

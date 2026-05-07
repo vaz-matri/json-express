@@ -6,6 +6,15 @@ import type { AddressInfo } from 'net';
 import { GraphQLApiGenerator } from '../src/index';
 import type { IConfigProvider, IDatabaseAdapter, ModelSchema } from '@json-express/core';
 
+
+const mockLogger: any = {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    child: () => mockLogger
+};
+
 const TEST_SECRET = 'phase-b-test-secret';
 
 function bearer(payload: Record<string, any>): { authorization: string } {
@@ -98,13 +107,12 @@ const userHeader = bearer({ sub: 'u-2', role: 'user' });
 describe('api-graphql — validation.rules enforcement', () => {
     it('rejects create mutations whose input fails the matched Zod rule', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({
-            database: db,
-            configProvider: makeConfig([
-                { method: 'POST', path: '/albums', body: failingSchema },
-            ]),
-        });
-        gen.setSchemas([albumSchema]);
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db });
+        const schemaWithRule = {
+            ...albumSchema,
+            validation: { create: { body: failingSchema } }
+        } as any;
+        gen.setSchemas([schemaWithRule]);
         const routes = await gen.generate(['albums']);
 
         const res = await invokePost(routes, {
@@ -120,13 +128,12 @@ describe('api-graphql — validation.rules enforcement', () => {
 
     it('passes parsed.data (transformed input) to db.create when validation succeeds', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({
-            database: db,
-            configProvider: makeConfig([
-                { method: 'POST', path: '/albums', body: passingSchema },
-            ]),
-        });
-        gen.setSchemas([albumSchema]);
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db });
+        const schemaWithRule = {
+            ...albumSchema,
+            validation: { create: { body: passingSchema } }
+        } as any;
+        gen.setSchemas([schemaWithRule]);
         const routes = await gen.generate(['albums']);
 
         await invokePost(routes, {
@@ -142,12 +149,7 @@ describe('api-graphql — validation.rules enforcement', () => {
 
     it('skips validation when no rule matches the collection path', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({
-            database: db,
-            configProvider: makeConfig([
-                { method: 'POST', path: '/other-collection', body: failingSchema },
-            ]),
-        });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db });
         gen.setSchemas([albumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -163,7 +165,7 @@ describe('api-graphql — validation.rules enforcement', () => {
 describe('api-graphql — NOT_FOUND mapping', () => {
     it('update on missing id throws GraphQLError with code NOT_FOUND', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([]) });
         gen.setSchemas([albumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -177,7 +179,7 @@ describe('api-graphql — NOT_FOUND mapping', () => {
 
     it('delete on missing id throws GraphQLError with code NOT_FOUND', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([]) });
         gen.setSchemas([albumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -208,7 +210,7 @@ const protectedAlbumSchema: ModelSchema = {
 describe('api-graphql — RBAC enforcement', () => {
     it('public read allows anonymous list query', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -220,7 +222,7 @@ describe('api-graphql — RBAC enforcement', () => {
 
     it('protected create returns UNAUTHENTICATED without payload', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -235,7 +237,7 @@ describe('api-graphql — RBAC enforcement', () => {
 
     it('protected create returns FORBIDDEN with non-matching role', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -252,7 +254,7 @@ describe('api-graphql — RBAC enforcement', () => {
 
     it('protected create succeeds with matching role', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -268,7 +270,7 @@ describe('api-graphql — RBAC enforcement', () => {
 
     it('array role rule allows any matching role (editor for delete)', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -314,7 +316,7 @@ function ownedDb(): InMemoryAdapter {
 describe('api-graphql — Owner row-level security', () => {
     it('list filters to caller-owned records', async () => {
         const db = ownedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([ownedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -331,7 +333,7 @@ describe('api-graphql — Owner row-level security', () => {
 
     it('list overwrites client-supplied where clause for the owner field', async () => {
         const db = ownedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([ownedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -348,7 +350,7 @@ describe('api-graphql — Owner row-level security', () => {
 
     it('list anonymous returns UNAUTHENTICATED', async () => {
         const db = ownedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([ownedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -360,7 +362,7 @@ describe('api-graphql — Owner row-level security', () => {
 
     it('byId returns NOT_FOUND for cross-owner access', async () => {
         const db = ownedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([ownedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -376,7 +378,7 @@ describe('api-graphql — Owner row-level security', () => {
 
     it('create auto-stamps ownerId from caller, overwriting client value', async () => {
         const db = ownedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([ownedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -394,7 +396,7 @@ describe('api-graphql — Owner row-level security', () => {
 
     it('update on cross-owner record returns NOT_FOUND', async () => {
         const db = ownedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([ownedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -410,7 +412,7 @@ describe('api-graphql — Owner row-level security', () => {
 
     it('delete on cross-owner record returns NOT_FOUND', async () => {
         const db = ownedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([ownedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -426,7 +428,7 @@ describe('api-graphql — Owner row-level security', () => {
 
     it('owner update on own record succeeds', async () => {
         const db = ownedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([ownedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -444,7 +446,7 @@ describe('api-graphql — Owner row-level security', () => {
 describe('api-graphql — Soft-decode on /graphql', () => {
     it('strips client-supplied x-user-payload to prevent header spoofing', async () => {
         const db = ownedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([ownedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -461,7 +463,7 @@ describe('api-graphql — Soft-decode on /graphql', () => {
 
     it('public ops succeed anonymously even when auth.secret is configured', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);   // read: 'public'
         const routes = await gen.generate(['albums']);
 
@@ -473,7 +475,7 @@ describe('api-graphql — Soft-decode on /graphql', () => {
 
     it('public ops succeed with a valid token too', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -488,7 +490,7 @@ describe('api-graphql — Soft-decode on /graphql', () => {
 
     it('invalid token is silently ignored on public ops (no 401 from middleware)', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([protectedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -539,7 +541,7 @@ function fieldGuardedDb(): InMemoryAdapter {
 describe('api-graphql — Field-level read access', () => {
     it('omits role-restricted field for anonymous reader (returns null)', async () => {
         const db = fieldGuardedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([fieldGuardedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -552,7 +554,7 @@ describe('api-graphql — Field-level read access', () => {
 
     it('returns role-restricted field for matching role', async () => {
         const db = fieldGuardedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([fieldGuardedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -568,7 +570,7 @@ describe('api-graphql — Field-level read access', () => {
 
     it('owner-scoped field is visible only on records the caller owns', async () => {
         const db = fieldGuardedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([fieldGuardedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -589,7 +591,7 @@ describe('api-graphql — Field-level read access', () => {
 describe('api-graphql — Field-level write access', () => {
     it('strips role-restricted field from create input for non-admin caller', async () => {
         const db = fieldGuardedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([fieldGuardedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -606,7 +608,7 @@ describe('api-graphql — Field-level write access', () => {
 
     it('keeps role-restricted field in create input for admin caller', async () => {
         const db = fieldGuardedDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([fieldGuardedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -628,7 +630,7 @@ describe('api-graphql — Field-level write access', () => {
             updatedWith = data;
             return origUpdate(c, id, data);
         };
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([fieldGuardedAlbumSchema]);
         const routes = await gen.generate(['albums']);
 
@@ -686,7 +688,7 @@ function postsAndUsersDb(): InMemoryAdapter {
 describe('api-graphql — Nested relation access', () => {
     it('anonymous nested query into admin-only target returns errors and nulls the relation', async () => {
         const db = postsAndUsersDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([postsPublicWithAuthor, usersAdminOnly]);
         const routes = await gen.generate(['posts', 'users']);
 
@@ -701,7 +703,7 @@ describe('api-graphql — Nested relation access', () => {
 
     it('admin nested query into admin-only target succeeds', async () => {
         const db = postsAndUsersDb();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([postsPublicWithAuthor, usersAdminOnly]);
         const routes = await gen.generate(['posts', 'users']);
 
@@ -752,7 +754,7 @@ describe('api-graphql — Nested relation owner filtering (one-to-many)', () => 
                 { id: 'p3', title: 'someone else', userId: 'u-1', ownerId: 'u-2' },
             ],
         };
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([usersWithOwnedPosts, postsOwnerOnly]);
         const routes = await gen.generate(['users', 'posts']);
 
@@ -773,7 +775,7 @@ describe('api-graphql — Nested relation owner filtering (one-to-many)', () => 
             users: [{ id: 'u-1', name: 'Alice' }],
             posts: [{ id: 'p1', title: 'x', userId: 'u-1', ownerId: 'u-1' }],
         };
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([], { authSecret: TEST_SECRET }) });
         gen.setSchemas([usersWithOwnedPosts, postsOwnerOnly]);
         const routes = await gen.generate(['users', 'posts']);
 
@@ -799,7 +801,7 @@ import {
 describe('api-graphql — Custom queryFields', () => {
     it('exposes a root query field with non-null arg', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([]) });
         gen.setSchemas([
             {
                 name: 'albums',
@@ -828,7 +830,7 @@ describe('api-graphql — Custom queryFields', () => {
 
     it('passes verified userPayload to custom query resolver', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,  
             database: db,
             configProvider: makeConfig([], { authSecret: TEST_SECRET }),
         });
@@ -867,7 +869,7 @@ describe('api-graphql — Custom queryFields', () => {
 describe('api-graphql — Custom mutationFields', () => {
     it('exposes a root mutation field', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([]) });
         let invokedWith: any = null;
         gen.setSchemas([
             {
@@ -903,7 +905,7 @@ describe('api-graphql — Custom typeFields on auto-generated object', () => {
     it('attaches a computed field to the auto-generated type', async () => {
         const db = new InMemoryAdapter();
         db.store = { albums: [{ id: 'a1', title: 'Abbey Road' }] };
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([]) });
         gen.setSchemas([
             {
                 name: 'albums',
@@ -936,7 +938,7 @@ describe('api-graphql — Custom typeFields on auto-generated object', () => {
                 { id: 'a2', title: 'Revolver', artistId: 'art-1' },
             ],
         };
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([]) });
         gen.setSchemas([
             {
                 name: 'albums',
@@ -976,7 +978,7 @@ describe('api-graphql — Custom field collision policy', () => {
     it('user-supplied root queryField overrides the auto-generated one (warn-and-override)', async () => {
         const db = new InMemoryAdapter();
         db.store = { albums: [{ id: 'a1', title: 'auto' }] };
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([]) });
         gen.setSchemas([
             {
                 name: 'albums',
@@ -1009,7 +1011,7 @@ describe('api-graphql — Custom field collision policy', () => {
 describe('api-graphql — Empty Mutation guard', () => {
     it('schema with no mutations does not throw at construction', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([]) });
         // No collections + a model that exposes only a custom queryField means the generated
         // schema has zero mutations. graphql-js throws on empty mutation type construction;
         // the guard should produce mutation: undefined instead.
@@ -1031,7 +1033,7 @@ describe('api-graphql — Empty Mutation guard', () => {
     it('builds normally when only a custom queryField exists alongside CRUD', async () => {
         // Sanity that mutation type still includes auto-generated CRUD plus any custom.
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([]) });
         gen.setSchemas([
             {
                 name: 'albums',
@@ -1051,7 +1053,7 @@ describe('api-graphql — Empty Mutation guard', () => {
 describe('api-graphql — Custom field shape validation', () => {
     it('warns and skips when graphql.queryFields is not an object or function', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({ database: db, configProvider: makeConfig([]) });
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,   database: db, configProvider: makeConfig([]) });
         gen.setSchemas([
             {
                 name: 'albums',
@@ -1124,9 +1126,9 @@ describe('api-graphql — JWKS soft-decode', () => {
 
     it('admin role embedded in an RS256 token unlocks an admin-gated query', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,  
             database: db,
-            configProvider: makeConfig([], { authJwksUri: jwks.url }),
+            configProvider: makeConfig([], { authJwksUri: jwks.url , logger: mockLogger }),
         });
         gen.setSchemas([adminProtectedAlbums]);
         const routes = await gen.generate(['albums']);
@@ -1145,9 +1147,9 @@ describe('api-graphql — JWKS soft-decode', () => {
 
     it('a token signed with a foreign key is rejected (resolvers see anonymous)', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,  
             database: db,
-            configProvider: makeConfig([], { authJwksUri: jwks.url }),
+            configProvider: makeConfig([], { authJwksUri: jwks.url , logger: mockLogger }),
         });
         gen.setSchemas([adminProtectedAlbums]);
         const routes = await gen.generate(['albums']);
@@ -1168,9 +1170,9 @@ describe('api-graphql — JWKS soft-decode', () => {
 
     it('audience mismatch is rejected when auth.audience is set', async () => {
         const db = new InMemoryAdapter();
-        const gen = new GraphQLApiGenerator({
+        const gen = new GraphQLApiGenerator({ logger: mockLogger,  
             database: db,
-            configProvider: makeConfig([], { authJwksUri: jwks.url, authAudience: 'my-api' }),
+            configProvider: makeConfig([], { authJwksUri: jwks.url, authAudience: 'my-api' , logger: mockLogger }),
         });
         gen.setSchemas([adminProtectedAlbums]);
         const routes = await gen.generate(['albums']);

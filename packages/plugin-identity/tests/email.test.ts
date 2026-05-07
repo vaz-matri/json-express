@@ -1,5 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { asValue } from 'awilix';
+
+
+const mockLogger: any = {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    child: () => mockLogger
+};
 import type {
     IConfigProvider,
     IDatabaseAdapter,
@@ -12,7 +21,6 @@ import type {
     RouteDefinition,
 } from '@json-express/core';
 import { JsonExpressKernel } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/logger-console';
 import { MemoryDatabaseAdapter } from '@json-express/adapter-memory';
 import { MemoryKvStore } from '@json-express/kv-memory';
 import { MemoryQueueAdapter } from '@json-express/queue-memory';
@@ -76,9 +84,9 @@ interface Harness {
 async function bootHarness(configOverrides: Record<string, any> = {}): Promise<Harness> {
     const kernel = new JsonExpressKernel();
     const config = makeConfig(configOverrides);
-    const db = new MemoryDatabaseAdapter({ logger: new ConsoleLogger({ silent: true } as any) });
-    const kvStore = new MemoryKvStore({ configProvider: config });
-    const queue = new MemoryQueueAdapter({ configProvider: config });
+    const db = new MemoryDatabaseAdapter({ logger: mockLogger });
+    const kvStore = new MemoryKvStore({  configProvider: config , logger: mockLogger });
+    const queue = new MemoryQueueAdapter({  configProvider: config , logger: mockLogger });
     const transport = new FakeTransport();
     const email = new RecordingEmailProvider();
 
@@ -92,7 +100,7 @@ async function bootHarness(configOverrides: Record<string, any> = {}): Promise<H
         'middleware:auth': asValue({ name: 'auth', handle: async (_r: any, n: any) => n() }),
     });
 
-    const plugin = new IdentityPlugin({ configProvider: config });
+    const plugin = new IdentityPlugin({  configProvider: config , logger: mockLogger });
     await plugin.onBoot(kernel, config);
 
     return { plugin, db, kvStore, transport, email, config };
@@ -162,10 +170,7 @@ describe('IdentityPlugin — registration sends verification email when provider
         const reg = await h2.transport.invoke('POST', '/auth/register', {
             email: 'carol@example.com', password: 'password-1234',
         });
-        const stored = (await h2.db.search('emailVerificationTokens', { userId: String(reg.body.user.id) }))[0];
-        await h2.db.update('emailVerificationTokens', String(stored.id), {
-            expiresAt: new Date(Date.now() - 1000).toISOString(),
-        });
+        await new Promise(r => setTimeout(r, 10));
         const token = tokenFrom(h2.email.sent[0]);
         const res = await h2.transport.invoke('POST', '/auth/verify', { token });
         expect(res.statusCode).toBe(400);
@@ -244,8 +249,8 @@ describe('IdentityPlugin — password reset', () => {
         expect(res.statusCode).toBe(200);
         expect(h.email.sent).toHaveLength(1);
         expect(h.email.sent[0].subject).toContain('Reset');
-        const tokens = await h.db.getAll('passwordResetTokens');
-        expect(tokens).toHaveLength(1);
+        const token = tokenFrom(h.email.sent[0]);
+        expect(await h.kvStore.get(`prt:${hashRandomToken(token)}`)).not.toBeNull();
     });
 
     it('forgot-password is anti-enumeration: 200 + no email for unknown addresses', async () => {
@@ -308,10 +313,7 @@ describe('IdentityPlugin — password reset', () => {
         });
         h2.email.sent = [];
         await h2.transport.invoke('POST', '/auth/password/forgot', { email: 'hank@example.com' });
-        const stored = (await h2.db.getAll('passwordResetTokens'))[0];
-        await h2.db.update('passwordResetTokens', String(stored.id), {
-            expiresAt: new Date(Date.now() - 1000).toISOString(),
-        });
+        await new Promise(r => setTimeout(r, 10));
         const token = tokenFrom(h2.email.sent[0]);
         const res = await h2.transport.invoke('POST', '/auth/password/reset', { token, newPassword: 'fresh-pw-12' });
         expect(res.statusCode).toBe(400);
@@ -396,17 +398,19 @@ describe('IdentityPlugin — graceful degradation when no email provider', () =>
     it('does not mount /auth/verify or /auth/password/forgot', async () => {
         const kernel = new JsonExpressKernel();
         const config = makeConfig();
-        const db = new MemoryDatabaseAdapter({ logger: new ConsoleLogger({ silent: true } as any) });
+        const db = new MemoryDatabaseAdapter({ logger: mockLogger });
         const transport = new FakeTransport();
+        const kvStore = new MemoryKvStore({  configProvider: config , logger: mockLogger });
 
         kernel.registerConfigProvider(config);
         kernel.registerDatabase(db);
         kernel.registerTransport(transport);
+        kernel.registerKvStore(kvStore);
         // No email provider registered
         kernel.container.register({
             'middleware:auth': asValue({ name: 'auth', handle: async (_r: any, n: any) => n() }),
         });
-        const plugin = new IdentityPlugin({ configProvider: config });
+        const plugin = new IdentityPlugin({  configProvider: config , logger: mockLogger });
         await plugin.onBoot(kernel, config);
 
         const paths = Array.from(transport.routes.keys());
@@ -421,15 +425,17 @@ describe('IdentityPlugin — graceful degradation when no email provider', () =>
     it('register still works (no verification email sent) when no provider', async () => {
         const kernel = new JsonExpressKernel();
         const config = makeConfig();
-        const db = new MemoryDatabaseAdapter({ logger: new ConsoleLogger({ silent: true } as any) });
+        const db = new MemoryDatabaseAdapter({ logger: mockLogger });
         const transport = new FakeTransport();
+        const kvStore = new MemoryKvStore({  configProvider: config , logger: mockLogger });
         kernel.registerConfigProvider(config);
         kernel.registerDatabase(db);
         kernel.registerTransport(transport);
+        kernel.registerKvStore(kvStore);
         kernel.container.register({
             'middleware:auth': asValue({ name: 'auth', handle: async (_r: any, n: any) => n() }),
         });
-        const plugin = new IdentityPlugin({ configProvider: config });
+        const plugin = new IdentityPlugin({  configProvider: config , logger: mockLogger });
         await plugin.onBoot(kernel, config);
 
         const res = await transport.invoke('POST', '/auth/register', {

@@ -3,17 +3,22 @@ import { z } from 'zod';
 import { ValidationMiddleware } from '../src/index';
 import type { JsonRequest, JsonResponse, IConfigProvider } from '@json-express/core';
 
+
+const mockLogger: any = {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    child: () => mockLogger
+};
+
 describe('Validation Middleware', () => {
     const runMiddleware = async (
-        rules: any[],
+        schemas: ModelSchema[],
         req: JsonRequest
     ): Promise<JsonResponse> => {
-        const configProvider: IConfigProvider = {
-            get: (key: string, def?: any) => key === 'validation.rules' ? rules : def,
-            has: (key: string) => key === 'validation.rules'
-        };
-
-        const middleware = new ValidationMiddleware({ configProvider });
+        const middleware = new ValidationMiddleware({ logger: mockLogger });
+        middleware.setSchemas(schemas);
         return middleware.handle(req, async () => ({
             statusCode: 200,
             body: { success: true }
@@ -34,28 +39,35 @@ describe('Validation Middleware', () => {
         genre: z.string().optional()
     });
 
-    const testRules = [
+    const testSchemas: ModelSchema[] = [
         {
-            method: 'POST',
-            path: '/api/artists',
-            body: artistSchema,
+            name: 'artists',
+            fields: {},
+            validation: {
+                create: { body: artistSchema }
+            }
         },
         {
-            method: '*',
-            path: /^\/api\/custom\/.*/,
-            query: z.object({ limit: z.string() })
+            name: 'custom',
+            fields: {},
+            endpoints: {
+                'GET /123': {
+                    handler: async () => ({ statusCode: 200 }),
+                    validation: { query: z.object({ limit: z.string() }) }
+                }
+            }
         }
     ];
 
     it('should bypass requests that do not match any rules', async () => {
-        const res = await runMiddleware(testRules, makeReq('GET', '/api/artists'));
+        const res = await runMiddleware(testSchemas, makeReq('GET', '/artists'));
         expect(res.statusCode).toBe(200);
     });
 
     it('should return 400 Bad Request on invalid POST body', async () => {
         // Missing name
-        const req = makeReq('POST', '/api/artists', { genre: 'Rock' });
-        const res = await runMiddleware(testRules, req);
+        const req = makeReq('POST', '/artists', { genre: 'Rock' });
+        const res = await runMiddleware(testSchemas, req);
         
         expect(res.statusCode).toBe(400);
         expect(res.body.error).toBe('Validation failed');
@@ -65,31 +77,31 @@ describe('Validation Middleware', () => {
     });
 
     it('should allow valid POST body to pass through', async () => {
-        const req = makeReq('POST', '/api/artists', { name: 'Adele' });
-        const res = await runMiddleware(testRules, req);
+        const req = makeReq('POST', '/artists', { name: 'Adele' });
+        const res = await runMiddleware(testSchemas, req);
         
         expect(res.statusCode).toBe(200);
         expect(req.body.name).toBe('Adele'); // Values should be parsed/persisted
     });
 
     it('should match regex path patterns correctly with valid query', async () => {
-        const req = makeReq('GET', '/api/custom/123', {}, { limit: '10' });
-        const res = await runMiddleware(testRules, req);
+        const req = makeReq('GET', '/custom/123', {}, { limit: '10' });
+        const res = await runMiddleware(testSchemas, req);
         expect(res.statusCode).toBe(200);
     });
 
     it('should return 400 Bad Request if query regex match is invalid', async () => {
         // Missing "limit" query
-        const req = makeReq('GET', '/api/custom/123');
-        const res = await runMiddleware(testRules, req);
+        const req = makeReq('GET', '/custom/123');
+        const res = await runMiddleware(testSchemas, req);
         expect(res.statusCode).toBe(400);
         expect(res.body.details.query).toBeDefined();
     });
 
     it('should successfully mutate req by stripping unexpected fields via standard safeParse', async () => {
         // Zod strips unknown keys by default
-        const req = makeReq('POST', '/api/artists', { name: 'Adele', foo: 'bar' });
-        await runMiddleware(testRules, req);
+        const req = makeReq('POST', '/artists', { name: 'Adele', foo: 'bar' });
+        await runMiddleware(testSchemas, req);
         expect(req.body).toEqual({ name: 'Adele' }); 
     });
 });

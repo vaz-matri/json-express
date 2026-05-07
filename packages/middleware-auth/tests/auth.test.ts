@@ -6,6 +6,15 @@ import { createServer, type Server } from 'http';
 import { generateKeyPairSync, randomUUID, type KeyObject } from 'crypto';
 import type { AddressInfo } from 'net';
 
+
+const mockLogger: any = {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    child: () => mockLogger
+};
+
 describe('Auth Middleware', () => {
     // Utility to run the middleware
     const runMiddleware = async (
@@ -17,7 +26,7 @@ describe('Auth Middleware', () => {
             has: (key: string) => key in provider
         };
 
-        const middleware = new AuthMiddleware({ configProvider });
+        const middleware = new AuthMiddleware({  configProvider , logger: mockLogger });
         return middleware.handle(req, async () => ({
             statusCode: 200,
             body: { success: true }
@@ -149,7 +158,7 @@ describe('Auth Middleware — JWKS configuration', () => {
             has: (k) => k in config,
             set: () => {},
         };
-        const middleware = new AuthMiddleware({ configProvider: provider });
+        const middleware = new AuthMiddleware({  configProvider: provider , logger: mockLogger });
         const req: JsonRequest = {
             method: 'GET', path: '/api/v1/data', body: {}, query: {}, params: {},
             headers: authHeader ? { authorization: authHeader } : {},
@@ -185,7 +194,7 @@ describe('Auth Middleware — JWKS configuration', () => {
             has: (k) => k === 'auth.secret' || k === 'auth.jwksUri',
             set: () => {},
         };
-        expect(() => new AuthMiddleware({ configProvider: provider })).toThrow(/both/i);
+        expect(() => new AuthMiddleware({  configProvider: provider , logger: mockLogger })).toThrow(/both/i);
     });
 
     it('rejects tokens with audience mismatch when auth.audience is set', async () => {

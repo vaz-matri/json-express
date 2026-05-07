@@ -1,5 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createContainer, asValue } from 'awilix';
+
+
+const mockLogger: any = {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    child: () => mockLogger
+};
 import type {
     IConfigProvider,
     IDatabaseAdapter,
@@ -10,7 +19,6 @@ import type {
     RouteDefinition,
 } from '@json-express/core';
 import { JsonExpressKernel, createJwtVerifier } from '@json-express/core';
-import { ConsoleLogger } from '@json-express/logger-console';
 import { MemoryDatabaseAdapter } from '@json-express/adapter-memory';
 import { MemoryKvStore } from '@json-express/kv-memory';
 import { MemoryQueueAdapter } from '@json-express/queue-memory';
@@ -59,9 +67,9 @@ interface Harness {
 async function bootHarness(configOverrides: Record<string, any> = {}): Promise<Harness> {
     const kernel = new JsonExpressKernel();
     const config = makeConfig(configOverrides);
-    const db = new MemoryDatabaseAdapter({ logger: new ConsoleLogger({ silent: true } as any) });
-    const kvStore = new MemoryKvStore({ configProvider: config });
-    const queue = new MemoryQueueAdapter({ configProvider: config });
+    const db = new MemoryDatabaseAdapter({ logger: mockLogger });
+    const kvStore = new MemoryKvStore({  configProvider: config , logger: mockLogger });
+    const queue = new MemoryQueueAdapter({  configProvider: config , logger: mockLogger });
     const transport = new FakeTransport();
 
     kernel.registerConfigProvider(config);
@@ -74,7 +82,7 @@ async function bootHarness(configOverrides: Record<string, any> = {}): Promise<H
         'middleware:auth': asValue({ name: 'auth', handle: async (_r: any, n: any) => n() }),
     });
 
-    const plugin = new IdentityPlugin({ configProvider: config });
+    const plugin = new IdentityPlugin({  configProvider: config , logger: mockLogger });
     await plugin.onBoot(kernel, config);
 
     return { plugin, kernel, config, db, kvStore, transport };
@@ -82,7 +90,7 @@ async function bootHarness(configOverrides: Record<string, any> = {}): Promise<H
 
 describe('IdentityPlugin — provideSchemas', () => {
     it('contributes users and roles only — token tables now live in the KV store', () => {
-        const plugin = new IdentityPlugin({});
+        const plugin = new IdentityPlugin({ logger: mockLogger });
         const names = plugin.provideSchemas().map(s => s.name);
         expect(names).toEqual(['users', 'roles']);
     });
@@ -92,27 +100,27 @@ describe('IdentityPlugin — peer-dep + config errors', () => {
     it('throws when middleware-auth is not registered', async () => {
         const kernel = new JsonExpressKernel();
         const config = makeConfig();
-        kernel.registerDatabase(new MemoryDatabaseAdapter({}));
+        kernel.registerDatabase(new MemoryDatabaseAdapter({ logger: mockLogger }));
         kernel.registerTransport(new FakeTransport());
-        const plugin = new IdentityPlugin({ configProvider: config });
+        const plugin = new IdentityPlugin({  configProvider: config , logger: mockLogger });
         await expect(plugin.onBoot(kernel, config)).rejects.toThrow(/middleware-auth/);
     });
 
     it('throws when kvStore is not registered', async () => {
         const kernel = new JsonExpressKernel();
-        kernel.registerDatabase(new MemoryDatabaseAdapter({}));
+        kernel.registerDatabase(new MemoryDatabaseAdapter({ logger: mockLogger }));
         kernel.registerTransport(new FakeTransport());
         kernel.container.register({
             'middleware:auth': asValue({ name: 'auth', handle: async (_r: any, n: any) => n() }),
         });
-        const plugin = new IdentityPlugin({ configProvider: makeConfig() });
+        const plugin = new IdentityPlugin({  configProvider: makeConfig() , logger: mockLogger });
         await expect(plugin.onBoot(kernel, makeConfig())).rejects.toThrow(/IKvStore/);
     });
 
     it('throws when auth.secret is unset', async () => {
         const kernel = new JsonExpressKernel();
-        kernel.registerDatabase(new MemoryDatabaseAdapter({}));
-        kernel.registerKvStore(new MemoryKvStore({}));
+        kernel.registerDatabase(new MemoryDatabaseAdapter({ logger: mockLogger }));
+        kernel.registerKvStore(new MemoryKvStore({ logger: mockLogger }));
         kernel.registerTransport(new FakeTransport());
         kernel.container.register({
             'middleware:auth': asValue({ name: 'auth', handle: async (_r: any, n: any) => n() }),
@@ -122,7 +130,7 @@ describe('IdentityPlugin — peer-dep + config errors', () => {
             has: () => false,
             set: () => {},
         };
-        const plugin = new IdentityPlugin({ configProvider: config });
+        const plugin = new IdentityPlugin({  configProvider: config , logger: mockLogger });
         await expect(plugin.onBoot(kernel, config)).rejects.toThrow(/JEX__AUTH__SECRET/);
     });
 });

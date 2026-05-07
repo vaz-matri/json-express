@@ -45,159 +45,72 @@ importers:
       '@json-express/adapter-json':
         specifier: workspace:*
         version: link:../../packages/adapter-json
-      '@json-express/cli':
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/cli
+        version: link:../../presets/boot
+
+  example/api-graphql:
+    dependencies:
+      '@json-express/api-graphql':
+        specifier: workspace:*
+        version: link:../../packages/api-graphql
+      '@json-express/boot':
+        specifier: workspace:*
+        version: link:../../presets/boot
       '@json-express/core':
         specifier: workspace:*
         version: link:../../packages/core
 
-  example/api-rest:
+  example/base-url:
     dependencies:
-      '@json-express/cli':
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-
-  example/class-files:
-    dependencies:
-      '@json-express/adapter-json':
-        specifier: workspace:*
-        version: link:../../packages/adapter-json
-      '@json-express/api-rest':
-        specifier: workspace:*
-        version: link:../../packages/api-rest
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@json-express/transport-express':
-        specifier: workspace:*
-        version: link:../../packages/transport-express
-    devDependencies:
-      '@json-express/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
-      '@playwright/test':
-        specifier: ^1.42.1
-        version: 1.59.1
+        version: link:../../presets/boot
 
   example/config:
-    dependencies:
-      '@json-express/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-
-  example/docs-light:
-    dependencies:
-      '@json-express/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-
-  example/docs-swagger:
-    dependencies:
-      '@json-express/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@json-express/docs-swagger':
-        specifier: workspace:*
-        version: link:../../packages/docs-swagger
-
-  example/graphql:
     dependencies:
       '@json-express/adapter-memory':
         specifier: workspace:*
         version: link:../../packages/adapter-memory
-      '@json-express/api-graphql':
+      '@json-express/api-rest':
         specifier: workspace:*
-        version: link:../../packages/api-graphql
+        version: link:../../packages/api-rest
+      '@json-express/config-env':
+        specifier: workspace:*
+        version: link:../../packages/config-env
       '@json-express/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@json-express/logger-console':
+        specifier: workspace:*
+        version: link:../../packages/logger-console
       '@json-express/transport-express':
         specifier: workspace:*
         version: link:../../packages/transport-express
-    devDependencies:
-      '@json-express/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
-      '@playwright/test':
-        specifier: ^1.42.1
-        version: 1.59.1
 
-  example/html-simple: {}
-
-  example/json-adv: {}
-
-  example/json-config: {}
-
-  example/json-simple:
+  example/docs-swagger:
     dependencies:
-      '@json-express/adapter-json':
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/adapter-json
+        version: link:../../presets/boot
       '@json-express/docs-swagger':
         specifier: workspace:*
         version: link:../../packages/docs-swagger
-      '@json-express/logger-pino':
-        specifier: workspace:*
-        version: link:../../packages/logger-pino
-      '@json-express/middleware-auth':
-        specifier: workspace:*
-        version: link:../../packages/middleware-auth
-      '@json-express/middleware-validation':
-        specifier: workspace:*
-        version: link:../../packages/middleware-validation
-      '@json-express/plugin-devcert':
-        specifier: workspace:*
-        version: link:../../packages/plugin-devcert
-      '@json-express/plugin-health':
-        specifier: workspace:*
-        version: link:../../packages/plugin-health
-      '@json-express/seeder-faker':
-        specifier: workspace:*
-        version: link:../../packages/seeder-faker
-      '@json-express/transport-fastify':
-        specifier: workspace:*
-        version: link:../../packages/transport-fastify
-    devDependencies:
-      '@json-express/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
 
   example/logger-pino:
     dependencies:
-      '@json-express/cli':
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
+        version: link:../../presets/boot
       '@json-express/logger-pino':
         specifier: workspace:*
         version: link:../../packages/logger-pino
 
   example/middleware-auth:
     dependencies:
-      '@json-express/cli':
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
+        version: link:../../presets/boot
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../../packages/middleware-auth
@@ -207,12 +120,9 @@ importers:
 
   example/middleware-validation:
     dependencies:
-      '@json-express/cli':
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
+        version: link:../../presets/boot
       '@json-express/middleware-validation':
         specifier: workspace:*
         version: link:../../packages/middleware-validation
@@ -220,38 +130,35 @@ importers:
         specifier: ^3.22.4
         version: 3.25.76
 
+  example/models-adv:
+    dependencies:
+      '@json-express/boot':
+        specifier: workspace:*
+        version: link:../../presets/boot
+
   example/plugin-devcert:
     dependencies:
-      '@json-express/cli':
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
+        version: link:../../presets/boot
       '@json-express/plugin-devcert':
         specifier: workspace:*
         version: link:../../packages/plugin-devcert
 
   example/plugin-health:
     dependencies:
-      '@json-express/cli':
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
+        version: link:../../presets/boot
       '@json-express/plugin-health':
         specifier: workspace:*
         version: link:../../packages/plugin-health
 
   example/plugin-identity:
     dependencies:
-      '@json-express/cli':
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
+        version: link:../../presets/boot
       '@json-express/email-console':
         specifier: workspace:*
         version: link:../../packages/email-console
@@ -267,19 +174,27 @@ importers:
       '@json-express/queue-memory':
         specifier: workspace:*
         version: link:../../packages/queue-memory
-    devDependencies:
-      '@playwright/test':
-        specifier: ^1.42.1
-        version: 1.59.1
+
+  example/routes-only:
+    dependencies:
+      '@json-express/boot':
+        specifier: workspace:*
+        version: link:../../presets/boot
+      '@json-express/middleware-validation':
+        specifier: workspace:*
+        version: link:../../packages/middleware-validation
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
 
   example/seeder-faker:
     dependencies:
-      '@json-express/cli':
+      '@json-express/adapter-json':
         specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
+        version: link:../../packages/adapter-json
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/core
+        version: link:../../presets/boot
       '@json-express/seeder-faker':
         specifier: workspace:*
         version: link:../../packages/seeder-faker
@@ -290,38 +205,20 @@ importers:
         specifier: workspace:*
         version: link:../../presets/boot
 
+  example/simple-models:
+    dependencies:
+      '@json-express/boot':
+        specifier: workspace:*
+        version: link:../../presets/boot
+
   example/transport-fastify:
     dependencies:
-      '@json-express/cli':
+      '@json-express/boot':
         specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
+        version: link:../../presets/boot
       '@json-express/transport-fastify':
         specifier: workspace:*
         version: link:../../packages/transport-fastify
-
-  example/validation-swagger:
-    dependencies:
-      '@json-express/api-rest':
-        specifier: workspace:*
-        version: link:../../packages/api-rest
-      '@json-express/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@json-express/docs-swagger':
-        specifier: workspace:*
-        version: link:../../packages/docs-swagger
-      '@json-express/middleware-validation':
-        specifier: workspace:*
-        version: link:../../packages/middleware-validation
-      zod:
-        specifier: ^3.22.4
-        version: 3.25.76
 
   examples/api:
     dependencies:
@@ -349,6 +246,12 @@ importers:
       '@json-express/preset-ecommerce':
         specifier: workspace:*
         version: link:../../presets/preset-ecommerce
+
+  examples/html-simple:
+    dependencies:
+      '@json-express/boot':
+        specifier: workspace:*
+        version: link:../../presets/boot
 
   examples/login:
     dependencies:
@@ -383,6 +286,15 @@ importers:
         specifier: workspace:*
         version: link:../../packages/transport-express
 
+  examples/preset-identity:
+    dependencies:
+      '@json-express/boot':
+        specifier: workspace:*
+        version: link:../../presets/boot
+      '@json-express/preset-identity':
+        specifier: workspace:*
+        version: link:../../presets/preset-identity
+
   packages/adapter-json:
     dependencies:
       '@json-express/core':
@@ -401,7 +313,7 @@ importers:
         specifier: workspace:*
         version: link:../core
       graphql:
-        specifier: ^16.0.0
+        specifier: ^16.8.1
         version: 16.13.2
     devDependencies:
       '@types/jsonwebtoken':
@@ -580,9 +492,6 @@ importers:
       '@json-express/kv-memory':
         specifier: workspace:*
         version: link:../kv-memory
-      '@json-express/logger-console':
-        specifier: workspace:*
-        version: link:../logger-console
       '@json-express/queue-memory':
         specifier: workspace:*
         version: link:../queue-memory
@@ -659,6 +568,24 @@ importers:
       '@json-express/boot':
         specifier: workspace:*
         version: link:../boot
+
+  presets/preset-identity:
+    dependencies:
+      '@json-express/email-console':
+        specifier: workspace:*
+        version: link:../../packages/email-console
+      '@json-express/kv-memory':
+        specifier: workspace:*
+        version: link:../../packages/kv-memory
+      '@json-express/middleware-auth':
+        specifier: workspace:*
+        version: link:../../packages/middleware-auth
+      '@json-express/plugin-identity':
+        specifier: workspace:*
+        version: link:../../packages/plugin-identity
+      '@json-express/queue-memory':
+        specifier: workspace:*
+        version: link:../../packages/queue-memory
 
 packages:
 

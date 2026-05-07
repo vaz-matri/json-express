@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@json-express/core": "workspace:*",
-    "graphql": "^16.0.0"
+    "graphql": "^16.8.1"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.4",
