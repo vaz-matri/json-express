@@ -101,6 +101,13 @@
   --vp-home-hero-name-color: var(--vp-c-text-1);
 }
 
+/* In dark mode the body-text color and the cyan tagline sit at similar
+   luminance, collapsing the H1/H2 hierarchy. Promote the name to the cream
+   brand color (also used in the logo SVG) so the heading clearly leads. */
+.dark {
+  --vp-home-hero-name-color: var(--solarized-base3);
+}
+
 /* Hero text slot: cyan accent */
 .VPHero .text {
   color: var(--solarized-cyan);

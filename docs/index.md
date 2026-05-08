@@ -82,7 +82,7 @@ One schema definition. Every layer is independently swappable.
   <div class="arch-layer">
     <div class="arch-label">Your Data</div>
     <div class="arch-boxes">
-      <div class="arch-box schema">posts.json <span>or</span> defineModel()</div>
+      <div class="arch-box schema">JSON file <span>or</span> TypeScript schema</div>
     </div>
   </div>
   <div class="arch-arrow">↓ choose your database</div>
