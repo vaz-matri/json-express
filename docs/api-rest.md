@@ -17,21 +17,17 @@ npm install @json-express/api-rest
 
 ## Configuration
 
-To activate the REST engine, register it in your core JSONExpress configuration pipeline:
+The REST generator is auto-discovered by the `json-express` runtime — installing the package is enough. It is the default API generator shipped with [`@json-express/boot`](/boot).
 
-```typescript
-import { JSONExpress } from '@json-express/core';
-import { RestApiGenerator } from '@json-express/api-rest';
-import { MemoryAdapter } from '@json-express/adapter-memory';
+```bash
+npm install @json-express/api-rest
+npx json-express
+```
 
-const db = new MemoryAdapter();
+If you have multiple API generators installed (e.g. REST alongside [GraphQL](/api-graphql)), pick one in `.env`:
 
-const app = new JSONExpress({
-    database: db,
-    apiGenerators: [
-        new RestApiGenerator({ database: db })
-    ]
-});
+```bash
+jex.api=@json-express/api-rest
 ```
 
 ## Core Features
@@ -79,5 +75,5 @@ export default defineModel({
 ```
 
 ## Related Ecosystem Plugins
-*   **[@json-express/api-graphql](/packages/api-graphql):** You can run the GraphQL generator side-by-side with REST! Both will respect the exact same schemas.
-*   **[@json-express/transport-express](/packages/transport-express):** The engine that actually binds these generated routes to an underlying Node.js server.
+*   **[@json-express/api-graphql](/api-graphql):** You can run the GraphQL generator side-by-side with REST! Both will respect the exact same schemas.
+*   **[@json-express/transport-express](/transport-express):** The engine that actually binds these generated routes to an underlying Node.js server.

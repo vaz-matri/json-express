@@ -191,9 +191,9 @@ One schema definition. Every layer is independently swappable.
 
 <div class="cta-section">
 <h2>Start in 30 Seconds</h2>
-<p class="section-subtitle">Install the CLI, drop a JSON file, and you have a running API.</p>
+<p class="section-subtitle">Install the boot preset, drop a JSON file, and you have a running API.</p>
 <div class="cta-install">
-<code>npm install @json-express/cli</code>
+<code>npm install @json-express/boot</code>
 </div>
 <div class="cta-buttons">
 <a href="/getting-started" class="cta-btn cta-primary">Read the Docs</a>

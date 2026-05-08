@@ -22,29 +22,29 @@ npm install @json-express/logger-pino pino-pretty
 # .env
 
 # Log level: trace | debug | info | warn | error | fatal
-JEX.LOG.LEVEL=info
+jex.log.level=info
 
 # Output destination: "stdout", "stderr", or a file path
-JEX.LOG.PATH=stdout
+jex.log.path=stdout
 
 # Human-readable formatting (auto-enabled in development)
-JEX.LOG.PRETTY=true
+jex.log.pretty=true
 ```
 
 ### Logging Modes
 
 **1. Twelve-Factor Mode (Stdout)**
-When `JEX.LOG.PATH=stdout`, all logs are streamed to standard output as raw JSON. This is the recommended mode for Docker containers and Kubernetes Pods, where a centralized log aggregator (like Datadog, Fluentd, or CloudWatch) scrapes stdout.
+When `jex.log.path=stdout`, all logs are streamed to standard output as raw JSON. This is the recommended mode for Docker containers and Kubernetes Pods, where a centralized log aggregator (like Datadog, Fluentd, or CloudWatch) scrapes stdout.
 
 ```json
 {"level":30,"time":1714300800000,"traceId":"a1b2-c3d4","component":"API-REST","msg":"GET /albums 200 (12ms)"}
 ```
 
 **2. Enterprise File Mode**
-When `JEX.LOG.PATH=./logs`, Pino writes structured JSON logs to `./logs/app.log`. The directory is automatically created if it doesn't exist (`mkdir: true`).
+When `jex.log.path=./logs`, Pino writes structured JSON logs to `./logs/app.log`. The directory is automatically created if it doesn't exist (`mkdir: true`).
 
 **3. Pretty Mode (Development)**
-When `JEX.LOG.PRETTY=true`, the logger uses `pino-pretty` to render colorized, human-readable output with timestamps stripped of noise.
+When `jex.log.pretty=true`, the logger uses `pino-pretty` to render colorized, human-readable output with timestamps stripped of noise.
 
 ## Core Features
 
@@ -64,5 +64,5 @@ dbLogger.info('Connected to database');
 Pino is designed to add virtually zero overhead to your application. Unlike Winston or Bunyan, Pino uses worker threads for serialization and avoids synchronous I/O entirely.
 
 ## Related Ecosystem Packages
-*   **[@json-express/logger-console](/packages/logger-console):** The zero-dependency fallback logger for when you don't need structured JSON output.
-*   **[@json-express/core](/packages/core):** Provides the `RequestContext` that automatically stamps `traceId` on every log entry.
+*   **[@json-express/logger-console](/logger-console):** The zero-dependency fallback logger for when you don't need structured JSON output.
+*   **[@json-express/core](/core):** Provides the `RequestContext` that automatically stamps `traceId` on every log entry.

@@ -17,17 +17,11 @@ npm install @json-express/kv-memory
 
 ## Configuration
 
-```typescript
-import { MemoryKvStore } from '@json-express/kv-memory';
-
-const kvStore = new MemoryKvStore();
-```
-
-The store accepts one optional configuration parameter via the configuration engine:
+The store is auto-discovered by the `json-express` runtime — you do not instantiate it manually. Tune the purge interval via the config provider:
 
 ```bash
-# .env — How often (in ms) the purge cycle runs to clean expired keys
-JEX.KV.PURGEINTERVALMS=30000
+# .env — how often (in ms) the purge cycle runs to clean expired keys (default: 30000)
+jex.kv.purgeIntervalMs=30000
 ```
 
 ## Core Features
@@ -48,5 +42,5 @@ To prevent memory leaks from accumulating expired entries, the store runs a peri
 The store exposes an `isHealthy()` method that always returns `true` (since RAM is always available). This method is consumed by the `@json-express/plugin-health` readiness probe.
 
 ## Related Ecosystem Packages
-*   **[@json-express/kv-redis](/packages/kv-redis):** The production-grade alternative that delegates TTL expiration to native Redis `PSETEX` commands.
-*   **[@json-express/plugin-identity](/packages/plugin-identity):** The primary consumer of the KV store — stores refresh tokens and password reset tokens.
+*   **@json-express/kv-redis** *(coming soon)***:** The production-grade alternative that delegates TTL expiration to native Redis `PSETEX` commands.
+*   **[@json-express/plugin-identity](/plugin-identity):** The primary consumer of the KV store — stores refresh tokens and password reset tokens.

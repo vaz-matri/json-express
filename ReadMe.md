@@ -1,16 +1,16 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="logo/logo_long_desc_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="logo/logo_long_desc.svg">
-  <img src="logo/logo_long_desc.svg" alt="JSON Express">
+  <img src="logo/logo_long_desc.svg" alt="JSONExpress">
 </picture>
 
 Skip the backend bottleneck and go from prototype to MVP launch faster.
-**JSON Express v2.0** is a highly modular, pluggable Meta-Framework. It instantly converts your JSON files into a complete server, providing the practical infrastructure you need until your dedicated backend is ready.
+**JSONExpress v2.0** is a highly modular, pluggable Meta-Framework. It instantly converts your JSON files into a complete server, providing the practical infrastructure you need until your dedicated backend is ready.
 
 visit [jsonexpress.com](https://jsonexpress.com)
 
 ## ✨ Features
-- **Schema-Driven Engine** - Define strongly-typed data models using `defineModel` for the ultimate Code-First experience. Use the ergonomic Zod-style fluent API (e.g. `types.string().required()`) or pure JSON. Drop TypeScript files into `/models` and JSON Express transpiles them at runtime with zero-config via `jiti`!
+- **Schema-Driven Engine** - Define strongly-typed data models using `defineModel` for the ultimate Code-First experience. Use the ergonomic Zod-style fluent API (e.g. `types.string().required()`) or pure JSON. Drop TypeScript files into `/models` and JSONExpress transpiles them at runtime with zero-config via `jiti`!
 - **Data & Logic Separation** - Strictly separates your definition schemas (`/models/albums.ts`) from your permanent disk storage (`/data/albums.json`).
 - **REST Joins** - The Memory database automatically resolves relationships natively! Use `?_expand=artistId` directly in HTTP requests to join objects securely.
 - **Custom Endpoints** - Extend your models immediately using the `endpoints: {}` block in schemas, or drop global API routes straight into a root `/routes` directory.
@@ -22,7 +22,7 @@ visit [jsonexpress.com](https://jsonexpress.com)
 
 ## 🚀 Installation & Quick Start
 
-JSON Express ships two installation paths so you can choose how much to wire up yourself.
+JSONExpress ships two installation paths so you can choose how much to wire up yourself.
 
 ### Path A — Beginner: `@json-express/boot` (Batteries Included)
 
@@ -62,7 +62,7 @@ npm install @json-express/core @json-express/config-env \
 
 ## 🧩 Infrastructure as Dependencies
 
-JSON Express's defining philosophy: **your application's infrastructure is defined entirely through composition in `package.json` dependencies.** You never write a `server.ts` or wire an IoC container — to swap a layer, install a different plugin.
+JSONExpress's defining philosophy: **your application's infrastructure is defined entirely through composition in `package.json` dependencies.** You never write a `server.ts` or wire an IoC container — to swap a layer, install a different plugin.
 
 - Want Fastify instead of Express? `npm install @json-express/transport-fastify`.
 - Want JSON-file persistence instead of in-memory? `npm install @json-express/adapter-json`.
@@ -72,7 +72,7 @@ JSON Express's defining philosophy: **your application's infrastructure is defin
 
 ## 🧠 How It Works Behind the Scenes
 
-JSON Express v2 is built on a "Headless Microkernel" architecture. The `@json-express/core` package contains **zero** HTTP or database logic — it acts as an orchestrator using an Inversion of Control (IoC) container, and ships the `json-express` binary that boots your server.
+JSONExpress v2 is built on a "Headless Microkernel" architecture. The `@json-express/core` package contains **zero** HTTP or database logic — it acts as an orchestrator using an Inversion of Control (IoC) container, and ships the `json-express` binary that boots your server.
 
 When you run `json-express`, the kernel boots in phases:
 1. **Configuration:** Auto-discovers the installed `config-*` module and loads `.env`.

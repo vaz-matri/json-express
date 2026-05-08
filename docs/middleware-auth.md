@@ -17,51 +17,33 @@ npm install @json-express/middleware-auth
 
 ## Configuration
 
-Register the middleware inside the `middlewares` array of your core JSONExpress configuration. 
+The middleware is auto-discovered by the `json-express` runtime — installing the package is enough. Its behaviour is driven entirely by `jex.auth.*` keys in the config provider.
 
-```typescript
-import { JSONExpress } from '@json-express/core';
-import { AuthMiddleware } from '@json-express/middleware-auth';
-
-const app = new JSONExpress({
-    database: myDb,
-    middlewares: [
-        new AuthMiddleware({ configProvider: myConfig, logger: myLogger })
-    ]
-});
+```bash
+npm install @json-express/middleware-auth
 ```
 
-The middleware behaves differently depending on the security variables you provide to the Configuration engine:
-
 ### 1. Symmetric Local Auth (HMAC)
-If you are using the built-in `@json-express/plugin-identity`, the authentication is handled locally using a standard secret.
 
-```typescript
-// JSONExpress Configuration Object
-{
-    auth: {
-        secret: process.env.JWT_SECRET || 'super-secret-key',
-        exclude: ['/auth/login', '/public/products']
-    }
-}
+When paired with [`@json-express/plugin-identity`](/plugin-identity), validation uses an HMAC secret:
+
+```bash
+# .env
+jex.auth.secret=a-strong-32-byte-secret
+jex.auth.exclude=/auth,/public/products
 ```
 
 ### 2. Asymmetric Enterprise Auth (JWKS)
-If your company uses a third-party Identity Provider like **Auth0**, **AWS Cognito**, or **Firebase**, you must use Asymmetric validation. 
 
-Instead of a `secret`, you provide the URL to your provider's public JSON Web Key Set (JWKS). The middleware will dynamically fetch the public keys, cache them, and verify the tokens issued by your provider.
+For a third-party Identity Provider (Auth0, AWS Cognito, Firebase, Okta), point the middleware at the provider's JWKS endpoint instead of supplying a secret. The middleware fetches public keys on demand, caches them, and verifies every Bearer token against them.
 
-```typescript
-// JSONExpress Configuration Object
-{
-    auth: {
-        jwksUri: 'https://your-tenant.us.auth0.com/.well-known/jwks.json',
-        audience: 'https://api.myapp.com', // Strongly recommended!
-        issuer: 'https://your-tenant.us.auth0.com/',
-        algorithms: ['RS256'],
-        exclude: ['/public']
-    }
-}
+```bash
+# .env
+jex.auth.jwksUri=https://your-tenant.us.auth0.com/.well-known/jwks.json
+jex.auth.audience=https://api.myapp.com
+jex.auth.issuer=https://your-tenant.us.auth0.com/
+jex.auth.algorithms=RS256
+jex.auth.exclude=/public
 ```
 
 ## Core Features
@@ -80,5 +62,5 @@ By default, if this middleware is mounted, it protects *everything*. You can use
 *   **`403 Forbidden`:** Returned if the token exists, but fails cryptographic verification, is expired, or its `audience`/`issuer` claims do not match the configuration.
 
 ## Related Ecosystem Packages
-*   **[@json-express/plugin-identity](/packages/plugin-identity):** If you aren't using Auth0, use this plugin to generate the JWTs locally!
-*   **[@json-express/api-rest](/packages/api-rest):** The API generators consume the decoded JWT payload from this middleware to enforce field-level access control.
+*   **[@json-express/plugin-identity](/plugin-identity):** If you aren't using Auth0, use this plugin to generate the JWTs locally!
+*   **[@json-express/api-rest](/api-rest):** The API generators consume the decoded JWT payload from this middleware to enforce field-level access control.

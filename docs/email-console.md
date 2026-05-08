@@ -19,19 +19,11 @@ npm install @json-express/email-console
 
 ## Configuration
 
-```typescript
-import { ConsoleEmailProvider } from '@json-express/email-console';
-
-const emailProvider = new ConsoleEmailProvider({
-    configProvider: myConfig
-});
-```
-
-You can configure the default sender address:
+The provider is auto-discovered by the `json-express` runtime — you do not instantiate it manually. Configure the default sender address through the config provider:
 
 ```bash
 # .env
-JEX.EMAIL.FROM=noreply@myapp.com
+jex.email.from=noreply@myapp.com
 ```
 
 ## What It Looks Like
@@ -63,5 +55,5 @@ The email body is also injected into the logger's `text` metadata field. This al
 The provider exposes an `isHealthy()` method that always returns `true`, satisfying the readiness probe contract.
 
 ## Related Ecosystem Packages
-*   **[@json-express/plugin-identity](/packages/plugin-identity):** The primary consumer that dispatches password reset and verification emails.
-*   **[@json-express/queue-memory](/packages/queue-memory):** Emails are typically dispatched via the task queue, not called directly.
+*   **[@json-express/plugin-identity](/plugin-identity):** The primary consumer that dispatches password reset and verification emails.
+*   **[@json-express/queue-memory](/queue-memory):** Emails are typically dispatched via the task queue, not called directly.

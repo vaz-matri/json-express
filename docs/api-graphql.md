@@ -1,6 +1,6 @@
 ---
 title: "@json-express/api-graphql"
-description: "Automatically generate a production-ready GraphQL API from your JSON Express schemas, complete with N+1 optimization and field-level security."
+description: "Automatically generate a production-ready GraphQL API from your JSONExpress schemas, complete with N+1 optimization and field-level security."
 ---
 
 # @json-express/api-graphql
@@ -19,24 +19,20 @@ npm install @json-express/api-graphql
 
 ## Configuration
 
-To activate the GraphQL engine, register it in your core JSONExpress configuration pipeline:
+The GraphQL generator is auto-discovered by the `json-express` runtime — installing the package is enough.
 
-```typescript
-import { JSONExpress } from '@json-express/core';
-import { GraphQLApiGenerator } from '@json-express/api-graphql';
-import { MemoryAdapter } from '@json-express/adapter-memory';
-
-const db = new MemoryAdapter();
-
-const app = new JSONExpress({
-    database: db,
-    apiGenerators: [
-        new GraphQLApiGenerator({ database: db })
-    ]
-});
+```bash
+npm install @json-express/api-graphql
+npx json-express
 ```
 
-By default, the API will be mounted at `POST /graphql` and includes a built-in GraphiQL playground at `GET /graphql` for rapid prototyping.
+By default, the API mounts at `POST /graphql` and includes a built-in GraphiQL playground at `GET /graphql` for rapid prototyping.
+
+If you have multiple API generators installed (e.g. GraphQL alongside [REST](/api-rest)), pick one in `.env`:
+
+```bash
+jex.api=@json-express/api-graphql
+```
 
 ## Core Features
 
@@ -77,5 +73,5 @@ export default defineModel({
 ```
 
 ## Related Ecosystem Plugins
-*   **[@json-express/api-rest](/packages/api-rest):** You can run the REST generator side-by-side with GraphQL! Both will respect the exact same schemas and database adapters.
-*   **[@json-express/middleware-auth](/packages/middleware-auth):** Use the authentication middleware to secure your GraphQL endpoint with JWTs and Argon2 hashed passwords.
+*   **[@json-express/api-rest](/api-rest):** You can run the REST generator side-by-side with GraphQL! Both will respect the exact same schemas and database adapters.
+*   **[@json-express/middleware-auth](/middleware-auth):** Use the authentication middleware to secure your GraphQL endpoint with JWTs and Argon2 hashed passwords.

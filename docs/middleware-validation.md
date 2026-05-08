@@ -1,13 +1,13 @@
 ---
 title: "@json-express/middleware-validation"
-description: "Zod-powered request body and query string validation middleware for JSONExpress APIs."
+description: "Model-driven request body and query string validation middleware for JSONExpress APIs, powered by Zod."
 ---
 
 # @json-express/middleware-validation
 
 > Official Zod validation middleware for JSONExpress.
 
-The `@json-express/middleware-validation` package implements `IMiddleware` and provides automatic request body and query string validation using **Zod** schemas. It sits in the middleware pipeline between the Auth gate and the API Generator, rejecting malformed requests before they ever reach your database.
+The `@json-express/middleware-validation` package implements `IMiddleware` and provides automatic request body / query string validation. Validation rules live **inside the model file** they guard — there is no separate `validation.rules` block in `jex.config.ts`. The middleware reads each model's `validation` block at boot, derives a Zod baseline from the model's `fields`, and rejects malformed requests with a structured 400 before they reach the database.
 
 ## Installation
 
@@ -15,66 +15,130 @@ The `@json-express/middleware-validation` package implements `IMiddleware` and p
 npm install @json-express/middleware-validation zod
 ```
 
+The CLI auto-discovers and registers it. No further wiring required.
+
 ## Configuration
 
-Define your validation rules inside the JSONExpress configuration object. Each rule targets a specific HTTP method and path, and provides a Zod schema for the request body and/or query string.
+Validation lives next to the entity it describes:
 
 ```typescript
+// models/users.ts
+import { defineModel, types } from '@json-express/core';
 import { z } from 'zod';
 
-// jex.config.ts
-export default {
+export default defineModel({
+    fields: {
+        id: types.id(),
+        email: types.string({ required: true }),
+        role: types.string({ required: true }),
+    },
     validation: {
-        rules: [
-            {
-                method: 'POST',
-                path: '/users',
-                body: z.object({
-                    email: z.string().email(),
-                    role: z.enum(['user', 'admin']).default('user')
-                })
-            },
-            {
-                method: 'PATCH',
-                path: '/users',
-                body: z.object({
+        // POST /users — full schema (overrides baseline)
+        create: {
+            body: z.object({
+                email: z.string().email(),
+                role: z.enum(['user', 'admin']).default('user'),
+            }),
+        },
+        // PATCH /users/:id — partial baseline + email refinement via builder
+        update: {
+            body: (baseline) =>
+                (baseline as any).extend({
                     email: z.string().email().optional(),
-                    role: z.enum(['user', 'admin']).optional()
-                })
-            },
-            {
-                method: 'GET',
-                path: '/products',
-                query: z.object({
-                    category: z.string().optional(),
-                    minPrice: z.coerce.number().optional()
-                })
-            }
-        ]
-    }
-};
+                }),
+        },
+        // GET /users — query-string validation
+        list: {
+            query: z.object({
+                role: z.enum(['user', 'admin']).optional(),
+            }),
+        },
+    },
+});
 ```
 
 ## Core Features
 
-### 1. Path Matching (Exact & Prefix)
-Rules support both exact path matching (`/users`) and prefix matching. If a rule targets `/users`, it will also match `/users/123`.
+### 1. Op-keyed validation (CRUD)
 
-You can also use **RegExp** patterns for complex matching:
+Each entry under `validation` corresponds to a generated CRUD operation:
+
+| Op | HTTP route | What it validates |
+|---|---|---|
+| `create` | `POST /<collection>` | request body |
+| `update` | `PATCH /<collection>/:id` | request body (baseline auto-becomes `.partial()`) |
+| `list`   | `GET /<collection>` | query string |
+
+You don't write `{ method, path }` — the route is implied by the model.
+
+### 2. Auto-derived baseline
+
+When `validation[op].body` is `undefined` (an empty op block: `create: {}`), the middleware uses a baseline Zod schema derived from the model's `fields`:
+
+| Field type | Zod | Honored options |
+|---|---|---|
+| `types.string` | `z.string()` | `minLength` → `.min(n)`, `maxLength` → `.max(n)` |
+| `types.number` | `z.number()` | `min` → `.min(n)`, `max` → `.max(n)` |
+| `types.boolean` | `z.boolean()` | — |
+| `types.date` | `z.union([z.string(), z.date()])` | — |
+| `types.id` / `types.relation` | skipped | (server-generated / server-resolved) |
+
+`required: true` keeps the field non-optional; otherwise it's `.optional()`. For `update` the baseline is automatically `.partial()` so PATCH requests can omit fields.
+
+### 3. Extend, override, or take the baseline
+
+| Form | Behavior |
+|---|---|
+| op block absent | No validation — middleware passes through. |
+| `{}` (empty op block) | Use baseline. |
+| `(baseline) => Validator` | Builder — extend the baseline. |
+| `Validator` (e.g. `z.object(...)`) | Override the baseline. |
+
+### 4. Custom endpoints
+
+Per-endpoint validation lives next to the handler in the model's `endpoints` block:
 
 ```typescript
-{
-    method: '*',
-    path: /^\/api\/v[0-9]+\/orders/,
-    body: orderSchema
+endpoints: {
+    'POST /:id/play': {
+        handler: async (req, res, ctx) => { /* ... */ },
+        validation: {
+            body: z.object({ trackNumber: z.number().int().positive() }),
+        },
+    },
 }
 ```
 
-### 2. Payload Sanitization
-When validation succeeds, the middleware replaces the raw `req.body` with Zod's parsed output (`bodyResult.data`). This means Zod transformations like `.trim()`, `.default()`, and `.transform()` are automatically applied before the data reaches the database adapter.
+The bare-function form (`'POST /:id/play': handler`) still works when no validation is needed.
 
-### 3. Structured Error Responses
-When validation fails, the middleware immediately returns a `400 Bad Request` with Zod's formatted error output:
+### 5. Fieldless / route-only models
+
+Routes that don't model an entity (`/search`, `/auth/login`, webhooks) use `defineRoutes()`:
+
+```typescript
+// models/search.ts
+import { defineRoutes } from '@json-express/core';
+import { z } from 'zod';
+
+export default defineRoutes({
+    endpoints: {
+        'GET /': {
+            handler: async (req, res, ctx) => { /* ... */ },
+            validation: {
+                query: z.object({ q: z.string().min(2) }),
+            },
+        },
+    },
+});
+```
+
+Mounts as `GET /search`. No CRUD codegen.
+
+### 6. Payload sanitization
+
+When validation succeeds, the middleware replaces the raw `req.body` (or `req.query`) with Zod's parsed output. Transformations like `.default()`, `.trim()`, `.transform()`, and `.coerce.number()` are applied before the handler runs.
+
+### 7. Structured error responses
 
 ```json
 {
@@ -87,11 +151,16 @@ When validation fails, the middleware immediately returns a `400 Bad Request` wi
 }
 ```
 
-This structured format allows frontend clients to map individual error messages directly to form fields.
+### 8. Plugin-swappable
 
-### 4. GraphQL Compatibility
-The validation rules are also consumed by the `@json-express/api-graphql` generator. When a GraphQL mutation is executed, the generator checks for matching validation rules and runs them against the mutation input, throwing a `GraphQLError` with `BAD_USER_INPUT` extensions on failure.
+`Validator` is a structural type — anything with `safeParse(v): { success, data, error }` works. Core never imports Zod, so a future `middleware-validation-yup` or `-valibot` could ship without forking.
 
-## Related Ecosystem Packages
-*   **[@json-express/middleware-auth](/packages/middleware-auth):** Auth runs *before* validation in the middleware pipeline, ensuring unauthenticated users are rejected before validation is even attempted.
-*   **[@json-express/api-rest](/packages/api-rest):** The REST generator automatically injects this middleware into routes that have matching validation rules.
+### 9. GraphQL
+
+`api-graphql` reads `validation.create.body` and `validation.update.body` directly from each model. Only the direct-Validator form is honored on the GraphQL side (the builder form requires the auto-baseline that lives in this middleware). Declare a concrete schema if you want validation on both REST and GraphQL.
+
+## Related Packages
+
+- [`@json-express/middleware-auth`](/middleware-auth) — auth runs *before* validation, so unauthenticated callers are 401'd before any schema is parsed.
+- [`@json-express/api-rest`](/api-rest) — attaches this middleware to CRUD routes when the model declares a `validation` block for the matching op, and to custom endpoints whose object form carries `validation`.
+- [`@json-express/api-graphql`](/api-graphql) — applies the create/update validators to mutations, throwing `GraphQLError` with `BAD_USER_INPUT` extensions on failure.

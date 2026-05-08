@@ -1,88 +1,89 @@
 ---
 title: Identity & Auth Plugin
-description: Secure your JSONExpress APIs with enterprise-grade identity management, Argon2 password hashing, and asymmetric JWT validation.
+description: Secure your JSONExpress APIs with auto-discovered identity management, argon2id password hashing, JWT issuance, and asymmetric JWKS validation.
 ---
 
 # Identity & Auth
 
-The `@json-express/plugin-identity` package transforms JSONExpress from an open API into a highly secure, zero-trust backend. It provides automated user provisioning, state-of-the-art password hashing, and highly configurable JWT workflows out of the box.
+The [`@json-express/plugin-identity`](/plugin-identity) package turns JSONExpress from an open API into a zero-trust backend. It is **auto-discovered** — install it (along with its peers) and the `json-express` runtime registers it for you. There is no manual `new IdentityPlugin(...)` wiring.
 
-## Core Features
+## What it does on boot
 
-When you register the Identity plugin in your `json-express` config, it automatically:
-1. **Injects a Secure `users` Model:** It registers a strict `users` schema that explicitly blocks `passwordHash` and `tokenVersion` from ever leaving the server in API responses.
-2. **Registers Cryptographic Hooks:** It attaches `beforeCreate` and `beforeUpdate` hooks to intercept any incoming passwords, strips them from the raw database payload, and heavily hashes them using **Argon2** before storage.
-3. **Generates Authentication Endpoints:** It mounts `/auth/login`, `/auth/refresh`, and `/auth/reset-password` endpoints.
+1. **Contributes a strict `users` schema** that blocks `passwordHash` and `tokenVersion` from ever appearing in API responses.
+2. **Hashes passwords with argon2id** through `beforeCreate` / `beforeUpdate` hooks — the plain-text value never reaches the database.
+3. **Mounts the `/auth/*` route group** (login, register, refresh, logout, password change, plus the email-driven flows when an email provider is installed).
+4. **Auto-seeds an admin** when the `users` collection is empty — the generated password is logged once on first boot.
+5. **Validates installed peers**: it throws on boot if `middleware-auth` or an `IKvStore` is missing.
 
 ---
 
 ## The Zero-Knowledge Provisioning Flow
 
-We built the Identity plugin with enterprise security in mind. Therefore, **plain-text passwords are never accepted via generic REST `POST` or `PATCH` requests.**
+Plain-text passwords are never accepted via generic REST `POST` / `PATCH /users` requests:
 
-Instead, we use a Zero-Knowledge Provisioning flow:
-1. An admin creates a new user via `POST /users`, providing only their `email` and `role`. 
-2. The user is created with a `requirePasswordReset: true` flag.
-3. A unique, TTL-bound reset token is generated and stored in the high-performance Key-Value store (`IKvStore`).
-4. An email is dispatched asynchronously via the Task Queue (`IQueueAdapter`).
-5. The user clicks the link and submits their password directly to the specialized `/auth/reset-password` endpoint, which performs the Argon2 hashing.
+1. An admin creates a user via `POST /users` with only `email` and `role`.
+2. The user is stored with `emailVerified: false` and no password.
+3. A TTL-bound reset token is written to the `IKvStore`.
+4. The reset email is enqueued on the `IQueueAdapter` and sent asynchronously.
+5. The user follows the link and submits their password to `POST /auth/password/reset`, which performs the argon2id hashing.
 
-This guarantees that administrators and API logs are never exposed to user passwords.
+Administrators and API logs never see user passwords.
 
 ---
 
 ## JWT Verification & Security
 
-The Identity plugin partners seamlessly with `@json-express/middleware-auth` to protect your generated APIs. 
+The plugin partners with [`@json-express/middleware-auth`](/middleware-auth) to verify the tokens it issues. Both sides read the same keys from the config provider — there is no cross-plugin import.
 
-### Symmetric vs Asymmetric Keys
-You can configure the authentication middleware to use standard HMAC secrets for local development, or enterprise-grade asymmetric keys (JWKS) for production.
+### Symmetric (HMAC) vs Asymmetric (JWKS)
 
-```typescript
-// Example json-express configuration
-export default {
-    auth: {
-        // Local Development (HMAC)
-        secret: process.env.JWT_SECRET,
-        
-        // Production (Asymmetric JWKS - e.g. AWS Cognito, Auth0)
-        // jwksUri: 'https://your-tenant.us.auth0.com/.well-known/jwks.json',
+For local development, `jex.auth.secret` is enough. For production, point both plugins at a JWKS endpoint and JSONExpress acts as a pure resource server validating tokens issued by an external IdP (Auth0, Cognito, Okta, …).
 
-        // Exclude specific public paths from the Auth Gate
-        exclude: ['/auth/login', '/public/products']
-    }
-}
+```bash
+# .env
+
+# Local development — HMAC
+jex.auth.secret=a-strong-32-byte-secret
+
+# Production — JWKS
+jex.auth.jwksUri=https://your-tenant.us.auth0.com/.well-known/jwks.json
+jex.auth.algorithms=RS256
+
+# Public paths the verifier must skip
+jex.auth.exclude=/auth,/public
 ```
 
-### The `tokenVersion` Pattern (Instant Revocation)
-Traditional JWTs cannot be revoked without a centralized blacklist, defeating the purpose of stateless authentication. 
+### The `tokenVersion` Pattern (instant revocation)
 
-JSONExpress solves this using the `tokenVersion` pattern. Every user record has an integer `tokenVersion` (which is excluded from REST responses). When a JWT is issued, this integer is stamped inside the payload. 
-
-If a user's account is compromised, an admin simply increments their `tokenVersion` in the database. The `middleware-auth` instantly rejects all previously issued JWTs because their stamped version no longer matches the database version.
+Stateless JWTs cannot normally be revoked without a centralized blocklist. JSONExpress instead stamps each token with the user's current `tokenVersion` integer (a non-readable field on the user record). When you need to revoke, increment that user's `tokenVersion` — every previously issued JWT becomes invalid on the next request because the stamped version no longer matches the database value. No blocklist, no cache invalidation, no extra storage.
 
 ---
 
-## Root Admin Auto-Seeding
+## Admin Auto-Seeding
 
-To prevent the "chicken and egg" problem of provisioning the first user on a fresh database deployment, the Identity plugin automatically checks if the `users` collection is empty on boot. 
-
-If it is, it automatically seeds a Root Admin user utilizing credentials provided via environment variables:
-
-```bash
-ROOT_ADMIN_EMAIL="admin@json-express.dev"
-ROOT_ADMIN_PASSWORD="super-secure-initial-password"
-```
+When the plugin boots and the `users` collection is empty, it creates an `admin@local` account with role `admin` and a randomly generated password. The password is printed once to the configured logger.
 
 > [!WARNING]
-> Do not leave `ROOT_ADMIN_PASSWORD` in your production environment variables after the initial deployment. It is only required for the first boot sequence.
+> Change the auto-generated admin password immediately on first boot via `POST /auth/password/change`.
+
+There is no `ROOT_ADMIN_EMAIL` / `ROOT_ADMIN_PASSWORD` environment variable — the admin email is fixed at `admin@local` and the password is randomly generated each fresh boot.
 
 ---
 
 ## Common Questions
 
-### Where are Refresh Tokens stored?
-Refresh tokens, email verification tokens, and password reset tokens are **not** stored in your primary database (MySQL, Postgres, etc.). They are highly ephemeral and are stored exclusively in the `IKvStore` (e.g., `@json-express/kv-redis`). This prevents your primary database from filling up with expired garbage data and offloads TTL-expiration to native Redis commands.
+### Where are refresh tokens stored?
 
-### Can I use Auth0 or Firebase instead?
-Yes. If you provide a `jwksUri` in the configuration, JSONExpress will bypass the local `/auth/login` strategy entirely and act as a pure Resource Server, trusting the JWTs issued by your external Identity Provider.
+Refresh tokens, email verification tokens, and password reset tokens are **not** stored in your primary database. They live in the `IKvStore` ([`@json-express/kv-memory`](/kv-memory) for development; a Redis-backed implementation in production). This keeps the primary database free of ephemeral records and offloads TTL expiration to native KV commands.
+
+### Can I use Auth0 / Firebase / Cognito instead of issuing my own tokens?
+
+Yes — set `jex.auth.jwksUri` to your IdP's JWKS endpoint. `middleware-auth` will validate every incoming JWT against those keys. You can keep `plugin-identity` installed for the `users` schema and admin endpoints, or remove it entirely and rely on the IdP's user store.
+
+### How do I install the whole stack in one command?
+
+```bash
+npm install @json-express/preset-identity
+```
+
+The [`@json-express/preset-identity`](/presets) preset bundles `plugin-identity`, `middleware-auth`, `kv-memory`, `queue-memory`, and `email-console`.

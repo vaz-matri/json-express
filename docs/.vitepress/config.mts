@@ -69,6 +69,7 @@ export default defineConfig({
         items: [
           { text: 'Getting Started', link: '/getting-started' },
           { text: 'Zero-Config JSON Mode', link: '/json-mode' },
+          { text: 'Presets', link: '/presets' },
           { text: 'Architecture', link: '/architecture' }
         ]
       },
@@ -92,11 +93,11 @@ export default defineConfig({
         text: 'Ecosystem',
         items: [
           {
-            text: 'Core & CLI',
+            text: 'Core & Runtime',
             collapsed: true,
             items: [
               { text: '@json-express/core', link: '/core' },
-              { text: '@json-express/cli', link: '/cli' },
+              { text: '@json-express/boot', link: '/boot' },
               { text: '@json-express/config', link: '/config' },
               { text: '@json-express/config-env', link: '/config-env' }
             ]

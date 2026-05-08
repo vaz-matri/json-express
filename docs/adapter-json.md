@@ -19,20 +19,23 @@ npm install @json-express/adapter-json
 
 ## Configuration
 
-Register the adapter in your core JSONExpress configuration. You must provide a path to the directory where you want the `.json` files to be stored.
+The adapter is auto-discovered by the `json-express` runtime — installing the package is enough. By default it reads from and writes to `./data/` in your current working directory.
 
-```typescript
-import { JSONExpress } from '@json-express/core';
-import { JsonAdapter } from '@json-express/adapter-json';
-import path from 'path';
+```bash
+npm install @json-express/adapter-json
+npx json-express
+```
 
-// Point it to a local /data directory
-const db = new JsonAdapter(path.join(process.cwd(), 'data'));
+If you want to override the storage path, set it in `.env`:
 
-const app = new JSONExpress({
-    database: db,
-    apiGenerators: [ /* ... */ ]
-});
+```bash
+jex.adapter.path=./data
+```
+
+When [`@json-express/adapter-memory`](/adapter-memory) is also installed, pick one explicitly:
+
+```bash
+jex.adapter=@json-express/adapter-json
 ```
 
 ## Core Features
@@ -53,5 +56,5 @@ Because all data is stored as raw, formatted JSON text files, this adapter is in
 Despite being a simple file-system adapter, it fully complies with the JSONExpress enterprise architecture. If a user attempts to `POST` a duplicate email to a field marked `unique: true`, the adapter will correctly halt the operation and throw a `UniqueConstraintError`.
 
 ## Related Ecosystem Plugins
-*   **[@json-express/core](/packages/core):** Contains the `IDatabaseAdapter` interface that this package implements.
-*   **[@json-express/adapter-memory](/packages/adapter-memory):** A RAM-based alternative for when you don't want data to persist across server restarts.
+*   **[@json-express/core](/core):** Contains the `IDatabaseAdapter` interface that this package implements.
+*   **[@json-express/adapter-memory](/adapter-memory):** A RAM-based alternative for when you don't want data to persist across server restarts.

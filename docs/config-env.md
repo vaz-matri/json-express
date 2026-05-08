@@ -1,72 +1,109 @@
 ---
 title: "@json-express/config-env"
-description: "Twelve-Factor compliant environment variable configuration provider for JSONExpress."
+description: "Twelve-Factor environment variable configuration provider for JSONExpress — auto-discovered, zero-dependency, lowercase-preferred."
 ---
 
 # @json-express/config-env
 
-> The default environment variable configuration provider for JSONExpress.
+> The default `IConfigProvider` shipped with `@json-express/boot`.
 
-The `@json-express/config-env` package implements `IConfigProvider` using the **Twelve-Factor App** methodology. It reads configuration exclusively from `.env` files and system environment variables, making it the simplest and most Docker/Kubernetes-friendly configuration strategy.
+`@json-express/config-env` implements `IConfigProvider` using the **Twelve-Factor App** methodology. It reads configuration exclusively from `.env` files and system environment variables, making it the simplest and most Docker / Kubernetes-friendly configuration strategy.
 
-This is the default configuration provider used by the `@json-express/cli`.
+It is auto-discovered by the `json-express` runtime and ships as a dependency of [`@json-express/boot`](/boot) — most users never install it directly.
 
 ## Installation
+
+If you are not using `@json-express/boot` and want to install the runtime piece-by-piece:
 
 ```bash
 npm install @json-express/config-env
 ```
 
-## Configuration
+## Naming convention
 
-All JSONExpress environment variables use the `JEX.` prefix (or `JEX__` for nested keys). The provider automatically strips this prefix and builds a nested configuration object.
+JSONExpress uses the `jex` namespace for every configuration key. **Lowercase is preferred**:
 
-### Example `.env` File
+```bash
+jex.port=3000
+jex.auth.secret=a-strong-32-byte-secret
+jex.transport=@json-express/transport-fastify
+```
+
+Cloud platforms that forbid lowercase env vars or dotted names (Heroku, some PaaS) are supported via the uppercase double-underscore form `JEX__KEY` — this is the same key, just spelled differently:
+
+```bash
+JEX__AUTH__SECRET=a-strong-32-byte-secret    # equivalent to jex.auth.secret
+```
+
+> [!IMPORTANT]
+> The single-underscore form `JEX_AUTH_SECRET` is **not supported** — it would be ambiguous with single-word keys (`JEX_PORT`). The provider rejects it. Always use double underscore (`__`) when the dot is unavailable.
+
+## Example `.env`
 
 ```bash
 # Server
-JEX.PORT=3000
-
-# Authentication
-JEX.AUTH.SECRET=my-super-secret-key
-JEX.AUTH.EXCLUDE=/auth/login,/health
+jex.port=3000
 
 # Logging
-JEX.LOG.LEVEL=debug
-JEX.LOG.PRETTY=true
+jex.log.level=debug
+jex.log.pretty=true
 
-# Plugin Overrides (set by --configure wizard)
-JEX.TRANSPORT=@json-express/transport-fastify
-JEX.ADAPTER=@json-express/adapter-json
+# Authentication
+jex.auth.secret=a-strong-32-byte-secret
+jex.auth.exclude=/auth,/health
+jex.auth.tokenTtl=1h
+
+# Plugin selection (only required when multiple of the same category are installed)
+jex.transport=@json-express/transport-fastify
+jex.adapter=@json-express/adapter-json
 ```
 
-### Cascading Precedence (Lowest → Highest)
-The provider loads `.env` files in a strict order. Later files overwrite earlier ones:
+## Cascading precedence
 
-1. `.env` — Base defaults
-2. `.env.development` — Environment-specific
-3. `.env.local` — Machine-specific (gitignored)
-4. `.env.development.local` — Machine + Environment specific
-5. **System environment variables** — Highest priority (Docker, Kubernetes)
+The provider walks `.env` files in this order. Later wins, system env wins last:
 
-This cascading order means you can safely commit `.env` to your repository with sane defaults, and override them per-machine using `.env.local` (which should be in `.gitignore`).
+1. `.env`
+2. `.env.[NODE_ENV]` (e.g. `.env.development`)
+3. `.env.local`
+4. `.env.[NODE_ENV].local` (e.g. `.env.development.local`)
+5. **`process.env`** — system environment variables (Docker, Kubernetes, CI)
 
-## Core Features
+When [`@json-express/config`](/config) is also installed, the framework merges its own cascade on top of `.env`:
 
-### 1. Automatic Nested Object Construction
-The provider uses `buildNestedConfigFromEnv()` from `@json-express/core` to automatically convert flat environment variables into deeply nested configuration objects:
+1. Plugin defaults
+2. `jex.config.*` (TypeScript / YAML / JSON)
+3. `jex.config.[NODE_ENV].*`
+4. `.env` and friends (steps 1–4 above)
+5. `jex.config.[NODE_ENV].local`
+6. `process.env`
+
+The general rule: **anything you can express in `.env` wins over anything in `jex.config.*`** unless the file is the `.local` variant. Commit `.env` and `jex.config.ts` to source control with safe defaults; keep `.env.local` and `jex.config.local.ts` gitignored.
+
+## Automatic nested object construction
+
+The provider uses `buildNestedConfigFromEnv()` from `@json-express/core` to convert flat keys into nested objects:
 
 ```bash
-JEX.AUTH.SECRET=abc123
+jex.auth.secret=abc123
+jex.auth.email.from=noreply@example.com
 ```
-Becomes:
+
+Reads as:
+
 ```typescript
-config.get('auth.secret') // → 'abc123'
+config.get('auth.secret')        // 'abc123'
+config.get('auth.email.from')    // 'noreply@example.com'
+config.get('auth.email')         // { from: 'noreply@example.com' }
 ```
 
-### 2. Zero External Dependencies
-Unlike the advanced `@json-express/config` package (which requires `js-yaml` and `jiti`), this provider depends only on `dotenv`. It is extremely lightweight and boots in less than 1 millisecond.
+Both `.` and `__` are nesting separators. Single `_` stays inside the segment — `jex.auth.token_ttl` is `{ auth: { token_ttl: '1h' } }`, not `{ auth: { token: { ttl: '1h' } } }`.
 
-## Related Ecosystem Packages
-*   **[@json-express/config](/packages/config):** The advanced alternative that supports YAML, TypeScript, and environment-specific file overrides.
-*   **[@json-express/cli](/packages/cli):** The CLI's `--configure` wizard writes its selections directly into `.env` using the `JEX.*` namespace.
+## Zero external dependencies
+
+This provider depends only on `dotenv`. It boots in under 1 ms and adds no compile step. For richer configuration formats (YAML, TypeScript with imports, environment-specific files), install [`@json-express/config`](/config) alongside it.
+
+## Related
+
+- [@json-express/config](/config) — advanced alternative with YAML / TypeScript support
+- [@json-express/boot](/boot) — bundles this provider in the default stack
+- [@json-express/core](/core) — exposes `buildNestedConfigFromEnv` and the `IConfigProvider` contract

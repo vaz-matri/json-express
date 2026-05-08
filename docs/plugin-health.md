@@ -17,36 +17,23 @@ npm install @json-express/plugin-health
 
 ## Configuration
 
-Register the plugin inside your core JSONExpress pipeline.
+The plugin is auto-discovered by the `json-express` runtime — installing the package is enough.
 
-```typescript
-import { JSONExpress } from '@json-express/core';
-import { HealthPlugin } from '@json-express/plugin-health';
-
-const app = new JSONExpress({
-    database: myDb,
-    plugins: [
-        new HealthPlugin()
-    ]
-});
+```bash
+npm install @json-express/plugin-health
+npx json-express
 ```
 
-By default, this will expose two endpoints:
-*   `GET /health` (Liveness)
-*   `GET /ready` (Readiness)
+By default it exposes two endpoints:
 
-If you need to change these paths to comply with your company's infrastructure standards, you can configure them via the JSONExpress configuration engine:
+- `GET /health` — liveness
+- `GET /ready` — readiness
 
-```typescript
-// JSONExpress Configuration Object
-{
-    plugins: {
-        health: {
-            livenessPath: '/internal/liveness',
-            readinessPath: '/internal/readiness'
-        }
-    }
-}
+To match your infrastructure conventions, override the paths in `.env`:
+
+```bash
+jex.health.livenessPath=/internal/liveness
+jex.health.readinessPath=/internal/readiness
 ```
 
 ## Core Features
@@ -63,4 +50,4 @@ Health probes are typically pinged by Load Balancers every 5 to 10 seconds. If l
 The JSONExpress transport layer automatically detects paths mounted by the Health plugin and **silences their access logs**. You get perfect infrastructure monitoring without the log spam.
 
 ## Related Ecosystem Packages
-*   **[@json-express/core](/packages/core):** The core engine that orchestrates the boot sequence before marking the `/ready` probe as active.
+*   **[@json-express/core](/core):** The core engine that orchestrates the boot sequence before marking the `/ready` probe as active.

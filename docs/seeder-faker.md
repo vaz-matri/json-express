@@ -1,66 +1,127 @@
 ---
 title: "@json-express/seeder-faker"
-description: "A developer utility for JSONExpress that automatically generates thousands of realistic mock records based on your schema definitions."
+description: "Auto-discovered Faker.js seeder for JSONExpress — derives a generator from your model fields, resolves relations topologically, and runs on --seed."
 ---
 
 # @json-express/seeder-faker
 
-> Official mock data generator for JSONExpress using Faker.js.
+> Schema-driven mock data generator for JSONExpress, powered by Faker.js.
 
-The `@json-express/seeder-faker` package is a high-speed development utility. It reads your JSONExpress `ModelSchema` objects and uses **Faker.js** to automatically populate your database adapter with realistic, relational mock data.
-
-This completely eliminates the need to manually write hundreds of insert statements when prototyping a frontend application or testing database performance.
+`@json-express/seeder-faker` implements `ISeeder` and is auto-discovered by the `json-express` runtime. It synthesises a generator from each model's `fields`, walks the relation graph to seed parents before children, and runs only when you invoke the server with `--seed` (or `--seed-append`). At any other time it is dormant.
 
 ## Installation
 
 ```bash
 npm install @json-express/seeder-faker @faker-js/faker -D
 ```
-*(Note: We recommend installing this as a `devDependency` since you should not be seeding fake data in production environments).*
+
+Install as a `devDependency` — you should not be seeding fake data in production.
+
+## Usage
+
+The seeder is an auto-discovered plugin, not a library you instantiate. The runtime registers it during `--seed`:
+
+```bash
+# Refresh: clear collections, then seed
+npx json-express --seed
+
+# Append: keep existing rows, add seeded ones on top
+npx json-express --seed-append
+```
+
+Without a flag, the seeder loads but does nothing — you can leave it in `dependencies` permanently.
 
 ## Configuration
 
-To use the seeder, invoke it immediately after initializing your `IDatabaseAdapter`, but before calling `app.start()`.
+All seeder configuration lives under the `jex.faker.*` namespace in your config provider (typically `.env`).
+
+```bash
+# .env
+
+# Default: every model with fields gets seeded automatically. Set to false
+# to opt-in only the collections explicitly listed below.
+jex.faker.auto=true
+
+# Default record count per collection when no per-collection number is given.
+jex.faker.count=10
+```
+
+For per-collection overrides, switch to `jex.config.ts` (or whichever config provider supports object values):
 
 ```typescript
-import { JSONExpress } from '@json-express/core';
-import { MemoryAdapter } from '@json-express/adapter-memory';
-import { FakerSeeder } from '@json-express/seeder-faker';
+// jex.config.ts
+export default {
+    faker: {
+        auto: true,
+        count: 10,
+        collections: {
+            users: 50,           // seed 50 users
+            posts: 200,          // seed 200 posts
+            comments: 500,       // seed 500 comments
+            invoices: () => ({   // full generator override
+                amount: faker.commerce.price(),
+                status: faker.helpers.arrayElement(['paid', 'unpaid'])
+            })
+        }
+    }
+};
+```
 
-async function bootstrap() {
-    const db = new MemoryAdapter();
-    await db.connect();
+### Configuration keys
 
-    // Instantiate the seeder and pass it your database
-    const seeder = new FakerSeeder(db);
+| Key | Type | Default | Effect |
+|---|---|---|---|
+| `jex.faker.auto` | boolean | `true` | When `true`, every model with `fields` is seeded automatically. Set `false` to opt-in only via `collections`. |
+| `jex.faker.count` | number | `10` | Default rows per collection when no per-collection number is given. |
+| `jex.faker.collections.<name>` | number \| `() => any` | – | Per-collection override. A number changes the count; a function replaces the generator entirely. |
 
-    // Generate 50 Users, 200 Posts, and 500 Comments!
-    await seeder.seed({
-        users: 50,
-        posts: 200,
-        comments: 500
-    });
+## How it works
 
-    const app = new JSONExpress({ database: db });
-    await app.start(3000);
+### 1. Schema-derived generators
+
+The seeder reads each `ModelSchema` you registered (via `defineModel` or auto-loaded from `data/*.json`) and synthesises a generator from the field types:
+
+| Field type | Generated value |
+|---|---|
+| `types.id()` | Skipped — assigned by the adapter |
+| `types.string({ minLength, maxLength })` | `faker.lorem.words(2..4)` clamped to bounds |
+| `types.number({ min, max })` | `faker.number.int({ min, max })` |
+| `types.boolean()` | `faker.datatype.boolean()` (or the field's `default` if set) |
+| `types.date()` | `faker.date.recent().toISOString()` |
+| `types.relation({ ... })` | Random id from the parent collection's seeded set |
+
+You can override the entire generator for any one collection by passing a function under `jex.faker.collections.<name>`.
+
+### 2. Topological relation resolution
+
+When a `posts` schema declares a `many-to-one` relation to `users` with foreign key `authorId`, the seeder topologically sorts the requested collections so `users` is seeded before `posts`. When generating a post, it picks a random already-inserted user id for `authorId` — making `?_expand=author` and equivalent GraphQL queries work out of the box.
+
+If a cycle exists in the relation graph, the seeder logs a warning, falls back to declaration order, and FKs on the lagging side resolve to `null`. To break the cycle, provide an explicit generator function for one side.
+
+### 3. Refresh vs append
+
+- `--seed` is **idempotent**. The seeder calls `IDatabaseAdapter.deleteMany({})` on each target collection before inserting — running it twice produces the same final state.
+- `--seed-append` skips the delete and inserts on top of whatever is already there. Useful for repeatedly populating a long-running adapter (e.g. `adapter-json` against a real file).
+
+## Custom seeders
+
+`seeder-faker` is one of many possible seeders. Anything that implements `ISeeder` is picked up by the runtime:
+
+```typescript
+import type { ISeeder, IDatabaseAdapter, ModelSchema, IConfigProvider, ILogger } from '@json-express/core';
+
+export class MyCsvSeeder implements ISeeder {
+    public readonly name = 'csv';
+    constructor(private deps: { configProvider: IConfigProvider; logger: ILogger }) {}
+    setSchemas(schemas: ModelSchema[]) { /* … */ }
+    async seed(database: IDatabaseAdapter, isAppend: boolean) { /* … */ }
 }
 ```
 
-## Core Features
+Publish it as `@your-scope/seeder-csv` (or any package name containing `seeder-` after the `@json-express/` namespace, or a third-party name containing `json-express-`) and it gets auto-discovered.
 
-### 1. Smart Schema Inference
-You do not need to configure how the seeder generates data. It natively understands the JSONExpress `types` builder. 
-*   If your schema defines an `email: types.string()`, it will automatically generate a valid email address via `faker.internet.email()`.
-*   If your schema defines an `avatarUrl: types.string()`, it will generate a valid image URL.
-*   If your schema defines a `published: types.boolean()`, it will randomly flip between true and false.
+## Related
 
-### 2. Automatic Relational Resolution
-If you have a `posts` schema with a `authorId` foreign key that points to the `users` collection, the seeder is smart enough to handle the relationships. 
-
-When you ask the seeder to generate 200 Posts, it will automatically query the database for existing Users, pick a random User ID, and assign it to the `authorId` field. This guarantees that your relational queries (`?_expand=author`) will actually work out of the box!
-
-### 3. Load Testing Preparation
-Because the JSONExpress routing engine uses an abstracted `IDatabaseAdapter`, you can easily point the `FakerSeeder` at a real MySQL or PostgreSQL database in a staging environment. You can command it to generate **500,000 records**, allowing your infrastructure team to instantly run realistic load tests and tune SQL indexes before going to production.
-
-## Related Ecosystem Packages
-*   **[@json-express/adapter-memory](/packages/adapter-memory):** The most common pairing. Use the seeder alongside the RAM adapter to spin up a fully populated, pristine backend in less than 50ms before running Playwright E2E tests!
+- [@json-express/adapter-memory](/adapter-memory) — pair with the memory adapter for a fully populated, pristine backend in a single boot
+- [@json-express/adapter-json](/adapter-json) — combine with `--seed-append` to incrementally fill a file-backed dataset
+- [Schemas & Models](/schemas) — what `fields` shapes are available to the synthesizer

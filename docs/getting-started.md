@@ -18,19 +18,23 @@ JSONExpress turns a JSON file into a running REST and GraphQL API with zero conf
 
 *The fastest path to a running API. No TypeScript, no config file, no setup.*
 
-### 1. Install the CLI
+### 1. Create a project and install the boot preset
 
 ```bash
-npm install -g @json-express/cli
+mkdir my-api && cd my-api
+npm init -y
+npm install @json-express/boot
 ```
+
+`@json-express/boot` is a [dependency-only preset](/presets) that bundles the recommended stack: in-memory adapter, Express transport, REST API, console logger, and `/docs`. It is the only package you need for the quickstart. The runtime entrypoint — `npx json-express` — is shipped by `@json-express/core` (which `boot` pulls in transitively).
 
 ### 2. Create a data file
 
 ```bash
-mkdir my-api && cd my-api
+mkdir data
 ```
 
-Create `posts.json`:
+Create `data/posts.json`:
 
 ```json
 [
@@ -48,7 +52,7 @@ npx json-express
 # Collections: posts (3 records)
 ```
 
-JSONExpress auto-discovers every `.json` file in the directory and creates a collection for each one.
+JSONExpress scans `./data/` for JSON files and creates a collection from each one.
 
 ### 4. Use the API
 
@@ -99,13 +103,7 @@ That's the full CRUD surface — all from a single JSON file.
 
 *For when you need types, validation, field-level access control, and auto-generated GraphQL.*
 
-### 1. Install core and CLI
-
-```bash
-npm install @json-express/core @json-express/cli
-```
-
-### 2. Define your first model
+### 1. Define your first model
 
 Create `models/posts.ts`:
 
@@ -131,7 +129,9 @@ export default defineModel({
 
 The `access` block is field-level security — it controls which roles can call each operation. `'public'` means no token required. `'admin'` and `'owner'` are enforced automatically by the auth middleware when installed.
 
-### 3. Start and test
+If a TypeScript model and a JSON file share the same name, the model wins.
+
+### 2. Start and test
 
 ```bash
 npx json-express
@@ -155,33 +155,36 @@ Default values (`published: false`, `views: 0`) are applied automatically. Sendi
 
 ## Option C — With Authentication
 
-*Full user accounts, JWT tokens, protected routes — from two package installs.*
+*Full user accounts, JWT tokens, protected routes — from one preset install.*
 
-### 1. Add the identity plugin
+### 1. Add the identity preset
 
 ```bash
-npm install @json-express/plugin-identity @json-express/middleware-auth
+npm install @json-express/preset-identity
 ```
+
+This dependency-only preset installs `plugin-identity`, `middleware-auth`, `email-console`, `kv-memory`, and `queue-memory` in one step.
 
 ### 2. Set your secret
 
 Create a `.env` file:
 
 ```bash
-JEX__AUTH__SECRET=your-secret-key-min-32-chars
+jex.auth.secret=your-secret-key-min-32-chars
+jex.auth.exclude=/auth
 ```
 
-The double-underscore (`__`) is the Docker-safe nested key separator. `JEX__AUTH__SECRET` maps to `{ auth: { secret: "..." } }` in the config.
+`jex.auth.exclude` tells the auth middleware not to require a token for `/auth/*` itself (so registration and login work). Lowercase `jex.*` is preferred. `JEX__AUTH__SECRET` (uppercase, double-underscore) is the same key, accepted as a fallback for cloud platforms that forbid dots or lowercase env vars.
 
 ### 3. Start the server
 
 ```bash
 npx json-express
 # Server started on http://localhost:3000
-# Auth routes: POST /auth/register, /auth/login, /auth/refresh, /auth/logout
+# Auth routes: POST /auth/register, /auth/login, /auth/refresh, /auth/logout, …
 ```
 
-`plugin-identity` automatically registers five schemas (users, roles, refreshTokens, emailVerificationTokens, passwordResetTokens) and mounts the `/auth/*` route group. No manual route writing.
+`plugin-identity` registers five schemas (users, roles, refreshTokens, emailVerificationTokens, passwordResetTokens) and mounts the `/auth/*` route group automatically.
 
 ### 4. Register, login, and make an authenticated request
 
@@ -216,7 +219,8 @@ Routes with `access: { read: 'public' }` work without a token. Routes with `crea
 
 ## What's Next
 
+- [Presets](/presets) — bundle a stack into a single npm package
 - [Schemas & Models](/schemas) — field types, relations, hooks, and access control in depth
-- [Database Adapters](/adapters) — swap to `adapter-json` for file persistence, or wait for Postgres
+- [Database Adapters](/adapters) — swap to `adapter-json` for file persistence
 - [Architecture](/architecture) — understand the kernel, IoC container, and plugin lifecycle
 - [Identity & Auth](/identity) — refresh token rotation, JWKS, email verification, and more

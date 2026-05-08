@@ -1,40 +1,69 @@
 ---
 title: "@json-express/core"
-description: "The foundational kernel, type system, schema engine, and interface contracts that power every JSONExpress package."
+description: "The microkernel, schema engine, and runtime — ships the json-express binary that boots every JSONExpress application."
 ---
 
 # @json-express/core
 
-> The foundational kernel of the entire JSONExpress ecosystem.
+> The foundational kernel **and** the runtime entrypoint of the entire JSONExpress ecosystem.
 
-The `@json-express/core` package is the beating heart of the framework. It does not contain any database drivers, HTTP servers, or third-party integrations. Instead, it defines the **strict TypeScript interfaces** that every other package must implement, and provides the **Kernel** that orchestrates the 5-stage boot pipeline.
+The `@json-express/core` package serves two roles:
 
-If you are building a custom adapter, transport, or plugin for JSONExpress, this is the only dependency you need.
+1. **The contract layer** — TypeScript interfaces every plugin must implement (`IDatabaseAdapter`, `ITransport`, `IApiGenerator`, …) plus the schema engine (`defineModel`, `defineRoutes`, `types`).
+2. **The runtime** — the `json-express` binary that auto-discovers installed plugins from `package.json`, instantiates them in dependency order, and starts the server.
+
+Core itself contains zero HTTP, zero database, and zero filesystem-handler logic. Every concrete capability comes from a separate `@json-express/*` package.
 
 ## Installation
+
+Most users install [`@json-express/boot`](/boot), which depends on core. Install core directly only if you want to hand-pick every plugin:
 
 ```bash
 npm install @json-express/core
 ```
 
-## What It Exports
+You will also need at least one transport, one adapter, one API generator, one logger, and a config provider for the runtime to boot.
 
-The core package exports the following critical subsystems:
+## The `json-express` binary
 
-### 1. The Interface Contracts
-These are the TypeScript interfaces that define the rules of the ecosystem:
-*   `IDatabaseAdapter` — Every database (Memory, JSON, Postgres) must implement this.
-*   `IApiGenerator` — Every API layer (REST, GraphQL) must implement this.
-*   `ITransport` — Every HTTP server (Express, Fastify) must implement this.
-*   `IMiddleware` — Every middleware (Auth, Validation) must implement this.
-*   `IKvStore` — Every key-value store (Memory, Redis) must implement this.
-*   `IQueueAdapter` — Every task queue (Memory, BullMQ) must implement this.
-*   `IEmailProvider` — Every email provider (Console, SMTP) must implement this.
-*   `ILogger` — Every logger (Console, Pino) must implement this.
-*   `IConfigProvider` — Every configuration engine (Env, File) must implement this.
+Core ships a single binary:
 
-### 2. The Schema Engine (`defineModel` & `types`)
-The declarative API for defining your data models:
+```bash
+npx json-express                                # Start the server
+npx json-express --seed                          # Run any installed seeders (idempotent)
+npx json-express --seed-append                   # Append seed records instead of resetting
+npx json-express --preset-init                   # Extract templates from an installed preset
+npx json-express --preset-init=@scope/preset     # Pick a specific preset by name
+```
+
+The binary boots through these stages (see `kernel.ts:boot`):
+
+1. Load the `IConfigProvider` (defaults to `@json-express/config-env`).
+2. Recursively walk `package.json` dependencies for `@json-express/*` packages and any package whose name contains `json-express-`.
+3. Resolve the active package per category — `adapter`, `api`, `transport`, `logger`, `docs`, `id`. If multiple are installed in one category, the binary aborts and asks you to set `jex.<category>=<pkg>` in `.env`.
+4. Run every plugin's `onRegister`, generate routes via `apiGenerator.generate(collections)`, compose middlewares per route, register routes with the transport.
+5. Run seeders if `--seed` was passed.
+6. Run `onBoot`, mount docs routes, call `transport.start(port)`, fire `onReady`.
+
+There is no separate `@json-express/cli` package required to use this binary.
+
+## What core exports
+
+### 1. Interface contracts (`src/types.ts`)
+
+The TypeScript interfaces that define the rules of the ecosystem:
+
+- `IDatabaseAdapter` — every database (Memory, JSON, Postgres, …)
+- `IApiGenerator` — every API layer (REST, GraphQL, …)
+- `ITransport` — every HTTP server (Express, Fastify, …)
+- `IMiddleware` — every middleware (auth, validation, …)
+- `IPlugin` — every boot-time plugin (identity, devcert, health, …)
+- `IConfigProvider` — every configuration engine (env, file, …)
+- `ILogger`, `IKvStore`, `IQueueAdapter`, `IEmailProvider`, `ISeeder`, `IIdGenerator`
+
+### 2. The schema engine — `defineModel` and `defineRoutes`
+
+`defineModel` is for entities (anything with `fields`). It auto-generates CRUD against the listed fields and lets you decorate with hooks, access rules, validation, custom endpoints, and GraphQL extensions.
 
 ```typescript
 import { defineModel, types } from '@json-express/core';
@@ -50,14 +79,42 @@ export default defineModel({
 });
 ```
 
-### 3. The Access Control Engine
-A complete set of utilities for evaluating security rules at runtime:
-*   `evaluateAccess(rule, userPayload)` — Determines if a request is allowed, denied, or requires an ownership check.
-*   `needsOwnerCheck(rule)` — Returns `true` if the access rule is `'owner'`.
-*   `ownsRecord(record, ownerField, user)` — Compares the record's owner field against the JWT payload.
-*   `stripDeniedReadFields()` / `stripDeniedWriteFields()` — Aggressively removes forbidden fields from API payloads.
+`defineRoutes` is sugar for fieldless / route-only models — search endpoints, webhooks, anything that does not represent an entity. The filename becomes the mount prefix, the endpoint key the suffix.
 
-### 4. The Adapter Compliance Suite
+```typescript
+// models/search.ts
+import { defineRoutes } from '@json-express/core';
+
+export default defineRoutes({
+    endpoints: {
+        'GET /': async ({ query }) => {
+            // GET /search?q=...
+        }
+    }
+});
+```
+
+Internally `defineRoutes` is `defineModel({ exposeApi: false, ... })` — it suppresses the auto-generated CRUD surface and keeps everything else.
+
+### 3. The kernel and runtime utilities
+
+```typescript
+import { JsonExpressKernel, startServer, runPresetInit } from '@json-express/core';
+```
+
+- `JsonExpressKernel` — the awilix container, plugin registries, and `boot()` / `shutdown()` lifecycle.
+- `startServer()` — what `npx json-express` calls. Auto-discovery + boot.
+- `runPresetInit(cwd, flagArg)` — what `--preset-init` calls. Copies a preset's `templates/` into `cwd`.
+
+### 4. Access control utilities
+
+- `evaluateAccess(rule, userPayload)` — allow / deny / owner-check decision.
+- `needsOwnerCheck(rule)` — `true` if rule is `'owner'`.
+- `ownsRecord(record, ownerField, user)` — compares the record owner field against the JWT payload.
+- `stripDeniedReadFields()` / `stripDeniedWriteFields()` — strip forbidden fields from API payloads.
+
+### 5. The adapter compliance suite
+
 A testing utility that lets custom adapter authors verify their implementation:
 
 ```typescript
@@ -69,16 +126,19 @@ await runAdapterComplianceTests(
 );
 ```
 
-### 5. The Request Context (`AsyncLocalStorage`)
-A Node.js `AsyncLocalStorage` wrapper that provides per-request tracing:
+### 6. Request context (`AsyncLocalStorage`)
+
+Per-request tracing wrapper:
 
 ```typescript
 import { RequestContext } from '@json-express/core';
 
-// Inside any function called during request handling:
-const traceId = RequestContext.getTraceId(); // Auto-injected UUID
+const traceId = RequestContext.getTraceId(); // auto-injected UUID
 ```
 
-## Related Ecosystem Packages
-*   **[@json-express/cli](/packages/cli):** The CLI that automatically boots the Kernel and orchestrates the entire plugin discovery pipeline.
-*   **[@json-express/config](/packages/config):** The advanced file-based configuration provider that feeds settings into the Kernel.
+## Related
+
+- [@json-express/boot](/boot) — the recommended default stack
+- [Presets](/presets) — bundle a stack as a single npm package
+- [@json-express/config-env](/config-env) — the default configuration provider
+- [Architecture](/architecture) — kernel, IoC container, plugin lifecycle in depth
