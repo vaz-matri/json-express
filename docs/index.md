@@ -20,17 +20,17 @@ features:
     title: Zero-Config JSON Mode
     details: Drop a JSON file and get a full CRUD REST API in seconds. No schemas, no config, no boilerplate. The fastest path to a running API.
     link: /json-mode
-    linkText: Learn more →
+    linkText: Explore Zero-Config JSON Mode
   - icon: 🔄
     title: Swap Any Layer
     details: Change your database, HTTP server, or API protocol with one line of config. Express → Fastify, REST → GraphQL, memory → file persistence. Your code never changes.
     link: /adapters
-    linkText: Learn more →
+    linkText: Compare swappable database adapters
   - icon: 🔓
     title: No Framework Lock-In
     details: Not tied to Next.js, Express, or any frontend. Works with Vue, Svelte, React Native, or vanilla HTML. 23 independently installable packages, MIT licensed.
     link: /architecture
-    linkText: Learn more →
+    linkText: See the modular architecture
 ---
 
 <div class="badge-row">

@@ -46,21 +46,9 @@ export default defineConfig({
     logo: '/logo.svg',
 
     nav: [
-      { text: 'Home', link: '/' },
       { text: 'Docs', link: '/getting-started' },
       { text: 'Ecosystem', link: '/core' },
-      { text: 'Compare', link: '/compare/json-server' },
-      { text: 'Blog', link: '/blog/' },
-      {
-        text: 'Quick Links',
-        items: [
-          { text: 'Zero-Config JSON Mode', link: '/json-mode' },
-          { text: 'Schemas & Models', link: '/schemas' },
-          { text: 'Identity & Auth', link: '/identity' },
-          { text: 'REST API Generator', link: '/api-rest' },
-          { text: 'GraphQL Generator', link: '/api-graphql' },
-        ]
-      }
+      { text: 'Blog', link: '/blog/' }
     ],
 
     sidebar: [
