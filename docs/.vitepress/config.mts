@@ -48,121 +48,177 @@ export default defineConfig({
     nav: [
       { text: 'Docs', link: '/getting-started' },
       { text: 'Ecosystem', link: '/core' },
-      { text: 'Blog', link: '/blog/' }
-    ],
-
-    sidebar: [
       {
-        text: 'Introduction',
-        items: [
-          { text: 'Getting Started', link: '/getting-started' },
-          { text: 'Zero-Config JSON Mode', link: '/json-mode' },
-          { text: 'Presets', link: '/presets' },
-          { text: 'Architecture', link: '/architecture' }
-        ]
-      },
-      {
-        text: 'Core Concepts',
-        items: [
-          { text: 'Schemas & Models', link: '/schemas' },
-          { text: 'Database Adapters', link: '/adapters' },
-          { text: 'Hooks & Security', link: '/hooks' }
-        ]
-      },
-      {
-        text: 'Plugins',
-        items: [
-          { text: 'Identity & Auth', link: '/identity' },
-          { text: 'API Generation', link: '/api' },
-          { text: 'KV & Queues', link: '/background' }
-        ]
-      },
-      {
-        text: 'Ecosystem',
+        text: 'Learn',
         items: [
           {
-            text: 'Core & Runtime',
-            collapsed: true,
+            text: 'JSONExpress',
             items: [
-              { text: '@json-express/core', link: '/core' },
-              { text: '@json-express/boot', link: '/boot' },
-              { text: '@json-express/config', link: '/config' },
-              { text: '@json-express/config-env', link: '/config-env' }
+              { text: 'Releases & Updates', link: '/blog/releases/' },
+              { text: 'Framework Tutorials', link: '/blog/tutorials/' }
             ]
           },
           {
-            text: 'Transports',
-            collapsed: true,
+            text: 'Engineering',
             items: [
-              { text: 'transport-express', link: '/transport-express' },
-              { text: 'transport-fastify', link: '/transport-fastify' }
-            ]
-          },
-          {
-            text: 'Database Adapters',
-            collapsed: true,
-            items: [
-              { text: 'adapter-json', link: '/adapter-json' },
-              { text: 'adapter-memory', link: '/adapter-memory' }
-            ]
-          },
-          {
-            text: 'API Generators',
-            collapsed: true,
-            items: [
-              { text: 'api-rest', link: '/api-rest' },
-              { text: 'api-graphql', link: '/api-graphql' }
-            ]
-          },
-          {
-            text: 'Middleware',
-            collapsed: true,
-            items: [
-              { text: 'middleware-auth', link: '/middleware-auth' },
-              { text: 'middleware-validation', link: '/middleware-validation' }
-            ]
-          },
-          {
-            text: 'Plugins',
-            collapsed: true,
-            items: [
-              { text: 'plugin-identity', link: '/plugin-identity' },
-              { text: 'plugin-health', link: '/plugin-health' },
-              { text: 'plugin-devcert', link: '/plugin-devcert' },
-              { text: 'docs-swagger', link: '/docs-swagger' },
-              { text: 'docs-light', link: '/docs-light' }
-            ]
-          },
-          {
-            text: 'Background Services',
-            collapsed: true,
-            items: [
-              { text: 'kv-memory', link: '/kv-memory' },
-              { text: 'queue-memory', link: '/queue-memory' },
-              { text: 'email-console', link: '/email-console' }
-            ]
-          },
-          {
-            text: 'Utilities',
-            collapsed: true,
-            items: [
-              { text: 'logger-pino', link: '/logger-pino' },
-              { text: 'logger-console', link: '/logger-console' },
-              { text: 'seeder-faker', link: '/seeder-faker' }
+              { text: 'Technical Blogs', link: '/blog/engineering/' },
+              { text: 'Tech News & Reviews', link: '/blog/news/' }
             ]
           }
         ]
-      },
-      {
-        text: 'Compare',
-        items: [
-          { text: 'vs json-server', link: '/compare/json-server' },
-          { text: 'vs Strapi', link: '/compare/strapi' },
-          { text: 'vs Payload', link: '/compare/payload' },
-          { text: 'vs Mockoon', link: '/compare/mockoon' }
-        ]
       }
     ],
+
+    sidebar: {
+      '/blog/tutorials/': [
+        {
+          text: 'Framework Tutorials',
+          items: [
+            { text: 'Overview', link: '/blog/tutorials/' }
+          ]
+        }
+      ],
+
+      '/blog/releases/': [
+        {
+          text: 'Releases & Updates',
+          items: [
+            { text: 'Overview', link: '/blog/releases/' }
+          ]
+        }
+      ],
+
+      '/blog/engineering/': [
+        {
+          text: 'Engineering',
+          items: [
+            { text: 'Overview', link: '/blog/engineering/' }
+          ]
+        }
+      ],
+
+      '/blog/news/': [
+        {
+          text: 'Tech News & Reviews',
+          items: [
+            { text: 'Overview', link: '/blog/news/' }
+          ]
+        }
+      ],
+
+      '/': [
+        {
+          text: 'Introduction',
+          items: [
+            { text: 'Getting Started', link: '/getting-started' },
+            { text: 'Zero-Config JSON Mode', link: '/json-mode' },
+            { text: 'Presets', link: '/presets' },
+            { text: 'Architecture', link: '/architecture' }
+          ]
+        },
+        {
+          text: 'Core Concepts',
+          items: [
+            { text: 'Schemas & Models', link: '/schemas' },
+            { text: 'Database Adapters', link: '/adapters' },
+            { text: 'Hooks & Security', link: '/hooks' }
+          ]
+        },
+        {
+          text: 'Plugins',
+          items: [
+            { text: 'Identity & Auth', link: '/identity' },
+            { text: 'API Generation', link: '/api' },
+            { text: 'KV & Queues', link: '/background' }
+          ]
+        },
+        {
+          text: 'Ecosystem',
+          items: [
+            {
+              text: 'Core & Runtime',
+              collapsed: true,
+              items: [
+                { text: '@json-express/core', link: '/core' },
+                { text: '@json-express/boot', link: '/boot' },
+                { text: '@json-express/config', link: '/config' },
+                { text: '@json-express/config-env', link: '/config-env' }
+              ]
+            },
+            {
+              text: 'Transports',
+              collapsed: true,
+              items: [
+                { text: 'transport-express', link: '/transport-express' },
+                { text: 'transport-fastify', link: '/transport-fastify' }
+              ]
+            },
+            {
+              text: 'Database Adapters',
+              collapsed: true,
+              items: [
+                { text: 'adapter-json', link: '/adapter-json' },
+                { text: 'adapter-memory', link: '/adapter-memory' }
+              ]
+            },
+            {
+              text: 'API Generators',
+              collapsed: true,
+              items: [
+                { text: 'api-rest', link: '/api-rest' },
+                { text: 'api-graphql', link: '/api-graphql' }
+              ]
+            },
+            {
+              text: 'Middleware',
+              collapsed: true,
+              items: [
+                { text: 'middleware-auth', link: '/middleware-auth' },
+                { text: 'middleware-validation', link: '/middleware-validation' }
+              ]
+            },
+            {
+              text: 'Plugins',
+              collapsed: true,
+              items: [
+                { text: 'plugin-identity', link: '/plugin-identity' },
+                { text: 'plugin-health', link: '/plugin-health' },
+                { text: 'plugin-devcert', link: '/plugin-devcert' },
+                { text: 'docs-swagger', link: '/docs-swagger' },
+                { text: 'docs-light', link: '/docs-light' }
+              ]
+            },
+            {
+              text: 'Background Services',
+              collapsed: true,
+              items: [
+                { text: 'kv-memory', link: '/kv-memory' },
+                { text: 'queue-memory', link: '/queue-memory' },
+                { text: 'email-console', link: '/email-console' }
+              ]
+            },
+            {
+              text: 'Utilities',
+              collapsed: true,
+              items: [
+                { text: 'logger-pino', link: '/logger-pino' },
+                { text: 'logger-console', link: '/logger-console' },
+                { text: 'seeder-faker', link: '/seeder-faker' }
+              ]
+            }
+          ]
+        },
+        {
+          text: 'Compare',
+          items: [
+            { text: 'vs json-server', link: '/compare/json-server' },
+            { text: 'vs Strapi', link: '/compare/strapi' },
+            { text: 'vs Payload', link: '/compare/payload' },
+            { text: 'vs Mockoon', link: '/compare/mockoon' }
+          ]
+        }
+      ]
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/vazmat/json-express' }

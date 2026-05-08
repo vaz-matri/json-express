@@ -148,11 +148,14 @@
 }
 
 @media (min-width: 960px) {
-  .VPHero .image-container {
-    max-width: 480px;
-    margin: 0;
-    justify-content: flex-end;
-  }
+    .VPHero .image-container {
+        max-width: 480px;
+        /* Push the illustration to the right edge of its column instead of
+           centering it (default `margin: 0 auto`). */
+        margin-left: auto;
+        margin-right: 0;
+        justify-content: flex-end;
+    }
 }
 
 /* Feature Cards */
