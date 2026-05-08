@@ -1,6 +1,13 @@
 <script></script>
 <template>
-  <svg viewBox="0 0 360 340" width="480" height="453" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    class="hero-svg"
+    viewBox="0 0 360 340"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="xMidYMid meet"
+    role="img"
+    aria-label="JSONExpress hero illustration"
+  >
     <defs>
       <clipPath id="h_r1"><rect x="40" y="20"  width="280" height="44"/></clipPath>
       <clipPath id="h_r2"><rect x="40" y="76"  width="280" height="44"/></clipPath>
@@ -47,6 +54,13 @@
 </template>
 
 <style scoped>
+.hero-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
 /* Block A: shrinks width from 280 to 0 */
 @keyframes shrink {
   from { width: 280px; }
