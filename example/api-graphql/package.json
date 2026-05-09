@@ -1,0 +1,15 @@
+{
+    "name": "example-graphql",
+    "private": true,
+    "version": "1.0.0",
+    "description": "E2E test for api-graphql — verifies GraphQL queries, mutations, and relations",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*",
+        "@json-express/core": "workspace:*",
+        "@json-express/api-graphql": "workspace:*"
+    }
+}

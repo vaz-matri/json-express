@@ -1,0 +1,18 @@
+[
+  {
+    "id": "prod-101",
+    "name": "Premium Wireless Headphones",
+    "description": "Noise-cancelling over-ear headphones with 40-hour battery life.",
+    "price": 299.99,
+    "stock": 50,
+    "isActive": true
+  },
+  {
+    "id": "prod-102",
+    "name": "Mechanical Gaming Keyboard",
+    "description": "Tenkeyless layout with linear red switches.",
+    "price": 129.50,
+    "stock": 120,
+    "isActive": true
+  }
+]

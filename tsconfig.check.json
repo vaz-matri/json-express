@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/adapter-json" },
+    { "path": "./packages/adapter-memory" },
+    { "path": "./packages/api-rest" },
+    { "path": "./packages/cli" },
+    { "path": "./packages/config" },
+    { "path": "./packages/config-env" },
+    { "path": "./packages/docs-light" },
+    { "path": "./packages/docs-swagger" },
+    { "path": "./packages/logger-console" },
+    { "path": "./packages/logger-pino" },
+    { "path": "./packages/middleware-auth" },
+    { "path": "./packages/middleware-validation" },
+    { "path": "./packages/plugin-devcert" },
+    { "path": "./packages/plugin-health" },
+    { "path": "./packages/seeder-faker" },
+    { "path": "./packages/transport-express" },
+    { "path": "./packages/transport-fastify" }
+  ]
+}

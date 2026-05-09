@@ -1,0 +1,4 @@
+[
+    { "id": "tag-urgent", "name": "urgent", "color": "#e11" },
+    { "id": "tag-later",  "name": "later",  "color": "#888" }
+]

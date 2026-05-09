@@ -1,13 +1,13 @@
 {
   "version": "0.2.0",
-  "configurations": [
+  "configurations":[
     {
       "type": "node",
       "request": "launch",
       "name": "Debug Server (Example Dir)",
-      "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/packages/core/bin/exec.js",
-      "cwd": "${workspaceFolder}/example",
+      "skipFiles":["<node_internals>/**"],
+      "program": "${workspaceFolder}/packages/cli/bin/exec.js",
+      "cwd": "${workspaceFolder}/example/json-simple",
       "restart": true,
       "console": "integratedTerminal"
     },
@@ -15,8 +15,8 @@
       "type": "node",
       "request": "launch",
       "name": "Debug Server (json-adv)",
-      "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/packages/core/bin/exec.js",
+      "skipFiles":["<node_internals>/**"],
+      "program": "${workspaceFolder}/packages/cli/bin/exec.js",
       "cwd": "${workspaceFolder}/example/json-adv",
       "restart": true,
       "console": "integratedTerminal"

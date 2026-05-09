@@ -1,0 +1,13 @@
+{
+    "name": "example-models-adv",
+    "private": true,
+    "version": "1.0.0",
+    "description": "E2E test for models-adv — hooks, custom endpoints, and exposeApi: false on TypeScript models",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*"
+    }
+}

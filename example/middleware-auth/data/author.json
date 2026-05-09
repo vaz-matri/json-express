@@ -1,0 +1,23 @@
+[
+    {
+        "id": "author-1",
+        "name": "Andy Hunt",
+        "email": "andy@example.com",
+        "bio": "Co-author of The Pragmatic Programmer.",
+        "country": "US"
+    },
+    {
+        "id": "author-2",
+        "name": "Martin Kleppmann",
+        "email": "martin@example.com",
+        "bio": "Researcher and author on distributed systems.",
+        "country": "UK"
+    },
+    {
+        "id": "author-3",
+        "name": "Robert C. Martin",
+        "email": "uncle.bob@example.com",
+        "bio": "Software craftsman and author of Clean Code.",
+        "country": "US"
+    }
+]

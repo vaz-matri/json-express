@@ -2,9 +2,32 @@
   "name": "json-express",
   "private": true,
   "scripts": {
-    "publish:core": "pnpm --filter @json-express/core publish"
+    "typecheck": "tsc --build tsconfig.check.json --noEmit",
+    "prebuild": "pnpm run typecheck",
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r --parallel run dev",
+    "test": "vitest run --exclude \"example/**\" --exclude \"examples/**\"",
+    "e2e": "pnpm --filter './example/**' test",
+    "publish:all": "pnpm -r publish --access public",
+    "docs:dev": "pnpm --filter @json-express/docs run dev",
+    "docs:build": "pnpm --filter @json-express/docs run build",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
-    "@json-express/core": "workspace:^"
+    "@changesets/cli": "^2.31.0",
+    "@json-express/core": "workspace:^",
+    "@playwright/test": "^1.59.1",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.5.0",
+    "tsdown": "^0.21.7",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "jiti": "^2.6.1",
+    "js-yaml": "^4.1.1"
   }
 }

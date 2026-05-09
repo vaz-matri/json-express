@@ -1,0 +1,43 @@
+{
+  "name": "@json-express/queue-memory",
+  "version": "2.0.0",
+  "description": "In-process task queue for JSON Express — setTimeout-based, single-instance only. Default for local dev.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {
+    "@json-express/core": "workspace:*"
+  },
+  "devDependencies": {},
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "task-queue",
+    "job-queue",
+    "background-jobs",
+    "settimeout"
+  ]
+}

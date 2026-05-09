@@ -3,13 +3,26 @@ node_modules/
 
 # ide
 .idea
+.claude
+CLAUDE.md
 
 # plans
 plan.txt
-
-# files
+*.log
 .DS_Store
 
 # context-builder
 context*
 llm-context*
+todo/
+
+# build outputs
+dist/
+.tsdown/
+*.tsbuildinfo
+
+# playright
+playwright-report/
+test-results/
+
+.envrc

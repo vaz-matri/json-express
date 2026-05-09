@@ -1,0 +1,16 @@
+content/
+example/
+logo
+LICENSE
+*.md
+*-lock.*
+
+TODO
+- how about core/src/index.ts file
+- fix pnpm i, pnpm -r run build
+- update philosophy and progress document
+- replace tests
+- fix all ide errors
+
+Ready to move on to Phase 5: The Middleware Pipeline
+This is where we add the ability to intercept these requests (which we will immediately use to build the Authentication and Schema Validation plugins).

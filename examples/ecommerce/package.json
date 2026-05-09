@@ -1,0 +1,11 @@
+{
+    "name": "examples-ecommerce",
+    "private": true,
+    "scripts": {
+        "serve": "json-express",
+        "preset": "json-express --preset-init"
+    },
+    "dependencies": {
+        "@json-express/preset-ecommerce": "workspace:*"
+    }
+}

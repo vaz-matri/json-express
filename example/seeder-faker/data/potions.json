@@ -1,0 +1,82 @@
+[
+  {
+    "name": "beatae quibusdam",
+    "wizardId": "fe0b6c8d-e173-4381-9d57-2208451dc8a0",
+    "rarity": "maxime saepe texo cum",
+    "potencyLevel": 3,
+    "bottled": true,
+    "id": "b9e7874b-c971-4320-bc48-a7c8f4e4bfd2"
+  },
+  {
+    "name": "ceno colligo architecto",
+    "wizardId": "6b2cc946-944c-4dd0-a0cd-b89642c24d4f",
+    "rarity": "callide eveniet",
+    "potencyLevel": 3,
+    "bottled": true,
+    "id": "4d901b73-095f-4da2-a8c1-e99b7e851167"
+  },
+  {
+    "name": "architecto torqueo animus",
+    "wizardId": "7b16bf1f-6b9f-4708-b089-88bc9733fc5c",
+    "rarity": "aurum caste facere",
+    "potencyLevel": 6,
+    "bottled": true,
+    "id": "c3b17f97-02cc-40a2-bd66-152117bc9e4f"
+  },
+  {
+    "name": "crepusculum distinctio",
+    "wizardId": "8df4ad0a-34fb-49d8-9ff4-fdef4f35040b",
+    "rarity": "attonbitus distinctio",
+    "potencyLevel": 2,
+    "bottled": true,
+    "id": "0fc733e0-6e79-4a51-b1c5-b58ce2ae2785"
+  },
+  {
+    "name": "conculco urbs arbustum",
+    "wizardId": "a5de57cd-c3d5-42ce-a64c-8446014610e6",
+    "rarity": "cerno baiulus crastinus",
+    "potencyLevel": 4,
+    "bottled": true,
+    "id": "90a743ff-b22b-4b67-8139-01f0bd64796b"
+  },
+  {
+    "name": "via callide comitatus",
+    "wizardId": "6b2cc946-944c-4dd0-a0cd-b89642c24d4f",
+    "rarity": "vulgo volutabrum thalassinus",
+    "potencyLevel": 3,
+    "bottled": true,
+    "id": "33749a33-108c-4884-9c71-d01350c84276"
+  },
+  {
+    "name": "cotidie enim",
+    "wizardId": "a3e4001c-6e74-4830-9cca-8c58b2a34390",
+    "rarity": "sopor tabella voco",
+    "potencyLevel": 8,
+    "bottled": true,
+    "id": "1313f032-2f0b-4dbc-a661-699489fc6a6a"
+  },
+  {
+    "name": "subnecto curatio",
+    "wizardId": "e5cdf95c-ec94-487f-b1bd-5cfe10c7ffd4",
+    "rarity": "creber deludo crinis vapulus",
+    "potencyLevel": 3,
+    "bottled": true,
+    "id": "de1d5269-d895-48c1-9103-46f914fee767"
+  },
+  {
+    "name": "cui calco creator eum",
+    "wizardId": "a3e4001c-6e74-4830-9cca-8c58b2a34390",
+    "rarity": "thema amissio appositus claro",
+    "potencyLevel": 7,
+    "bottled": true,
+    "id": "a82b57be-d692-406a-ab62-17a63fd8fcc0"
+  },
+  {
+    "name": "vestigium cribro tredecim",
+    "wizardId": "8df4ad0a-34fb-49d8-9ff4-fdef4f35040b",
+    "rarity": "aqua deduco",
+    "potencyLevel": 9,
+    "bottled": true,
+    "id": "2987cdd2-d0c9-4cb3-aa29-39cdf334ad74"
+  }
+]

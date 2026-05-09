@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "composite": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "isolatedModules": true,
+    /* --- Security: Deny Leaking (No Source Maps) --- */
+    "sourceMap": false,
+    "inlineSourceMap": false,
+    "inlineSources": false
+  }
+}

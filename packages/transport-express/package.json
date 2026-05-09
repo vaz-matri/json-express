@@ -1,0 +1,46 @@
+{
+  "name": "@json-express/transport-express",
+  "version": "2.0.0",
+  "description": "Express.js transport plugin for JSON Express",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {
+    "@json-express/core": "workspace:*",
+    "express": "5.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "expressjs",
+    "express",
+    "http-server",
+    "transport"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "name": "@json-express/config",
+  "version": "2.0.0",
+  "description": "Advanced Configuration plugin (YAML, JSON, JS, TS) for JSON Express",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "jiti": "^1.21.6",
+    "@json-express/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9"
+  },
+  "peerDependencies": {
+    "@json-express/core": "workspace:*"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "yaml-config",
+    "typescript-config",
+    "configuration",
+    "jiti"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+    "name": "examples-html-simple",
+    "private": true,
+    "version": "1.0.0",
+    "description": "E2E test for html-simple — frontend demo fetching from a JSON Express API",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*"
+    }
+}

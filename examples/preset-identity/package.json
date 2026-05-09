@@ -1,0 +1,14 @@
+{
+    "name": "examples-preset-identity",
+    "private": true,
+    "version": "1.0.0",
+    "description": "Showcase: full identity stack via the @json-express/preset-identity meta-package",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*",
+        "@json-express/preset-identity": "workspace:*"
+    }
+}

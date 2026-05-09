@@ -1,0 +1,47 @@
+{
+  "name": "@json-express/email-console",
+  "version": "2.0.0",
+  "description": "Console email provider for JSON Express — logs the message instead of sending. Default for local dev.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {
+    "@json-express/core": "workspace:*"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "email",
+    "email-provider",
+    "dev-email",
+    "console-email"
+  ]
+}

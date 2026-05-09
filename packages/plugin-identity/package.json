@@ -1,0 +1,60 @@
+{
+  "name": "@json-express/plugin-identity",
+  "version": "2.0.0",
+  "description": "Local Identity plugin for JSON Express — auto-injected users/roles schemas, login/register/refresh endpoints, and password hashing.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {
+    "@json-express/core": "workspace:*",
+    "argon2": "^0.41.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "peerDependencies": {
+    "@json-express/middleware-auth": "workspace:*"
+  },
+  "devDependencies": {
+    "@json-express/adapter-memory": "workspace:*",
+    "@json-express/kv-memory": "workspace:*",
+    "@json-express/queue-memory": "workspace:*",
+    "@types/jsonwebtoken": "^9.0.4",
+    "awilix": "^10.0.1"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "authentication",
+    "argon2",
+    "user-management",
+    "auth-plugin",
+    "argon2id"
+  ]
+}

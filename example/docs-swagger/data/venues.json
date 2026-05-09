@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Madison Square Garden",
+    "city": "New York",
+    "country": "USA",
+    "capacity": 20789,
+    "indoor": true,
+    "openedYear": 1968
+  },
+  {
+    "name": "O2 Arena",
+    "city": "London",
+    "country": "UK",
+    "capacity": 20000,
+    "indoor": true,
+    "openedYear": 2007
+  },
+  {
+    "name": "Red Rocks Amphitheatre",
+    "city": "Morrison",
+    "country": "USA",
+    "capacity": 9525,
+    "indoor": false,
+    "openedYear": 1941
+  }
+]

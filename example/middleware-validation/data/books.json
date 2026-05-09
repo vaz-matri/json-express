@@ -1,0 +1,4 @@
+[
+    { "id": 1, "title": "The Pragmatic Programmer", "authorId": 1, "isbn": "978-0135957059", "pages": 352 },
+    { "id": 2, "title": "Designing Data-Intensive Applications", "authorId": 2, "isbn": "978-1449373320", "pages": 616 }
+]

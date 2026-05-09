@@ -1,92 +1,57 @@
 {
   "name": "@json-express/core",
-  "version": "0.2.6-alpha",
-  "description": "Convert JSON to express server",
-  "scripts": {
-    "dev": "nodemon bin/exec.js",
-    "dev:eg": "nodemon --exec 'cd ../../example/json-adv && json-express'",
-    "serve": "cd ../../example && json-express",
-    "link": "pnpm link --global",
-    "unlink": "pnpm rm --global @json-express/core",
-    "check": "pnpm list --global --depth=0",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "keywords": [
-    "json",
-    "server",
-    "express",
-    "cli",
-    "json-express",
-    "json-server",
-    "jsonserver",
-    "json server",
-    "jsonexpress",
-    "json express",
-    "mock server"
-  ],
-  "author": {
-    "name": "vazmat",
-    "url": "https://github.com/vaz-matri"
-  },
-  "license": "MIT",
+  "version": "2.0.0",
+  "description": "The Microkernel and IoC container for JSON Express",
   "type": "module",
-  "preferGlobal": true,
-  "engines": {
-    "node": ">=16.0.0"
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "bin": {
+    "json-express": "./bin/run.js"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "devcert": "^1.2.2",
-    "express": "5.1.0",
-    "express-session": "^1.18.1",
-    "get-port": "^7.1.0",
-    "joi": "^17.13.3",
+    "awilix": "^10.0.1",
+    "jiti": "^2.6.1",
     "jsonwebtoken": "^9.0.2",
-    "lodash.get": "^4.4.2",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
-    "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0"
+    "jwks-rsa": "^3.1.0"
   },
   "devDependencies": {
-    "nodemon": "3.1.10",
-    "supertest": "^7.2.2",
-    "vitest": "^4.1.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/vaz-matri/json-express.git"
-  },
-  "bugs": {
-    "url": "https://github.com/vaz-matri/json-express/issues"
-  },
-  "homepage": "https://jsonexpress.com/",
-  "funding": {
-    "type": "github",
-    "url": "https://github.com/sponsors/vaz-matri"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "@types/jsonwebtoken": "^9.0.4"
   },
   "files": [
-    "bin/",
-    "src/",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENSE"
+    "bin",
+    "dist"
   ],
-  "bin": {
-    "json-express": "./bin/exec.js"
-  },
-  "os": [
-    "darwin",
-    "linux",
-    "win32"
-  ],
-  "cpu": [
-    "x64",
-    "arm64"
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "headless-cms",
+    "rest-api",
+    "graphql",
+    "typescript",
+    "nodejs",
+    "api-generator",
+    "mock-api",
+    "backend-framework",
+    "ioc",
+    "dependency-injection",
+    "microkernel",
+    "awilix"
   ]
 }

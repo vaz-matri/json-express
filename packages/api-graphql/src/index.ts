@@ -1,0 +1,630 @@
+import {
+    GraphQLSchema,
+    GraphQLObjectType,
+    GraphQLInputObjectType,
+    GraphQLString,
+    GraphQLFloat,
+    GraphQLBoolean,
+    GraphQLID,
+    GraphQLInt,
+    GraphQLList,
+    GraphQLNonNull,
+    GraphQLScalarType,
+    GraphQLError,
+    graphql as executeGraphQL,
+} from 'graphql';
+import type {
+    IApiGenerator,
+    IDatabaseAdapter,
+    IConfigProvider,
+    ILogger,
+    ModelSchema,
+    RouteDefinition,
+    AccessRule,
+    AccessOp,
+    GraphQLFieldsBlock,
+    TypeRegistry,
+    JwtVerifier,
+} from '@json-express/core';
+import {
+    evaluateAccess,
+    needsOwnerCheck,
+    resolveOwnerField,
+    resolveUserId,
+    ownsRecord,
+    createJwtVerifier,
+    getFieldRule,
+    stripDeniedWriteFields,
+} from '@json-express/core';
+
+interface ResolverContext {
+    userPayload: string | string[] | undefined;
+    db: IDatabaseAdapter;
+}
+
+/**
+ * Runs `evaluateAccess` and throws a GraphQLError on deny. Returns the user payload
+ * (which may be null) so the caller can perform owner checks without re-decoding.
+ */
+function enforceAccess(
+    rule: AccessRule | undefined,
+    ctx: ResolverContext,
+    typeName: string,
+    op: AccessOp
+): Record<string, any> | null {
+    const verdict = evaluateAccess(rule, ctx?.userPayload);
+    if (!verdict.allowed) {
+        throw new GraphQLError(`${verdict.reason} (${typeName}.${op})`, {
+            extensions: { code: verdict.code },
+        });
+    }
+    return verdict.user;
+}
+
+function notFoundError(typeName: string, id: string): GraphQLError {
+    return new GraphQLError(`${typeName} with id '${id}' not found`, {
+        extensions: { code: 'NOT_FOUND' },
+    });
+}
+
+const JSONScalar = new GraphQLScalarType({
+    name: 'JSON',
+    description: 'Arbitrary JSON value — used for collections without a ModelSchema',
+    serialize: (value) => value,
+    parseValue: (value) => value,
+    parseLiteral: () => null,
+});
+
+function toSingular(name: string): string {
+    if (name.endsWith('ies')) return name.slice(0, -3) + 'y';
+    if (name.endsWith('s')) return name.slice(0, -1);
+    return name;
+}
+
+function toTypeName(collection: string): string {
+    const s = toSingular(collection);
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function scalarFor(type: string): GraphQLScalarType {
+    switch (type) {
+        case 'id': return GraphQLID;
+        case 'number': return GraphQLFloat;
+        case 'boolean': return GraphQLBoolean;
+        default: return GraphQLString; // string, date, unknown
+    }
+}
+
+// Structural shape for a Zod-compatible schema. Typed locally so api-graphql
+// does not depend on zod or middleware-validation directly.
+interface ParsableSchema {
+    safeParse(input: unknown): { success: boolean; data?: any; error?: { format(): any } };
+}
+
+const GRAPHIQL_HTML = `<!DOCTYPE html>
+<html>
+  <head>
+    <title>GraphiQL</title>
+    <link rel="stylesheet" href="https://unpkg.com/graphiql@3/graphiql.min.css" />
+  </head>
+  <body style="margin:0;height:100vh">
+    <div id="graphiql" style="height:100%"></div>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/graphiql@3/graphiql.min.js"></script>
+    <script>
+      const root = ReactDOM.createRoot(document.getElementById('graphiql'));
+      root.render(React.createElement(GraphiQL, {
+        fetcher: GraphiQL.createFetcher({ url: window.location.href })
+      }));
+    </script>
+  </body>
+</html>`;
+
+export class GraphQLApiGenerator implements IApiGenerator {
+    private db: IDatabaseAdapter;
+    private config?: IConfigProvider;
+    private logger: ILogger;
+    private schemas: ModelSchema[] = [];
+
+    constructor({
+        database,
+        configProvider,
+        logger,
+    }: {
+        database: IDatabaseAdapter;
+        configProvider?: IConfigProvider;
+        logger: ILogger;
+    }) {
+        this.db = database;
+        this.config = configProvider;
+        this.logger = logger.child({ component: 'API-GraphQL' });
+    }
+
+    public setSchemas(schemas: ModelSchema[]) {
+        this.schemas = schemas;
+    }
+
+    private buildSchema(collections: string[]): GraphQLSchema {
+        const db = this.db;
+        const logger = this.logger;
+        const schemaMap = new Map(this.schemas.map((s) => [s.name, s]));
+
+        // Phase 1: register all GraphQLObjectTypes up-front so relation thunks can reference them
+        const typeRegistry = new Map<string, GraphQLObjectType>();
+        const inputRegistry = new Map<string, GraphQLInputObjectType>();
+        const whereRegistry = new Map<string, GraphQLInputObjectType>();
+
+        // Read-only handle exposed to user-supplied function-form `graphql.*Fields` blocks.
+        // Lets custom resolvers reference auto-generated types lazily.
+        const registry: TypeRegistry = {
+            getType: (collection) => typeRegistry.get(collection),
+            getInputType: (collection) => inputRegistry.get(collection),
+            getWhereType: (collection) => whereRegistry.get(collection),
+        };
+
+        // Resolve a `GraphQLFieldsBlock` (object | function) into an object map.
+        // Validates the value is plain-object or function — anything else is a no-op + warning.
+        const resolveFieldsBlock = (
+            block: GraphQLFieldsBlock | undefined,
+            label: string
+        ): Record<string, any> => {
+            if (block === undefined || block === null) return {};
+            if (typeof block === 'function') {
+                try {
+                    const result = block(registry);
+                    if (result && typeof result === 'object') return result;
+                    logger.warn(`Ignoring ${label}: function did not return a plain object`);
+                    return {};
+                } catch (err: any) {
+                    logger.error(`Error resolving ${label}`, { error: err?.message });
+                    return {};
+                }
+            }
+            if (typeof block === 'object') return block as Record<string, any>;
+            logger.warn(`Ignoring ${label}: expected object or function`);
+            return {};
+        };
+
+        // Merge user-supplied fields into a target map; warn-and-override on collision.
+        const mergeUserFields = (
+            target: Record<string, any>,
+            extras: Record<string, any>,
+            label: string
+        ) => {
+            for (const [name, config] of Object.entries(extras)) {
+                if (name in target) {
+                    logger.warn(`'${label}.${name}' overridden by user-supplied field`);
+                }
+                target[name] = config;
+            }
+        };
+
+        // Collections that should participate in GraphQL codegen.
+        // Fieldless models (defineRoutes / models with only endpoints) and `exposeApi: false`
+        // models declare behavior only — no GraphQL type, input, or root-field is generated.
+        const gqlCollections = collections.filter(c => {
+            const m = schemaMap.get(c);
+            if (!m) return true; // raw JSON collection — gets generic {id,data} treatment
+            if (m.exposeApi === false) return false;
+            if (!m.fields) return false;
+            return true;
+        });
+
+        for (const collection of gqlCollections) {
+            const typeName = toTypeName(collection);
+            const modelSchema = schemaMap.get(collection);
+
+            if (!modelSchema) {
+                this.logger.warn(`No ModelSchema for '${collection}' — exposing id + data (JSON) fields`);
+            }
+
+            typeRegistry.set(
+                collection,
+                new GraphQLObjectType({
+                    name: typeName,
+                    fields: () => {
+                        if (!modelSchema) {
+                            return {
+                                id: { type: GraphQLID },
+                                data: {
+                                    type: JSONScalar,
+                                    resolve: (obj: any) => {
+                                        const { id, ...rest } = obj;
+                                        return rest;
+                                    },
+                                },
+                            };
+                        }
+
+                        const fields: Record<string, any> = {};
+
+                        for (const [fieldName, fieldDef] of Object.entries(modelSchema.fields)) {
+                            if (fieldDef.type === 'relation') {
+                                const opts = fieldDef.options as any;
+                                const targetType = typeRegistry.get(opts.target);
+                                if (!targetType) continue;
+
+                                const isMany = opts.type === 'one-to-many' || opts.type === 'many-to-many';
+                                const targetAccess = schemaMap.get(opts.target)?.access;
+                                const targetReadRule = targetAccess?.read;
+                                const targetTypeName = toTypeName(opts.target);
+                                const targetOwnerField = resolveOwnerField(targetAccess);
+
+                                fields[fieldName] = {
+                                    type: isMany ? new GraphQLList(targetType) : targetType,
+                                    resolve: async (parent: any, _args: any, ctx: ResolverContext) => {
+                                        // Enforce target collection's read rule on relation traversal.
+                                        const verdict = evaluateAccess(targetReadRule, ctx?.userPayload);
+                                        if (!verdict.allowed) {
+                                            // Throw so graphql-js nulls the relation field; the parent stays.
+                                            throw new GraphQLError(`${verdict.reason} (${targetTypeName}.read via ${typeName}.${fieldName})`, {
+                                                extensions: { code: verdict.code },
+                                            });
+                                        }
+
+                                        if (isMany) {
+                                            const fkField = opts.foreignKey ?? `${toSingular(collection)}Id`;
+                                            const filter: Record<string, any> = { [fkField]: parent.id };
+                                            if (needsOwnerCheck(targetReadRule)) {
+                                                // Owner-scoped target: only return target rows the caller owns.
+                                                filter[targetOwnerField] = resolveUserId(verdict.user);
+                                            }
+                                            return await db.search(opts.target, filter);
+                                        }
+                                        const fkField = opts.foreignKey ?? `${fieldName}Id`;
+                                        const fkValue = parent[fkField];
+                                        if (!fkValue) return null;
+                                        const record = await db.getById(opts.target, String(fkValue)).catch(() => null);
+                                        if (!record) return null;
+                                        if (needsOwnerCheck(targetReadRule) && !ownsRecord(record, targetOwnerField, verdict.user)) {
+                                            // Pretend the relation doesn't exist when the caller doesn't own it.
+                                            return null;
+                                        }
+                                        return record;
+                                    },
+                                };
+                            } else {
+                                const fieldReadRule = getFieldRule(modelSchema.access, fieldName, 'read');
+                                if (fieldReadRule !== undefined) {
+                                    const accessForField = modelSchema.access;
+                                    const accessOwnerField = resolveOwnerField(accessForField);
+                                    fields[fieldName] = {
+                                        type: scalarFor(fieldDef.type),
+                                        resolve: (parent: any, _args: any, ctx: ResolverContext) => {
+                                            const v = evaluateAccess(fieldReadRule, ctx?.userPayload);
+                                            if (!v.allowed) return null;
+                                            if (needsOwnerCheck(fieldReadRule) && !ownsRecord(parent, accessOwnerField, v.user)) {
+                                                return null;
+                                            }
+                                            return parent[fieldName];
+                                        },
+                                    };
+                                } else {
+                                    fields[fieldName] = { type: scalarFor(fieldDef.type) };
+                                }
+                            }
+                        }
+
+                        // User-supplied typeFields layered onto the auto-generated object type.
+                        const customTypeFields = resolveFieldsBlock(
+                            modelSchema.graphql?.typeFields,
+                            `${typeName}.typeFields`
+                        );
+                        mergeUserFields(fields, customTypeFields, typeName);
+
+                        return fields;
+                    },
+                })
+            );
+
+            inputRegistry.set(
+                collection,
+                new GraphQLInputObjectType({
+                    name: `${typeName}Input`,
+                    fields: () => {
+                        if (!modelSchema) {
+                            return { data: { type: JSONScalar } };
+                        }
+
+                        const inputFields: Record<string, any> = {};
+                        for (const [fieldName, fieldDef] of Object.entries(modelSchema.fields)) {
+                            // Skip id (auto-generated) and relations (resolved, not set directly)
+                            if (fieldDef.type === 'id' || fieldDef.type === 'relation') continue;
+                            inputFields[fieldName] = { type: scalarFor(fieldDef.type) };
+                        }
+                        return inputFields;
+                    },
+                })
+            );
+
+            // Where-input: scalar fields (all optional) for exact-match filtering on list queries.
+            // Relations are excluded; id is included since filtering by id is useful.
+            whereRegistry.set(
+                collection,
+                new GraphQLInputObjectType({
+                    name: `${typeName}WhereInput`,
+                    fields: () => {
+                        if (!modelSchema) return { id: { type: GraphQLID } };
+                        const whereFields: Record<string, any> = {};
+                        for (const [fieldName, fieldDef] of Object.entries(modelSchema.fields)) {
+                            if (fieldDef.type === 'relation') continue;
+                            whereFields[fieldName] = { type: scalarFor(fieldDef.type) };
+                        }
+                        return whereFields;
+                    },
+                })
+            );
+        }
+
+        // Phase 2: build Query and Mutation root types
+        const queryFields: Record<string, any> = {};
+        const mutationFields: Record<string, any> = {};
+
+        for (const collection of gqlCollections) {
+            const gqlType = typeRegistry.get(collection)!;
+            const inputType = inputRegistry.get(collection)!;
+            const whereType = whereRegistry.get(collection)!;
+            const typeName = toTypeName(collection);
+            const singleField = toSingular(collection); // e.g. 'album'
+
+            const access = schemaMap.get(collection)?.access;
+            const readRule = access?.read;
+            const createAccessRule = access?.create;
+            const updateAccessRule = access?.update;
+            const deleteAccessRule = access?.delete;
+            const ownerField = resolveOwnerField(access);
+
+            // List: always use the collection name (e.g. 'albums')
+            queryFields[collection] = {
+                type: new GraphQLList(gqlType),
+                args: {
+                    limit: { type: GraphQLInt },
+                    offset: { type: GraphQLInt },
+                    where: { type: whereType },
+                },
+                resolve: async (_: any, args: any, ctx: ResolverContext) => {
+                    const user = enforceAccess(readRule, ctx, typeName, 'read');
+                    const { limit, offset, where } = args ?? {};
+                    const filter: Record<string, any> = { ...(where ?? {}) };
+                    if (needsOwnerCheck(readRule)) {
+                        // Owner clause overwrites any client-supplied value to prevent spoofing.
+                        filter[ownerField] = resolveUserId(user);
+                    }
+                    const hasFilter = Object.keys(filter).length > 0;
+                    const all = hasFilter
+                        ? await db.search(collection, filter)
+                        : await db.getAll(collection);
+                    const start = offset ?? 0;
+                    const end = limit != null ? start + limit : undefined;
+                    return (all as any[]).slice(start, end);
+                },
+            };
+
+            // Single: use singular form only if it differs from the collection name
+            if (singleField !== collection) {
+                queryFields[singleField] = {
+                    type: gqlType,
+                    args: { id: { type: new GraphQLNonNull(GraphQLID) } },
+                    resolve: async (_: any, { id }: { id: string }, ctx: ResolverContext) => {
+                        const user = enforceAccess(readRule, ctx, typeName, 'read');
+                        const record = await db.getById(collection, id).catch(() => null);
+                        if (!record) throw notFoundError(typeName, id);
+                        if (needsOwnerCheck(readRule) && !ownsRecord(record, ownerField, user)) {
+                            // 404 (not 403) so callers cannot probe for IDs they don't own.
+                            throw notFoundError(typeName, id);
+                        }
+                        return record;
+                    },
+                };
+            }
+
+            // Resolve create/update validators from the model's validation block. Only the
+            // direct-Validator form (`{ body: zodSchema }`) is honored here — builder-form
+            // (`(baseline) => ...`) requires the auto-derived baseline that lives in
+            // `middleware-validation`. For GraphQL, declare a concrete schema directly.
+            const validation = schemaMap.get(collection)?.validation;
+            const createValidator = resolveDirectValidator(validation?.create?.body);
+            const updateValidator = resolveDirectValidator(validation?.update?.body);
+
+            mutationFields[`create${typeName}`] = {
+                type: gqlType,
+                args: { input: { type: new GraphQLNonNull(inputType) } },
+                resolve: async (_: any, { input }: any, ctx: ResolverContext) => {
+                    const user = enforceAccess(createAccessRule, ctx, typeName, 'create');
+                    const validated = runValidation(createValidator, input, typeName);
+                    let body: any = stripDeniedWriteFields(validated, access, user, 'create');
+                    if (needsOwnerCheck(createAccessRule)) {
+                        // Auto-stamp caller as owner; overwrites any client-supplied value.
+                        body[ownerField] = resolveUserId(user);
+                    }
+                    return db.create(collection, body);
+                },
+            };
+
+            mutationFields[`update${typeName}`] = {
+                type: gqlType,
+                args: {
+                    id: { type: new GraphQLNonNull(GraphQLID) },
+                    input: { type: new GraphQLNonNull(inputType) },
+                },
+                resolve: async (_: any, { id, input }: any, ctx: ResolverContext) => {
+                    const user = enforceAccess(updateAccessRule, ctx, typeName, 'update');
+                    const existing = await db.getById(collection, id).catch(() => null);
+                    if (!existing) throw notFoundError(typeName, id);
+                    if (needsOwnerCheck(updateAccessRule) && !ownsRecord(existing, ownerField, user)) {
+                        throw notFoundError(typeName, id);
+                    }
+                    const validated = runValidation(updateValidator, input, typeName);
+                    const body = stripDeniedWriteFields(validated, access, user, 'update');
+                    return db.update(collection, id, body);
+                },
+            };
+
+            mutationFields[`delete${typeName}`] = {
+                type: gqlType,
+                args: { id: { type: new GraphQLNonNull(GraphQLID) } },
+                resolve: async (_: any, { id }: any, ctx: ResolverContext) => {
+                    const user = enforceAccess(deleteAccessRule, ctx, typeName, 'delete');
+                    const existing = await db.getById(collection, id).catch(() => null);
+                    if (!existing) throw notFoundError(typeName, id);
+                    if (needsOwnerCheck(deleteAccessRule) && !ownsRecord(existing, ownerField, user)) {
+                        throw notFoundError(typeName, id);
+                    }
+                    return db.delete(collection, id);
+                },
+            };
+        }
+
+        // User-supplied root queryFields / mutationFields layered onto the generated schema.
+        // Walks schemas a final time so the order is deterministic per-collection.
+        for (const collection of collections) {
+            const modelSchema = schemaMap.get(collection);
+            if (!modelSchema?.graphql) continue;
+            const customQueryFields = resolveFieldsBlock(
+                modelSchema.graphql.queryFields,
+                `${collection}.graphql.queryFields`
+            );
+            mergeUserFields(queryFields, customQueryFields, 'Query');
+            const customMutationFields = resolveFieldsBlock(
+                modelSchema.graphql.mutationFields,
+                `${collection}.graphql.mutationFields`
+            );
+            mergeUserFields(mutationFields, customMutationFields, 'Mutation');
+        }
+
+        // Mutation type is optional in graphql-js; constructing one with zero
+        // fields throws. Defensive guard for future "queries-only" projects.
+        const mutationType = Object.keys(mutationFields).length > 0
+            ? new GraphQLObjectType({ name: 'Mutation', fields: mutationFields })
+            : undefined;
+
+        return new GraphQLSchema({
+            query: new GraphQLObjectType({ name: 'Query', fields: queryFields }),
+            mutation: mutationType,
+        });
+    }
+
+    public async generate(collections: string[]): Promise<RouteDefinition[]> {
+        const endpoint = this.config?.get<string>('api.graphql.endpoint') ?? '/graphql';
+        const graphiql = this.config?.get<boolean>('api.graphql.graphiql') ?? true;
+
+        if (collections.length === 0) {
+            this.logger.warn('No collections — GraphQL API will be empty');
+            return [];
+        }
+
+        const schema = this.buildSchema(collections);
+        this.logger.info(`GraphQL API ready at POST ${endpoint}`, { collections });
+
+        const routes: RouteDefinition[] = [];
+
+        // GraphQL is single-endpoint: blanket-gating /graphql with the auth middleware can't
+        // express per-op rules. Instead the route is left open and the handler does an
+        // unconditional soft-decode of the Bearer token, populating user context for the
+        // resolvers. Resolvers remain the source of truth via evaluateAccess.
+        const authSecret = this.config?.get<string | undefined>('auth.secret', undefined);
+        const authJwksUri = this.config?.get<string | undefined>('auth.jwksUri', undefined);
+        const authAudience = this.config?.get<string | string[] | undefined>('auth.audience', undefined);
+        const authIssuer = this.config?.get<string | undefined>('auth.issuer', undefined);
+        const authAlgorithms = this.config?.get<string[] | undefined>('auth.algorithms', undefined);
+
+        const hasSecret = typeof authSecret === 'string' && authSecret.length > 0;
+        const hasJwks = typeof authJwksUri === 'string' && authJwksUri.length > 0;
+        const verifier: JwtVerifier | null = (hasSecret || hasJwks)
+            ? createJwtVerifier({
+                secret: authSecret,
+                jwksUri: authJwksUri,
+                audience: authAudience,
+                issuer: authIssuer,
+                algorithms: authAlgorithms,
+            })
+            : null;
+
+        routes.push({
+            method: 'POST',
+            path: endpoint,
+            middlewares: [],
+            metadata: { graphql: true },
+            handler: async (req) => {
+                const { query, variables, operationName } = req.body ?? {};
+
+                if (!query) {
+                    return {
+                        statusCode: 400,
+                        body: { errors: [{ message: 'Missing "query" in request body' }] },
+                    };
+                }
+
+                // Anti-spoof: drop any client-supplied x-user-payload before we (maybe) re-set it
+                // from a verified JWT. Without this, a forged header could pose as authenticated.
+                delete req.headers['x-user-payload'];
+                delete req.headers['X-User-Payload'];
+
+                if (verifier) {
+                    const verified = await verifier(req.headers['authorization']);
+                    if (verified) req.headers['x-user-payload'] = verified;
+                }
+
+                try {
+                    const ctx: ResolverContext = { userPayload: req.headers['x-user-payload'], db: this.db };
+                    const result = await executeGraphQL({
+                        schema,
+                        source: query,
+                        variableValues: variables,
+                        operationName,
+                        contextValue: ctx,
+                    });
+                    return { statusCode: 200, body: result };
+                } catch (err: any) {
+                    this.logger.error('GraphQL execution error', { error: err.message });
+                    return {
+                        statusCode: 400,
+                        body: { errors: [{ message: err.message }] },
+                    };
+                }
+            },
+        });
+
+        if (graphiql) {
+            routes.push({
+                method: 'GET',
+                path: endpoint,
+                middlewares: [],
+                metadata: { graphql: true, graphiql: true },
+                handler: async () => ({
+                    statusCode: 200,
+                    // transport-express checks Content-Type === 'text/html' to use res.send() vs res.json()
+                    headers: { 'Content-Type': 'text/html' },
+                    body: GRAPHIQL_HTML,
+                }),
+            });
+        }
+
+        return routes;
+    }
+}
+
+function resolveDirectValidator(entry: unknown): ParsableSchema | undefined {
+    if (!entry) return undefined;
+    if (typeof entry === 'object' && entry !== null && typeof (entry as any).safeParse === 'function') {
+        return entry as ParsableSchema;
+    }
+    // Builder form requires a baseline that core can't compute (no Zod dep). GraphQL skips it.
+    return undefined;
+}
+
+function runValidation(validator: ParsableSchema | undefined, input: any, typeName: string): any {
+    if (!validator) return input;
+    const parsed = validator.safeParse(input);
+    if (!parsed.success) {
+        throw new GraphQLError(`${typeName} input validation failed`, {
+            extensions: {
+                code: 'BAD_USER_INPUT',
+                details: parsed.error?.format?.(),
+            },
+        });
+    }
+    return parsed.data ?? input;
+}
+

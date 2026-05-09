@@ -1,0 +1,4 @@
+[
+    { "id": "alb-1", "title": "Abbey Road", "artistId": "art-1", "playCount": 0 },
+    { "id": "alb-2", "title": "Discovery", "artistId": "art-2", "playCount": 0 }
+]

@@ -1,0 +1,29 @@
+[
+    {
+        "id": "book-1",
+        "title": "The Pragmatic Programmer",
+        "isbn": "978-0135957059",
+        "pages": 352,
+        "publishedYear": 2019,
+        "authorId": "author-1",
+        "publisherId": "pub-1"
+    },
+    {
+        "id": "book-2",
+        "title": "Designing Data-Intensive Applications",
+        "isbn": "978-1449373320",
+        "pages": 616,
+        "publishedYear": 2017,
+        "authorId": "author-2",
+        "publisherId": "pub-2"
+    },
+    {
+        "id": "book-3",
+        "title": "Clean Code",
+        "isbn": "978-0132350884",
+        "pages": 464,
+        "publishedYear": 2008,
+        "authorId": "author-3",
+        "publisherId": "pub-3"
+    }
+]

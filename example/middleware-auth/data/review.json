@@ -1,0 +1,26 @@
+[
+    {
+        "id": "r-a-1",
+        "ownerId": "user-a",
+        "bookId": "book-1",
+        "rating": 5,
+        "body": "Loved it — pragmatic and timeless.",
+        "moderatorNotes": "MODERATOR-ONLY a-1"
+    },
+    {
+        "id": "r-a-2",
+        "ownerId": "user-a",
+        "bookId": "book-2",
+        "rating": 4,
+        "body": "Solid technical read.",
+        "moderatorNotes": "MODERATOR-ONLY a-2"
+    },
+    {
+        "id": "r-b-1",
+        "ownerId": "user-b",
+        "bookId": "book-1",
+        "rating": 3,
+        "body": "Decent intro for beginners.",
+        "moderatorNotes": "MODERATOR-ONLY b-1"
+    }
+]

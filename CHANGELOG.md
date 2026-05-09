@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0-alpha.0] - 2026-04-03
+
+### Added
+- **Fastify Transport**: Introduced `@json-express/transport-fastify` for high-performance server logic.
+- **Health & Info Baselines**: Native `/health` and `/info` endpoints built directly into the CLI lifecycle.
+- **Advanced Health Plugin**: New `@json-express/plugin-health` for database-aware health probing.
+- **JSON Error Convention**: Standardized JSON error responses for 404s and 500s across all transports.
+
+### Changed
+- **Kernel Architecture**: Refactored the core kernel to support plugin-based lifecycle hooks (`IPlugin`).
+- **Auto-Discovery Engine**: Enhanced the CLI to detect and manage conflicting plugin overrides.
+
 ## [0.2.5] - wip
 
 ### Added

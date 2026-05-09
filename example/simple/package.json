@@ -1,0 +1,12 @@
+{
+    "name": "example-simple",
+    "private": true,
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+        "serve": "json-express"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*"
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "name": "example-simple-models",
+    "private": true,
+    "version": "1.0.0",
+    "description": "E2E test for simple-models — TypeScript model definitions with field-level features and relations",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*"
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "name": "examples-login",
+    "private": true,
+    "version": "1.0.0",
+    "description": "Login page example",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/core": "workspace:*",
+        "@json-express/config-env": "workspace:*",
+        "@json-express/logger-console": "workspace:*",
+        "@json-express/adapter-json": "workspace:*",
+        "@json-express/api-rest": "workspace:*",
+        "@json-express/transport-express": "workspace:*",
+        "@json-express/middleware-auth": "workspace:*",
+        "@json-express/plugin-identity": "workspace:*",
+        "@json-express/docs-swagger": "workspace:*",
+        "@json-express/kv-memory": "workspace:*"
+    }
+}

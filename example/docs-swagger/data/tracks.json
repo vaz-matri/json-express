@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Lose Yourself",
+    "artist": "Eminem",
+    "album": "8 Mile Soundtrack",
+    "durationSeconds": 326,
+    "explicit": true,
+    "releaseDate": "2002-10-28"
+  },
+  {
+    "title": "Comfortably Numb",
+    "artist": "Pink Floyd",
+    "album": "The Wall",
+    "durationSeconds": 382,
+    "explicit": false,
+    "releaseDate": "1979-11-30"
+  },
+  {
+    "title": "Get Lucky",
+    "artist": "Daft Punk",
+    "album": "Random Access Memories",
+    "durationSeconds": 369,
+    "explicit": false,
+    "releaseDate": "2013-04-19"
+  },
+  {
+    "title": "Bohemian Rhapsody",
+    "artist": "Queen",
+    "album": "A Night at the Opera",
+    "durationSeconds": 354,
+    "explicit": false,
+    "releaseDate": "1975-10-31"
+  }
+]

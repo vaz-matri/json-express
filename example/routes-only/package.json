@@ -1,0 +1,15 @@
+{
+    "name": "example-routes-only",
+    "private": true,
+    "version": "1.0.0",
+    "description": "E2E test for defineRoutes() — fieldless models that declare only behavior",
+    "scripts": {
+        "serve": "json-express",
+        "test": "playwright test"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*",
+        "@json-express/middleware-validation": "workspace:*",
+        "zod": "^3.22.4"
+    }
+}
