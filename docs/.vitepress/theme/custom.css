@@ -119,6 +119,10 @@
   font-weight: 800;
 }
 
+.VPHero .tagline {
+    font-size: 18px;
+}
+
 /* Hero image: hidden below 768px (the illustration is decorative and the
    small-screen layout reads better without it). At 768px+ we override
    VitePress's hard-coded 320×320 / 392×392 container so the responsive SVG
