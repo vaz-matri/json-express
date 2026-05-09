@@ -123,27 +123,711 @@ One schema definition. Every layer is independently swappable.
 
 
 
-## The Ecosystem
+<div class="eco-articles">
 
-23 independently installable packages. Install only what you need.
+<div class="eco-article">
+<div class="eco-img">
+<svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logging illustration — log document and server stack">
+  <rect x="60" y="282" width="420" height="2" fill="#2a9d8f" opacity="0.25"></rect>
+  <g transform="translate(330 110)">
+    <rect x="6" y="8" width="140" height="180" rx="6" fill="#1f5e57" opacity="0.25"></rect>
+    <rect width="140" height="180" rx="6" fill="#1f5e57"></rect>
+    <g>
+      <rect x="10" y="12" width="120" height="36" rx="4" fill="#2a9d8f"></rect>
+      <circle cx="22" cy="30" r="3.5" fill="#c8d97a"></circle>
+      <circle cx="34" cy="30" r="3.5" fill="#c8d97a" opacity="0.5"></circle>
+      <rect x="52" y="26" width="68" height="3" rx="1" fill="#f5f0e8" opacity="0.7"></rect>
+      <rect x="52" y="33" width="50" height="3" rx="1" fill="#f5f0e8" opacity="0.45"></rect>
+      <rect x="10" y="54" width="120" height="36" rx="4" fill="#2a9d8f"></rect>
+      <circle cx="22" cy="72" r="3.5" fill="#c8d97a"></circle>
+      <circle cx="34" cy="72" r="3.5" fill="#d97560"></circle>
+      <rect x="52" y="68" width="58" height="3" rx="1" fill="#f5f0e8" opacity="0.7"></rect>
+      <rect x="52" y="75" width="68" height="3" rx="1" fill="#f5f0e8" opacity="0.45"></rect>
+      <rect x="10" y="96" width="120" height="36" rx="4" fill="#2a9d8f"></rect>
+      <circle cx="22" cy="114" r="3.5" fill="#c8d97a"></circle>
+      <circle cx="34" cy="114" r="3.5" fill="#c8d97a" opacity="0.5"></circle>
+      <rect x="52" y="110" width="66" height="3" rx="1" fill="#f5f0e8" opacity="0.7"></rect>
+      <rect x="52" y="117" width="46" height="3" rx="1" fill="#f5f0e8" opacity="0.45"></rect>
+      <rect x="10" y="138" width="120" height="36" rx="4" fill="#2a9d8f"></rect>
+      <circle cx="22" cy="156" r="3.5" fill="#c8d97a"></circle>
+      <circle cx="34" cy="156" r="3.5" fill="#c8d97a" opacity="0.5"></circle>
+      <rect x="52" y="152" width="56" height="3" rx="1" fill="#f5f0e8" opacity="0.7"></rect>
+      <rect x="52" y="159" width="64" height="3" rx="1" fill="#f5f0e8" opacity="0.45"></rect>
+    </g>
+  </g>
+  <g transform="translate(140 80)">
+    <rect x="6" y="8" width="200" height="220" rx="8" fill="#1f5e57" opacity="0.25"></rect>
+    <rect width="200" height="220" rx="8" fill="#f5f0e8"></rect>
+    <path d="M 180 0 L 200 20 L 180 20 Z" fill="#e2dac3"></path>
+    <rect x="18" y="20" width="100" height="8" rx="2" fill="#2a9d8f"></rect>
+    <rect x="18" y="34" width="60" height="4" rx="1" fill="#2a9d8f" opacity="0.45"></rect>
+    <g transform="translate(18 56)">
+      <circle cx="5" cy="5" r="5" fill="#d97560"></circle>
+      <rect x="18" y="3" width="150" height="5" rx="1" fill="#1f5e57" opacity="0.75"></rect>
+    </g>
+    <g transform="translate(18 78)">
+      <circle cx="5" cy="5" r="5" fill="#2a9d8f"></circle>
+      <rect x="18" y="3" width="120" height="5" rx="1" fill="#1f5e57" opacity="0.75"></rect>
+    </g>
+    <g transform="translate(18 100)">
+      <circle cx="5" cy="5" r="5" fill="#c8d97a"></circle>
+      <rect x="18" y="3" width="160" height="5" rx="1" fill="#1f5e57" opacity="0.75"></rect>
+    </g>
+    <g transform="translate(18 122)">
+      <circle cx="5" cy="5" r="5" fill="#2a9d8f"></circle>
+      <rect x="18" y="3" width="110" height="5" rx="1" fill="#1f5e57" opacity="0.75"></rect>
+    </g>
+    <g transform="translate(18 144)">
+      <circle cx="5" cy="5" r="5" fill="#2a9d8f" opacity="0.5"></circle>
+      <rect x="18" y="3" width="140" height="5" rx="1" fill="#1f5e57" opacity="0.5"></rect>
+    </g>
+    <g transform="translate(18 166)">
+      <circle cx="5" cy="5" r="5" fill="#c8d97a" opacity="0.55"></circle>
+      <rect x="18" y="3" width="150" height="5" rx="1" fill="#1f5e57" opacity="0.5"></rect>
+    </g>
+    <g transform="translate(18 188)">
+      <circle cx="5" cy="5" r="5" fill="#2a9d8f" opacity="0.3"></circle>
+      <rect x="18" y="3" width="100" height="5" rx="1" fill="#1f5e57" opacity="0.3"></rect>
+    </g>
+  </g>
+  <g transform="translate(310 56)">
+    <path d="M -22 -22 L 22 -22 Q 30 -22 30 -14 L 30 8 Q 30 16 22 16 L 4 16 L -4 26 L -2 16 L -22 16 Q -30 16 -30 8 L -30 -14 Q -30 -22 -22 -22 Z" fill="#d97560"></path>
+    <rect x="-2.5" y="-15" width="5" height="14" rx="1" fill="#f5f0e8"></rect>
+    <circle cx="0" cy="6" r="2.5" fill="#f5f0e8"></circle>
+  </g>
+  <g transform="translate(252 184)">
+    <rect x="34" y="36" width="14" height="46" rx="5" fill="#1f5e57" transform="rotate(38 34 36)"></rect>
+    <circle r="42" fill="#1f5e57"></circle>
+    <circle r="34" fill="#c8d97a" opacity="0.45"></circle>
+    <circle r="34" fill="none" stroke="#f5f0e8" stroke-width="1.5" opacity="0.5"></circle>
+    <path d="M -22 -14 Q -30 0 -22 18" stroke="#f5f0e8" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"></path>
+  </g>
+  <circle cx="80" cy="120" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+  <circle cx="60" cy="220" r="2.5" fill="#c8d97a" opacity="0.7"></circle>
+  <circle cx="500" cy="80" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+  <circle cx="510" cy="270" r="3" fill="#c8d97a" opacity="0.6"></circle>
+</svg>
+</div>
+<div class="eco-content">
+<p>Structured logging is a foundational practice for any production Node.js application. Covering what logs and loggers are, how log levels work, and how to set up pino — one of the fastest loggers in the Node.js ecosystem — with child loggers, pretty printing, and best practices for capturing the right data without leaking sensitive information.</p>
+<a href="/logger-pino" class="eco-read-more">Read more →</a>
+</div>
+</div>
 
-<div class="eco-grid">
-<div class="eco-category">
-<h3>🛡️ Security & Auth</h3>
-<p><code>plugin-identity</code> gives you register, login, refresh tokens, password reset, and email verification — all from one <code>npm install</code>. Argon2id hashing, JWKS support for Auth0/Firebase/Cognito, anti-enumeration on every endpoint.</p>
+<div class="eco-article">
+<div class="eco-img">
+<svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OpenAPI spec illustration">
+  <g transform="translate(120 70) rotate(-9)">
+    <rect width="260" height="180" rx="10" fill="#c8d97a" opacity="0.55"></rect>
+  </g>
+  <g transform="translate(140 86) rotate(-4)">
+    <rect width="260" height="180" rx="10" fill="#2a9d8f" opacity="0.45"></rect>
+  </g>
+  <g transform="translate(150 96)">
+    <rect width="280" height="180" rx="10" fill="#2a9d8f"></rect>
+    <rect x="0" y="0" width="280" height="32" rx="10" fill="#1f5e57"></rect>
+    <rect x="0" y="22" width="280" height="10" fill="#1f5e57"></rect>
+    <circle cx="14" cy="16" r="3.5" fill="#c8d97a" opacity="0.9"></circle>
+    <circle cx="26" cy="16" r="3.5" fill="#f5f0e8" opacity="0.55"></circle>
+    <circle cx="38" cy="16" r="3.5" fill="#f5f0e8" opacity="0.35"></circle>
+    <rect x="120" y="12" width="80" height="8" rx="2" fill="#f5f0e8" opacity="0.7"></rect>
+    <g transform="translate(16 50)">
+      <rect width="46" height="20" rx="4" fill="#c8d97a"></rect>
+      <rect x="8" y="6" width="30" height="3" rx="1" fill="#2c2924"></rect>
+      <rect x="8" y="12" width="20" height="3" rx="1" fill="#2c2924" opacity="0.55"></rect>
+      <rect x="56" y="4" width="180" height="6" rx="2" fill="#f5f0e8"></rect>
+      <rect x="56" y="14" width="120" height="4" rx="2" fill="#f5f0e8" opacity="0.45"></rect>
+    </g>
+    <g transform="translate(16 78)">
+      <rect width="46" height="20" rx="4" fill="#1f5e57"></rect>
+      <rect x="8" y="6" width="30" height="3" rx="1" fill="#c8d97a"></rect>
+      <rect x="8" y="12" width="20" height="3" rx="1" fill="#c8d97a" opacity="0.6"></rect>
+      <rect x="56" y="4" width="150" height="6" rx="2" fill="#f5f0e8"></rect>
+      <rect x="56" y="14" width="160" height="4" rx="2" fill="#f5f0e8" opacity="0.45"></rect>
+    </g>
+    <g transform="translate(16 106)">
+      <rect width="46" height="20" rx="4" fill="#c8d97a" opacity="0.7"></rect>
+      <rect x="8" y="6" width="30" height="3" rx="1" fill="#2c2924"></rect>
+      <rect x="8" y="12" width="20" height="3" rx="1" fill="#2c2924" opacity="0.55"></rect>
+      <rect x="56" y="4" width="200" height="6" rx="2" fill="#f5f0e8"></rect>
+      <rect x="56" y="14" width="100" height="4" rx="2" fill="#f5f0e8" opacity="0.45"></rect>
+    </g>
+    <g transform="translate(16 134)">
+      <rect width="46" height="20" rx="4" fill="#1f5e57"></rect>
+      <rect x="8" y="6" width="30" height="3" rx="1" fill="#c8d97a"></rect>
+      <rect x="8" y="12" width="20" height="3" rx="1" fill="#c8d97a" opacity="0.6"></rect>
+      <rect x="56" y="4" width="170" height="6" rx="2" fill="#f5f0e8"></rect>
+      <rect x="56" y="14" width="140" height="4" rx="2" fill="#f5f0e8" opacity="0.45"></rect>
+    </g>
+    <rect x="16" y="160" width="100" height="6" rx="2" fill="#f5f0e8" opacity="0.4"></rect>
+    <rect x="120" y="160" width="40" height="6" rx="2" fill="#c8d97a" opacity="0.7"></rect>
+  </g>
+  <g transform="translate(380 70) rotate(20)">
+    <circle r="30" fill="none" stroke="#1f5e57" stroke-width="7"></circle>
+    <circle r="30" fill="none" stroke="#1f5e57" stroke-width="7" stroke-dasharray="80 60" stroke-linecap="round"></circle>
+    <path d="M 28 -8 L 34 0 L 26 6" fill="none" stroke="#1f5e57" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M -28 8 L -34 0 L -26 -6" fill="none" stroke="#1f5e57" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></path>
+    <circle r="8" fill="#c8d97a"></circle>
+  </g>
+  <g transform="translate(420 244)">
+    <circle r="28" fill="#c8d97a"></circle>
+    <path d="M -10 0 L -3 8 L 11 -8" fill="none" stroke="#2c2924" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+  <circle cx="80" cy="60" r="4" fill="#2a9d8f" opacity="0.5"></circle>
+  <circle cx="60" cy="240" r="3" fill="#c8d97a" opacity="0.7"></circle>
+  <circle cx="500" cy="170" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+  <circle cx="100" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
+</svg>
 </div>
-<div class="eco-category">
-<h3>🌐 Transport & Servers</h3>
-<p>Start with <code>transport-express</code>. Swap to <code>transport-fastify</code> for higher throughput. One config line change — every route, schema, and middleware carries over automatically.</p>
+<div class="eco-content">
+<p>API documentation that goes stale is worse than no documentation at all. Covering how to generate a complete OpenAPI 3.0 spec directly from your model definitions at boot time — no annotations to write, no spec files to maintain — and mount a live Swagger UI that stays automatically in sync as your schemas evolve.</p>
+<a href="/docs-swagger" class="eco-read-more">Read more →</a>
 </div>
-<div class="eco-category">
-<h3>🗄️ Database Adapters</h3>
-<p><code>adapter-memory</code> for blazing-fast ephemeral storage (~500K RPS read). <code>adapter-json</code> for file-system persistence with atomic writes. Postgres and MongoDB on the roadmap.</p>
 </div>
-<div class="eco-category">
-<h3>🔧 Docs, Seeders & Logging</h3>
-<p>Auto-generate OpenAPI specs with <code>docs-swagger</code>. Populate test databases with <code>seeder-faker</code>. Structured logging via <code>logger-pino</code> with automatic <code>traceId</code> injection.</p>
+
+<div class="eco-article">
+<div class="eco-img">
+<svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Authentication illustration — credential stack">
+  <g transform="translate(120 76) rotate(-9)">
+    <rect width="280" height="160" rx="14" fill="#c8d97a" opacity="0.55"></rect>
+  </g>
+  <g transform="translate(140 92) rotate(-4)">
+    <rect width="280" height="160" rx="14" fill="#2a9d8f" opacity="0.45"></rect>
+  </g>
+  <g transform="translate(150 100)">
+    <rect width="280" height="160" rx="14" fill="#2a9d8f"></rect>
+    <rect x="20" y="22" width="60" height="74" rx="6" fill="#1f5e57"></rect>
+    <circle cx="50" cy="48" r="11" fill="#c8d97a"></circle>
+    <path d="M 30 86 Q 30 70 50 70 Q 70 70 70 86 Z" fill="#c8d97a"></path>
+    <rect x="100" y="28" width="140" height="10" rx="3" fill="#f5f0e8"></rect>
+    <rect x="100" y="46" width="100" height="6" rx="2" fill="#f5f0e8" opacity="0.6"></rect>
+    <rect x="100" y="58" width="120" height="6" rx="2" fill="#f5f0e8" opacity="0.6"></rect>
+    <rect x="100" y="76" width="80" height="6" rx="2" fill="#f5f0e8" opacity="0.4"></rect>
+    <rect x="20" y="114" width="36" height="28" rx="4" fill="#c8d97a"></rect>
+    <line x1="38" y1="114" x2="38" y2="142" stroke="#2a9d8f" stroke-width="1.5"></line>
+    <line x1="20" y1="128" x2="56" y2="128" stroke="#2a9d8f" stroke-width="1.5"></line>
+    <rect x="68" y="120" width="180" height="8" rx="2" fill="#f5f0e8" opacity="0.5"></rect>
+    <rect x="68" y="132" width="120" height="8" rx="2" fill="#f5f0e8" opacity="0.3"></rect>
+  </g>
+  <g transform="translate(360 60) rotate(28)">
+    <circle r="24" fill="none" stroke="#1f5e57" stroke-width="8"></circle>
+    <rect x="20" y="-5" width="78" height="10" rx="2" fill="#1f5e57"></rect>
+    <rect x="76" y="5" width="9" height="11" fill="#1f5e57"></rect>
+    <rect x="90" y="5" width="9" height="16" fill="#1f5e57"></rect>
+    <circle r="9" fill="none"></circle>
+  </g>
+  <g transform="translate(400 244)">
+    <circle r="28" fill="#c8d97a"></circle>
+    <path d="M -10 0 L -3 8 L 11 -8" fill="none" stroke="#2c2924" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+  <circle cx="80" cy="60" r="4" fill="#2a9d8f" opacity="0.5"></circle>
+  <circle cx="60" cy="240" r="3" fill="#c8d97a" opacity="0.7"></circle>
+  <circle cx="480" cy="160" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+</svg>
 </div>
+<div class="eco-content">
+<p>Authentication is one of the most common reasons a backend project grows beyond a prototype. Covering how to add register, login, refresh-token rotation, password reset, and email verification to your API — backed by Argon2id password hashing, anti-enumeration on every endpoint, and JWKS support for Auth0, Firebase, and Cognito.</p>
+<a href="/plugin-identity" class="eco-read-more">Read more →</a>
+</div>
+</div>
+
+<div class="eco-article">
+<div class="eco-img">
+<svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Zod input validation illustration">
+  <g transform="translate(270 30)">
+    <rect x="-72" y="-14" width="144" height="28" rx="14" fill="#c8d97a"></rect>
+    <text x="0" y="4" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="700" fill="#2c2924" text-anchor="middle">derived from model</text>
+    <path d="M 0 14 L 0 28 M -5 23 L 0 30 L 5 23" fill="none" stroke="#c8d97a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+  <g transform="translate(28 100)">
+    <rect x="6" y="8" width="120" height="160" rx="6" fill="#1f5e57" opacity="0.25"></rect>
+    <rect width="120" height="160" rx="6" fill="#f5f0e8"></rect>
+    <path d="M 104 0 L 120 16 L 104 16 Z" fill="#e2dac3"></path>
+    <g transform="translate(10 12)">
+      <rect width="56" height="16" rx="3" fill="#2a9d8f"></rect>
+      <text x="6" y="11" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#f5f0e8">POST</text>
+    </g>
+    <g font-family="ui-monospace,Menlo,monospace">
+      <text x="10" y="46" font-size="11" font-weight="700" fill="#2a9d8f">{</text>
+      <rect x="22" y="54" width="36" height="3" rx="1" fill="#2a9d8f"></rect>
+      <rect x="62" y="54" width="44" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="22" y="68" width="42" height="3" rx="1" fill="#2a9d8f"></rect>
+      <rect x="68" y="68" width="38" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="22" y="82" width="30" height="3" rx="1" fill="#2a9d8f"></rect>
+      <rect x="56" y="82" width="50" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="22" y="96" width="40" height="3" rx="1" fill="#2a9d8f"></rect>
+      <rect x="66" y="96" width="40" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="22" y="110" width="34" height="3" rx="1" fill="#2a9d8f"></rect>
+      <rect x="60" y="110" width="46" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+      <text x="10" y="138" font-size="11" font-weight="700" fill="#2a9d8f">}</text>
+    </g>
+  </g>
+  <g transform="translate(160 178)">
+    <path d="M 0 0 L 30 0" stroke="#2a9d8f" stroke-width="2.6" stroke-linecap="round"></path>
+    <path d="M 26 -5 L 34 0 L 26 5" stroke="#2a9d8f" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+  <g transform="translate(204 80)">
+    <rect x="6" y="8" width="200" height="200" rx="8" fill="#1f5e57" opacity="0.3"></rect>
+    <rect width="200" height="200" rx="8" fill="#1f5e57"></rect>
+    <rect width="200" height="28" rx="8" fill="#163f3a"></rect>
+    <rect y="20" width="200" height="8" fill="#163f3a"></rect>
+    <g transform="translate(12 8)">
+      <rect width="62" height="14" rx="3" fill="#c8d97a"></rect>
+      <text x="6" y="10" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#2c2924">z.object</text>
+    </g>
+    <rect x="84" y="12" width="60" height="6" rx="2" fill="#f5f0e8" opacity="0.4"></rect>
+    <g transform="translate(12 48)">
+      <circle cx="8" cy="8" r="8" fill="#c8d97a"></circle>
+      <path d="M 4 8 L 7 11 L 13 5" fill="none" stroke="#2c2924" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+      <rect x="22" y="2" width="48" height="4" rx="1" fill="#c8d97a"></rect>
+      <rect x="74" y="2" width="44" height="4" rx="1" fill="#f5f0e8" opacity="0.55"></rect>
+      <rect x="22" y="11" width="100" height="3" rx="1" fill="#f5f0e8" opacity="0.4"></rect>
+    </g>
+    <g transform="translate(12 72)">
+      <circle cx="8" cy="8" r="8" fill="#c8d97a"></circle>
+      <path d="M 4 8 L 7 11 L 13 5" fill="none" stroke="#2c2924" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+      <rect x="22" y="2" width="38" height="4" rx="1" fill="#c8d97a"></rect>
+      <rect x="64" y="2" width="58" height="4" rx="1" fill="#f5f0e8" opacity="0.55"></rect>
+      <rect x="22" y="11" width="80" height="3" rx="1" fill="#f5f0e8" opacity="0.4"></rect>
+    </g>
+    <g transform="translate(0 96)">
+      <rect width="200" height="22" fill="#d97560" opacity="0.18"></rect>
+      <g transform="translate(12 4)">
+        <circle cx="8" cy="8" r="8" fill="#d97560"></circle>
+        <path d="M 5 5 L 11 11 M 11 5 L 5 11" stroke="#f5f0e8" stroke-width="1.8" stroke-linecap="round"></path>
+        <rect x="22" y="2" width="44" height="4" rx="1" fill="#d97560"></rect>
+        <rect x="70" y="2" width="38" height="4" rx="1" fill="#f5f0e8" opacity="0.7"></rect>
+        <rect x="22" y="11" width="120" height="3" rx="1" fill="#d97560" opacity="0.6"></rect>
+      </g>
+    </g>
+    <g transform="translate(12 124)">
+      <circle cx="8" cy="8" r="8" fill="#c8d97a"></circle>
+      <path d="M 4 8 L 7 11 L 13 5" fill="none" stroke="#2c2924" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+      <rect x="22" y="2" width="50" height="4" rx="1" fill="#c8d97a"></rect>
+      <rect x="76" y="2" width="44" height="4" rx="1" fill="#f5f0e8" opacity="0.55"></rect>
+      <rect x="22" y="11" width="90" height="3" rx="1" fill="#f5f0e8" opacity="0.4"></rect>
+    </g>
+    <g transform="translate(12 148)">
+      <circle cx="8" cy="8" r="8" fill="#c8d97a"></circle>
+      <path d="M 4 8 L 7 11 L 13 5" fill="none" stroke="#2c2924" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+      <rect x="22" y="2" width="40" height="4" rx="1" fill="#c8d97a"></rect>
+      <rect x="66" y="2" width="56" height="4" rx="1" fill="#f5f0e8" opacity="0.55"></rect>
+      <rect x="22" y="11" width="76" height="3" rx="1" fill="#f5f0e8" opacity="0.4"></rect>
+    </g>
+    <rect x="12" y="174" width="60" height="14" rx="3" fill="#d97560"></rect>
+    <text x="42" y="184" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#f5f0e8" text-anchor="middle">1 invalid</text>
+    <rect x="80" y="174" width="60" height="14" rx="3" fill="#c8d97a"></rect>
+    <text x="110" y="184" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#2c2924" text-anchor="middle">4 valid</text>
+  </g>
+  <g transform="translate(412 178)">
+    <path d="M 0 0 L 30 0" stroke="#d97560" stroke-width="2.6" stroke-linecap="round"></path>
+    <path d="M 26 -5 L 34 0 L 26 5" stroke="#d97560" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+  <g transform="translate(454 110)">
+    <rect x="6" y="8" width="80" height="140" rx="6" fill="#1f5e57" opacity="0.25"></rect>
+    <rect width="80" height="140" rx="6" fill="#f5f0e8"></rect>
+    <rect width="80" height="22" rx="6" fill="#d97560"></rect>
+    <rect y="14" width="80" height="8" fill="#d97560"></rect>
+    <text x="40" y="14" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="700" fill="#f5f0e8" text-anchor="middle">422</text>
+    <g font-family="ui-monospace,Menlo,monospace">
+      <text x="6" y="40" font-size="9" font-weight="700" fill="#d97560">errors:</text>
+      <rect x="6" y="48" width="68" height="3" rx="1" fill="#d97560"></rect>
+      <rect x="6" y="56" width="56" height="3" rx="1" fill="#1f5e57" opacity="0.7"></rect>
+      <rect x="6" y="64" width="64" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+      <text x="6" y="84" font-size="8" fill="#1f5e57" opacity="0.7">path:</text>
+      <rect x="6" y="88" width="50" height="3" rx="1" fill="#2a9d8f"></rect>
+      <text x="6" y="106" font-size="8" fill="#1f5e57" opacity="0.7">code:</text>
+      <rect x="6" y="110" width="40" height="3" rx="1" fill="#2a9d8f"></rect>
+      <text x="6" y="128" font-size="8" fill="#1f5e57" opacity="0.7">msg:</text>
+      <rect x="6" y="132" width="64" height="3" rx="1" fill="#1f5e57" opacity="0.6"></rect>
+    </g>
+  </g>
+  <circle cx="40" cy="60" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+  <circle cx="510" cy="60" r="3" fill="#c8d97a" opacity="0.7"></circle>
+  <circle cx="40" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
+  <circle cx="510" cy="290" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+</svg>
+</div>
+<div class="eco-content">
+<p>Input validation is the first line of defence against malformed data reaching your business logic. Covering how to derive Zod schemas directly from your model's field definitions, validate every incoming write automatically, and return structured 422 errors with field-level detail — define your data shape once and get validation everywhere.</p>
+<a href="/middleware-validation" class="eco-read-more">Read more →</a>
+</div>
+</div>
+
+<div class="eco-article">
+<div class="eco-img">
+<svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Seed fake data illustration">
+  <g transform="translate(28 36)">
+    <rect x="6" y="8" width="200" height="64" rx="6" fill="#1f5e57" opacity="0.25"></rect>
+    <rect width="200" height="64" rx="6" fill="#1f5e57"></rect>
+    <rect width="200" height="20" rx="6" fill="#163f3a"></rect>
+    <rect y="12" width="200" height="8" fill="#163f3a"></rect>
+    <circle cx="10" cy="10" r="3" fill="#c8d97a"></circle>
+    <circle cx="20" cy="10" r="3" fill="#f5f0e8" opacity="0.4"></circle>
+    <circle cx="30" cy="10" r="3" fill="#f5f0e8" opacity="0.25"></circle>
+    <g font-family="ui-monospace,Menlo,monospace">
+      <text x="10" y="38" font-size="11" fill="#c8d97a">$</text>
+      <text x="22" y="38" font-size="11" fill="#f5f0e8">cli db </text>
+      <text x="74" y="38" font-size="11" font-weight="700" fill="#c8d97a">seed</text>
+      <rect x="10" y="46" width="180" height="12" rx="2" fill="#c8d97a" opacity="0.18"></rect>
+      <text x="14" y="55" font-size="10" font-weight="700" fill="#c8d97a">--rows 200 --seed 42</text>
+    </g>
+  </g>
+  <g transform="translate(140 110)">
+    <path d="M 0 0 L 0 30" stroke="#c8d97a" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="2 5"></path>
+    <path d="M -5 26 L 0 34 L 5 26" fill="none" stroke="#c8d97a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+  <g transform="translate(50 156)">
+    <rect x="6" y="8" width="380" height="142" rx="8" fill="#1f5e57" opacity="0.3"></rect>
+    <rect width="380" height="142" rx="8" fill="#f5f0e8"></rect>
+    <rect width="380" height="22" rx="8" fill="#2a9d8f"></rect>
+    <rect y="14" width="380" height="8" fill="#2a9d8f"></rect>
+    <g font-family="ui-monospace,Menlo,monospace" fill="#f5f0e8" font-size="9" font-weight="700">
+      <text x="56" y="14">name</text>
+      <text x="158" y="14">email</text>
+      <text x="248" y="14">created_at</text>
+      <text x="324" y="14">uuid</text>
+    </g>
+    <g transform="translate(0 30)">
+      <rect width="380" height="22" fill="#f5f0e8"></rect>
+      <circle cx="22" cy="11" r="8" fill="#c8d97a"></circle>
+      <text x="22" y="14" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#2c2924" text-anchor="middle">A</text>
+      <rect x="42" y="8" width="80" height="6" rx="2" fill="#1f5e57"></rect>
+      <rect x="148" y="8" width="80" height="5" rx="2" fill="#2a9d8f"></rect>
+      <rect x="244" y="8" width="64" height="5" rx="2" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="320" y="8" width="50" height="5" rx="2" fill="#1f5e57" opacity="0.55"></rect>
+    </g>
+    <g transform="translate(0 52)">
+      <rect width="380" height="22" fill="#ece6d6"></rect>
+      <circle cx="22" cy="11" r="8" fill="#2a9d8f"></circle>
+      <text x="22" y="14" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#f5f0e8" text-anchor="middle">B</text>
+      <rect x="42" y="8" width="68" height="6" rx="2" fill="#1f5e57"></rect>
+      <rect x="148" y="8" width="92" height="5" rx="2" fill="#2a9d8f"></rect>
+      <rect x="244" y="8" width="64" height="5" rx="2" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="320" y="8" width="50" height="5" rx="2" fill="#1f5e57" opacity="0.55"></rect>
+    </g>
+    <g transform="translate(0 74)">
+      <rect width="380" height="22" fill="#f5f0e8"></rect>
+      <circle cx="22" cy="11" r="8" fill="#1f5e57"></circle>
+      <text x="22" y="14" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#c8d97a" text-anchor="middle">C</text>
+      <rect x="42" y="8" width="74" height="6" rx="2" fill="#1f5e57"></rect>
+      <rect x="148" y="8" width="84" height="5" rx="2" fill="#2a9d8f"></rect>
+      <rect x="244" y="8" width="64" height="5" rx="2" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="320" y="8" width="50" height="5" rx="2" fill="#1f5e57" opacity="0.55"></rect>
+    </g>
+    <g transform="translate(0 96)">
+      <rect width="380" height="22" fill="#ece6d6"></rect>
+      <circle cx="22" cy="11" r="8" fill="#d97560"></circle>
+      <text x="22" y="14" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#f5f0e8" text-anchor="middle">D</text>
+      <rect x="42" y="8" width="86" height="6" rx="2" fill="#1f5e57"></rect>
+      <rect x="148" y="8" width="76" height="5" rx="2" fill="#2a9d8f"></rect>
+      <rect x="244" y="8" width="64" height="5" rx="2" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="320" y="8" width="50" height="5" rx="2" fill="#1f5e57" opacity="0.55"></rect>
+    </g>
+    <g transform="translate(0 118)" opacity="0.5">
+      <rect width="380" height="22" fill="#f5f0e8"></rect>
+      <circle cx="22" cy="11" r="8" fill="#c8d97a"></circle>
+      <rect x="42" y="8" width="64" height="6" rx="2" fill="#1f5e57"></rect>
+      <rect x="148" y="8" width="88" height="5" rx="2" fill="#2a9d8f"></rect>
+      <rect x="244" y="8" width="64" height="5" rx="2" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="320" y="8" width="50" height="5" rx="2" fill="#1f5e57" opacity="0.55"></rect>
+    </g>
+  </g>
+  <g transform="translate(478 200)">
+    <circle r="34" fill="#c8d97a"></circle>
+    <circle r="34" fill="none" stroke="#2c2924" stroke-width="1.5" opacity="0.4" stroke-dasharray="2 3"></circle>
+    <text x="0" y="6" font-family="ui-monospace,Menlo,monospace" font-size="16" font-weight="700" fill="#2c2924" text-anchor="middle">×200</text>
+  </g>
+  <g transform="translate(310 50)">
+    <g>
+      <rect x="0" y="0" width="50" height="18" rx="9" fill="#2a9d8f"></rect>
+      <text x="25" y="12" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#f5f0e8" text-anchor="middle">name</text>
+    </g>
+    <g transform="translate(56 0)">
+      <rect width="56" height="18" rx="9" fill="#1f5e57"></rect>
+      <text x="28" y="12" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#c8d97a" text-anchor="middle">email</text>
+    </g>
+    <g transform="translate(118 0)">
+      <rect width="50" height="18" rx="9" fill="#c8d97a"></rect>
+      <text x="25" y="12" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#2c2924" text-anchor="middle">date</text>
+    </g>
+    <g transform="translate(174 0)">
+      <rect width="50" height="18" rx="9" fill="#2a9d8f"></rect>
+      <text x="25" y="12" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#f5f0e8" text-anchor="middle">uuid</text>
+    </g>
+  </g>
+  <circle cx="510" cy="60" r="3" fill="#c8d97a" opacity="0.7"></circle>
+  <circle cx="40" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
+  <circle cx="510" cy="290" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+  <circle cx="260" cy="100" r="2.5" fill="#2a9d8f" opacity="0.4"></circle>
+</svg>
+</div>
+<div class="eco-content">
+<p>Realistic test data makes the difference between a demo that lands and one that doesn't. Covering how to populate your database with contextually correct fake data — names, emails, dates, UUIDs, and more — using a single CLI flag, and how to build reproducible CI fixtures and believable local development environments.</p>
+<a href="/seeder-faker" class="eco-read-more">Read more →</a>
+</div>
+</div>
+
+<div class="eco-article">
+<div class="eco-img">
+<svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fastify throughput illustration">
+  <g>
+    <rect x="18" y="60" width="20" height="6" rx="2" fill="#c8d97a" opacity="0.55"></rect>
+    <rect x="46" y="60" width="14" height="6" rx="2" fill="#c8d97a" opacity="0.7"></rect>
+    <rect x="68" y="60" width="22" height="6" rx="2" fill="#c8d97a" opacity="0.85"></rect>
+    <rect x="98" y="60" width="16" height="6" rx="2" fill="#c8d97a"></rect>
+    <rect x="14" y="90" width="14" height="6" rx="2" fill="#2a9d8f" opacity="0.45"></rect>
+    <rect x="36" y="90" width="20" height="6" rx="2" fill="#2a9d8f" opacity="0.65"></rect>
+    <rect x="64" y="90" width="14" height="6" rx="2" fill="#2a9d8f" opacity="0.85"></rect>
+    <rect x="86" y="90" width="22" height="6" rx="2" fill="#2a9d8f"></rect>
+  </g>
+  <g transform="translate(140 150)">
+    <circle cx="6" cy="8" r="86" fill="#1f5e57" opacity="0.2"></circle>
+    <circle r="86" fill="#1f5e57"></circle>
+    <circle r="74" fill="#2a9d8f"></circle>
+    <path d="M -56 30 A 64 64 0 1 1 56 30" fill="none" stroke="#1f5e57" stroke-width="10" stroke-linecap="round" opacity="0.55"></path>
+    <path d="M -56 30 A 64 64 0 1 1 60 -22" fill="none" stroke="#c8d97a" stroke-width="10" stroke-linecap="round"></path>
+    <g stroke="#f5f0e8" stroke-width="2" stroke-linecap="round" opacity="0.65">
+      <line x1="-58" y1="20" x2="-50" y2="14"></line>
+      <line x1="-50" y1="-14" x2="-42" y2="-10"></line>
+      <line x1="-30" y1="-40" x2="-26" y2="-32"></line>
+      <line x1="0" y1="-50" x2="0" y2="-42"></line>
+      <line x1="30" y1="-40" x2="26" y2="-32"></line>
+      <line x1="50" y1="-14" x2="42" y2="-10"></line>
+      <line x1="58" y1="20" x2="50" y2="14"></line>
+    </g>
+    <g transform="rotate(60)">
+      <path d="M -3 6 L 3 6 L 1 -54 L -1 -54 Z" fill="#c8d97a"></path>
+    </g>
+    <circle r="8" fill="#1f5e57"></circle>
+    <circle r="3" fill="#c8d97a"></circle>
+    <g transform="translate(0 50)">
+      <rect x="-44" y="-12" width="88" height="22" rx="11" fill="#c8d97a"></rect>
+      <text x="0" y="3" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="700" fill="#2c2924" text-anchor="middle">req / sec</text>
+    </g>
+  </g>
+  <g transform="translate(266 90)">
+    <rect width="46" height="14" rx="3" fill="#1f5e57"></rect>
+    <text x="6" y="10" font-family="ui-monospace,Menlo,monospace" font-size="8" font-weight="700" fill="#c8d97a">BEFORE</text>
+    <rect x="56" y="0" width="80" height="14" rx="3" fill="#2a9d8f" opacity="0.55"></rect>
+    <rect x="56" y="0" width="80" height="14" rx="3" fill="none" stroke="#2a9d8f" stroke-width="1" opacity="0.4"></rect>
+    <rect x="138" y="-2" width="2" height="18" rx="1" fill="#1f5e57" opacity="0.4"></rect>
+    <g transform="translate(0 30)">
+      <rect width="46" height="14" rx="3" fill="#c8d97a"></rect>
+      <text x="11" y="10" font-family="ui-monospace,Menlo,monospace" font-size="8" font-weight="700" fill="#2c2924">AFTER</text>
+      <rect x="56" y="0" width="220" height="14" rx="3" fill="#2a9d8f"></rect>
+      <rect x="220" y="3" width="14" height="2" rx="1" fill="#f5f0e8" opacity="0.7"></rect>
+      <rect x="240" y="3" width="22" height="2" rx="1" fill="#f5f0e8" opacity="0.55"></rect>
+      <rect x="220" y="9" width="22" height="2" rx="1" fill="#f5f0e8" opacity="0.55"></rect>
+      <rect x="248" y="9" width="14" height="2" rx="1" fill="#f5f0e8" opacity="0.7"></rect>
+    </g>
+    <g transform="translate(244 60)">
+      <rect x="-22" y="-12" width="44" height="22" rx="11" fill="#c8d97a"></rect>
+      <text x="0" y="3" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="700" fill="#2c2924" text-anchor="middle">2.7×</text>
+    </g>
+  </g>
+  <g transform="translate(266 196)">
+    <rect x="6" y="8" width="232" height="84" rx="6" fill="#1f5e57" opacity="0.25"></rect>
+    <rect width="232" height="84" rx="6" fill="#1f5e57"></rect>
+    <rect width="232" height="22" rx="6" fill="#163f3a"></rect>
+    <rect y="14" width="232" height="8" fill="#163f3a"></rect>
+    <circle cx="12" cy="11" r="3" fill="#c8d97a"></circle>
+    <circle cx="22" cy="11" r="3" fill="#f5f0e8" opacity="0.4"></circle>
+    <circle cx="32" cy="11" r="3" fill="#f5f0e8" opacity="0.25"></circle>
+    <rect x="92" y="8" width="60" height="6" rx="2" fill="#f5f0e8" opacity="0.4"></rect>
+    <g font-family="ui-monospace,Menlo,monospace">
+      <g opacity="0.55">
+        <rect x="14" y="36" width="200" height="10" rx="2" fill="#d97560" opacity="0.18"></rect>
+        <text x="20" y="44" font-size="10" fill="#d97560" text-decoration="line-through">- adapter: &#39;express&#39;</text>
+      </g>
+      <g>
+        <rect x="14" y="52" width="200" height="10" rx="2" fill="#c8d97a" opacity="0.22"></rect>
+        <text x="20" y="60" font-size="10" font-weight="700" fill="#c8d97a">+ adapter: &#39;fastify&#39;</text>
+      </g>
+      <text x="14" y="74" font-size="9" fill="#f5f0e8" opacity="0.55">// every route, schema, middleware preserved</text>
+    </g>
+  </g>
+  <g transform="translate(82 102)">
+    <path d="M 0 -16 L -10 4 L -2 4 L -8 22 L 12 -2 L 2 -2 L 8 -16 Z" fill="#c8d97a"></path>
+  </g>
+  <circle cx="510" cy="60" r="3" fill="#c8d97a" opacity="0.7"></circle>
+  <circle cx="20" cy="240" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+  <circle cx="40" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
+  <circle cx="510" cy="290" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+</svg>
+</div>
+<div class="eco-content">
+<p>The HTTP server is the innermost performance constraint in any API. Covering how to replace Express with Fastify's low-overhead request lifecycle, what throughput gains to expect in practice, and how a single config change migrates every route, schema, and middleware automatically without touching a line of application code.</p>
+<a href="/transport-fastify" class="eco-read-more">Read more →</a>
+</div>
+</div>
+
+<div class="eco-article">
+<div class="eco-img">
+<svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="JSON file persistence with atomic writes">
+  <g transform="translate(370 110)" opacity="0.95">
+    <ellipse cx="50" cy="160" rx="56" ry="8" fill="#1f5e57" opacity="0.2"></ellipse>
+    <rect x="-4" y="20" width="108" height="130" fill="#2a9d8f"></rect>
+    <ellipse cx="50" cy="150" rx="54" ry="14" fill="#2a9d8f"></ellipse>
+    <ellipse cx="50" cy="20" rx="54" ry="14" fill="#1f5e57"></ellipse>
+    <ellipse cx="50" cy="56" rx="54" ry="14" fill="none" stroke="#1f5e57" stroke-width="2" opacity="0.55"></ellipse>
+    <ellipse cx="50" cy="92" rx="54" ry="14" fill="none" stroke="#1f5e57" stroke-width="2" opacity="0.55"></ellipse>
+    <circle cx="22" cy="124" r="3" fill="#c8d97a"></circle>
+    <circle cx="34" cy="124" r="3" fill="#c8d97a" opacity="0.5"></circle>
+  </g>
+  <g transform="translate(58 132)">
+    <rect x="4" y="6" width="84" height="106" rx="6" fill="#1f5e57" opacity="0.2"></rect>
+    <rect width="84" height="106" rx="6" fill="#f5f0e8" opacity="0.85"></rect>
+    <path d="M 70 0 L 84 14 L 70 14 Z" fill="#e2dac3"></path>
+    <g transform="translate(8 10)">
+      <rect width="44" height="14" rx="3" fill="#c8d97a" opacity="0.85"></rect>
+      <text x="6" y="10" font-family="ui-monospace,Menlo,monospace" font-size="8" font-weight="700" fill="#2c2924">.tmp</text>
+    </g>
+    <rect x="10" y="34" width="50" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+    <rect x="10" y="44" width="64" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+    <rect x="10" y="54" width="40" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+    <rect x="10" y="64" width="58" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+    <rect x="10" y="74" width="46" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+    <rect x="10" y="84" width="62" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+  </g>
+  <g>
+    <path d="M 150 150 Q 200 100 246 132" fill="none" stroke="#c8d97a" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 6"></path>
+    <path d="M 240 126 L 250 132 L 240 138" fill="none" stroke="#c8d97a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+    <g transform="translate(196 96)">
+      <rect x="-44" y="-10" width="88" height="20" rx="10" fill="#c8d97a"></rect>
+      <text x="0" y="4" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#2c2924" text-anchor="middle">rename()</text>
+    </g>
+  </g>
+  <g transform="translate(180 80)">
+    <rect x="6" y="8" width="180" height="220" rx="8" fill="#1f5e57" opacity="0.3"></rect>
+    <rect width="180" height="220" rx="8" fill="#f5f0e8"></rect>
+    <path d="M 162 0 L 180 18 L 162 18 Z" fill="#e2dac3"></path>
+    <g transform="translate(14 14)">
+      <rect width="80" height="22" rx="4" fill="#2a9d8f"></rect>
+      <text x="8" y="15" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="700" fill="#f5f0e8">data.json</text>
+    </g>
+    <g font-family="ui-monospace,Menlo,monospace">
+      <text x="14" y="62" font-size="14" font-weight="700" fill="#2a9d8f">[</text>
+      <text x="26" y="80" font-size="11" font-weight="700" fill="#2a9d8f">{</text>
+      <rect x="40" y="84" width="36" height="4" rx="1" fill="#2a9d8f"></rect>
+      <rect x="80" y="84" width="64" height="4" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="40" y="94" width="48" height="4" rx="1" fill="#2a9d8f"></rect>
+      <rect x="92" y="94" width="50" height="4" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+      <text x="26" y="114" font-size="11" font-weight="700" fill="#2a9d8f">},</text>
+      <text x="26" y="132" font-size="11" font-weight="700" fill="#2a9d8f">{</text>
+      <rect x="40" y="136" width="40" height="4" rx="1" fill="#2a9d8f"></rect>
+      <rect x="84" y="136" width="58" height="4" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+      <rect x="40" y="146" width="32" height="4" rx="1" fill="#2a9d8f"></rect>
+      <rect x="76" y="146" width="64" height="4" rx="1" fill="#1f5e57" opacity="0.55"></rect>
+      <text x="26" y="166" font-size="11" font-weight="700" fill="#2a9d8f">},</text>
+      <rect x="40" y="180" width="6" height="6" rx="3" fill="#2a9d8f" opacity="0.5"></rect>
+      <rect x="50" y="180" width="6" height="6" rx="3" fill="#2a9d8f" opacity="0.5"></rect>
+      <rect x="60" y="180" width="6" height="6" rx="3" fill="#2a9d8f" opacity="0.5"></rect>
+      <text x="14" y="206" font-size="14" font-weight="700" fill="#2a9d8f">]</text>
+    </g>
+  </g>
+  <g transform="translate(348 264)">
+    <circle r="28" fill="#c8d97a"></circle>
+    <path d="M 0 -14 L 12 -8 L 12 2 Q 12 12 0 16 Q -12 12 -12 2 L -12 -8 Z" fill="#1f5e57"></path>
+    <path d="M -6 0 L -1 5 L 7 -5" fill="none" stroke="#c8d97a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+  <circle cx="60" cy="60" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+  <circle cx="500" cy="60" r="3" fill="#c8d97a" opacity="0.7"></circle>
+  <circle cx="40" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
+  <circle cx="120" cy="284" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+</svg>
+</div>
+<div class="eco-content">
+<p>Persisting data doesn't always mean running a database. Covering how to store your collections as JSON files with atomic writes — so a crash mid-write never corrupts your data — when file-system persistence is the right choice, and how to graduate to a relational database without changing any application code.</p>
+<a href="/adapters" class="eco-read-more">Read more →</a>
+</div>
+</div>
+
+<div class="eco-article">
+<div class="eco-img">
+<svg viewBox="0 0 540 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="GraphQL and REST from one model">
+  <g transform="translate(210 28)">
+    <rect x="6" y="8" width="120" height="60" rx="8" fill="#1f5e57" opacity="0.25"></rect>
+    <rect width="120" height="60" rx="8" fill="#2a9d8f"></rect>
+    <rect x="14" y="14" width="92" height="6" rx="2" fill="#c8d97a"></rect>
+    <rect x="14" y="26" width="64" height="4" rx="1" fill="#f5f0e8" opacity="0.85"></rect>
+    <rect x="14" y="34" width="80" height="4" rx="1" fill="#f5f0e8" opacity="0.6"></rect>
+    <rect x="14" y="42" width="50" height="4" rx="1" fill="#f5f0e8" opacity="0.85"></rect>
+    <rect x="14" y="50" width="72" height="4" rx="1" fill="#f5f0e8" opacity="0.6"></rect>
+    <text x="100" y="55" font-family="ui-monospace,Menlo,monospace" font-size="14" font-weight="700" fill="#c8d97a">{ }</text>
+  </g>
+  <path d="M 240 100 Q 200 130 140 138" fill="none" stroke="#2a9d8f" stroke-width="2.4" stroke-dasharray="2 6" stroke-linecap="round" opacity="0.6"></path>
+  <path d="M 300 100 Q 340 130 400 138" fill="none" stroke="#c8d97a" stroke-width="2.4" stroke-dasharray="2 6" stroke-linecap="round" opacity="0.85"></path>
+  <g transform="translate(40 130)">
+    <rect x="6" y="8" width="200" height="160" rx="8" fill="#1f5e57" opacity="0.25"></rect>
+    <rect width="200" height="160" rx="8" fill="#f5f0e8"></rect>
+    <g transform="translate(14 14)">
+      <rect width="58" height="20" rx="4" fill="#2a9d8f"></rect>
+      <text x="10" y="14" font-family="ui-monospace,Menlo,monospace" font-size="11" font-weight="700" fill="#f5f0e8">REST</text>
+    </g>
+    <rect x="80" y="20" width="60" height="6" rx="2" fill="#1f5e57" opacity="0.25"></rect>
+    <g transform="translate(14 50)">
+      <rect width="40" height="16" rx="3" fill="#c8d97a"></rect>
+      <text x="6" y="11" font-family="ui-monospace,Menlo,monospace" font-size="8" font-weight="700" fill="#2c2924">GET</text>
+      <rect x="50" y="4" width="120" height="4" rx="1" fill="#1f5e57" opacity="0.75"></rect>
+      <rect x="50" y="11" width="80" height="3" rx="1" fill="#1f5e57" opacity="0.4"></rect>
+    </g>
+    <g transform="translate(14 74)">
+      <rect width="40" height="16" rx="3" fill="#1f5e57"></rect>
+      <text x="5" y="11" font-family="ui-monospace,Menlo,monospace" font-size="8" font-weight="700" fill="#c8d97a">POST</text>
+      <rect x="50" y="4" width="100" height="4" rx="1" fill="#1f5e57" opacity="0.75"></rect>
+      <rect x="50" y="11" width="120" height="3" rx="1" fill="#1f5e57" opacity="0.4"></rect>
+    </g>
+    <g transform="translate(14 98)">
+      <rect width="40" height="16" rx="3" fill="#c8d97a" opacity="0.7"></rect>
+      <text x="9" y="11" font-family="ui-monospace,Menlo,monospace" font-size="8" font-weight="700" fill="#2c2924">PUT</text>
+      <rect x="50" y="4" width="130" height="4" rx="1" fill="#1f5e57" opacity="0.75"></rect>
+      <rect x="50" y="11" width="70" height="3" rx="1" fill="#1f5e57" opacity="0.4"></rect>
+    </g>
+    <g transform="translate(14 122)">
+      <rect width="40" height="16" rx="3" fill="#1f5e57"></rect>
+      <text x="3" y="11" font-family="ui-monospace,Menlo,monospace" font-size="8" font-weight="700" fill="#c8d97a">DEL</text>
+      <rect x="50" y="4" width="110" height="4" rx="1" fill="#1f5e57" opacity="0.75"></rect>
+      <rect x="50" y="11" width="90" height="3" rx="1" fill="#1f5e57" opacity="0.4"></rect>
+    </g>
+  </g>
+  <g transform="translate(300 130)">
+    <rect x="6" y="8" width="200" height="160" rx="8" fill="#1f5e57" opacity="0.25"></rect>
+    <rect width="200" height="160" rx="8" fill="#1f5e57"></rect>
+    <g transform="translate(14 14)">
+      <rect width="80" height="20" rx="4" fill="#c8d97a"></rect>
+      <text x="8" y="14" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="700" fill="#2c2924">GraphQL</text>
+    </g>
+    <rect x="104" y="20" width="60" height="6" rx="2" fill="#f5f0e8" opacity="0.3"></rect>
+    <g font-family="ui-monospace,Menlo,monospace">
+      <text x="14" y="58" font-size="13" font-weight="700" fill="#c8d97a">query {</text>
+      <rect x="32" y="64" width="60" height="4" rx="1" fill="#c8d97a"></rect>
+      <rect x="96" y="64" width="80" height="4" rx="1" fill="#f5f0e8" opacity="0.55"></rect>
+      <text x="32" y="82" font-size="11" fill="#c8d97a">{</text>
+      <rect x="46" y="88" width="42" height="4" rx="1" fill="#f5f0e8" opacity="0.85"></rect>
+      <rect x="46" y="98" width="56" height="4" rx="1" fill="#f5f0e8" opacity="0.85"></rect>
+      <rect x="46" y="108" width="36" height="4" rx="1" fill="#f5f0e8" opacity="0.85"></rect>
+      <rect x="46" y="118" width="64" height="4" rx="1" fill="#f5f0e8" opacity="0.65"></rect>
+      <text x="32" y="136" font-size="11" fill="#c8d97a">}</text>
+      <text x="14" y="148" font-size="13" font-weight="700" fill="#c8d97a">}</text>
+    </g>
+  </g>
+  <g transform="translate(270 116)">
+    <rect x="-44" y="-10" width="88" height="20" rx="10" fill="#c8d97a"></rect>
+    <text x="0" y="4" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#2c2924" text-anchor="middle">one model</text>
+  </g>
+  <circle cx="60" cy="60" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+  <circle cx="500" cy="60" r="3" fill="#c8d97a" opacity="0.7"></circle>
+  <circle cx="40" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
+  <circle cx="520" cy="290" r="3" fill="#2a9d8f" opacity="0.5"></circle>
+</svg>
+</div>
+<div class="eco-content">
+<p>GraphQL and REST serve different clients well, and you shouldn't have to choose between them. Covering how to generate a complete GraphQL schema from your existing model definitions, expose it alongside your REST endpoints, and inherit all your hooks, access rules, and validation — with no separate schema to write or maintain.</p>
+<a href="/api-graphql" class="eco-read-more">Read more →</a>
+</div>
+</div>
+
 </div>
 
 
@@ -250,6 +934,13 @@ One schema definition. Every layer is independently swappable.
   border-top: none !important;
   margin-top: 4rem;
   padding-top: 0 !important;
+  text-align: center;
+}
+.VPHome .vp-doc h2 + p {
+  text-align: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .VPHome .vp-doc table {
   width: 100% !important;
@@ -353,22 +1044,53 @@ One schema definition. Every layer is independently swappable.
   margin-top: 1rem;
 }
 
-/* ═══════════════ ECOSYSTEM GRID ═══════════════ */
-.eco-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.25rem;
-  margin-top: 1.5rem;
+/* ═══════════════ ECOSYSTEM ARTICLES ═══════════════ */
+.eco-articles {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  margin-top: 2.5rem;
 }
-.eco-category {
-  background: var(--vp-c-bg-alt);
-  border: 1px solid var(--vp-c-border);
+.eco-article {
+  display: flex;
+  align-items: center;
+  gap: 3.5rem;
+}
+.eco-article:nth-child(even) {
+  flex-direction: row-reverse;
+}
+.eco-img {
+  flex: 0 0 48%;
   border-radius: 12px;
-  padding: 1.25rem;
-  transition: border-color 0.25s;
+  overflow: hidden;
+  background: var(--vp-c-bg-alt);
 }
-.eco-category:hover { border-color: var(--solarized-cyan); }
-.eco-category h3 { margin: 0 0 0.75rem !important; font-size: 1.05rem; border: none !important; padding: 0 !important; }
+.eco-img svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.eco-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.eco-content p {
+  font-size: 0.95rem;
+  color: var(--vp-c-text-2);
+  line-height: 1.75;
+  margin: 0;
+}
+.eco-read-more {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--solarized-cyan);
+  text-decoration: none;
+  transition: color 0.2s;
+  align-self: flex-start;
+}
+.eco-read-more:hover { color: var(--solarized-blue); text-decoration: underline; }
 
 /* ═══════════════ FAQ ═══════════════ */
 .faq-item {
@@ -508,8 +1230,10 @@ One schema definition. Every layer is independently swappable.
 
 /* ═══════════════ RESPONSIVE ═══════════════ */
 @media (max-width: 768px) {
-  .steps-grid { grid-template-columns: 1fr; }
-  .eco-grid { grid-template-columns: 1fr; }
+  .steps-grid  { grid-template-columns: 1fr; }
+  .eco-article,
+  .eco-article:nth-child(even) { flex-direction: column; }
+  .eco-img     { flex: none; width: 100%; }
   .footer-grid { grid-template-columns: 1fr; }
 }
 </style>
