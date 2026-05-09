@@ -152,7 +152,8 @@
     /* Give the text side more width */
     .VPHome .VPHero .main {
         width: 65% !important;
-        max-width: 800px !important; /* Forces VitePress to allow wider text */
+        max-width: 800px !important;
+        min-width: 0;
     }
 
     /* Shrink the image side container to match */
@@ -162,9 +163,13 @@
         justify-content: flex-end !important;
     }
 
-    /* Optional: You can also prevent the specific text from wrapping */
+    /* Scale font down with viewport so the headline stays on one line
+       without overflowing into the image column (65 % of 960 px = 624 px).
+       3.3 vw gives ~32 px at 960 px and grows naturally to the 3.25 rem cap
+       at wider breakpoints. */
     .VPHome .VPHero .text {
         white-space: nowrap;
+        font-size: clamp(1.5rem, 3.3vw, 3.25rem) !important;
     }
 
     .VPHome .VPHero .image-src {
