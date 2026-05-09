@@ -75,7 +75,7 @@ Every capability ships as its own package — install only what you need, swap i
     <path d="M 70 0 L 84 14 L 70 14 Z" fill="#e2dac3"></path>
     <g transform="translate(8 10)">
       <rect width="44" height="14" rx="3" fill="#c8d97a" opacity="0.85"></rect>
-      <text x="6" y="10" font-family="ui-monospace,Menlo,monospace" font-size="8" font-weight="700" fill="#2c2924">.tmp</text>
+      <text x="6" y="10" font-family="ui-monospace,Menlo,monospace" font-size="8" font-weight="700" fill="#2c2924">.db</text>
     </g>
     <rect x="10" y="34" width="50" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
     <rect x="10" y="44" width="64" height="3" rx="1" fill="#1f5e57" opacity="0.55"></rect>
@@ -87,10 +87,6 @@ Every capability ships as its own package — install only what you need, swap i
   <g>
     <path d="M 150 150 Q 200 100 246 132" fill="none" stroke="#c8d97a" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 6"></path>
     <path d="M 240 126 L 250 132 L 240 138" fill="none" stroke="#c8d97a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
-    <g transform="translate(196 96)">
-      <rect x="-44" y="-10" width="88" height="20" rx="10" fill="#c8d97a"></rect>
-      <text x="0" y="4" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#2c2924" text-anchor="middle">rename()</text>
-    </g>
   </g>
   <g transform="translate(180 80)">
     <rect x="6" y="8" width="180" height="220" rx="8" fill="#1f5e57" opacity="0.3"></rect>
@@ -98,7 +94,7 @@ Every capability ships as its own package — install only what you need, swap i
     <path d="M 162 0 L 180 18 L 162 18 Z" fill="#e2dac3"></path>
     <g transform="translate(14 14)">
       <rect width="80" height="22" rx="4" fill="#2a9d8f"></rect>
-      <text x="8" y="15" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="700" fill="#f5f0e8">data.json</text>
+      <text x="8" y="15" font-family="ui-monospace,Menlo,monospace" font-size="10" font-weight="700" fill="#f5f0e8">*.json</text>
     </g>
     <g font-family="ui-monospace,Menlo,monospace">
       <text x="14" y="62" font-size="14" font-weight="700" fill="#2a9d8f">[</text>

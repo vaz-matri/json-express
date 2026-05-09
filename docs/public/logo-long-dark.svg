@@ -1,0 +1,16 @@
+<svg viewBox="0 0 320 80" width="320" height="80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="JSONExpress logo">
+  <g transform="translate(20, 17)">
+    <rect x="0" y="0" width="46" height="5" rx="2.5" fill="#e8dfc8"></rect>
+    <rect x="0" y="7" width="46" height="5" rx="2.5" fill="#e8dfc8"></rect>
+
+    <rect x="0" y="15" width="46" height="5" rx="2.5" fill="#2a9d8f"></rect>
+    <rect x="0" y="22" width="46" height="5" rx="2.5" fill="#2a9d8f"></rect>
+
+    <rect x="0" y="29" width="46" height="5" rx="2.5" fill="#e8dfc8"></rect>
+    <rect x="0" y="36" width="46" height="5" rx="2.5" fill="#e8dfc8"></rect>
+
+    <rect x="0" y="43" width="46" height="2.5" rx="2.5" fill="#e8dfc8"></rect>
+  </g>
+
+  <text x="84" y="51" font-family="&#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="-0.5" fill="#fdf5e0">JSON<tspan font-weight="400" fill="#fdf5e0">Express</tspan></text>
+</svg>
