@@ -48,25 +48,25 @@ export default defineConfig({
     nav: [
       { text: 'Docs', link: '/getting-started' },
       { text: 'Ecosystem', link: '/core' },
-      {
-        text: 'Learn',
-        items: [
-          {
-            text: 'JSONExpress',
-            items: [
-              { text: 'Releases & Updates', link: '/blog/releases/' },
-              { text: 'Framework Tutorials', link: '/blog/tutorials/' }
-            ]
-          },
-          {
-            text: 'Engineering',
-            items: [
-              { text: 'Technical Blogs', link: '/blog/engineering/' },
-              { text: 'Tech News & Reviews', link: '/blog/news/' }
-            ]
-          }
-        ]
-      }
+      // {
+      //   text: 'Learn',
+      //   items: [
+      //     {
+      //       text: 'JSONExpress',
+      //       items: [
+      //         { text: 'Releases & Updates', link: '/blog/releases/' },
+      //         { text: 'Framework Tutorials', link: '/blog/tutorials/' }
+      //       ]
+      //     },
+      //     {
+      //       text: 'Engineering',
+      //       items: [
+      //         { text: 'Technical Blogs', link: '/blog/engineering/' },
+      //         { text: 'Tech News & Reviews', link: '/blog/news/' }
+      //       ]
+      //     }
+      //   ]
+      // }
     ],
 
     sidebar: {
@@ -221,7 +221,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vazmat/json-express' }
+      { icon: 'github', link: 'https://github.com/vaz-matri/json-express' }
     ]
   }
 })

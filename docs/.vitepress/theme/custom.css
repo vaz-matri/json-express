@@ -147,14 +147,29 @@
   }
 }
 
+/* ═══════════════ HERO LAYOUT OVERRIDES ═══════════════ */
 @media (min-width: 960px) {
-    .VPHero .image-container {
-        max-width: 480px;
-        /* Push the illustration to the right edge of its column instead of
-           centering it (default `margin: 0 auto`). */
-        margin-left: auto;
-        margin-right: 0;
-        justify-content: flex-end;
+    /* Give the text side more width */
+    .VPHome .VPHero .main {
+        width: 65% !important;
+        max-width: 800px !important; /* Forces VitePress to allow wider text */
+    }
+
+    /* Shrink the image side container to match */
+    .VPHome .VPHero .image {
+        width: 35% !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+
+    /* Optional: You can also prevent the specific text from wrapping */
+    .VPHome .VPHero .text {
+        white-space: nowrap;
+    }
+
+    .VPHome .VPHero .image-src {
+        margin-right: 0 !important;
+        margin-left: auto !important;
     }
 }
 
