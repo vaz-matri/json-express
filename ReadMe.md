@@ -85,12 +85,12 @@ The runtime is non-interactive — if multiple plugins are installed in the same
 ### The Default Stack
 
 `@json-express/boot` bundles the recommended set:
-- **Config:** [`@json-express/config-env`](./packages/config-env)
-- **Logger:** [`@json-express/logger-console`](./packages/logger-console)
-- **Server:** [`@json-express/transport-express`](./packages/transport-express)
-- **API:** [`@json-express/api-rest`](./packages/api-rest)
-- **Database:** [`@json-express/adapter-memory`](./packages/adapter-memory)
-- **Docs:** [`@json-express/docs-light`](./packages/docs-light)
+- **Config:** [`@json-express/config-env`](./packages/config-env/README.md)
+- **Logger:** [`@json-express/logger-console`](./packages/logger-console/README.md)
+- **Server:** [`@json-express/transport-express`](./packages/transport-express/README.md)
+- **API:** [`@json-express/api-rest`](./packages/api-rest/README.md)
+- **Database:** [`@json-express/adapter-memory`](./packages/adapter-memory/README.md)
+- **Docs:** [`@json-express/docs-light`](./packages/docs-light/README.md)
 
 ---
 
@@ -108,35 +108,34 @@ Recommended as a `devDependency` or invoked via `npx`.
 
 ---
 
-## 🧩 The Ecosystem (Mix & Match)
+## 🧩 The Ecosystem
 
 ### 🛠️ Core & Tooling
-* **[`@json-express/core`](./packages/core)** - Kernel + IoC container + Auto-Discovery Orchestrator. Provides the `json-express` binary.
-* **[`@json-express/boot`](./packages/boot)** - "Batteries Included" preset bundling the recommended default stack.
-* **[`@json-express/cli`](./packages/cli)** - Offline developer utility exposing the `jex` binary (`init`, `configure`, `export`).
+* **[`@json-express/core`](./packages/core/README.md)** - Kernel + IoC container + Auto-Discovery Orchestrator. Provides the `json-express` binary.
+* **[`@json-express/boot`](./packages/boot/README.md)** - "Batteries Included" preset bundling the recommended default stack.
 
 ### ⚙️ Configuration
-* **[`@json-express/config-env`](./packages/config-env)** *(Default)* - Twelve-Factor `.env` configuration provider.
+* **[`@json-express/config-env`](./packages/config-env/README.md)** *(Default)* - Twelve-Factor `.env` configuration provider.
 
 ### 🌐 Transports (Server Layer)
-* **[`@json-express/transport-express`](./packages/transport-express)** *(Default)* - Express.js server.
-* **[`@json-express/transport-fastify`](./packages/transport-fastify)** - High-performance Fastify server.
+* **[`@json-express/transport-express`](./packages/transport-express/README.md)** *(Default)* - Express.js server.
+* **[`@json-express/transport-fastify`](./packages/transport-fastify/README.md)** - High-performance Fastify server.
 
 ### 🔌 API Paradigms
-* **[`@json-express/api-rest`](./packages/api-rest)** *(Default)* - Standardized RESTful routes (`GET`, `POST`, `PATCH`, `DELETE`).
-* **[`@json-express/api-graphql`](./packages/api-graphql)** - Generates a GraphQL schema and resolvers.
+* **[`@json-express/api-rest`](./packages/api-rest/README.md)** *(Default)* - Standardized RESTful routes (`GET`, `POST`, `PATCH`, `DELETE`).
+* **[`@json-express/api-graphql`](./packages/api-graphql/README.md)** - Generates a GraphQL schema and resolvers.
 
 ### 🗄️ Adapters (Database Layer)
-* **[`@json-express/adapter-memory`](./packages/adapter-memory)** *(Default)* - Fast, in-memory storage.
-* **[`@json-express/adapter-json`](./packages/adapter-json)** - Persists each collection as a JSON file on disk.
+* **[`@json-express/adapter-memory`](./packages/adapter-memory/README.md)** *(Default)* - Fast, in-memory storage.
+* **[`@json-express/adapter-json`](./packages/adapter-json/README.md)** - Persists each collection as a JSON file on disk.
 
 ### 📊 Loggers (Observability Layer)
-* **[`@json-express/logger-console`](./packages/logger-console)** *(Default)* - Zero-dependency standard output logging.
-* **[`@json-express/logger-pino`](./packages/logger-pino)** - Enterprise high-performance structured JSON logging.
+* **[`@json-express/logger-console`](./packages/logger-console/README.md)** *(Default)* - Zero-dependency standard output logging.
+* **[`@json-express/logger-pino`](./packages/logger-pino/README.md)** - Enterprise high-performance structured JSON logging.
 
 ### 📚 Documentation Providers
-* **[`@json-express/docs-light`](./packages/docs-light)** *(Default)* - Lightweight HTML manifest at `/docs`.
-* **[`@json-express/docs-swagger`](./packages/docs-swagger)** - Interactive Swagger UI at `/docs`.
+* **[`@json-express/docs-light`](./packages/docs-light/README.md)** *(Default)* - Lightweight HTML manifest at `/docs`.
+* **[`@json-express/docs-swagger`](./packages/docs-swagger/README.md)** - Interactive Swagger UI at `/docs`.
 
 ---
 
