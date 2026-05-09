@@ -114,7 +114,8 @@ export default defineConfig({
             { text: 'Getting Started', link: '/getting-started' },
             { text: 'Zero-Config JSON Mode', link: '/json-mode' },
             { text: 'Presets', link: '/presets' },
-            { text: 'Architecture', link: '/architecture' }
+            { text: 'Architecture', link: '/architecture' },
+            { text: 'Migrating to v2', link: '/migration-v2' }
           ]
         },
         {

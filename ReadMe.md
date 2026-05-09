@@ -1,7 +1,7 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="logo/logo_long_desc_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="logo/logo_long_desc.svg">
-  <img src="logo/logo_long_desc.svg" alt="JSONExpress">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/public/logo-long-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/public/logo-long-light.svg">
+  <img src="docs/public/logo-long-dark.svg" alt="JSONExpress">
 </picture>
 
 Skip the backend bottleneck and go from prototype to MVP launch faster.
