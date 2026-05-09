@@ -10,9 +10,13 @@
     "e2e": "pnpm --filter './example/**' test",
     "publish:all": "pnpm -r publish --access public",
     "docs:dev": "pnpm --filter @json-express/docs run dev",
-    "docs:build": "pnpm --filter @json-express/docs run build"
+    "docs:build": "pnpm --filter @json-express/docs run build",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@json-express/core": "workspace:^",
     "@playwright/test": "^1.59.1",
     "@types/js-yaml": "^4.0.9",

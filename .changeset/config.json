@@ -1,0 +1,42 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.4/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [
+    [
+      "@json-express/adapter-json",
+      "@json-express/adapter-memory",
+      "@json-express/api-graphql",
+      "@json-express/api-rest",
+      "@json-express/boot",
+      "@json-express/config",
+      "@json-express/config-env",
+      "@json-express/core",
+      "@json-express/docs-light",
+      "@json-express/docs-swagger",
+      "@json-express/email-console",
+      "@json-express/kv-memory",
+      "@json-express/logger-console",
+      "@json-express/logger-pino",
+      "@json-express/middleware-auth",
+      "@json-express/middleware-validation",
+      "@json-express/plugin-devcert",
+      "@json-express/plugin-health",
+      "@json-express/plugin-identity",
+      "@json-express/preset-ecommerce",
+      "@json-express/preset-identity",
+      "@json-express/queue-memory",
+      "@json-express/seeder-faker",
+      "@json-express/transport-express",
+      "@json-express/transport-fastify"
+    ]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "master",
+  "updateInternalDependencies": "patch",
+  "ignore": [
+    "@json-express/docs",
+    "examples-login"
+  ]
+}
