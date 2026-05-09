@@ -1,5 +1,6 @@
 {
-    "name": "logger-pino",
+    "name": "example-logger-pino",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for logger-pino — verifies Pino logger swap and server boot",
     "scripts": {

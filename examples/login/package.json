@@ -1,5 +1,6 @@
 {
     "name": "examples-login",
+    "private": true,
     "version": "1.0.0",
     "description": "Login page example",
     "scripts": {

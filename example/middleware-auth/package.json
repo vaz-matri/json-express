@@ -1,5 +1,6 @@
 {
-    "name": "middleware-auth",
+    "name": "example-middleware-auth",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for middleware-auth — verifies JWT authentication",
     "scripts": {

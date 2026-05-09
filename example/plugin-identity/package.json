@@ -1,5 +1,6 @@
 {
-    "name": "plugin-identity-example",
+    "name": "example-plugin-identity",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for @json-express/plugin-identity — login, register, refresh, logout",
     "scripts": {

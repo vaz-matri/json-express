@@ -1,5 +1,6 @@
 {
-    "name": "plugin-health",
+    "name": "example-plugin-health",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for plugin-health — verifies health check endpoint",
     "scripts": {

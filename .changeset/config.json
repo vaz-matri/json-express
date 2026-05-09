@@ -37,6 +37,7 @@
   "updateInternalDependencies": "patch",
   "ignore": [
     "@json-express/docs",
-    "examples-login"
+    "example-*",
+    "examples-*"
   ]
 }

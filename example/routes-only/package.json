@@ -1,5 +1,6 @@
 {
-    "name": "routes-only",
+    "name": "example-routes-only",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for defineRoutes() — fieldless models that declare only behavior",
     "scripts": {

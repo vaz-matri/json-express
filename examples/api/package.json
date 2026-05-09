@@ -1,5 +1,6 @@
 {
-    "name": "api",
+    "name": "examples-api",
+    "private": true,
     "version": "1.0.0",
     "description": "Login page example",
     "scripts": {

@@ -1,5 +1,6 @@
 {
-    "name": "plugin-devcert",
+    "name": "example-plugin-devcert",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for plugin-devcert — verifies plugin boots without crashing",
     "scripts": {

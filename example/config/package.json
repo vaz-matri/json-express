@@ -1,5 +1,6 @@
 {
-    "name": "config",
+    "name": "example-config",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for config — verifies .env-driven configuration via the default config-env provider",
     "scripts": {

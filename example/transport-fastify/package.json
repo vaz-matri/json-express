@@ -1,5 +1,6 @@
 {
-    "name": "transport-fastify",
+    "name": "example-transport-fastify",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for transport-fastify — verifies Fastify transport swap from Express",
     "scripts": {

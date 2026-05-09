@@ -112,7 +112,7 @@ Recommended as a `devDependency` or invoked via `npx`.
 
 ### 🛠️ Core & Tooling
 * **[`@json-express/core`](./packages/core/README.md)** - Kernel + IoC container + Auto-Discovery Orchestrator. Provides the `json-express` binary.
-* **[`@json-express/boot`](./packages/boot/README.md)** - "Batteries Included" preset bundling the recommended default stack.
+* **[`@json-express/boot`](./presets/boot/README.md)** - "Batteries Included" preset bundling the recommended default stack.
 
 ### ⚙️ Configuration
 * **[`@json-express/config-env`](./packages/config-env/README.md)** *(Default)* - Twelve-Factor `.env` configuration provider.

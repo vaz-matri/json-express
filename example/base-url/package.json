@@ -1,5 +1,6 @@
 {
-    "name": "base-url",
+    "name": "example-base-url",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for base-url — verifies API prefix configured via .env",
     "scripts": {

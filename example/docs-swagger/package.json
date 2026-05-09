@@ -1,5 +1,6 @@
 {
-    "name": "docs-swagger",
+    "name": "example-docs-swagger",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for docs-swagger — verifies Swagger/OpenAPI documentation",
     "scripts": {

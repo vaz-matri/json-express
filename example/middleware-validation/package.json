@@ -1,5 +1,6 @@
 {
-    "name": "middleware-validation",
+    "name": "example-middleware-validation",
+    "private": true,
     "version": "1.0.0",
     "description": "E2E test for middleware-validation — verifies Zod schema rejection",
     "scripts": {
