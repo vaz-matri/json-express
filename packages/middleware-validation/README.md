@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/middleware-validation
 
 Model-driven validation middleware for JSONExpress v2. Reads each model's `validation` block at boot, derives a Zod baseline from `fields`, and rejects malformed requests with a structured 400.

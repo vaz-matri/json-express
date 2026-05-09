@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/logger-pino
 
 High-performance, industry-standard structured logging for JSONExpress.

@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/config-env
 
 The default Configuration Provider for [JSONExpress](https://github.com/vaz-matri/json-express).

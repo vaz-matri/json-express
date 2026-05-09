@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # API prefix example
 
 Mounts every generated route under a configurable prefix (e.g. `/api`) instead of the root path. Useful when your service shares a domain with a frontend or sits behind a reverse proxy that strips a path prefix.

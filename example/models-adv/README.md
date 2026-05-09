@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Advanced models example
 
 Three model-level options of `defineModel` working in concert: **`hooks`**, **`endpoints`**, and **`exposeApi`**. The example boots three cooperating models — `albums` (mutated through hooks + a custom action), `artists` (relation target), and `audit-log` (an internal collection hidden from auto-CRUD) — and uses each to demo one option without losing sight of the others.

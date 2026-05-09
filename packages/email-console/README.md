@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # `@json-express/email-console`
 
 > **Console email provider for JSONExpress v2.**

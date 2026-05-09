@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # TypeScript models example
 
 Switch from inferred schemas (one JSON file = one collection, types guessed from the first row) to explicit TypeScript model files. You get strict typing, custom field types beyond what inference can detect, constraints, defaults, and relations between collections.

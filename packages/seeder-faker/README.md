@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/seeder-faker
 
 The official Faker plugin for JSONExpress. Drops realistic mock data into your database on boot — schema-aware out of the box, with foreign keys auto-wired across related collections. Zero configuration needed for the common case; full per-collection control available when you want it.

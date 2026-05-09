@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Fieldless models / `defineRoutes()` example
 
 Some routes don't belong to an entity — `/search`, `/auth/login`, `/webhooks/stripe`. In JSONExpress v2, those still live in `models/*.ts`, but with no `fields` block. `defineRoutes()` is sugar that signals intent.

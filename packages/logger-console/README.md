@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/logger-console
 
 The default, zero-dependency console logger for the JSONExpress meta-framework.

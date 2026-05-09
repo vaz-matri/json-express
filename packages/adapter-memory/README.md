@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/adapter-memory
 
 The default Database Adapter for [JSONExpress](https://github.com/vaz-matri/json-express).

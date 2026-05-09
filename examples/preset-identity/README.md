@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Full identity flow — one preset, two installs
 
 A complete, runnable showcase of how `plugin-identity` and `middleware-auth` collaborate to deliver real authentication: registration, login, refresh-token rotation, logout, password recovery, role gating, owner-scoped resources, and a public health probe — all installed with a single meta-package.

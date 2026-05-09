@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/transport-fastify
 
 High-performance Fastify transport plugin for JSONExpress v2.

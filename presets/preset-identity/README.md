@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/preset-identity
 
 Zero-code preset that bundles `plugin-identity` with sensible local defaults so you can boot a working auth stack with a single install.

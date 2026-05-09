@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Health & info endpoints example
 
 Adds `/health` and `/info` endpoints to your server — the same shape Kubernetes, ECS, and most uptime checkers expect for liveness and readiness probes.

@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Default stack example
 
 The fastest way to spin up a working API. Install one package, drop a JSON file in `data/`, run the server. You're done.

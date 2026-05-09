@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # `@json-express/adapter-json`
 
 > **Persistent JSON file database adapter for JSONExpress v2.**

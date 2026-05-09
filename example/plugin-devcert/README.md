@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Local HTTPS dev certificate example
 
 Generates a self-signed HTTPS certificate for `localhost` so you can develop against `https://localhost:3000` without browser warnings or `--insecure` curl flags.

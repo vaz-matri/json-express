@@ -43,7 +43,8 @@ export default defineConfig({
     }
   },
   themeConfig: {
-    logo: '/logo.svg',
+    logo: { light: '/logo-long-light.svg', dark: '/logo-long-dark.svg' },
+    siteTitle: false,
 
     nav: [
       { text: 'Docs', link: '/getting-started' },

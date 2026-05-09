@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # `@json-express/plugin-identity`
 
 > **Local identity plugin for JSONExpress v2.**

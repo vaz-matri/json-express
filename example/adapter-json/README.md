@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # JSON file storage example
 
 A minimal JSONExpress setup where your collections live as plain `.json` files on disk and survive server restarts.

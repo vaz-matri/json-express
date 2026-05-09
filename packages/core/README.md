@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/core
 
 The IoC Kernel **and** the Auto-Discovery Engine for [JSONExpress](https://github.com/vaz-matri/json-express). Provides the `json-express` binary that runs your server.

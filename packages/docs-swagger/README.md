@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # `@json-express/docs-swagger`
 
 > **Documentation provider plugin for JSONExpress v2.**

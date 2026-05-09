@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Swagger / OpenAPI docs example
 
 Swaps the default lightweight docs page for [Swagger UI](https://swagger.io/tools/swagger-ui/) backed by an OpenAPI 3.0 spec. You get an interactive "try it out" console at `/docs`, and the spec itself is generated authoritatively from your model definitions — resource grouping, request bodies, and component schemas all derive from `models/*.ts`, not from URL parsing.

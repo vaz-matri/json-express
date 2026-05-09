@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Pino structured logging example
 
 Swaps the default pretty console logger for [Pino](https://getpino.io). You get one JSON object per line, automatic `traceId` correlation across components, and output that drops straight into Datadog, Loki, CloudWatch, or any other log aggregator.

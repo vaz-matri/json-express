@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/transport-express
 
 The official Express.js transport layer for [JSONExpress](https://github.com/vaz-matri/json-express).

@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Fastify transport example
 
 Swaps the default Express HTTP server for Fastify. Same routes, same JSON files — just a different transport underneath.

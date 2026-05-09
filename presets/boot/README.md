@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # @json-express/boot
 
 Zero-code preset that bundles the recommended JSON Express stack so you can boot a working server with a single install.

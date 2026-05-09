@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # HTML frontend + JSON Express API example
 
 A minimal static HTML page that consumes a JSON Express API. Useful as a starting point for "small frontend, small backend" projects where you don't want a build step or a frontend framework.

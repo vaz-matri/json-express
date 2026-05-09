@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Identity-driven mini publishing platform
 
 A working example that exercises every access pattern `plugin-identity` introduces — owner-scoped writes, field-level redaction, role-gated custom endpoints, and a fieldless route module that reads the JWT directly. Use it as a reference for any project that needs real auth out of the box.

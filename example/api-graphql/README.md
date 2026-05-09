@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # GraphQL API example
 
 Swaps the default REST API for an auto-generated GraphQL schema. Queries, mutations, and relations all come from your model files — no resolver boilerplate.

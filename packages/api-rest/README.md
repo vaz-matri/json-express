@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # `@json-express/api-rest`
 
 > **REST API generator plugin for JSONExpress v2.**

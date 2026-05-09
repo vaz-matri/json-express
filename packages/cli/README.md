@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # `@json-express/cli`
 
 > **The Human Interface for JSONExpress v2.**

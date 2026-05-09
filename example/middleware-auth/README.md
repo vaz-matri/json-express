@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # JWT auth & RBAC example
 
 Protects your API with JWT authentication and adds row- and field-level access rules driven from the model schema. Models a small bookstore: **authors** write **books**, **publishers** release them, and **users** leave private **reviews**.

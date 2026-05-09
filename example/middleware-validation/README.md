@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Zod request validation example
 
 Adds [Zod](https://zod.dev) schema validation in front of your routes. Bad payloads get rejected with `400` and a structured error before they reach your data layer.

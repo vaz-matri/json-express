@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Fake data seeding example
 
 Populates your collections with realistic fake data on boot using [`@faker-js/faker`](https://fakerjs.dev). Schema-aware out of the box — drop a model in `models/`, run `--seed`, and you get 10 records with foreign keys auto-resolved across relations.

@@ -4,7 +4,7 @@ title: JSONExpress — Instant REST & GraphQL API from a JSON File
 description: Open-source Node.js meta-framework. Drop a JSON file, get REST + GraphQL in seconds. Swap in Postgres, Fastify, or Auth0 when you're ready. MIT licensed, TypeScript-native. 23 modular packages.
 
 hero:
-  name: "JSONExpress"
+  name: "<span style='font-weight:800'>JSON</span><span style='font-weight:600'>Express</span>"
   text: "Drop a JSON file. Get an API."
   tagline: "Instant REST + GraphQL from a JSON file. Swap in Postgres, Fastify, or Auth0 when you outgrow it — no rewrites, same config. MIT licensed, TypeScript-native."
   actions:

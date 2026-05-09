@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # Config — the reference example
 
 Every JSONExpress plugin reads its settings from a single, shared **config provider**. This example is the canonical reference for that provider: it shows the simplest form (a `.env` file) and documents every other supported file format, every key the framework reads, and which package owns each one.

@@ -1,3 +1,5 @@
+<img src="../../docs/public/logo-long-light.svg" alt="JSONExpress">
+
 # `@json-express/middleware-auth`
 
 > **JWT authentication middleware for JSONExpress v2.**
