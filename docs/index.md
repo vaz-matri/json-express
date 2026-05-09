@@ -125,10 +125,6 @@ Every capability ships as its own package — install only what you need, swap i
     <path d="M 0 -14 L 12 -8 L 12 2 Q 12 12 0 16 Q -12 12 -12 2 L -12 -8 Z" fill="#1f5e57"></path>
     <path d="M -6 0 L -1 5 L 7 -5" fill="none" stroke="#c8d97a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
   </g>
-  <circle cx="60" cy="60" r="3" fill="#2a9d8f" opacity="0.5"></circle>
-  <circle cx="500" cy="60" r="3" fill="#c8d97a" opacity="0.7"></circle>
-  <circle cx="40" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
-  <circle cx="120" cy="284" r="3" fill="#2a9d8f" opacity="0.5"></circle>
 </svg>
 </div>
 <div class="eco-content">
@@ -219,10 +215,6 @@ Every capability ships as its own package — install only what you need, swap i
   <g transform="translate(82 102)">
     <path d="M 0 -16 L -10 4 L -2 4 L -8 22 L 12 -2 L 2 -2 L 8 -16 Z" fill="#c8d97a"></path>
   </g>
-  <circle cx="510" cy="60" r="3" fill="#c8d97a" opacity="0.7"></circle>
-  <circle cx="20" cy="240" r="3" fill="#2a9d8f" opacity="0.5"></circle>
-  <circle cx="40" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
-  <circle cx="510" cy="290" r="3" fill="#2a9d8f" opacity="0.5"></circle>
 </svg>
 </div>
 <div class="eco-content">
@@ -304,10 +296,6 @@ Every capability ships as its own package — install only what you need, swap i
     <rect x="-44" y="-10" width="88" height="20" rx="10" fill="#c8d97a"></rect>
     <text x="0" y="4" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#2c2924" text-anchor="middle">one model</text>
   </g>
-  <circle cx="60" cy="60" r="3" fill="#2a9d8f" opacity="0.5"></circle>
-  <circle cx="500" cy="60" r="3" fill="#c8d97a" opacity="0.7"></circle>
-  <circle cx="40" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
-  <circle cx="520" cy="290" r="3" fill="#2a9d8f" opacity="0.5"></circle>
 </svg>
 </div>
 <div class="eco-content">
@@ -427,10 +415,6 @@ Every capability ships as its own package — install only what you need, swap i
       <rect x="6" y="132" width="64" height="3" rx="1" fill="#1f5e57" opacity="0.6"></rect>
     </g>
   </g>
-  <circle cx="40" cy="60" r="3" fill="#2a9d8f" opacity="0.5"></circle>
-  <circle cx="510" cy="60" r="3" fill="#c8d97a" opacity="0.7"></circle>
-  <circle cx="40" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
-  <circle cx="510" cy="290" r="3" fill="#2a9d8f" opacity="0.5"></circle>
 </svg>
 </div>
 <div class="eco-content">
@@ -466,17 +450,13 @@ Every capability ships as its own package — install only what you need, swap i
   <g transform="translate(360 60) rotate(28)">
     <circle r="24" fill="none" stroke="#1f5e57" stroke-width="8"></circle>
     <rect x="20" y="-5" width="78" height="10" rx="2" fill="#1f5e57"></rect>
-    <rect x="76" y="5" width="9" height="11" fill="#1f5e57"></rect>
-    <rect x="90" y="5" width="9" height="16" fill="#1f5e57"></rect>
-    <circle r="9" fill="none"></circle>
+    <rect x="70" y="5" width="9" height="10" fill="#1f5e57"></rect>
+    <rect x="85" y="5" width="9" height="15" fill="#1f5e57"></rect>
   </g>
   <g transform="translate(400 244)">
     <circle r="28" fill="#c8d97a"></circle>
     <path d="M -10 0 L -3 8 L 11 -8" fill="none" stroke="#2c2924" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
   </g>
-  <circle cx="80" cy="60" r="4" fill="#2a9d8f" opacity="0.5"></circle>
-  <circle cx="60" cy="240" r="3" fill="#c8d97a" opacity="0.7"></circle>
-  <circle cx="480" cy="160" r="3" fill="#2a9d8f" opacity="0.5"></circle>
 </svg>
 </div>
 <div class="eco-content">
@@ -533,21 +513,6 @@ Every capability ships as its own package — install only what you need, swap i
     <rect x="16" y="160" width="100" height="6" rx="2" fill="#f5f0e8" opacity="0.4"></rect>
     <rect x="120" y="160" width="40" height="6" rx="2" fill="#c8d97a" opacity="0.7"></rect>
   </g>
-  <g transform="translate(380 70) rotate(20)">
-    <circle r="30" fill="none" stroke="#1f5e57" stroke-width="7"></circle>
-    <circle r="30" fill="none" stroke="#1f5e57" stroke-width="7" stroke-dasharray="80 60" stroke-linecap="round"></circle>
-    <path d="M 28 -8 L 34 0 L 26 6" fill="none" stroke="#1f5e57" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></path>
-    <path d="M -28 8 L -34 0 L -26 -6" fill="none" stroke="#1f5e57" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></path>
-    <circle r="8" fill="#c8d97a"></circle>
-  </g>
-  <g transform="translate(420 244)">
-    <circle r="28" fill="#c8d97a"></circle>
-    <path d="M -10 0 L -3 8 L 11 -8" fill="none" stroke="#2c2924" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
-  </g>
-  <circle cx="80" cy="60" r="4" fill="#2a9d8f" opacity="0.5"></circle>
-  <circle cx="60" cy="240" r="3" fill="#c8d97a" opacity="0.7"></circle>
-  <circle cx="500" cy="170" r="3" fill="#2a9d8f" opacity="0.5"></circle>
-  <circle cx="100" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
 </svg>
 </div>
 <div class="eco-content">
@@ -658,10 +623,6 @@ Every capability ships as its own package — install only what you need, swap i
       <text x="25" y="12" font-family="ui-monospace,Menlo,monospace" font-size="9" font-weight="700" fill="#f5f0e8" text-anchor="middle">uuid</text>
     </g>
   </g>
-  <circle cx="510" cy="60" r="3" fill="#c8d97a" opacity="0.7"></circle>
-  <circle cx="40" cy="290" r="2.5" fill="#c8d97a" opacity="0.6"></circle>
-  <circle cx="510" cy="290" r="3" fill="#2a9d8f" opacity="0.5"></circle>
-  <circle cx="260" cy="100" r="2.5" fill="#2a9d8f" opacity="0.4"></circle>
 </svg>
 </div>
 <div class="eco-content">
@@ -741,16 +702,12 @@ Every capability ships as its own package — install only what you need, swap i
     <circle cx="0" cy="6" r="2.5" fill="#f5f0e8"></circle>
   </g>
   <g transform="translate(252 184)">
-    <rect x="34" y="36" width="14" height="46" rx="5" fill="#1f5e57" transform="rotate(38 34 36)"></rect>
+    <rect x="25" y="25" width="12" height="45" rx="6" fill="#1f5e57" transform="rotate(-45 25 25)"></rect>
     <circle r="42" fill="#1f5e57"></circle>
     <circle r="34" fill="#c8d97a" opacity="0.45"></circle>
     <circle r="34" fill="none" stroke="#f5f0e8" stroke-width="1.5" opacity="0.5"></circle>
     <path d="M -22 -14 Q -30 0 -22 18" stroke="#f5f0e8" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"></path>
   </g>
-  <circle cx="80" cy="120" r="3" fill="#2a9d8f" opacity="0.5"></circle>
-  <circle cx="60" cy="220" r="2.5" fill="#c8d97a" opacity="0.7"></circle>
-  <circle cx="500" cy="80" r="3" fill="#2a9d8f" opacity="0.5"></circle>
-  <circle cx="510" cy="270" r="3" fill="#c8d97a" opacity="0.6"></circle>
 </svg>
 </div>
 <div class="eco-content">
@@ -1068,7 +1025,7 @@ One schema definition. Every layer is independently swappable.
   flex: 0 0 48%;
   border-radius: 12px;
   overflow: hidden;
-  background: var(--vp-c-bg-alt);
+  /*background: var(--vp-c-bg-alt);*/
 }
 .eco-img svg {
   display: block;
