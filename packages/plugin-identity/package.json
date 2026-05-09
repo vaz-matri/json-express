@@ -1,6 +1,6 @@
 {
   "name": "@json-express/plugin-identity",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "Local Identity plugin for JSON Express — auto-injected users/roles schemas, login/register/refresh endpoints, and password hashing.",
   "type": "module",
   "main": "./dist/index.cjs",

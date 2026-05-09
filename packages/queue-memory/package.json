@@ -1,6 +1,6 @@
 {
   "name": "@json-express/queue-memory",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "In-process task queue for JSON Express — setTimeout-based, single-instance only. Default for local dev.",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,6 +1,6 @@
 {
   "name": "@json-express/plugin-devcert",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "Automatic Local HTTPS via Devcert",
   "type": "module",
   "main": "./dist/index.cjs",

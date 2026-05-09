@@ -1,6 +1,6 @@
 {
   "name": "@json-express/boot",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "Batteries-included default stack for JSON Express (memory adapter, Express transport, REST API, console logger, light docs).",
   "main": "README.md",
   "dependencies": {

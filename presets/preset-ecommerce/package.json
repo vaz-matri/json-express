@@ -1,12 +1,12 @@
 {
   "name": "@json-express/preset-ecommerce",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "JSON Express E-Commerce Preset (Models & Data Templates)",
   "main": "package.json",
   "dependencies": {
     "@json-express/boot": "workspace:*"
   },
   "files": [
-      "templates"
+    "templates"
   ]
 }

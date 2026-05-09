@@ -1,6 +1,6 @@
 {
   "name": "@json-express/cli",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "Developer workflow utility for JSON Express (scaffold projects, export collections to typed models). The server itself runs via the json-express binary shipped by @json-express/core.",
   "type": "module",
   "bin": {

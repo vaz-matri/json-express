@@ -1,6 +1,6 @@
 {
   "name": "@json-express/email-console",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "Console email provider for JSON Express — logs the message instead of sending. Default for local dev.",
   "type": "module",
   "main": "./dist/index.cjs",

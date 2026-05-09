@@ -1,6 +1,6 @@
 {
   "name": "@json-express/logger-pino",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "description": "High-performance Pino logger for JSON Express v2",
   "type": "module",
   "main": "./dist/index.cjs",
