@@ -7,7 +7,7 @@
     "build": "vitepress build",
     "serve": "vitepress serve"
   },
-  "devDependencies": {
+  "dependencies": {
     "vitepress": "^1.0.0-rc.31"
   }
 }
