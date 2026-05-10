@@ -19,7 +19,7 @@ npm install @json-express/adapter-memory
 
 ## Configuration
 
-The adapter is auto-discovered by the `json-express` runtime — installing the package is the entire configuration. It is the default adapter shipped with [`@json-express/boot`](/boot).
+The adapter is auto-discovered by the `json-express` runtime — installing the package is the entire configuration. It is the default adapter shipped with [`@json-express/boot`](/packages/boot).
 
 ```bash
 npm install @json-express/adapter-memory
@@ -50,5 +50,5 @@ You might wonder: *"If I test my app using RAM, how do I know it will work in pr
 This adapter is strictly verified against the internal **Adapter Compliance Suite**. It guarantees 100% feature parity with enterprise SQL adapters. If you issue a `GET /albums?_expand=artist`, the `MemoryAdapter` will perform the exact same foreign-key resolution logic as a real SQL join. If you insert a duplicate email, it will throw the exact same `UniqueConstraintError`.
 
 ## Related Ecosystem Plugins
-*   **[@json-express/core](/core):** Run the `runAdapterComplianceTests` from the core testing utilities to verify adapter behavior.
-*   **[@json-express/adapter-json](/adapter-json):** Swap to the JSON file adapter if you want your mock data to survive server restarts!
+*   **[@json-express/core](/packages/core):** Run the `runAdapterComplianceTests` from the core testing utilities to verify adapter behavior.
+*   **[@json-express/adapter-json](/packages/adapter-json):** Swap to the JSON file adapter if you want your mock data to survive server restarts!

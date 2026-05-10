@@ -16,7 +16,7 @@ Core itself contains zero HTTP, zero database, and zero filesystem-handler logic
 
 ## Installation
 
-Most users install [`@json-express/boot`](/boot), which depends on core. Install core directly only if you want to hand-pick every plugin:
+Most users install [`@json-express/boot`](/packages/boot), which depends on core. Install core directly only if you want to hand-pick every plugin:
 
 ```bash
 npm install @json-express/core
@@ -138,7 +138,7 @@ const traceId = RequestContext.getTraceId(); // auto-injected UUID
 
 ## Related
 
-- [@json-express/boot](/boot) — the recommended default stack
-- [Presets](/presets) — bundle a stack as a single npm package
-- [@json-express/config-env](/config-env) — the default configuration provider
-- [Architecture](/architecture) — kernel, IoC container, plugin lifecycle in depth
+- [@json-express/boot](/packages/boot) — the recommended default stack
+- [Presets](/guide/presets) — bundle a stack as a single npm package
+- [@json-express/config-env](/packages/config-env) — the default configuration provider
+- [Architecture](/guide/architecture) — kernel, IoC container, plugin lifecycle in depth

@@ -64,5 +64,5 @@ dbLogger.info('Connected to database');
 Pino is designed to add virtually zero overhead to your application. Unlike Winston or Bunyan, Pino uses worker threads for serialization and avoids synchronous I/O entirely.
 
 ## Related Ecosystem Packages
-*   **[@json-express/logger-console](/logger-console):** The zero-dependency fallback logger for when you don't need structured JSON output.
-*   **[@json-express/core](/core):** Provides the `RequestContext` that automatically stamps `traceId` on every log entry.
+*   **[@json-express/logger-console](/packages/logger-console):** The zero-dependency fallback logger for when you don't need structured JSON output.
+*   **[@json-express/core](/packages/core):** Provides the `RequestContext` that automatically stamps `traceId` on every log entry.

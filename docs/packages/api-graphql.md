@@ -28,7 +28,7 @@ npx json-express
 
 By default, the API mounts at `POST /graphql` and includes a built-in GraphiQL playground at `GET /graphql` for rapid prototyping.
 
-If you have multiple API generators installed (e.g. GraphQL alongside [REST](/api-rest)), pick one in `.env`:
+If you have multiple API generators installed (e.g. GraphQL alongside [REST](/packages/api-rest)), pick one in `.env`:
 
 ```bash
 jex.api=@json-express/api-graphql
@@ -73,5 +73,5 @@ export default defineModel({
 ```
 
 ## Related Ecosystem Plugins
-*   **[@json-express/api-rest](/api-rest):** You can run the REST generator side-by-side with GraphQL! Both will respect the exact same schemas and database adapters.
-*   **[@json-express/middleware-auth](/middleware-auth):** Use the authentication middleware to secure your GraphQL endpoint with JWTs and Argon2 hashed passwords.
+*   **[@json-express/api-rest](/packages/api-rest):** You can run the REST generator side-by-side with GraphQL! Both will respect the exact same schemas and database adapters.
+*   **[@json-express/middleware-auth](/packages/middleware-auth):** Use the authentication middleware to secure your GraphQL endpoint with JWTs and Argon2 hashed passwords.

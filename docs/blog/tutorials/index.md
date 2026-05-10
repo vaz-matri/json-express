@@ -17,7 +17,7 @@ The first wave of tutorials is in writing. They will cover topics like:
 - Wiring `plugin-identity` to an external IdP (Auth0, Cognito, Firebase)
 - Extending the auto-generated GraphQL schema with custom resolvers
 
-Until they land, the [Getting Started guide](/getting-started) and the [`example/` workspace in the repo](https://github.com/vaz-matri/json-express/tree/master/example) are the most direct path from zero to running code.
+Until they land, the [Getting Started guide](/guide/getting-started) and the [`example/` workspace in the repo](https://github.com/vaz-matri/json-express/tree/master/example) are the most direct path from zero to running code.
 
 ---
 

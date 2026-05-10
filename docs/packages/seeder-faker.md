@@ -122,6 +122,6 @@ Publish it as `@your-scope/seeder-csv` (or any package name containing `seeder-`
 
 ## Related
 
-- [@json-express/adapter-memory](/adapter-memory) — pair with the memory adapter for a fully populated, pristine backend in a single boot
-- [@json-express/adapter-json](/adapter-json) — combine with `--seed-append` to incrementally fill a file-backed dataset
-- [Schemas & Models](/schemas) — what `fields` shapes are available to the synthesizer
+- [@json-express/adapter-memory](/packages/adapter-memory) — pair with the memory adapter for a fully populated, pristine backend in a single boot
+- [@json-express/adapter-json](/packages/adapter-json) — combine with `--seed-append` to incrementally fill a file-backed dataset
+- [Schemas & Models](/guide/schemas) — what `fields` shapes are available to the synthesizer

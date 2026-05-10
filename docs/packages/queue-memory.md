@@ -17,7 +17,7 @@ npm install @json-express/queue-memory
 
 ## Configuration
 
-The queue is auto-discovered by the `json-express` runtime — installing the package is enough. Plugins that need a queue (e.g. [`plugin-identity`](/plugin-identity) for async email dispatch) resolve it from the IoC container automatically.
+The queue is auto-discovered by the `json-express` runtime — installing the package is enough. Plugins that need a queue (e.g. [`plugin-identity`](/packages/plugin-identity) for async email dispatch) resolve it from the IoC container automatically.
 
 ```bash
 npm install @json-express/queue-memory
@@ -62,4 +62,4 @@ If you attempt to use the `cron` option, the adapter will log a warning explaini
 
 ## Related Ecosystem Packages
 *   **@json-express/queue-bullmq** *(coming soon)***:** The production-grade alternative with automatic retries, dead-letter queues, and Redis-backed distributed processing.
-*   **[@json-express/plugin-identity](/plugin-identity):** Uses the queue to dispatch password reset emails asynchronously.
+*   **[@json-express/plugin-identity](/packages/plugin-identity):** Uses the queue to dispatch password reset emails asynchronously.

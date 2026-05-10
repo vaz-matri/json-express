@@ -26,7 +26,7 @@ npm init -y
 npm install @json-express/boot
 ```
 
-`@json-express/boot` is a [dependency-only preset](/presets) that bundles the recommended stack: in-memory adapter, Express transport, REST API, console logger, and `/docs`. It is the only package you need for the quickstart. The runtime entrypoint — `npx json-express` — is shipped by `@json-express/core` (which `boot` pulls in transitively).
+`@json-express/boot` is a [dependency-only preset](/guide/presets) that bundles the recommended stack: in-memory adapter, Express transport, REST API, console logger, and `/docs`. It is the only package you need for the quickstart. The runtime entrypoint — `npx json-express` — is shipped by `@json-express/core` (which `boot` pulls in transitively).
 
 ### 2. Create a data file
 
@@ -219,8 +219,8 @@ Routes with `access: { read: 'public' }` work without a token. Routes with `crea
 
 ## What's Next
 
-- [Presets](/presets) — bundle a stack into a single npm package
-- [Schemas & Models](/schemas) — field types, relations, hooks, and access control in depth
-- [Database Adapters](/adapters) — swap to `adapter-json` for file persistence
-- [Architecture](/architecture) — understand the kernel, IoC container, and plugin lifecycle
-- [Identity & Auth](/identity) — refresh token rotation, JWKS, email verification, and more
+- [Presets](/guide/presets) — bundle a stack into a single npm package
+- [Schemas & Models](/guide/schemas) — field types, relations, hooks, and access control in depth
+- [Database Adapters](/guide/adapters) — swap to `adapter-json` for file persistence
+- [Architecture](/guide/architecture) — understand the kernel, IoC container, and plugin lifecycle
+- [Identity & Auth](/guide/identity) — refresh token rotation, JWKS, email verification, and more

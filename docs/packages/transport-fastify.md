@@ -19,7 +19,7 @@ npm install @json-express/transport-fastify fastify @fastify/cors
 
 ## Configuration
 
-The transport is auto-discovered by the `json-express` runtime — installing the package is enough. Most users start with [`@json-express/boot`](/boot) (which ships `transport-express`) and switch to Fastify by uninstalling Express:
+The transport is auto-discovered by the `json-express` runtime — installing the package is enough. Most users start with [`@json-express/boot`](/packages/boot) (which ships `transport-express`) and switch to Fastify by uninstalling Express:
 
 ```bash
 npm uninstall @json-express/transport-express
@@ -65,5 +65,5 @@ One of the biggest headaches in Node.js is migrating an application from Express
 Because JSONExpress strictly types custom endpoint handlers using `JsonRequest` and `JsonResponse`, you can safely swap `@json-express/transport-express` for `@json-express/transport-fastify` in `package.json` and deploy immediately!
 
 ## Related Ecosystem Packages
-*   **[@json-express/transport-express](/transport-express):** The default, highly stable transport layer.
-*   **[@json-express/api-graphql](/api-graphql):** The Fastify transport seamlessly serves the generated GraphQL endpoints!
+*   **[@json-express/transport-express](/packages/transport-express):** The default, highly stable transport layer.
+*   **[@json-express/api-graphql](/packages/api-graphql):** The Fastify transport seamlessly serves the generated GraphQL endpoints!

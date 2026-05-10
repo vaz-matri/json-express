@@ -9,7 +9,7 @@ description: "Zero-dependency default logger for JSONExpress — auto-discovered
 
 `@json-express/logger-console` implements `ILogger` using native `console.log`, `console.warn`, and `console.error`. It is auto-discovered by the `json-express` runtime and registered first, before any other plugin — every other plugin's constructor receives this logger via its option bag.
 
-If you want structured JSON output for production, swap to [`@json-express/logger-pino`](/logger-pino).
+If you want structured JSON output for production, swap to [`@json-express/logger-pino`](/packages/logger-pino).
 
 ## Installation
 
@@ -85,6 +85,6 @@ The `debug()` method is a deliberate no-op so verbose plugin internals do not cl
 
 ## Related
 
-- [@json-express/logger-pino](/logger-pino) — structured JSON logs with full level support
-- [@json-express/core](/core) — exposes `RequestContext` and the `ILogger` contract
-- [@json-express/boot](/boot) — bundles this logger in the default stack
+- [@json-express/logger-pino](/packages/logger-pino) — structured JSON logs with full level support
+- [@json-express/core](/packages/core) — exposes `RequestContext` and the `ILogger` contract
+- [@json-express/boot](/packages/boot) — bundles this logger in the default stack

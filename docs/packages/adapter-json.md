@@ -32,7 +32,7 @@ If you want to override the storage path, set it in `.env`:
 jex.adapter.path=./data
 ```
 
-When [`@json-express/adapter-memory`](/adapter-memory) is also installed, pick one explicitly:
+When [`@json-express/adapter-memory`](/packages/adapter-memory) is also installed, pick one explicitly:
 
 ```bash
 jex.adapter=@json-express/adapter-json
@@ -56,5 +56,5 @@ Because all data is stored as raw, formatted JSON text files, this adapter is in
 Despite being a simple file-system adapter, it fully complies with the JSONExpress enterprise architecture. If a user attempts to `POST` a duplicate email to a field marked `unique: true`, the adapter will correctly halt the operation and throw a `UniqueConstraintError`.
 
 ## Related Ecosystem Plugins
-*   **[@json-express/core](/core):** Contains the `IDatabaseAdapter` interface that this package implements.
-*   **[@json-express/adapter-memory](/adapter-memory):** A RAM-based alternative for when you don't want data to persist across server restarts.
+*   **[@json-express/core](/packages/core):** Contains the `IDatabaseAdapter` interface that this package implements.
+*   **[@json-express/adapter-memory](/packages/adapter-memory):** A RAM-based alternative for when you don't want data to persist across server restarts.

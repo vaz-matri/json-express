@@ -43,4 +43,4 @@ The store exposes an `isHealthy()` method that always returns `true` (since RAM 
 
 ## Related Ecosystem Packages
 *   **@json-express/kv-redis** *(coming soon)***:** The production-grade alternative that delegates TTL expiration to native Redis `PSETEX` commands.
-*   **[@json-express/plugin-identity](/plugin-identity):** The primary consumer of the KV store — stores refresh tokens and password reset tokens.
+*   **[@json-express/plugin-identity](/packages/plugin-identity):** The primary consumer of the KV store — stores refresh tokens and password reset tokens.

@@ -161,6 +161,6 @@ When validation succeeds, the middleware replaces the raw `req.body` (or `req.qu
 
 ## Related Packages
 
-- [`@json-express/middleware-auth`](/middleware-auth) — auth runs *before* validation, so unauthenticated callers are 401'd before any schema is parsed.
-- [`@json-express/api-rest`](/api-rest) — attaches this middleware to CRUD routes when the model declares a `validation` block for the matching op, and to custom endpoints whose object form carries `validation`.
-- [`@json-express/api-graphql`](/api-graphql) — applies the create/update validators to mutations, throwing `GraphQLError` with `BAD_USER_INPUT` extensions on failure.
+- [`@json-express/middleware-auth`](/packages/middleware-auth) — auth runs *before* validation, so unauthenticated callers are 401'd before any schema is parsed.
+- [`@json-express/api-rest`](/packages/api-rest) — attaches this middleware to CRUD routes when the model declares a `validation` block for the matching op, and to custom endpoints whose object form carries `validation`.
+- [`@json-express/api-graphql`](/packages/api-graphql) — applies the create/update validators to mutations, throwing `GraphQLError` with `BAD_USER_INPUT` extensions on failure.

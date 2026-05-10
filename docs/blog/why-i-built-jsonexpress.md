@@ -88,6 +88,6 @@ If any of this resonates — if you have hit the same scaffolding cliff, or you 
 
 The best json-server alternative is not one that replaces json-server. It is one that starts exactly where json-server starts, and then keeps going.
 
-[Get started in 60 seconds →](/getting-started)
+[Get started in 60 seconds →](/guide/getting-started)
 
 Star the repo, open an issue, or just try it on your next project. I read everything.

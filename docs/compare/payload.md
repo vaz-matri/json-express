@@ -133,4 +133,4 @@ If you are building outside of Next.js, want to start with a JSON file before co
 
 ---
 
-**Ready to try it?** [Get started in 60 seconds →](/getting-started)
+**Ready to try it?** [Get started in 60 seconds →](/guide/getting-started)

@@ -5,7 +5,7 @@ description: Secure your JSONExpress APIs with auto-discovered identity manageme
 
 # Identity & Auth
 
-The [`@json-express/plugin-identity`](/plugin-identity) package turns JSONExpress from an open API into a zero-trust backend. It is **auto-discovered** — install it (along with its peers) and the `json-express` runtime registers it for you. There is no manual `new IdentityPlugin(...)` wiring.
+The [`@json-express/plugin-identity`](/packages/plugin-identity) package turns JSONExpress from an open API into a zero-trust backend. It is **auto-discovered** — install it (along with its peers) and the `json-express` runtime registers it for you. There is no manual `new IdentityPlugin(...)` wiring.
 
 ## What it does on boot
 
@@ -33,7 +33,7 @@ Administrators and API logs never see user passwords.
 
 ## JWT Verification & Security
 
-The plugin partners with [`@json-express/middleware-auth`](/middleware-auth) to verify the tokens it issues. Both sides read the same keys from the config provider — there is no cross-plugin import.
+The plugin partners with [`@json-express/middleware-auth`](/packages/middleware-auth) to verify the tokens it issues. Both sides read the same keys from the config provider — there is no cross-plugin import.
 
 ### Symmetric (HMAC) vs Asymmetric (JWKS)
 
@@ -74,7 +74,7 @@ There is no `ROOT_ADMIN_EMAIL` / `ROOT_ADMIN_PASSWORD` environment variable — 
 
 ### Where are refresh tokens stored?
 
-Refresh tokens, email verification tokens, and password reset tokens are **not** stored in your primary database. They live in the `IKvStore` ([`@json-express/kv-memory`](/kv-memory) for development; a Redis-backed implementation in production). This keeps the primary database free of ephemeral records and offloads TTL expiration to native KV commands.
+Refresh tokens, email verification tokens, and password reset tokens are **not** stored in your primary database. They live in the `IKvStore` ([`@json-express/kv-memory`](/packages/kv-memory) for development; a Redis-backed implementation in production). This keeps the primary database free of ephemeral records and offloads TTL expiration to native KV commands.
 
 ### Can I use Auth0 / Firebase / Cognito instead of issuing my own tokens?
 
@@ -86,4 +86,4 @@ Yes — set `jex.auth.jwksUri` to your IdP's JWKS endpoint. `middleware-auth` wi
 npm install @json-express/preset-identity
 ```
 
-The [`@json-express/preset-identity`](/presets) preset bundles `plugin-identity`, `middleware-auth`, `kv-memory`, `queue-memory`, and `email-console`.
+The [`@json-express/preset-identity`](/guide/presets) preset bundles `plugin-identity`, `middleware-auth`, `kv-memory`, `queue-memory`, and `email-console`.

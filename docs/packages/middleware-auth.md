@@ -25,7 +25,7 @@ npm install @json-express/middleware-auth
 
 ### 1. Symmetric Local Auth (HMAC)
 
-When paired with [`@json-express/plugin-identity`](/plugin-identity), validation uses an HMAC secret:
+When paired with [`@json-express/plugin-identity`](/packages/plugin-identity), validation uses an HMAC secret:
 
 ```bash
 # .env
@@ -62,5 +62,5 @@ By default, if this middleware is mounted, it protects *everything*. You can use
 *   **`403 Forbidden`:** Returned if the token exists, but fails cryptographic verification, is expired, or its `audience`/`issuer` claims do not match the configuration.
 
 ## Related Ecosystem Packages
-*   **[@json-express/plugin-identity](/plugin-identity):** If you aren't using Auth0, use this plugin to generate the JWTs locally!
-*   **[@json-express/api-rest](/api-rest):** The API generators consume the decoded JWT payload from this middleware to enforce field-level access control.
+*   **[@json-express/plugin-identity](/packages/plugin-identity):** If you aren't using Auth0, use this plugin to generate the JWTs locally!
+*   **[@json-express/api-rest](/packages/api-rest):** The API generators consume the decoded JWT payload from this middleware to enforce field-level access control.

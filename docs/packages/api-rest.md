@@ -17,14 +17,14 @@ npm install @json-express/api-rest
 
 ## Configuration
 
-The REST generator is auto-discovered by the `json-express` runtime — installing the package is enough. It is the default API generator shipped with [`@json-express/boot`](/boot).
+The REST generator is auto-discovered by the `json-express` runtime — installing the package is enough. It is the default API generator shipped with [`@json-express/boot`](/packages/boot).
 
 ```bash
 npm install @json-express/api-rest
 npx json-express
 ```
 
-If you have multiple API generators installed (e.g. REST alongside [GraphQL](/api-graphql)), pick one in `.env`:
+If you have multiple API generators installed (e.g. REST alongside [GraphQL](/packages/api-graphql)), pick one in `.env`:
 
 ```bash
 jex.api=@json-express/api-rest
@@ -75,5 +75,5 @@ export default defineModel({
 ```
 
 ## Related Ecosystem Plugins
-*   **[@json-express/api-graphql](/api-graphql):** You can run the GraphQL generator side-by-side with REST! Both will respect the exact same schemas.
-*   **[@json-express/transport-express](/transport-express):** The engine that actually binds these generated routes to an underlying Node.js server.
+*   **[@json-express/api-graphql](/packages/api-graphql):** You can run the GraphQL generator side-by-side with REST! Both will respect the exact same schemas.
+*   **[@json-express/transport-express](/packages/transport-express):** The engine that actually binds these generated routes to an underlying Node.js server.

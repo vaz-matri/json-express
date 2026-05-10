@@ -104,4 +104,4 @@ If you are a developer building a project that will eventually go live, JSONExpr
 
 ---
 
-**Ready to try it?** [Get started in 60 seconds →](/getting-started)
+**Ready to try it?** [Get started in 60 seconds →](/guide/getting-started)

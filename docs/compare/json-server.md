@@ -153,4 +153,4 @@ JSONExpress is the json-server alternative for when that stops being enough — 
 
 ---
 
-**Ready to try it?** [Get started in 60 seconds →](/getting-started)
+**Ready to try it?** [Get started in 60 seconds →](/guide/getting-started)

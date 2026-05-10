@@ -15,7 +15,7 @@ In the meantime:
 
 - Track day-to-day work in the [JSONExpress GitHub repository](https://github.com/vaz-matri/json-express).
 - Browse package versions on [npm](https://www.npmjs.com/package/@json-express/core).
-- Read the [Getting Started guide](/getting-started) to install the latest published packages.
+- Read the [Getting Started guide](/guide/getting-started) to install the latest published packages.
 
 ---
 

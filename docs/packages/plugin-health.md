@@ -50,4 +50,4 @@ Health probes are typically pinged by Load Balancers every 5 to 10 seconds. If l
 The JSONExpress transport layer automatically detects paths mounted by the Health plugin and **silences their access logs**. You get perfect infrastructure monitoring without the log spam.
 
 ## Related Ecosystem Packages
-*   **[@json-express/core](/core):** The core engine that orchestrates the boot sequence before marking the `/ready` probe as active.
+*   **[@json-express/core](/packages/core):** The core engine that orchestrates the boot sequence before marking the `/ready` probe as active.

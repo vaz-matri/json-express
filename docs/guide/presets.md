@@ -20,7 +20,7 @@ Both flavours work because the `json-express` binary (shipped by `@json-express/
 
 | Preset | Flavour | What it gives you |
 |---|---|---|
-| [`@json-express/boot`](/boot) | Dependency | The recommended default stack: memory adapter, Express transport, REST, console logger, light docs |
+| [`@json-express/boot`](/packages/boot) | Dependency | The recommended default stack: memory adapter, Express transport, REST, console logger, light docs |
 | `@json-express/preset-identity` | Dependency | `plugin-identity` + `middleware-auth` + `email-console` + `kv-memory` + `queue-memory` |
 | `@json-express/preset-ecommerce` | Template | Boot stack + sample `models/` and `data/` for a small e-commerce schema |
 
@@ -128,6 +128,6 @@ The runtime detects packages by the `@json-express/` namespace **or** any name c
 
 ## Related
 
-- [@json-express/boot](/boot) — the default stack preset
-- [Getting Started](/getting-started) — quickstart that uses `@json-express/boot`
-- [@json-express/core](/core) — the runtime that discovers and boots everything
+- [@json-express/boot](/packages/boot) — the default stack preset
+- [Getting Started](/guide/getting-started) — quickstart that uses `@json-express/boot`
+- [@json-express/core](/packages/core) — the runtime that discovers and boots everything

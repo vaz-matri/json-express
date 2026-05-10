@@ -36,13 +36,13 @@ You now have a fully working server at `http://localhost:3000` with `GET/POST/PA
 
 | Package | Role |
 |---|---|
-| [`@json-express/core`](/core) | Microkernel + IoC container, ships the `json-express` binary |
-| [`@json-express/config-env`](/config-env) | `.env`-based configuration provider |
-| [`@json-express/transport-express`](/transport-express) | Express-based HTTP transport |
-| [`@json-express/adapter-memory`](/adapter-memory) | In-memory database adapter |
-| [`@json-express/api-rest`](/api-rest) | REST API generator |
-| [`@json-express/logger-console`](/logger-console) | Console logger |
-| [`@json-express/docs-light`](/docs-light) | Lightweight `/docs` provider |
+| [`@json-express/core`](/packages/core) | Microkernel + IoC container, ships the `json-express` binary |
+| [`@json-express/config-env`](/packages/config-env) | `.env`-based configuration provider |
+| [`@json-express/transport-express`](/packages/transport-express) | Express-based HTTP transport |
+| [`@json-express/adapter-memory`](/packages/adapter-memory) | In-memory database adapter |
+| [`@json-express/api-rest`](/packages/api-rest) | REST API generator |
+| [`@json-express/logger-console`](/packages/logger-console) | Console logger |
+| [`@json-express/docs-light`](/packages/docs-light) | Lightweight `/docs` provider |
 
 That's it — no `boot.js`, no `bootstrap()` call, no plugin wiring. The `json-express` binary discovers each package from your `package.json` and assembles the stack at boot.
 
@@ -77,6 +77,6 @@ npx json-express
 
 ## Related
 
-- [Getting Started](/getting-started) — the full quickstart that uses this preset
-- [Presets](/presets) — what presets are and how to author one
-- [@json-express/core](/core) — the microkernel and `json-express` binary
+- [Getting Started](/guide/getting-started) — the full quickstart that uses this preset
+- [Presets](/guide/presets) — what presets are and how to author one
+- [@json-express/core](/packages/core) — the microkernel and `json-express` binary

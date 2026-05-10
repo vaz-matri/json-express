@@ -87,5 +87,5 @@ const port = config.get<number>('port', 3000);
 ```
 
 ## Related Ecosystem Packages
-*   **[@json-express/config-env](/config-env):** The simpler, `.env`-only alternative. Use this if you don't need file-based configuration.
-*   **[@json-express/core](/core):** The runtime that resolves the active config provider and hands it to every plugin during boot.
+*   **[@json-express/config-env](/packages/config-env):** The simpler, `.env`-only alternative. Use this if you don't need file-based configuration.
+*   **[@json-express/core](/packages/core):** The runtime that resolves the active config provider and hands it to every plugin during boot.

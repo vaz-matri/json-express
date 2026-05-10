@@ -9,7 +9,7 @@ description: "Auto-discovered Identity plugin for JSONExpress — argon2 passwor
 
 `@json-express/plugin-identity` implements `IPlugin` and is **auto-discovered** by the `json-express` runtime. It contributes the `users` and `roles` schemas, mounts the `/auth/*` route group, hashes passwords with **argon2id**, issues JWTs, and rotates refresh tokens through the configured `IKvStore`. Verification, password-reset, and admin-flow emails are dispatched through the configured `IQueueAdapter` and `IEmailProvider` when both are present.
 
-For the high-level architecture and the `tokenVersion` revocation pattern, see [Identity & Auth](/identity).
+For the high-level architecture and the `tokenVersion` revocation pattern, see [Identity & Auth](/guide/identity).
 
 ## Installation
 
@@ -23,11 +23,11 @@ npm install @json-express/plugin-identity \
 
 `middleware-auth` and an `IKvStore` are **required peers** — the plugin throws on boot without them. The queue and email provider are optional but needed for the verification and reset flows.
 
-For a one-line install of the full identity stack, use the [`@json-express/preset-identity`](/presets) preset, which depends on all five.
+For a one-line install of the full identity stack, use the [`@json-express/preset-identity`](/guide/presets) preset, which depends on all five.
 
 ## Configuration
 
-The plugin is constructed by the runtime as `new IdentityPlugin({ configProvider, logger })`. **You do not instantiate it manually.** All configuration comes from the config provider — typically `.env` parsed by [`@json-express/config-env`](/config-env).
+The plugin is constructed by the runtime as `new IdentityPlugin({ configProvider, logger })`. **You do not instantiate it manually.** All configuration comes from the config provider — typically `.env` parsed by [`@json-express/config-env`](/packages/config-env).
 
 ### Minimum `.env`
 
@@ -36,7 +36,7 @@ jex.auth.secret=a-strong-32-byte-secret
 jex.auth.exclude=/auth
 ```
 
-`jex.auth.exclude=/auth` tells [`middleware-auth`](/middleware-auth) not to require a JWT on the auth endpoints themselves — registration and login would otherwise be unreachable.
+`jex.auth.exclude=/auth` tells [`middleware-auth`](/packages/middleware-auth) not to require a JWT on the auth endpoints themselves — registration and login would otherwise be unreachable.
 
 ### Full configuration reference
 
@@ -125,8 +125,8 @@ await queue.enqueue('emails', 'sendPasswordReset', {
 
 ## Related
 
-- [Identity & Auth](/identity) — high-level architecture, `tokenVersion`, JWKS
-- [@json-express/middleware-auth](/middleware-auth) — required peer; verifies the tokens this plugin issues
-- [@json-express/kv-memory](/kv-memory) — required peer for refresh token storage in development
-- [@json-express/queue-memory](/queue-memory) — optional peer for async email dispatch
-- [@json-express/email-console](/email-console) — optional peer; prints emails to stdout (swap for SMTP / SES / SendGrid in production)
+- [Identity & Auth](/guide/identity) — high-level architecture, `tokenVersion`, JWKS
+- [@json-express/middleware-auth](/packages/middleware-auth) — required peer; verifies the tokens this plugin issues
+- [@json-express/kv-memory](/packages/kv-memory) — required peer for refresh token storage in development
+- [@json-express/queue-memory](/packages/queue-memory) — optional peer for async email dispatch
+- [@json-express/email-console](/packages/email-console) — optional peer; prints emails to stdout (swap for SMTP / SES / SendGrid in production)

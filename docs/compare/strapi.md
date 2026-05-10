@@ -123,4 +123,4 @@ JSONExpress is the right choice for developers who want a lighter starting point
 
 ---
 
-**Ready to try it?** [Get started in 60 seconds →](/getting-started)
+**Ready to try it?** [Get started in 60 seconds →](/guide/getting-started)

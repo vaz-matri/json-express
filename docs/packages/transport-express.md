@@ -19,14 +19,14 @@ npm install @json-express/transport-express express
 
 ## Configuration
 
-The transport is auto-discovered by the `json-express` runtime — installing the package is enough. It is the default transport shipped with [`@json-express/boot`](/boot).
+The transport is auto-discovered by the `json-express` runtime — installing the package is enough. It is the default transport shipped with [`@json-express/boot`](/packages/boot).
 
 ```bash
 npm install @json-express/transport-express express
 npx json-express
 ```
 
-The default port is `3000`; override via `jex.port`. If both `transport-express` and [`transport-fastify`](/transport-fastify) are installed, pick one explicitly:
+The default port is `3000`; override via `jex.port`. If both `transport-express` and [`transport-fastify`](/packages/transport-fastify) are installed, pick one explicitly:
 
 ```bash
 jex.port=8080
@@ -48,7 +48,7 @@ When an HTTP request enters the `ExpressTransport`, the transport automatically:
 4. Outputs a standardized post-response access log (e.g., `GET /albums 200 (15ms)`).
 
 ### 3. Native HTTPS / SSL Support
-If you are developing locally and want to test secure cookies or webhook integrations, you can mount an SSL key/cert directly into the transport without a reverse proxy. The simplest path is to install [`@json-express/plugin-devcert`](/plugin-devcert), which generates a locally-trusted certificate and injects it into `express.ssl` automatically.
+If you are developing locally and want to test secure cookies or webhook integrations, you can mount an SSL key/cert directly into the transport without a reverse proxy. The simplest path is to install [`@json-express/plugin-devcert`](/packages/plugin-devcert), which generates a locally-trusted certificate and injects it into `express.ssl` automatically.
 
 To pin your own files, set their paths through the config provider in `jex.config.ts` (file paths cannot be expressed as plain `.env` strings):
 
@@ -71,5 +71,5 @@ When `express.ssl` is present, the transport boots an `https.createServer` inste
 This transport registers centralized `404` and `500` error handlers at the very bottom of the middleware stack. This guarantees that unhandled exceptions from custom endpoints never crash the server, and always return a strictly formatted JSON response back to the client.
 
 ## Related Ecosystem Packages
-*   **[@json-express/transport-fastify](/transport-fastify):** Want higher throughput? Swap to Fastify without rewriting any of your application code!
-*   **[@json-express/plugin-devcert](/plugin-devcert):** Automatically generates local SSL certificates and injects them into the `express.ssl` configuration block!
+*   **[@json-express/transport-fastify](/packages/transport-fastify):** Want higher throughput? Swap to Fastify without rewriting any of your application code!
+*   **[@json-express/plugin-devcert](/packages/plugin-devcert):** Automatically generates local SSL certificates and injects them into the `express.ssl` configuration block!

@@ -9,7 +9,7 @@ description: "Twelve-Factor environment variable configuration provider for JSON
 
 `@json-express/config-env` implements `IConfigProvider` using the **Twelve-Factor App** methodology. It reads configuration exclusively from `.env` files and system environment variables, making it the simplest and most Docker / Kubernetes-friendly configuration strategy.
 
-It is auto-discovered by the `json-express` runtime and ships as a dependency of [`@json-express/boot`](/boot) — most users never install it directly.
+It is auto-discovered by the `json-express` runtime and ships as a dependency of [`@json-express/boot`](/packages/boot) — most users never install it directly.
 
 ## Installation
 
@@ -68,7 +68,7 @@ The provider walks `.env` files in this order. Later wins, system env wins last:
 4. `.env.[NODE_ENV].local` (e.g. `.env.development.local`)
 5. **`process.env`** — system environment variables (Docker, Kubernetes, CI)
 
-When [`@json-express/config`](/config) is also installed, the framework merges its own cascade on top of `.env`:
+When [`@json-express/config`](/packages/config) is also installed, the framework merges its own cascade on top of `.env`:
 
 1. Plugin defaults
 2. `jex.config.*` (TypeScript / YAML / JSON)
@@ -100,10 +100,10 @@ Both `.` and `__` are nesting separators. Single `_` stays inside the segment �
 
 ## Zero external dependencies
 
-This provider depends only on `dotenv`. It boots in under 1 ms and adds no compile step. For richer configuration formats (YAML, TypeScript with imports, environment-specific files), install [`@json-express/config`](/config) alongside it.
+This provider depends only on `dotenv`. It boots in under 1 ms and adds no compile step. For richer configuration formats (YAML, TypeScript with imports, environment-specific files), install [`@json-express/config`](/packages/config) alongside it.
 
 ## Related
 
-- [@json-express/config](/config) — advanced alternative with YAML / TypeScript support
-- [@json-express/boot](/boot) — bundles this provider in the default stack
-- [@json-express/core](/core) — exposes `buildNestedConfigFromEnv` and the `IConfigProvider` contract
+- [@json-express/config](/packages/config) — advanced alternative with YAML / TypeScript support
+- [@json-express/boot](/packages/boot) — bundles this provider in the default stack
+- [@json-express/core](/packages/core) — exposes `buildNestedConfigFromEnv` and the `IConfigProvider` contract

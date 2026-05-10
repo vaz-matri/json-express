@@ -50,5 +50,5 @@ The first time you run the plugin, `devcert` will install a local Certificate Au
 The plugin uses the `configProvider.set()` API to dynamically inject the SSL key and certificate at runtime. This means your configuration files never contain hardcoded file paths to `.pem` files — the entire lifecycle is fully automated.
 
 ## Related Ecosystem Packages
-*   **[@json-express/transport-express](/transport-express):** The transport that consumes the injected `express.ssl` configuration to boot an HTTPS server.
-*   **[@json-express/transport-fastify](/transport-fastify):** Also supports the injected SSL configuration for Fastify-based HTTPS.
+*   **[@json-express/transport-express](/packages/transport-express):** The transport that consumes the injected `express.ssl` configuration to boot an HTTPS server.
+*   **[@json-express/transport-fastify](/packages/transport-fastify):** Also supports the injected SSL configuration for Fastify-based HTTPS.

@@ -90,4 +90,4 @@ jex.adapter=adapter-json
 jex.transport=transport-fastify
 ```
 
-See the [config-env](/config-env) docs for the full reference.
+See the [config-env](/packages/config-env) docs for the full reference.
