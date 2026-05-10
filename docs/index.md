@@ -5,7 +5,7 @@ description: Open-source Node.js meta-framework. Drop a JSON file, get REST + Gr
 
 hero:
   name: "<span style='font-weight:800'>JSON</span><span style='font-weight:600'>Express</span>"
-  text: "Drop a JSON file. Get an API."
+  text: "Drop JSON files. Get APIs."
   tagline: "Stop rewriting your backend. JSONExpress is a modular Node.js framework that generates instant APIs from simple JSON. Scale to production with swappable Postgres adapters, Fastify transports, and built-in Identity management—without changing your code."
   actions:
     - theme: brand
