@@ -919,7 +919,7 @@ One schema definition. Every layer is independently swappable.
   display: flex;
   gap: 0.5rem;
   justify-content: center;
-  margin: 1rem 0 2rem;
+  margin: 2rem 0 0 0;
   flex-wrap: wrap;
 }
 
