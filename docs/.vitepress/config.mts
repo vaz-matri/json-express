@@ -4,6 +4,7 @@ export default defineConfig({
   title: "JSONExpress",
   description: "From JSON to Enterprise REST & GraphQL API in 0 seconds. Open-source Node.js meta-framework with pluggable databases, identity management, and 23 modular packages.",
   cleanUrls: true,
+  srcExclude: ['blog/engineering', 'blog/news', 'blog/releases/', 'blog/tutorials/'],
   sitemap: {
     hostname: 'https://jsonexpress.com'
   },
@@ -49,6 +50,7 @@ export default defineConfig({
     nav: [
       { text: 'Docs', link: '/getting-started' },
       { text: 'Ecosystem', link: '/core' },
+      { text: 'Blog', link: '/blog' },
       // {
       //   text: 'Learn',
       //   items: [
@@ -71,41 +73,41 @@ export default defineConfig({
     ],
 
     sidebar: {
-      '/blog/tutorials/': [
-        {
-          text: 'Framework Tutorials',
-          items: [
-            { text: 'Overview', link: '/blog/tutorials/' }
-          ]
-        }
-      ],
-
-      '/blog/releases/': [
-        {
-          text: 'Releases & Updates',
-          items: [
-            { text: 'Overview', link: '/blog/releases/' }
-          ]
-        }
-      ],
-
-      '/blog/engineering/': [
-        {
-          text: 'Engineering',
-          items: [
-            { text: 'Overview', link: '/blog/engineering/' }
-          ]
-        }
-      ],
-
-      '/blog/news/': [
-        {
-          text: 'Tech News & Reviews',
-          items: [
-            { text: 'Overview', link: '/blog/news/' }
-          ]
-        }
-      ],
+      // '/blog/tutorials/': [
+      //   {
+      //     text: 'Framework Tutorials',
+      //     items: [
+      //       { text: 'Overview', link: '/blog/tutorials/' }
+      //     ]
+      //   }
+      // ],
+      //
+      // '/blog/releases/': [
+      //   {
+      //     text: 'Releases & Updates',
+      //     items: [
+      //       { text: 'Overview', link: '/blog/releases/' }
+      //     ]
+      //   }
+      // ],
+      //
+      // '/blog/engineering/': [
+      //   {
+      //     text: 'Engineering',
+      //     items: [
+      //       { text: 'Overview', link: '/blog/engineering/' }
+      //     ]
+      //   }
+      // ],
+      //
+      // '/blog/news/': [
+      //   {
+      //     text: 'Tech News & Reviews',
+      //     items: [
+      //       { text: 'Overview', link: '/blog/news/' }
+      //     ]
+      //   }
+      // ],
 
       '/': [
         {
