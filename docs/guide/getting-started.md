@@ -1,11 +1,11 @@
 ---
 title: Getting Started with JSONExpress — API in 30 Seconds
-description: Install JSONExpress, drop a JSON file, and get a full CRUD REST API running in under 30 seconds. Then add TypeScript schemas, a real database, and auth — without rewriting anything.
+description: Install JSONExpress, drop JSON files, and get a full CRUD REST API running in under 30 seconds. Then add TypeScript schemas, a real database, and auth — without rewriting anything.
 ---
 
 # Getting Started
 
-JSONExpress turns a JSON file into a running REST and GraphQL API with zero configuration. When you outgrow it, you add TypeScript schemas, swap in a real database, or wire up authentication — without rewriting anything you already built.
+JSONExpress turns JSON files into a running REST and GraphQL API with zero configuration. When you outgrow the prototype, you can swap any layer of the stack (like swapping your memory adapter for Postgres, or Express for Fastify) — without changing your code.
 
 ## Prerequisites
 
@@ -95,7 +95,7 @@ curl -X DELETE http://localhost:3000/posts/1
 # 204 No Content
 ```
 
-That's the full CRUD surface — all from a single JSON file.
+That's the full CRUD surface — all from JSON files.
 
 ---
 
@@ -129,7 +129,7 @@ export default defineModel({
 
 The `access` block is field-level security — it controls which roles can call each operation. `'public'` means no token required. `'admin'` and `'owner'` are enforced automatically by the auth middleware when installed.
 
-If a TypeScript model and a JSON file share the same name, the model wins.
+If a TypeScript model and JSON files share the same name, the model wins.
 
 ### 2. Start and test
 

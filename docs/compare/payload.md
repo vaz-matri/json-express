@@ -89,7 +89,7 @@ Payload is the better tool if:
 JSONExpress is the better fit if:
 
 - **You are not using Next.js.** Vue, Svelte, Astro, React Native, vanilla HTML — JSONExpress works with all of them identically. There is no framework assumption anywhere in the stack.
-- **You want to start with a JSON file before writing TypeScript.** Payload is always code-first from day one. JSONExpress lets you drop a `posts.json` and get a running API in 30 seconds, then graduate to TypeScript schemas when you are ready.
+- **You want to start with JSON files before writing TypeScript.** Payload is always code-first from day one. JSONExpress lets you drop a `posts.json` and get a running API in 30 seconds, then graduate to TypeScript schemas when you are ready.
 - **You need to swap your HTTP server.** Payload runs on the Next.js server and cannot be replaced. JSONExpress lets you choose between Express and Fastify, with more transports on the roadmap.
 - **You prefer independent ownership.** Payload is now owned by Figma. For some teams, independent MIT-licensed ownership matters — for others it does not. JSONExpress is independently developed with no acquisition, no corporate parent, and no enterprise upsell.
 - **You want a zero-config prototype path.** JSONExpress goes from JSON file to production TypeScript backend in a straight line. Payload starts at TypeScript and does not have the JSON file mode.
@@ -129,7 +129,7 @@ For teams where independent open-source ownership is a decision criterion — th
 
 If you are building in Next.js with a React team and want seamless framework integration, an admin UI co-located in your app, and a mature tool with Figma's resources behind it — use Payload. It is excellent at what it does.
 
-If you are building outside of Next.js, want to start with a JSON file before committing to TypeScript, need to choose your own HTTP server, or prefer independent ownership — JSONExpress gives you the same code-first TypeScript DX without the framework assumption.
+If you are building outside of Next.js, want to start with JSON files before committing to TypeScript, need to choose your own HTTP server, or prefer independent ownership — JSONExpress gives you the same code-first TypeScript DX without the framework assumption.
 
 ---
 

@@ -8,7 +8,7 @@ date: 2026-05-01
 
 I have started a lot of side projects. And for years, the pattern was always the same.
 
-Day one: drop a JSON file, run `json-server`, and have a CRUD API in 30 seconds. Perfect. I could build the frontend immediately, move fast, and figure out the real backend later.
+Day one: drop JSON files, run `json-server`, and have a CRUD API in 30 seconds. Perfect. I could build the frontend immediately, move fast, and figure out the real backend later.
 
 Day thirty: the prototype worked. Users liked it. Time to make it real. And that meant: throw away the json-server setup, start an Express app from scratch, write the same CRUD routes by hand, add authentication, wire up a database, re-implement everything I had already built in a different shape.
 
@@ -28,7 +28,7 @@ The tool that helped you on day one is not designed to help you on day thirty. T
 
 ## The idea
 
-At some point I started asking: what if the same primitive — a schema definition — could power a JSON file in development *and* a Postgres database in production? Not by being clever about it, but by making the database an explicit, swappable dependency?
+At some point I started asking: what if the same primitive — a schema definition — could power JSON files in development *and* a Postgres database in production? Not by being clever about it, but by making the database an explicit, swappable dependency?
 
 What if every layer of the backend — the database, the HTTP server, the API protocol, the auth system — was an independently installable npm package that implemented a TypeScript interface? So you could start with `adapter-memory` and swap to `adapter-postgres` by changing one line of config, without touching your schemas or hooks?
 
@@ -66,7 +66,7 @@ That is what I wanted the whole project to feel like: genuine production capabil
 
 ## Where it stands today
 
-JSONExpress v2.0.0 is 23 packages, all MIT licensed, all TypeScript-native. It is the first version I am confident showing publicly. The full stack works end to end: drop a JSON file, get REST and GraphQL immediately, add auth with one install, swap your HTTP server with one config line.
+JSONExpress v2.0.0 is 23 packages, all MIT licensed, all TypeScript-native. It is the first version I am confident showing publicly. The full stack works end to end: drop JSON files, get REST and GraphQL immediately, add auth with one install, swap your HTTP server with one config line.
 
 The two available database adapters — `adapter-memory` and `adapter-json` — cover development and low-to-medium traffic production workloads. `adapter-memory` runs at ~500K RPS for reads. `adapter-json` uses 50ms debounced atomic writes for file-system persistence.
 

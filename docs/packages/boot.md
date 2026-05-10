@@ -20,7 +20,7 @@ npm install @json-express/boot
 
 ## Run
 
-Drop a JSON file into `./data/` (or define a TypeScript model in `./models/`):
+Drop JSON files into `./data/` (or define a TypeScript model in `./models/`):
 
 ```bash
 mkdir -p data

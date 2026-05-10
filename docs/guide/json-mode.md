@@ -11,7 +11,7 @@ When building a new application, you often don't know exactly what your schema l
 
 ## The Magic of `/data`
 
-To generate a full REST and GraphQL API, you do not need to write a single line of code. Simply create a JSON file inside your project's `/data` directory.
+To generate a full REST and GraphQL API, you do not need to write a single line of code. Simply create JSON files inside your project's `/data` directory.
 
 Let's say you drop a file called `posts.json` into `/data/posts.json` with the following content:
 

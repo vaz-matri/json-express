@@ -1,7 +1,7 @@
 ---
 layout: home
-title: JSONExpress — Instant REST & GraphQL API from a JSON File
-description: Open-source Node.js meta-framework. Drop a JSON file, get REST + GraphQL in seconds. Swap in Postgres, Fastify, or Auth0 when you're ready. MIT licensed, TypeScript-native. 23 modular packages.
+title: JSONExpress — Instant REST & GraphQL API from JSON files
+description: Open-source Node.js meta-framework. Drop JSON files, get REST + GraphQL in seconds. Swap in Postgres, Fastify, or Auth0 when you're ready. MIT licensed, TypeScript-native. 23 modular packages.
 
 hero:
   name: "<span style='font-weight:800'>JSON</span><span style='font-weight:600'>Express</span>"
@@ -18,7 +18,7 @@ hero:
 features:
   - icon: ⚡
     title: Zero-Config JSON Mode
-    details: Drop a JSON file and get a full CRUD REST API in seconds. No schemas, no config, no boilerplate. The fastest path to a running API.
+    details: Drop JSON files and get a full CRUD REST API in seconds. No schemas, no config, no boilerplate. The fastest path to a running API.
     link: /json-mode
     linkText: Explore Zero-Config JSON Mode
   - icon: 🔄
@@ -724,7 +724,7 @@ The biggest trap in backend development is throwaway code — tools that are gre
 <div class="step-card">
 <div class="step-number">1</div>
 <h3>The Instant Mock API</h3>
-<p>Drop a JSON file and get a full CRUD API in seconds. No config, no TypeScript required. Real endpoints, real HTTP — just working.</p>
+<p>Drop JSON files and get a full CRUD API in seconds. No config, no TypeScript required. Real endpoints, real HTTP — just working.</p>
 </div>
 <div class="step-card">
 <div class="step-number">2</div>
@@ -832,7 +832,7 @@ One schema definition. Every layer is independently swappable.
 
 <div class="cta-section">
 <h2>Start in 30 Seconds</h2>
-<p class="section-subtitle">Install the boot preset, drop a JSON file, and you have a running API.</p>
+<p class="section-subtitle">Install the boot preset, drop JSON files, and you have a running API.</p>
 <div class="cta-install">
 <code>npm install @json-express/boot</code>
 </div>
@@ -846,7 +846,7 @@ One schema definition. Every layer is independently swappable.
 <div class="footer-grid">
 <div class="footer-col">
 <h4>JSONExpress</h4>
-<p class="footer-tagline">Open-source Node.js meta-framework. Drop a JSON file, get an API. MIT licensed.</p>
+<p class="footer-tagline">Open-source Node.js meta-framework. Drop JSON files, get an API. MIT licensed.</p>
 </div>
 <div class="footer-col">
 <h4>Learn</h4>

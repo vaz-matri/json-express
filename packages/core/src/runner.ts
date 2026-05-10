@@ -170,7 +170,7 @@ export const startServer = async () => {
     }
 
     if (collections.length === 0) {
-        console.warn('⚠️  No valid Model Schemas or JSON data files found to serve. Try dropping a JSON file into /data.');
+        console.warn('⚠️  No valid Model Schemas or JSON data files found to serve. Try dropping JSON files into /data.');
         process.exit(1);
     }
 

@@ -17,7 +17,7 @@ The question is not which tool is better — it is which workflow fits your team
 
 **Mockoon's workflow:** Open the desktop app → click to add a route → configure the method, path, and response body via forms → click Run → test your API. No files to create, no commands to type. A non-developer can set up a mock API in minutes.
 
-**JSONExpress's workflow:** Create a JSON file or TypeScript schema → run `npx json-express` → test your API. Everything lives in your codebase from the first second.
+**JSONExpress's workflow:** Create JSON files or TypeScript schema → run `npx json-express` → test your API. Everything lives in your codebase from the first second.
 
 This difference compounds over the life of a project. GUI configurations are harder to review in a pull request, harder to diff, and harder for AI coding tools to generate or modify. Code-first configurations are version-controlled by default, reviewable, and fully reproducible from a fresh clone.
 
@@ -27,7 +27,7 @@ This difference compounds over the life of a project. GUI configurations are har
 
 Mockoon is the better tool if:
 
-- **Non-developers need to design the mock API.** QA engineers, product managers, and designers can use Mockoon's GUI without writing a line of code. JSONExpress requires at least a JSON file.
+- **Non-developers need to design the mock API.** QA engineers, product managers, and designers can use Mockoon's GUI without writing a line of code. JSONExpress requires at least JSON files.
 - **You want a visual editor.** Some developers genuinely prefer a GUI for this kind of task — seeing all your routes in a list, clicking to edit responses. Mockoon's UI is well-built.
 - **You need a quick one-off simulation** with no need to share, version, or reproduce it. Click, run, test, close. Done.
 - **Your workflow is desktop-first.** Mockoon ships a full desktop application for macOS, Windows, and Linux. JSONExpress is a CLI tool.
@@ -38,7 +38,7 @@ Mockoon is the better tool if:
 
 JSONExpress is the better fit if:
 
-- **Your project lives in git.** Every JSONExpress configuration — your data files, your TypeScript schemas, your `.env` — is a text file that belongs in version control. `git diff` on a JSON file is meaningful. `git diff` on a Mockoon GUI export is less so.
+- **Your project lives in git.** Every JSONExpress configuration — your data files, your TypeScript schemas, your `.env` — is a text file that belongs in version control. `git diff` on JSON files is meaningful. `git diff` on a Mockoon GUI export is less so.
 - **Your team uses AI coding tools.** Because JSONExpress adapters, transports, and schemas are explicit named npm packages with TypeScript interfaces, an LLM in Cursor, Claude Code, or Codex can reliably scaffold a working JSONExpress backend on the first try. The configuration surface is declarative and predictable. GUI-based tools are harder for AI to generate because they produce opaque exported files rather than structured code.
 - **You need real data persistence.** Mockoon simulates responses — it does not store or persist data. Every response is a static or templated mock. JSONExpress with `adapter-json` writes real data to disk atomically, so it survives restarts and accumulates state across requests.
 - **Your mock API needs to become a real API.** Mockoon is a mock tool. When your prototype needs to graduate to production, you start over. JSONExpress is designed for exactly this transition — start with `adapter-memory`, add `adapter-json` for persistence, add `plugin-identity` for auth, add `adapter-postgres` when it ships. The schemas and business logic carry forward at every stage.

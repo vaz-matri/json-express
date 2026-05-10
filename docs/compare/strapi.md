@@ -38,7 +38,7 @@ Be honest with yourself about your use case — Strapi is the better tool if:
 JSONExpress is the better fit if:
 
 - **You are a solo developer or small team** that does not need a GUI. Configuring Strapi's admin panel for a project where only developers will ever touch the backend is overhead that adds no value.
-- **You want to start in 30 seconds, not 30 minutes.** Drop a JSON file, run `npx json-express`, and you have a CRUD API. No setup wizard, no database configuration prompt, no admin UI to configure.
+- **You want to start in 30 seconds, not 30 minutes.** Drop JSON files, run `npx json-express`, and you have a CRUD API. No setup wizard, no database configuration prompt, no admin UI to configure.
 - **You are building a prototype that needs to graduate to production.** JSONExpress is designed for exactly this — start with `adapter-memory`, add `adapter-json` for persistence, add `plugin-identity` for auth, each as a single `npm install`. Nothing is thrown away between stages.
 - **You are sensitive to the license change.** Strapi's Community Edition remains free, but v5 moved some enterprise features to the Business Source License (BSL). JSONExpress is MIT with no feature gates and no revenue caps, now or in the future.
 - **You need transport flexibility.** Strapi is built on Koa and cannot be swapped to Fastify or any other HTTP server. JSONExpress lets you choose Express or Fastify, with more transports on the roadmap.
@@ -119,7 +119,7 @@ The reason it is worth mentioning is not to criticise Strapi, but to note that B
 
 Strapi is the right choice for teams that need a content editor GUI, have a plugin marketplace requirement, or are running a mature enterprise project that needs proven infrastructure and paid support. It has earned its position as the leading Node.js headless CMS.
 
-JSONExpress is the right choice for developers who want a lighter starting point, a code-first workflow, and a path from a JSON file to a production TypeScript backend without a rewrite. If you are a solo developer or small team who does not need a GUI and finds Strapi's setup overhead disproportionate to your project's size — JSONExpress is built for you.
+JSONExpress is the right choice for developers who want a lighter starting point, a code-first workflow, and a path from JSON files to a production TypeScript backend without a rewrite. If you are a solo developer or small team who does not need a GUI and finds Strapi's setup overhead disproportionate to your project's size — JSONExpress is built for you.
 
 ---
 

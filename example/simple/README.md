@@ -2,7 +2,7 @@
 
 # Default stack example
 
-The fastest way to spin up a working API. Install one package, drop a JSON file in `data/`, run the server. You're done.
+The fastest way to spin up a working API. Install one package, drop JSON files in `data/`, run the server. You're done.
 
 ## Setup
 

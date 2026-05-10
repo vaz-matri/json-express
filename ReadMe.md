@@ -5,7 +5,7 @@
 </picture>
 
 Skip the backend bottleneck and go from prototype to MVP launch faster.
-**JSONExpress v2.0** is a highly modular, pluggable Meta-Framework. It instantly converts your JSON files into a complete server, providing the practical infrastructure you need until your dedicated backend is ready.
+**JSONExpress v2.0** is an infrastructure-agnostic Node.js framework. Drop JSON files to get instant REST & GraphQL APIs. When you outgrow the prototype? Swap any layer of the stack (like Postgres or Fastify) without changing your code.
 
 visit [jsonexpress.com](https://jsonexpress.com)
 
@@ -40,7 +40,7 @@ In `package.json`:
 }
 ```
 
-Drop a JSON file in and run:
+Drop JSON files in and run:
 ```bash
 mkdir data && echo '[{"id":"1","title":"Hello"}]' > data/posts.json
 npm run start    # serves GET/POST/PATCH/DELETE /posts on :3000
@@ -127,7 +127,7 @@ Recommended as a `devDependency` or invoked via `npx`.
 
 ### 🗄️ Adapters (Database Layer)
 * **[`@json-express/adapter-memory`](./packages/adapter-memory/README.md)** *(Default)* - Fast, in-memory storage.
-* **[`@json-express/adapter-json`](./packages/adapter-json/README.md)** - Persists each collection as a JSON file on disk.
+* **[`@json-express/adapter-json`](./packages/adapter-json/README.md)** - Persists each collection as JSON files on disk.
 
 ### 📊 Loggers (Observability Layer)
 * **[`@json-express/logger-console`](./packages/logger-console/README.md)** *(Default)* - Zero-dependency standard output logging.
