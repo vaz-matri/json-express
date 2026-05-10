@@ -6,19 +6,19 @@ export default defineConfig({
   cleanUrls: true,
   srcExclude: ['blog/engineering', 'blog/news', 'blog/releases/', 'blog/tutorials/'],
   sitemap: {
-    hostname: 'https://jsonexpress.com'
+    hostname: 'https://www.jsonexpress.com'
   },
   head: [
     ['meta', { name: 'google-site-verification', content: 'FqePtk21d7xIR5ykuGM0Q9I3pU0i5gr9rdHlbTjCsn4' }],
     ['meta', { name: 'theme-color', content: '#2aa198' }],
     ['meta', { name: 'author', content: 'vaz' }],
     ['meta', { name: 'keywords', content: 'JSONExpress, Node.js framework, declarative API, JSON to REST API, GraphQL generator, headless CMS alternative, TypeScript backend, infrastructure-agnostic, schema-driven API' }],
-    ['meta', { property: 'og:image', content: 'https://jsonexpress.com/og-image.png' }],
-    ['meta', { name: 'twitter:image', content: 'https://jsonexpress.com/og-image.png' }],
+    ['meta', { property: 'og:image', content: 'https://www.jsonexpress.com/og-image.png' }],
+    ['meta', { name: 'twitter:image', content: 'https://www.jsonexpress.com/og-image.png' }],
     ['meta', { name: 'twitter:site', content: '@vazmat0' }],
     ['meta', { name: 'twitter:creator', content: '@vazmat0' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:url', content: 'https://jsonexpress.com' }],
+    ['meta', { property: 'og:url', content: 'https://www.jsonexpress.com' }],
     ['meta', { property: 'og:site_name', content: 'JSONExpress' }],
     ['meta', { property: 'og:title', content: 'JSONExpress — Stop Rewriting Your Backend' }],
     ['meta', { property: 'og:description', content: 'A modular Node.js framework that generates instant APIs from simple JSON files. Scale to production with swappable databases and transports without changing your code.' }],
