@@ -50,8 +50,8 @@ export default defineConfig({
     siteTitle: false,
 
     nav: [
-      { text: 'Docs', link: '/getting-started' },
-      { text: 'Ecosystem', link: '/core' },
+      { text: 'Docs', link: '/guide/getting-started' },
+      { text: 'Packages', link: '/packages/core' },
       { text: 'Blog', link: '/blog' },
       // {
       //   text: 'Learn',
@@ -115,101 +115,101 @@ export default defineConfig({
         {
           text: 'Introduction',
           items: [
-            { text: 'Getting Started', link: '/getting-started' },
-            { text: 'Zero-Config JSON Mode', link: '/json-mode' },
-            { text: 'Presets', link: '/presets' },
-            { text: 'Architecture', link: '/architecture' },
-            { text: 'Migrating to v2', link: '/migration-v2' }
+            { text: 'Getting Started', link: '/guide/getting-started' },
+            { text: 'Zero-Config JSON Mode', link: '/guide/json-mode' },
+            { text: 'Presets', link: '/guide/presets' },
+            { text: 'Architecture', link: '/guide/architecture' },
+            { text: 'Migrating to v2', link: '/guide/migration-v2' }
           ]
         },
         {
           text: 'Core Concepts',
           items: [
-            { text: 'Schemas & Models', link: '/schemas' },
-            { text: 'Database Adapters', link: '/adapters' },
-            { text: 'Hooks & Security', link: '/hooks' }
+            { text: 'Schemas & Models', link: '/guide/schemas' },
+            { text: 'Database Adapters', link: '/guide/adapters' },
+            { text: 'Hooks & Security', link: '/guide/hooks' }
           ]
         },
         {
           text: 'Plugins',
           items: [
-            { text: 'Identity & Auth', link: '/identity' },
-            { text: 'API Generation', link: '/api' },
-            { text: 'KV & Queues', link: '/background' }
+            { text: 'Identity & Auth', link: '/guide/identity' },
+            { text: 'API Generation', link: '/guide/api' },
+            { text: 'KV & Queues', link: '/guide/background' }
           ]
         },
         {
-          text: 'Ecosystem',
+          text: 'Packages',
           items: [
             {
               text: 'Core & Runtime',
               collapsed: true,
               items: [
-                { text: '@json-express/core', link: '/core' },
-                { text: '@json-express/boot', link: '/boot' },
-                { text: '@json-express/config', link: '/config' },
-                { text: '@json-express/config-env', link: '/config-env' }
+                { text: '@json-express/core', link: '/packages/core' },
+                { text: '@json-express/boot', link: '/packages/boot' },
+                { text: '@json-express/config', link: '/packages/config' },
+                { text: '@json-express/config-env', link: '/packages/config-env' }
               ]
             },
             {
               text: 'Transports',
               collapsed: true,
               items: [
-                { text: 'transport-express', link: '/transport-express' },
-                { text: 'transport-fastify', link: '/transport-fastify' }
+                { text: 'transport-express', link: '/packages/transport-express' },
+                { text: 'transport-fastify', link: '/packages/transport-fastify' }
               ]
             },
             {
               text: 'Database Adapters',
               collapsed: true,
               items: [
-                { text: 'adapter-json', link: '/adapter-json' },
-                { text: 'adapter-memory', link: '/adapter-memory' }
+                { text: 'adapter-json', link: '/packages/adapter-json' },
+                { text: 'adapter-memory', link: '/packages/adapter-memory' }
               ]
             },
             {
               text: 'API Generators',
               collapsed: true,
               items: [
-                { text: 'api-rest', link: '/api-rest' },
-                { text: 'api-graphql', link: '/api-graphql' }
+                { text: 'api-rest', link: '/packages/api-rest' },
+                { text: 'api-graphql', link: '/packages/api-graphql' }
               ]
             },
             {
               text: 'Middleware',
               collapsed: true,
               items: [
-                { text: 'middleware-auth', link: '/middleware-auth' },
-                { text: 'middleware-validation', link: '/middleware-validation' }
+                { text: 'middleware-auth', link: '/packages/middleware-auth' },
+                { text: 'middleware-validation', link: '/packages/middleware-validation' }
               ]
             },
             {
               text: 'Plugins',
               collapsed: true,
               items: [
-                { text: 'plugin-identity', link: '/plugin-identity' },
-                { text: 'plugin-health', link: '/plugin-health' },
-                { text: 'plugin-devcert', link: '/plugin-devcert' },
-                { text: 'docs-swagger', link: '/docs-swagger' },
-                { text: 'docs-light', link: '/docs-light' }
+                { text: 'plugin-identity', link: '/packages/plugin-identity' },
+                { text: 'plugin-health', link: '/packages/plugin-health' },
+                { text: 'plugin-devcert', link: '/packages/plugin-devcert' },
+                { text: 'docs-swagger', link: '/packages/docs-swagger' },
+                { text: 'docs-light', link: '/packages/docs-light' }
               ]
             },
             {
               text: 'Background Services',
               collapsed: true,
               items: [
-                { text: 'kv-memory', link: '/kv-memory' },
-                { text: 'queue-memory', link: '/queue-memory' },
-                { text: 'email-console', link: '/email-console' }
+                { text: 'kv-memory', link: '/packages/kv-memory' },
+                { text: 'queue-memory', link: '/packages/queue-memory' },
+                { text: 'email-console', link: '/packages/email-console' }
               ]
             },
             {
               text: 'Utilities',
               collapsed: true,
               items: [
-                { text: 'logger-pino', link: '/logger-pino' },
-                { text: 'logger-console', link: '/logger-console' },
-                { text: 'seeder-faker', link: '/seeder-faker' }
+                { text: 'logger-pino', link: '/packages/logger-pino' },
+                { text: 'logger-console', link: '/packages/logger-console' },
+                { text: 'seeder-faker', link: '/packages/seeder-faker' }
               ]
             }
           ]
