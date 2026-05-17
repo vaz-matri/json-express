@@ -10,7 +10,7 @@ hero:
   actions:
     - theme: brand
       text: ⚡ Get Started in 60 Seconds
-      link: /getting-started
+      link: /guide/getting-started
     - theme: alt
       text: View on GitHub
       link: https://github.com/vaz-matri/json-express
@@ -19,17 +19,17 @@ features:
   - icon: ⚡
     title: Zero-Config JSON Mode
     details: Drop JSON files and get a full CRUD REST API in seconds. No schemas, no config, no boilerplate. The fastest path to a running API.
-    link: /json-mode
+    link: /guide/json-mode
     linkText: Explore Zero-Config JSON Mode
   - icon: 🔄
     title: Swap Any Layer
     details: Change your database, HTTP server, or API protocol with one line of config. Express → Fastify, REST → GraphQL, memory → file persistence. Your code never changes.
-    link: /adapters
+    link: /guide/adapters
     linkText: Compare swappable database adapters
   - icon: 🔓
     title: No Framework Lock-In
     details: Not tied to Next.js, Express, or any frontend. Works with Vue, Svelte, React Native, or vanilla HTML. 23 independently installable packages, MIT licensed.
-    link: /architecture
+    link: /guide/architecture
     linkText: See the modular architecture
 ---
 
@@ -125,7 +125,7 @@ Every capability ships as its own package — install only what you need, swap i
 </div>
 <div class="eco-content">
 <p>Persisting data doesn't always mean running a database. Covering how to store your collections as JSON files with atomic writes — so a crash mid-write never corrupts your data — when file-system persistence is the right choice, and how to graduate to a relational database without changing any application code.</p>
-<a href="/adapters" class="eco-read-more">Read more →</a>
+<a href="/guide/adapters" class="eco-read-more">Read more →</a>
 </div>
 </div>
 
@@ -215,7 +215,7 @@ Every capability ships as its own package — install only what you need, swap i
 </div>
 <div class="eco-content">
 <p>The HTTP server is the innermost performance constraint in any API. Covering how to replace Express with Fastify's low-overhead request lifecycle, what throughput gains to expect in practice, and how a single config change migrates every route, schema, and middleware automatically without touching a line of application code.</p>
-<a href="/transport-fastify" class="eco-read-more">Read more →</a>
+<a href="/packages/transport-fastify" class="eco-read-more">Read more →</a>
 </div>
 </div>
 
@@ -296,7 +296,7 @@ Every capability ships as its own package — install only what you need, swap i
 </div>
 <div class="eco-content">
 <p>GraphQL and REST serve different clients well, and you shouldn't have to choose between them. Covering how to generate a complete GraphQL schema from your existing model definitions, expose it alongside your REST endpoints, and inherit all your hooks, access rules, and validation — with no separate schema to write or maintain.</p>
-<a href="/api-graphql" class="eco-read-more">Read more →</a>
+<a href="/packages/api-graphql" class="eco-read-more">Read more →</a>
 </div>
 </div>
 
@@ -415,7 +415,7 @@ Every capability ships as its own package — install only what you need, swap i
 </div>
 <div class="eco-content">
 <p>Input validation is the first line of defence against malformed data reaching your business logic. Covering how to derive Zod schemas directly from your model's field definitions, validate every incoming write automatically, and return structured 422 errors with field-level detail — define your data shape once and get validation everywhere.</p>
-<a href="/middleware-validation" class="eco-read-more">Read more →</a>
+<a href="/packages/middleware-validation" class="eco-read-more">Read more →</a>
 </div>
 </div>
 
@@ -457,7 +457,7 @@ Every capability ships as its own package — install only what you need, swap i
 </div>
 <div class="eco-content">
 <p>Authentication is one of the most common reasons a backend project grows beyond a prototype. Covering how to add register, login, refresh-token rotation, password reset, and email verification to your API — backed by Argon2id password hashing, anti-enumeration on every endpoint, and JWKS support for Auth0, Firebase, and Cognito.</p>
-<a href="/plugin-identity" class="eco-read-more">Read more →</a>
+<a href="/packages/plugin-identity" class="eco-read-more">Read more →</a>
 </div>
 </div>
 
@@ -513,7 +513,7 @@ Every capability ships as its own package — install only what you need, swap i
 </div>
 <div class="eco-content">
 <p>API documentation that goes stale is worse than no documentation at all. Covering how to generate a complete OpenAPI 3.0 spec directly from your model definitions at boot time — no annotations to write, no spec files to maintain — and mount a live Swagger UI that stays automatically in sync as your schemas evolve.</p>
-<a href="/docs-swagger" class="eco-read-more">Read more →</a>
+<a href="/packages/docs-swagger" class="eco-read-more">Read more →</a>
 </div>
 </div>
 
@@ -623,7 +623,7 @@ Every capability ships as its own package — install only what you need, swap i
 </div>
 <div class="eco-content">
 <p>Realistic test data makes the difference between a demo that lands and one that doesn't. Covering how to populate your database with contextually correct fake data — names, emails, dates, UUIDs, and more — using a single CLI flag, and how to build reproducible CI fixtures and believable local development environments.</p>
-<a href="/seeder-faker" class="eco-read-more">Read more →</a>
+<a href="/packages/seeder-faker" class="eco-read-more">Read more →</a>
 </div>
 </div>
 
@@ -708,7 +708,7 @@ Every capability ships as its own package — install only what you need, swap i
 </div>
 <div class="eco-content">
 <p>Structured logging is a foundational practice for any production Node.js application. Covering what logs and loggers are, how log levels work, and how to set up pino — one of the fastest loggers in the Node.js ecosystem — with child loggers, pretty printing, and best practices for capturing the right data without leaking sensitive information.</p>
-<a href="/logger-pino" class="eco-read-more">Read more →</a>
+<a href="/packages/logger-pino" class="eco-read-more">Read more →</a>
 </div>
 </div>
 
@@ -837,7 +837,7 @@ One schema definition. Every layer is independently swappable.
 <code>npm install @json-express/boot</code>
 </div>
 <div class="cta-buttons">
-<a href="/getting-started" class="cta-btn cta-primary">Read the Docs</a>
+<a href="/guide/getting-started" class="cta-btn cta-primary">Read the Docs</a>
 <a href="https://github.com/vaz-matri/json-express" class="cta-btn cta-secondary">View on GitHub</a>
 </div>
 </div>
@@ -850,19 +850,19 @@ One schema definition. Every layer is independently swappable.
 </div>
 <div class="footer-col">
 <h4>Learn</h4>
-<a href="/getting-started">Getting Started</a>
-<a href="/json-mode">Zero-Config JSON Mode</a>
-<a href="/architecture">Architecture</a>
-<a href="/schemas">Schemas & Models</a>
-<a href="/hooks">Hooks & Security</a>
+<a href="/guide/getting-started">Getting Started</a>
+<a href="/guide/json-mode">Zero-Config JSON Mode</a>
+<a href="/guide/architecture">Architecture</a>
+<a href="/guide/schemas">Schemas & Models</a>
+<a href="/guide/hooks">Hooks & Security</a>
 </div>
 <div class="footer-col">
 <h4>Ecosystem</h4>
-<a href="/core">Core</a>
-<a href="/api-rest">REST Generator</a>
-<a href="/api-graphql">GraphQL Generator</a>
-<a href="/plugin-identity">Identity Plugin</a>
-<a href="/middleware-auth">Auth Middleware</a>
+<a href="/packages/core">Core</a>
+<a href="/packages/api-rest">REST Generator</a>
+<a href="/packages/api-graphql">GraphQL Generator</a>
+<a href="/packages/plugin-identity">Identity Plugin</a>
+<a href="/packages/middleware-auth">Auth Middleware</a>
 </div>
 <div class="footer-col">
 <h4>Community</h4>
