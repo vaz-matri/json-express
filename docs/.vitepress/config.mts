@@ -1,6 +1,15 @@
 import { defineConfig } from 'vitepress'
 
+const SITE = 'https://www.jsonexpress.com'
+
 export default defineConfig({
+  transformHead({ pageData }) {
+    const slug = pageData.relativePath
+      .replace(/index\.md$/, '')
+      .replace(/\.md$/, '')
+    const canonical = slug ? `${SITE}/${slug}` : SITE
+    return [['link', { rel: 'canonical', href: canonical }]]
+  },
   title: "JSONExpress",
   description: "JSONExpress is an infrastructure-agnostic Node.js framework. Generate instant REST & GraphQL APIs from simple JSON files, then scale to production with swappable Postgres, Fastify, and Auth0—without rewriting your code.",
   cleanUrls: true,
@@ -38,7 +47,7 @@ export default defineConfig({
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Cross-platform",
       "description": "Open-source Node.js meta-framework that generates REST and GraphQL APIs from JSON files and TypeScript schemas.",
-      "url": "https://jsonexpress.com",
+      "url": "https://www.jsonexpress.com",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     })]
   ],
