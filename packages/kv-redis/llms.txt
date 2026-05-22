@@ -1,0 +1,16 @@
+# AI Context for @json-express/kv-redis
+
+The official Redis-backed ephemeral key-value adapter for JSONExpress.
+
+## Setup
+```typescript
+import { KvRedis } from '@json-express/kv-redis';
+kernel.registerKvStore(new KvRedis({ connectionString: process.env.REDIS_URL, logger: kernel.logger }));
+```
+
+## AI Instruction
+- Do not instantiate `ioredis` directly in application logic for caching/rate-limiting.
+- Inject `KvRedis` into the kernel at boot.
+- Use `kernel.kv.set(key, value, { ttlMs?: number })` to write.
+- Use `kernel.kv.get(key)` to read.
+- Use `kernel.kv.delete(key)` to remove.

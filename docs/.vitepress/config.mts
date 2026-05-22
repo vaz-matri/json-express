@@ -213,6 +213,7 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'queue-redis', link: '/packages/queue-redis' },
+                { text: 'kv-redis', link: '/packages/kv-redis' },
                 { text: 'kv-memory', link: '/packages/kv-memory' },
                 { text: 'queue-memory', link: '/packages/queue-memory' },
                 { text: 'email-console', link: '/packages/email-console' }
