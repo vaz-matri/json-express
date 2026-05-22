@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { runExportSchema } from './commands/export';
 import { runInit } from './commands/init';
 import { runConfigure } from './commands/configure';
+import { runMigrate } from './commands/migrate';
 
 const program = new Command();
 
@@ -24,5 +25,10 @@ program
     .command('export <collection>')
     .description('Export a JSON collection to a strongly-typed model file under ./models')
     .action((collection: string) => runExportSchema(process.cwd(), collection));
+
+program
+    .command('migrate')
+    .description('Run database migrations for the active adapter (e.g. Postgres CREATE TABLEs)')
+    .action(() => runMigrate(process.cwd()));
 
 program.parse();

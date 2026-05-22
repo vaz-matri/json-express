@@ -1,0 +1,39 @@
+{
+  "name": "@json-express/adapter-postgres",
+  "version": "1.0.0",
+  "description": "Postgres database adapter for JSONExpress using Drizzle ORM",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {
+    "@json-express/core": "workspace:*",
+    "drizzle-orm": "^0.30.10",
+    "pg": "^8.11.5",
+    "uuidv7": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.5",
+    "drizzle-kit": "^0.20.17"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "postgres",
+    "drizzle",
+    "database-adapter"
+  ]
+}

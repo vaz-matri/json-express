@@ -1,6 +1,6 @@
 ---
 title: Migrating to JSONExpress v2
-description: JSONExpress v2 is a complete rewrite. The single v1 package has been replaced by a modular ecosystem of 23 focused packages. This guide walks you through the migration.
+description: JSONExpress v2 is a complete rewrite. The single v1 package has been replaced by a modular ecosystem of focused packages. This guide walks you through the migration.
 ---
 
 # Migrating to v2

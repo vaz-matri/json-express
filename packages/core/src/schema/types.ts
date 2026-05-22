@@ -5,6 +5,7 @@ export interface BaseOptions {
     default?: any;
     unique?: boolean;
     index?: boolean;
+    primaryKey?: boolean;
 }
 
 export interface StringOptions extends BaseOptions {

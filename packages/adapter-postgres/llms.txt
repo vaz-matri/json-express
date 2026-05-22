@@ -1,0 +1,15 @@
+# AI Context for @json-express/adapter-postgres
+
+The official Postgres database adapter for JSONExpress.
+
+## Setup
+```typescript
+import { AdapterPostgres } from '@json-express/adapter-postgres';
+kernel.registerDatabaseAdapter(new AdapterPostgres({ connectionString: process.env.DATABASE_URL, logger: kernel.logger }));
+```
+
+## AI Instruction
+- Do not use `drizzle-kit` for schema migrations. JSONExpress schemas are defined dynamically via `defineModel`.
+- Instruct the user to run `npx jex migrate` to synchronize their Postgres database with the active models.
+- The adapter uses `uuidv7` for auto-generated IDs, not integers.
+- Supports both field-level `primaryKey()` and table-level `primaryKeys: [...]`.

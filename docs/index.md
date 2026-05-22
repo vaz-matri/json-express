@@ -1,12 +1,12 @@
 ---
 layout: home
 title: JSONExpress — Instant REST & GraphQL API from JSON files
-description: Open-source Node.js meta-framework. Drop JSON files, get REST + GraphQL in seconds. Swap in Postgres, Fastify, or Auth0 when you're ready. MIT licensed, TypeScript-native. 23 modular packages.
+description: Open-source Node.js meta-framework. Drop JSON files, get REST + GraphQL in seconds. Swap in Postgres, Fastify, or Auth0 when you're ready. MIT licensed, TypeScript-native. A suite of modular packages.
 
 hero:
   name: "<span style='font-weight:800'>JSON</span><span style='font-weight:600'>Express</span>"
   text: "Drop JSON files. Get APIs."
-  tagline: "Stop rewriting your backend. JSONExpress is a modular Node.js framework that generates instant APIs from simple JSON. Scale to production with swappable Postgres adapters, Fastify transports, and built-in Identity management—without changing your code."
+  tagline: "Stop rewriting your backend. JSONExpress is an Agent-First Node.js framework that generates instant APIs from simple JSON. Orchestrate with AI to scale to production with swappable Postgres adapters, Fastify transports, and built-in Identity management—without changing your code."
   actions:
     - theme: brand
       text: ⚡ Get Started in 60 Seconds
@@ -28,9 +28,14 @@ features:
     linkText: Compare swappable database adapters
   - icon: 🔓
     title: No Framework Lock-In
-    details: Not tied to Next.js, Express, or any frontend. Works with Vue, Svelte, React Native, or vanilla HTML. 23 independently installable packages, MIT licensed.
+    details: Not tied to Next.js, Express, or any frontend. Works with Vue, Svelte, React Native, or vanilla HTML. Independently installable packages, MIT licensed.
     link: /guide/architecture
     linkText: See the modular architecture
+  - icon: 🤖
+    title: Agent-First Design
+    details: Built to be orchestrated by AI. Every official package ships with AI instructions (llms.txt), giving your agent perfectly understood, rock-solid building blocks.
+    link: /blog/the-evolution-to-agent-first
+    linkText: Read about the Agent-First evolution
 ---
 
 <div class="badge-row">

@@ -179,6 +179,10 @@ export interface ModelConfig<TFields extends Record<string, TypeDefinition> = an
      * codegen. Useful for feature-modules like `/search`, `/auth/login`, webhooks.
      */
     fields?: TFields;
+    /**
+     * Optional composite primary keys. If provided, overrides any field-level `primaryKey`.
+     */
+    primaryKeys?: string[];
     endpoints?: Record<string, CustomEndpointEntry>;
     hooks?: ModelHooks;
     access?: AuthRules;

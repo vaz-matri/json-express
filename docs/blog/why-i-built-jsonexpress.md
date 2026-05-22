@@ -66,7 +66,7 @@ That is what I wanted the whole project to feel like: genuine production capabil
 
 ## Where it stands today
 
-JSONExpress v2.0.0 is 23 packages, all MIT licensed, all TypeScript-native. It is the first version I am confident showing publicly. The full stack works end to end: drop JSON files, get REST and GraphQL immediately, add auth with one install, swap your HTTP server with one config line.
+JSONExpress v2.0.0 is a suite of granular packages, all MIT licensed, all TypeScript-native. It is the first version I am confident showing publicly. The full stack works end to end: drop JSON files, get REST and GraphQL immediately, add auth with one install, swap your HTTP server with one config line.
 
 The two available database adapters — `adapter-memory` and `adapter-json` — cover development and low-to-medium traffic production workloads. `adapter-memory` runs at ~500K RPS for reads. `adapter-json` uses 50ms debounced atomic writes for file-system persistence.
 

@@ -73,6 +73,11 @@ export interface IDatabaseAdapter {
     delete<T = any>(collection: string, id: string): Promise<T>;
 
     isHealthy?(): Promise<boolean>;
+
+    /**
+     * Optional method for adapters that need explicit schema migration (e.g. SQL databases).
+     */
+    migrate?(): Promise<void>;
 }
 
 /**

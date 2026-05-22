@@ -175,6 +175,7 @@ export default defineConfig({
               text: 'Database Adapters',
               collapsed: true,
               items: [
+                { text: 'adapter-postgres', link: '/packages/adapter-postgres' },
                 { text: 'adapter-json', link: '/packages/adapter-json' },
                 { text: 'adapter-memory', link: '/packages/adapter-memory' }
               ]
