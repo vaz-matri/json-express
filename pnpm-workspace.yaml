@@ -4,3 +4,6 @@ packages:
   - 'example/*'
   - 'examples/*'
   - 'docs'
+allowBuilds:
+  argon2: true
+  esbuild: true
