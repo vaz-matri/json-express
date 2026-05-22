@@ -176,6 +176,7 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'adapter-postgres', link: '/packages/adapter-postgres' },
+                { text: 'adapter-mongodb', link: '/packages/adapter-mongodb' },
                 { text: 'adapter-json', link: '/packages/adapter-json' },
                 { text: 'adapter-memory', link: '/packages/adapter-memory' }
               ]
@@ -211,6 +212,7 @@ export default defineConfig({
               text: 'Background Services',
               collapsed: true,
               items: [
+                { text: 'queue-redis', link: '/packages/queue-redis' },
                 { text: 'kv-memory', link: '/packages/kv-memory' },
                 { text: 'queue-memory', link: '/packages/queue-memory' },
                 { text: 'email-console', link: '/packages/email-console' }

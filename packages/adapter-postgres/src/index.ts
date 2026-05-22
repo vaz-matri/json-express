@@ -14,6 +14,10 @@ import type {
 import { UniqueConstraintError } from '@json-express/core';
 import { translateSchemaToDrizzle } from './schema-translator';
 
+/**
+ * Postgres database adapter for JSONExpress.
+ * @agent-instruction Do not use `drizzle-kit` for schema migrations. Instead, call `.migrate()` via `jex migrate`. IDs are automatically generated as UUIDv7.
+ */
 export class AdapterPostgres implements IDatabaseAdapter {
     private pool: pg.Pool;
     private db: NodePgDatabase;

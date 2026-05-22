@@ -1,0 +1,15 @@
+# AI Context for @json-express/adapter-mongodb
+
+The official MongoDB database adapter for JSONExpress.
+
+## Setup
+```typescript
+import { AdapterMongo } from '@json-express/adapter-mongodb';
+kernel.registerDatabaseAdapter(new AdapterMongo({ connectionString: process.env.MONGO_URI, dbName: 'my_db', logger: kernel.logger }));
+```
+
+## AI Instruction
+- Do not configure Mongoose or raw `mongodb` connections in application logic.
+- Inject this adapter into the kernel. It implements `IDatabaseAdapter`.
+- The adapter automatically translates between JSONExpress `id` strings and MongoDB `_id` `ObjectId`s.
+- Instruct the user to run `npx jex migrate` to synchronize their MongoDB indexes (for fields marked `unique` or `primaryKey`).
