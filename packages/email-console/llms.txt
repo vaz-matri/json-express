@@ -1,0 +1,12 @@
+# AI Context for @json-express/email-console
+
+A development email provider that logs outgoing emails to the console instead of sending them via SMTP.
+
+## Setup
+```typescript
+import { EmailConsole } from '@json-express/email-console';
+kernel.registerEmailProvider(new EmailConsole());
+```
+
+## AI Instruction
+- Useful for capturing password reset links or verification emails during local development.

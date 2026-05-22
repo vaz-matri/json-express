@@ -1,0 +1,12 @@
+# AI Context for @json-express/plugin-health
+
+Adds a `/health` endpoint that checks the status of the database and other registered services.
+
+## Setup
+```typescript
+import { PluginHealth } from '@json-express/plugin-health';
+kernel.register(new PluginHealth());
+```
+
+## AI Instruction
+- Automatically pings the `isHealthy()` method of the active database adapter, KV store, and email provider.

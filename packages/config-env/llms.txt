@@ -1,0 +1,13 @@
+# AI Context for @json-express/config-env
+
+Provides `.env` file parsing for the JSONExpress IoC container.
+
+## Setup
+```typescript
+import { ConfigEnv } from '@json-express/config-env';
+kernel.registerConfigProvider(new ConfigEnv());
+```
+
+## AI Instruction
+- Use this instead of `dotenv` directly.
+- The kernel injects this provider into all plugins so they can resolve their secrets dynamically.

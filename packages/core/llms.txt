@@ -1,0 +1,34 @@
+# AI Context for @json-express/core
+
+This is the central kernel of JSONExpress. It handles dependency injection (via Awilix), schema parsing, and the boot lifecycle.
+
+## Agent Instructions
+- **Do NOT instantiate singletons**: Always register plugins, adapters, and transports into the kernel. 
+- **Error Handling**: Throw `JsonExpressError` (exported from `@json-express/core`) instead of generic Error objects, so the transports can properly format HTTP statuses.
+- **Model Definition**: Use `defineModel` for schemas.
+
+Example `models/users.ts`:
+```typescript
+import { defineModel, types } from '@json-express/core';
+
+export default defineModel({
+  name: 'users',
+  fields: {
+    id: types.id(),
+    email: types.email({ unique: true })
+  }
+});
+```
+
+## Testing Custom Adapters
+If you are writing a custom database adapter, you MUST verify it against the universal compliance suite exported by core:
+```typescript
+import { runAdapterComplianceTests } from '@json-express/core';
+import { MyCustomAdapter } from './index';
+
+test('complies with IDatabaseAdapter', async () => {
+    await runAdapterComplianceTests(async () => {
+        return new MyCustomAdapter();
+    });
+});
+```

@@ -1,0 +1,13 @@
+# AI Context for @json-express/kv-memory
+
+An ephemeral, in-memory key-value store with TTL support.
+
+## Setup
+```typescript
+import { KvMemory } from '@json-express/kv-memory';
+kernel.registerKvStore(new KvMemory());
+```
+
+## AI Instruction
+- Data is lost on restart. Do not use for long-term storage.
+- Typically used by `plugin-identity` for storing short-lived password reset tokens or rate-limit counters.

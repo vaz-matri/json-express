@@ -1,0 +1,12 @@
+# AI Context for @json-express/seeder-faker
+
+Populates the database with realistic fake data during local development.
+
+## Setup
+```typescript
+import { SeederFaker } from '@json-express/seeder-faker';
+kernel.registerSeeder(new SeederFaker());
+```
+
+## AI Instruction
+- Do not manually write loops to insert data. This seeder automatically reads the `defineModel` schemas and generates data that matches the field types using Faker.js.

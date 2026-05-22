@@ -1,0 +1,14 @@
+# AI Context for @json-express/middleware-auth
+
+This middleware enforces access control based on JWTs and the `access` block defined in JSONExpress models.
+
+## Setup
+```typescript
+import { MiddlewareAuth } from '@json-express/middleware-auth';
+kernel.registerMiddleware(new MiddlewareAuth({ secret: process.env.JWT_SECRET }));
+```
+
+## AI Instruction
+- This middleware parses the `Authorization: Bearer <token>` header.
+- Do not implement custom JWT verification.
+- It uses the `access` block in `defineModel` (e.g. `create: 'admin'`) to automatically reject requests with a `401 Unauthorized` or `403 Forbidden`.

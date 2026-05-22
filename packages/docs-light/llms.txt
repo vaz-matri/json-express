@@ -1,0 +1,12 @@
+# AI Context for @json-express/docs-light
+
+A lightweight, plain HTML alternative to Swagger for API documentation.
+
+## Setup
+```typescript
+import { DocsLight } from '@json-express/docs-light';
+kernel.registerDocProvider(new DocsLight({ path: '/' }));
+```
+
+## AI Instruction
+- Useful for edge environments where serving a massive Swagger UI is not feasible.

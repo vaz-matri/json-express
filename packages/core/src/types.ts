@@ -41,6 +41,7 @@ export interface RouteDefinition {
 /**
  * 3. The Database Adapter Contract
  * Any database plugin (Memory, Mongo, Postgres) MUST implement these methods.
+ * @agent-instruction When writing an adapter, ensure writes are atomic. If a unique constraint is violated, you MUST throw a JsonExpressError with a 409 status code.
  */
 export interface QueryOptions {
     expand?: string[];
@@ -77,6 +78,7 @@ export interface IDatabaseAdapter {
 /**
  * 4. The Transport Server Contract
  * Any server plugin (Express, Fastify) MUST implement these methods.
+ * @agent-instruction Do not implement business logic or routing internals here. Just translate the generic JsonRequest and JsonResponse to native framework objects.
  */
 export interface ITransport {
     registerRoute(route: RouteDefinition): void;
@@ -103,6 +105,7 @@ export interface ITransport {
 /**
  * 5. The API Generator Contract
  * Transforms the Database operations into Route Definitions (REST or GraphQL).
+ * @agent-instruction Do not bind to HTTP directly. Output pure RouteDefinition arrays for the transport to consume.
  */
 export interface IApiGenerator {
     setSchemas?(schemas: ModelSchema[]): void;
@@ -115,8 +118,9 @@ export interface IApiGenerator {
  *
  * Middlewares MAY implement `setSchemas?` to receive the project's loaded model
  * schemas before any request is served. The runner calls this once during boot,
- * after middlewares are registered. Used by `middleware-validation` to build a
+ * schemas before any request is served. Used by `middleware-validation` to build a
  * route → validators lookup from each model's `validation` block.
+ * @agent-instruction When writing custom middleware, do not use `res.send`. You MUST return a Promise<JsonResponse> or call `next()`.
  */
 export interface IMiddleware {
     name: string;
@@ -127,6 +131,7 @@ export interface IMiddleware {
 /**
  * 7. The Configuration Provider Contract
  * Supplies configuration values to all other plugins during the boot sequence.
+ * @agent-instruction Only read from the configProvider, never process.env directly inside plugins.
  */
 export interface IConfigProvider {
     get<T>(key: string, defaultValue?: T): T;
@@ -149,6 +154,7 @@ export interface IConfigProvider {
  * a generator per collection. The kernel calls `setSchemas` once during boot,
  * after plugin-contributed schemas have been merged, so the seeder sees the
  * exact same schema set as the database adapter and API generator.
+ * @agent-instruction Seeders should only insert data if the `isForce` flag is true or the database is entirely empty.
  */
 export interface ISeeder {
     name: string;
@@ -159,6 +165,7 @@ export interface ISeeder {
 /**
  * 9. The Plugin Contract
  * Attaches generic behaviors to the kernel before boot
+ * @agent-instruction Never use global singletons. Register any exported services or middleware directly into the kernel's IoC container via the configProvider.
  */
 export interface IPlugin {
     name: string;
@@ -177,6 +184,7 @@ export interface IPlugin {
 /**
  * 10. The Logger Contract
  * Provides a standardized way for all plugins to output logs.
+ * @agent-instruction Never use `console.log` directly in plugins. Always use the injected `ILogger` instance.
  */
 export interface ILogger {
     info(message: string, context?: any): void;
@@ -201,6 +209,7 @@ export interface ILogger {
  * adapter and API generator. This is the source of truth for resource names,
  * field shapes, and access rules — doc providers should prefer it over
  * reverse-engineering the same information from `RouteDefinition[]` paths.
+ * @agent-instruction Derive all OpenAPI/Swagger specs from the `setSchemas` payload, not the route definitions.
  */
 export interface IDocProvider {
     setSchemas?(schemas: ModelSchema[]): void;
@@ -226,6 +235,7 @@ export interface IIdGenerator {
  * Sends transactional email on behalf of plugins (e.g. verification + password reset).
  * The default implementation (`@json-express/email-console`) logs the message
  * instead of sending — keeping local dev free of SMTP credentials.
+ * @agent-instruction Do not implement custom SMTP logic inside business hooks. Always use the injected `IEmailProvider`.
  */
 export interface EmailMessage {
     to: string | string[];
@@ -250,6 +260,7 @@ export interface IEmailProvider {
  * High-performance ephemeral storage with TTL semantics. Used for short-lived
  * tokens (refresh / verification / password-reset), rate-limit counters, and
  * other transient state that should not pollute the relational database.
+ * @agent-instruction Use this for ephemeral/temporary data only (like OTPs or rate limits). Never for persistent business data.
  */
 export interface KvSetOptions {
     /** Time-To-Live in milliseconds */
@@ -268,6 +279,7 @@ export interface IKvStore {
  * 15. The Distributed Task Queue Contract
  * Moves long-running tasks (emails, data crunching, heavy webhooks) off the
  * main HTTP thread to dedicated background workers.
+ * @agent-instruction Ensure all job payloads are fully JSON serializable. Do not pass classes or functions into `enqueue()`.
  */
 export interface JobOptions {
     /** Run after X milliseconds */

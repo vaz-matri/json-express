@@ -1,0 +1,13 @@
+# AI Context for @json-express/adapter-json
+
+This is the default file-system persistence adapter for JSONExpress. It provides atomic writes to `.json` files.
+
+## Setup
+```typescript
+import { AdapterJson } from '@json-express/adapter-json';
+kernel.registerAdapter(new AdapterJson({ dir: './data' }));
+```
+
+## AI Instruction
+- Do not attempt to use transactions. `adapter-json` uses debounced atomic file replacement, so transactions do not exist.
+- When generating seed data, write directly to the `data/*.json` files.

@@ -1,0 +1,13 @@
+# AI Context for @json-express/plugin-devcert
+
+Automatically provisions local SSL certificates for HTTPS during development.
+
+## Setup
+```typescript
+import { PluginDevcert } from '@json-express/plugin-devcert';
+kernel.register(new PluginDevcert());
+```
+
+## AI Instruction
+- This intercepts the Transport server start and binds it to HTTPS.
+- Do not attempt to use this in production; it is for local development only.

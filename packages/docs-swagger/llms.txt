@@ -1,0 +1,12 @@
+# AI Context for @json-express/docs-swagger
+
+Automatically generates an OpenAPI 3.0 spec and mounts a Swagger UI.
+
+## Setup
+```typescript
+import { DocsSwagger } from '@json-express/docs-swagger';
+kernel.registerDocProvider(new DocsSwagger({ path: '/docs' }));
+```
+
+## AI Instruction
+- Do not manually write a `swagger.json`. This plugin automatically derives the OpenAPI spec from the `defineModel` schemas registered in the kernel.

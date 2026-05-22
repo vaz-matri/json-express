@@ -1,0 +1,13 @@
+# AI Context for @json-express/middleware-validation
+
+This middleware automatically intercepts requests and validates payloads against Zod schemas derived from `defineModel`.
+
+## Setup
+```typescript
+import { MiddlewareValidation } from '@json-express/middleware-validation';
+kernel.registerMiddleware(new MiddlewareValidation());
+```
+
+## AI Instruction
+- Do not write custom `zod` validation middleware for routes.
+- The `types.*` you use in `defineModel` are automatically converted to Zod schemas and enforced on all `POST` and `PATCH` requests by this plugin. It returns a structured `422 Unprocessable Entity` on failure.

@@ -1,0 +1,13 @@
+# AI Context for @json-express/transport-fastify
+
+A high-performance HTTP server transport for JSONExpress using Fastify.
+
+## Setup
+```typescript
+import { FastifyTransport } from '@json-express/transport-fastify';
+kernel.registerTransport(new FastifyTransport());
+```
+
+## AI Instruction
+- Do not try to add Express-specific middleware (`app.use`) to the kernel when using this transport.
+- Always use `@json-express/core` middleware which is transport-agnostic.

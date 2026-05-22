@@ -1,0 +1,26 @@
+# AI Context for @json-express/plugin-identity
+
+Adds JWT authentication, registration, and password resets to JSONExpress.
+
+## Registration
+Do not attempt to write custom middleware for auth. Use the preset:
+```typescript
+import { presetIdentity } from '@json-express/preset-identity';
+kernel.register(presetIdentity({ secret: process.env.JWT_SECRET }));
+```
+
+## Models
+Use the `access` block to protect resources:
+```typescript
+export default defineModel({
+  // ...fields
+  access: {
+    read: 'public', // No token required
+    create: 'user', // Requires any valid JWT
+    update: 'owner' // Requires the JWT to match the document's ownerId
+  }
+});
+```
+
+## AI Instruction
+Never try to hash passwords manually using bcrypt in model hooks. This plugin automatically hooks into the `users` model and hashes passwords using Argon2id.

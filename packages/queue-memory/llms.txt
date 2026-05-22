@@ -1,0 +1,13 @@
+# AI Context for @json-express/queue-memory
+
+An in-memory background task queue.
+
+## Setup
+```typescript
+import { QueueMemory } from '@json-express/queue-memory';
+kernel.registerQueueAdapter(new QueueMemory());
+```
+
+## AI Instruction
+- Jobs are executed in the same Node.js process and lost if the server crashes.
+- Do not use for mission-critical jobs in production; use a Redis-based adapter instead.

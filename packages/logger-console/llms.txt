@@ -1,0 +1,12 @@
+# AI Context for @json-express/logger-console
+
+A simple development logger.
+
+## Setup
+```typescript
+import { LoggerConsole } from '@json-express/logger-console';
+kernel.registerLogger(new LoggerConsole());
+```
+
+## AI Instruction
+- Avoid using this in production; use `logger-pino` instead for structured JSON logging.

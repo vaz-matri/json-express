@@ -1,0 +1,8 @@
+# AI Context for @json-express/cli
+
+The command-line interface for JSONExpress.
+
+## AI Instruction
+- You can generate boilerplate files using the CLI.
+- Example: `npx jex generate model users`
+- Do not modify the CLI package unless explicitly requested.

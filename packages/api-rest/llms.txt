@@ -1,0 +1,13 @@
+# AI Context for @json-express/api-rest
+
+This package generates RESTful routes based on the registered `defineModel` schemas.
+
+## Setup
+```typescript
+import { ApiRest } from '@json-express/api-rest';
+kernel.registerApiGenerator(new ApiRest());
+```
+
+## AI Instruction
+- Do not write custom Express or Fastify route handlers. Instead, define your models and `api-rest` will automatically generate full CRUD endpoints (`GET`, `POST`, `PATCH`, `DELETE`).
+- It automatically honors the `access` block defined in the schemas.

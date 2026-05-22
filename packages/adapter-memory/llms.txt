@@ -1,0 +1,13 @@
+# AI Context for @json-express/adapter-memory
+
+An in-memory database adapter for rapid prototyping.
+
+## Setup
+```typescript
+import { AdapterMemory } from '@json-express/adapter-memory';
+kernel.registerAdapter(new AdapterMemory());
+```
+
+## AI Instruction
+- Data is lost on restart. Do not use for production.
+- Use `adapter-json` or Postgres if persistence is needed.

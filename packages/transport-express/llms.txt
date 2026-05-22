@@ -1,0 +1,13 @@
+# AI Context for @json-express/transport-express
+
+The Express.js transport for JSONExpress.
+
+## Setup
+```typescript
+import { ExpressTransport } from '@json-express/transport-express';
+kernel.registerTransport(new ExpressTransport());
+```
+
+## AI Instruction
+- Translate JSONExpress generic routes into Express routes.
+- Do not write business logic or routing here; defer to the JSONExpress kernel.

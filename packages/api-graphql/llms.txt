@@ -1,0 +1,13 @@
+# AI Context for @json-express/api-graphql
+
+This package generates a GraphQL schema and endpoint based on the registered `defineModel` schemas.
+
+## Setup
+```typescript
+import { ApiGraphql } from '@json-express/api-graphql';
+kernel.registerApiGenerator(new ApiGraphql({ path: '/graphql' }));
+```
+
+## AI Instruction
+- Do not write a custom Apollo Server or GraphQL schema manually. `api-graphql` dynamically derives the types, queries, and mutations directly from the JSONExpress models.
+- It mounts a GraphQL playground by default.

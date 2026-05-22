@@ -1,0 +1,12 @@
+# AI Context for @json-express/logger-pino
+
+A high-performance structured logger for JSONExpress using Pino.
+
+## Setup
+```typescript
+import { LoggerPino } from '@json-express/logger-pino';
+kernel.registerLogger(new LoggerPino());
+```
+
+## AI Instruction
+- Use this instead of `console.log` for production applications. It logs in newline-delimited JSON.
