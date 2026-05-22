@@ -1,15 +1,15 @@
-# @json-express/queue-redis
+# @json-express/queue-bullmq
 
-A distributed task queue adapter for JSONExpress powered by Redis and BullMQ.
+A distributed task queue adapter for JSONExpress powered by BullMQ.
 
 ## Overview
 
-Unlike `queue-memory`, the Redis queue adapter is designed for robust, scalable production environments. It guarantees reliable execution across multiple instances and seamlessly supports retries, delayed jobs, and distributed cron schedules using BullMQ under the hood.
+Unlike `queue-memory`, the BullMQ queue adapter is designed for robust, scalable production environments. It guarantees reliable execution across multiple instances and seamlessly supports retries, delayed jobs, and distributed cron schedules.
 
 ## Installation
 
 ```bash
-npm install @json-express/queue-redis bullmq ioredis
+npm install @json-express/queue-bullmq bullmq ioredis
 ```
 
 ## Setup
@@ -19,11 +19,11 @@ Register the adapter during kernel boot:
 ```typescript
 // src/boot.ts
 import { Kernel } from '@json-express/core';
-import { QueueRedis } from '@json-express/queue-redis';
+import { QueueBullmq } from '@json-express/queue-bullmq';
 
 export const kernel = new Kernel();
 
-kernel.registerQueueAdapter(new QueueRedis({
+kernel.registerQueueAdapter(new QueueBullmq({
     connectionString: process.env.REDIS_URL || 'redis://localhost:6379',
     logger: kernel.logger
 }));
@@ -31,7 +31,7 @@ kernel.registerQueueAdapter(new QueueRedis({
 
 ## Usage
 
-This adapter implements the `IQueueAdapter` interface. This means you do not need to configure BullMQ directly. Simply enqueue jobs on the kernel, and `queue-redis` translates the generic constraints (`delay`, `cron`) into BullMQ instructions.
+This adapter implements the `IQueueAdapter` interface. This means you do not need to configure BullMQ directly. Simply enqueue jobs on the kernel, and `queue-bullmq` translates the generic constraints (`delay`, `cron`) into native BullMQ instructions.
 
 ```typescript
 // Fire and forget

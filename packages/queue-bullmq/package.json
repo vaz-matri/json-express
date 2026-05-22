@@ -1,7 +1,7 @@
 {
-  "name": "@json-express/queue-redis",
+  "name": "@json-express/queue-bullmq",
   "version": "1.0.0",
-  "description": "Redis-backed distributed queue adapter for JSONExpress using BullMQ",
+  "description": "BullMQ distributed queue adapter for JSONExpress",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

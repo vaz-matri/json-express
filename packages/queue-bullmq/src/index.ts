@@ -2,36 +2,36 @@ import { Queue, Worker, JobsOptions } from 'bullmq';
 import Redis from 'ioredis';
 import type { IQueueAdapter, JobOptions, ILogger } from '@json-express/core';
 
-export interface QueueRedisConfig {
+export interface QueueBullmqConfig {
     connectionString: string;
     logger: ILogger;
 }
 
 /**
- * Redis-backed distributed task queue adapter for JSONExpress.
+ * BullMQ-backed distributed task queue adapter for JSONExpress.
  * @agent-instruction Do not instantiate BullMQ or configure Redis directly. Inject this adapter into the kernel and use `IQueueAdapter.enqueue()`. The framework handles the rest.
  */
-export class QueueRedis implements IQueueAdapter {
+export class QueueBullmq implements IQueueAdapter {
     private connection: Redis;
     private logger: ILogger;
     private queues: Map<string, Queue> = new Map();
     private workers: Worker[] = [];
 
-    constructor(config: QueueRedisConfig) {
+    constructor(config: QueueBullmqConfig) {
         // BullMQ uses ioredis internally. We pass the connection to both Queues and Workers.
         // maxRetriesPerRequest must be null for BullMQ
         this.connection = new Redis(config.connectionString, {
             maxRetriesPerRequest: null
         });
         
-        this.logger = config.logger.child({ component: 'Queue-Redis' });
+        this.logger = config.logger.child({ component: 'Queue-Bullmq' });
         
         this.connection.on('error', (err) => {
             this.logger.error('Redis connection error', { error: err.message });
         });
         
         this.connection.on('ready', () => {
-            this.logger.info('Connected to Redis');
+            this.logger.info('Connected to Redis for BullMQ');
         });
     }
 
@@ -101,7 +101,7 @@ export class QueueRedis implements IQueueAdapter {
      * Gracefully shutdown connections
      */
     public async shutdown(): Promise<void> {
-        this.logger.info('Shutting down QueueRedis adapter...');
+        this.logger.info('Shutting down QueueBullmq adapter...');
         
         // Close workers
         for (const worker of this.workers) {

@@ -1,15 +1,15 @@
-# AI Context for @json-express/queue-redis
+# AI Context for @json-express/queue-bullmq
 
-The official Redis-backed distributed task queue adapter for JSONExpress.
+The official BullMQ-backed distributed task queue adapter for JSONExpress.
 
 ## Setup
 ```typescript
-import { QueueRedis } from '@json-express/queue-redis';
-kernel.registerQueueAdapter(new QueueRedis({ connectionString: process.env.REDIS_URL, logger: kernel.logger }));
+import { QueueBullmq } from '@json-express/queue-bullmq';
+kernel.registerQueueAdapter(new QueueBullmq({ connectionString: process.env.REDIS_URL, logger: kernel.logger }));
 ```
 
 ## AI Instruction
 - Do not instantiate `bullmq` or configure `ioredis` directly in application logic.
-- Register `QueueRedis` into the kernel at boot.
+- Register `QueueBullmq` into the kernel at boot.
 - Use `kernel.queue.enqueue(queueName, jobName, payload, options)` to add jobs.
 - The `options` parameter supports `{ delay: number }` and `{ cron: string }`. These map to BullMQ seamlessly behind the scenes.

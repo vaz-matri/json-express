@@ -212,7 +212,7 @@ export default defineConfig({
               text: 'Background Services',
               collapsed: true,
               items: [
-                { text: 'queue-redis', link: '/packages/queue-redis' },
+                { text: 'queue-bullmq', link: '/packages/queue-bullmq' },
                 { text: 'kv-redis', link: '/packages/kv-redis' },
                 { text: 'kv-memory', link: '/packages/kv-memory' },
                 { text: 'queue-memory', link: '/packages/queue-memory' },
