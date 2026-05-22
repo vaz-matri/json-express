@@ -1,0 +1,35 @@
+{
+  "name": "@json-express/queue-redis",
+  "version": "1.0.0",
+  "description": "Redis-backed distributed queue adapter for JSONExpress using BullMQ",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "dependencies": {
+    "@json-express/core": "workspace:*",
+    "bullmq": "^5.7.0",
+    "ioredis": "^5.3.2"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "json-express",
+    "redis",
+    "queue",
+    "bullmq",
+    "distributed-queue"
+  ]
+}

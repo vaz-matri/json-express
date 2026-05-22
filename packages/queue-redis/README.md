@@ -1,0 +1,47 @@
+# @json-express/queue-redis
+
+A distributed task queue adapter for JSONExpress powered by Redis and BullMQ.
+
+## Installation
+
+```bash
+npm install @json-express/queue-redis bullmq ioredis
+```
+
+## Setup
+
+```typescript
+// src/boot.ts
+import { Kernel } from '@json-express/core';
+import { QueueRedis } from '@json-express/queue-redis';
+
+export const kernel = new Kernel();
+
+kernel.registerQueueAdapter(new QueueRedis({
+    connectionString: process.env.REDIS_URL || 'redis://localhost:6379',
+    logger: kernel.logger
+}));
+```
+
+## Usage
+
+This adapter implements the `IQueueAdapter` interface, which provides a simple, engine-agnostic API for background jobs. It automatically connects to Redis via BullMQ under the hood.
+
+```typescript
+// Enqueue a job
+await kernel.queue.enqueue('emails', 'sendWelcome', { to: 'user@example.com' });
+
+// Enqueue with delay
+await kernel.queue.enqueue('cleanup', 'deleteTemp', { id: 123 }, { delay: 5000 });
+
+// Enqueue distributed cron job
+await kernel.queue.enqueue('reports', 'daily', {}, { cron: '0 0 * * *' });
+```
+
+Workers process the queues seamlessly:
+
+```typescript
+kernel.queue.registerWorker('emails', async (job) => {
+    console.log(`Sending email to ${job.payload.to}`);
+});
+```
