@@ -1,0 +1,17 @@
+{
+    "name": "example-production-stack",
+    "private": true,
+    "version": "1.0.0",
+    "description": "A fully functional complex e-commerce app running on Postgres, BullMQ, and Redis KV.",
+    "scripts": {
+        "dev": "json-express",
+        "migrate": "jex migrate"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*",
+        "@json-express/cli": "workspace:*",
+        "@json-express/adapter-postgres": "workspace:*",
+        "@json-express/queue-bullmq": "workspace:*",
+        "@json-express/kv-redis": "workspace:*"
+    }
+}

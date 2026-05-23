@@ -1,0 +1,15 @@
+{
+    "name": "example-local-stack",
+    "private": true,
+    "version": "1.0.0",
+    "description": "A fully functional complex e-commerce app running instantly on local JSON files and memory.",
+    "scripts": {
+        "dev": "json-express"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*",
+        "@json-express/adapter-json": "workspace:*",
+        "@json-express/queue-memory": "workspace:*",
+        "@json-express/kv-memory": "workspace:*"
+    }
+}

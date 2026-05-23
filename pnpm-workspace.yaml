@@ -1,7 +1,7 @@
 packages:
   - 'packages/*'
   - 'presets/*'
-  - 'example/*'
+  - 'e2e/*'
   - 'examples/*'
   - 'docs'
 allowBuilds:
