@@ -60,6 +60,9 @@ export default defineConfig({
   themeConfig: {
     logo: { light: '/logo-long-light.svg', dark: '/logo-long-dark.svg' },
     siteTitle: false,
+    search: {
+      provider: 'local'
+    },
 
     nav: [
       { text: 'Docs', link: '/guide/getting-started' },
@@ -131,13 +134,15 @@ export default defineConfig({
             { text: 'Zero-Config JSON Mode', link: '/guide/json-mode' },
             { text: 'Presets', link: '/guide/presets' },
             { text: 'Architecture', link: '/guide/architecture' },
-            { text: 'Migrating to v2', link: '/guide/migration-v2' }
+            { text: 'Migrating to v2', link: '/guide/migration-v2' },
+            { text: 'Deploying to Production', link: '/guide/deployment' }
           ]
         },
         {
           text: 'Core Concepts',
           items: [
             { text: 'Schemas & Models', link: '/guide/schemas' },
+            { text: 'API Reference', link: '/guide/api-reference' },
             { text: 'Database Adapters', link: '/guide/adapters' },
             { text: 'Hooks & Security', link: '/guide/hooks' }
           ]

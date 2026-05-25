@@ -1,11 +1,13 @@
 ---
 title: Getting Started with JSONExpress — API in 30 Seconds
-description: Install JSONExpress, drop JSON files, and get a full CRUD REST API running in under 30 seconds. Then add TypeScript schemas, a real database, and auth — without rewriting anything.
+description: Build a complex E-Commerce backend from scratch. Start with local JSON files, then scale to Postgres and Redis without rewriting any code.
 ---
 
 # Getting Started
 
-JSONExpress turns JSON files into a running REST and GraphQL API with zero configuration. When you outgrow the prototype, you can swap any layer of the stack (like swapping your memory adapter for Postgres, or Express for Fastify) — without changing your code.
+JSONExpress is built around a single, powerful philosophy: **Zero-Code Prototyping, Enterprise Scaling.**
+
+In this tutorial, we are going to build a functional **E-Commerce API** from scratch. We will start with a simple mock server running on JSON files, and progressively evolve it into a robust production backend running on Postgres and BullMQ—*without rewriting a single line of business logic*.
 
 ## Prerequisites
 
@@ -14,213 +16,199 @@ JSONExpress turns JSON files into a running REST and GraphQL API with zero confi
 
 ---
 
-## Option A — Zero-Config JSON Mode
+## Stage 1: The Local Mock Server
 
-*The fastest path to a running API. No TypeScript, no config file, no setup.*
+*When starting a new project, you don't want to mess with databases or migrations. You just need an API and some fake data.*
 
-### 1. Create a project and install the boot preset
+### 1. Install the Mock Server Preset
 
 ```bash
-mkdir my-api && cd my-api
+mkdir ecommerce-api && cd ecommerce-api
 npm init -y
-npm install @json-express/boot
+npm install @json-express/preset-mock-server
 ```
 
-`@json-express/boot` is a [dependency-only preset](/guide/presets) that bundles the recommended stack: in-memory adapter, Express transport, REST API, console logger, and `/docs`. It is the only package you need for the quickstart. The runtime entrypoint — `npx json-express` — is shipped by `@json-express/core` (which `boot` pulls in transitively).
+`@json-express/preset-mock-server` bundles everything you need to prototype instantly: local JSON persistence, a REST API generator, and the Faker seeder plugin.
 
-### 2. Create a data file
+### 2. Create your E-Commerce Data
+
+Create a `data/` directory and drop in a `products.json` file.
 
 ```bash
 mkdir data
 ```
 
-Create `data/posts.json`:
-
 ```json
+// data/products.json
 [
-  {"id":"1","title":"Hello JSONExpress","published":true},
-  {"id":"2","title":"Building APIs the easy way","published":true},
-  {"id":"3","title":"Draft post","published":false}
+  {
+    "id": "prod_1",
+    "name": "Mechanical Keyboard",
+    "price": 120,
+    "stock": 50
+  }
 ]
 ```
 
-### 3. Start the server
+### 3. Start the Server
 
 ```bash
 npx json-express
 # Server started on http://localhost:3000
-# Collections: posts (3 records)
+# Collections: products (1 record)
 ```
 
-JSONExpress scans `./data/` for JSON files and creates a collection from each one.
+**JSONExpress just inferred your schema.** Without any configuration, you now have a full CRUD API.
 
-### 4. Use the API
+Try fetching your products:
+```bash
+curl http://localhost:3000/products
+```
 
-**List all posts:**
+### 4. Seed 100 Fake Products
+
+Because you installed the `preset-mock-server`, the seeder is automatically active. Let's ask it to generate 100 realistic products matching the exact schema it inferred from your `prod_1` object!
 
 ```bash
-curl http://localhost:3000/posts
-# [{"id":"1","title":"Hello JSONExpress","published":true},{"id":"2",...},{"id":"3",...}]
+curl -X POST "http://localhost:3000/products/_seed?count=100"
 ```
-
-**Get a single post:**
-
-```bash
-curl http://localhost:3000/posts/1
-# {"id":"1","title":"Hello JSONExpress","published":true}
-```
-
-**Create a post:**
-
-```bash
-curl -X POST http://localhost:3000/posts \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Second post","published":false}'
-# {"id":"2","title":"Second post","published":false}
-```
-
-**Update a post:**
-
-```bash
-curl -X PATCH http://localhost:3000/posts/1 \
-  -H "Content-Type: application/json" \
-  -d '{"published":true}'
-# {"id":"1","title":"Hello JSONExpress","published":true}
-```
-
-**Delete a post:**
-
-```bash
-curl -X DELETE http://localhost:3000/posts/1
-# 204 No Content
-```
-
-That's the full CRUD surface — all from JSON files.
+Instantly, your `data/products.json` file on disk is populated with 100 randomized products.
 
 ---
 
-## Option B — TypeScript Schema Mode
+## Stage 2: Ejecting to TypeScript
 
-*For when you need types, validation, field-level access control, and auto-generated GraphQL.*
+*Your prototype is a success. Now, you need to add a Shopping Cart and enforce strict validation constraints.*
 
-### 1. Define your first model
+Raw JSON files are great for speed, but they can't define relational links or complex validations. Let's **eject** our `products` to a TypeScript model.
 
-Create `models/posts.ts`:
+### 1. Define the Schema
+
+Create a `models/` directory, and create `models/products.ts`:
 
 ```typescript
+// models/products.ts
 import { defineModel, types } from '@json-express/core';
 
 export default defineModel({
-  name: 'posts',
   fields: {
     id: types.id(),
-    title: types.string({ required: true, unique: true }),
-    published: types.boolean({ default: false }),
-    views: types.number({ default: 0 })
-  },
-  access: {
-    read: 'public',
-    create: 'admin',
-    update: 'owner',
-    delete: 'admin'
+    name: types.string({ required: true, minLength: 3 }),
+    price: types.number({ min: 0 }),
+    stock: types.number({ default: 0 })
   }
 });
 ```
 
-The `access` block is field-level security — it controls which roles can call each operation. `'public'` means no token required. `'admin'` and `'owner'` are enforced automatically by the auth middleware when installed.
+Create a new model for user carts, `models/carts.ts`:
 
-If a TypeScript model and JSON files share the same name, the model wins.
+```typescript
+// models/carts.ts
+import { defineModel, types } from '@json-express/core';
 
-### 2. Start and test
-
-```bash
-npx json-express
-# Server started on http://localhost:3000
-# Collections: posts
+export default defineModel({
+  fields: {
+    id: types.id(),
+    userId: types.string({ required: true }),
+    productId: types.string({ required: true }),
+    quantity: types.number({ min: 1, default: 1 }),
+    
+    // Add a relational link to the products collection!
+    product: types.relation({ target: 'products', type: 'many-to-one', foreignKey: 'productId' })
+  }
+});
 ```
 
-```bash
-curl -X POST http://localhost:3000/posts \
-  -H "Content-Type: application/json" \
-  -d '{"title":"My first typed post"}'
-# {"id":"1","title":"My first typed post","published":false,"views":0}
-
-curl http://localhost:3000/posts
-# [{"id":"1","title":"My first typed post","published":false,"views":0}]
-```
-
-Default values (`published: false`, `views: 0`) are applied automatically. Sending a duplicate `title` will return a `409 Conflict` because of `unique: true`.
+Restart `npx json-express`. The framework prioritizes the `models/` folder over the `data/` folder. Your API is now strictly validated. If you try to `POST /products` with a negative price, it will be rejected!
 
 ---
 
-## Option C — With Authentication
+## Stage 3: Advanced Business Logic
 
-*Full user accounts, JWT tokens, protected routes — from one preset install.*
+*You want to add an endpoint to let users purchase a product. This requires deducting stock (Database), sending an email receipt (Queue), and rate-limiting the purchases (KV Cache).*
 
-### 1. Add the identity preset
+JSONExpress provides native `ctx.queue` and `ctx.kvStore` interfaces right inside your models. 
 
-```bash
-npm install @json-express/preset-identity
+Update `models/products.ts` to include a custom endpoint:
+
+```typescript
+// models/products.ts
+import { defineModel, types } from '@json-express/core';
+
+export default defineModel({
+  fields: {
+    id: types.id(),
+    name: types.string(),
+    price: types.number(),
+    stock: types.number()
+  },
+  endpoints: {
+    // Add a custom 'Buy' endpoint
+    'POST /:id/buy': async (req, res, ctx) => {
+        const id = req.params.id;
+
+        // 1. Rate Limit using the KV Store
+        const attempts = (await ctx.kvStore?.get(`rate:${id}`)) || 0;
+        if (attempts >= 5) return res.status(429).json({ error: 'Too many attempts' });
+        await ctx.kvStore?.set(`rate:${id}`, attempts + 1, { ttlMs: 60000 });
+
+        // 2. Update Database
+        const product = await ctx.db.getById('products', id);
+        await ctx.db.update('products', id, { stock: product.stock - 1 });
+
+        // 3. Enqueue Background Task
+        await ctx.queue?.enqueue('emails', 'send-receipt', { product: product.name });
+
+        res.status(200).json({ success: true });
+    }
+  }
+});
 ```
 
-This dependency-only preset installs `plugin-identity`, `middleware-auth`, `email-console`, `kv-memory`, and `queue-memory` in one step.
+Because you are using `preset-mock-server`, the KV Store and Queue are automatically backed by Node's local RAM. It "just works" locally!
 
-### 2. Set your secret
+---
 
-Create a `.env` file:
+## Stage 4: Deploying to Production
 
+*Your E-Commerce API is feature-complete. It's time to go live.*
+
+You cannot run a high-traffic API on local JSON files and RAM queues. You need Postgres and Redis.
+
+In traditional frameworks, this means rewriting your data access layer. In JSONExpress, you simply swap dependencies.
+
+1. **Install the Production Adapters**
 ```bash
-jex.auth.secret=your-secret-key-min-32-chars
-jex.auth.exclude=/auth
+npm install @json-express/adapter-postgres @json-express/queue-bullmq @json-express/kv-redis
 ```
 
-`jex.auth.exclude` tells the auth middleware not to require a token for `/auth/*` itself (so registration and login work). Lowercase `jex.*` is preferred. `JEX__AUTH__SECRET` (uppercase, double-underscore) is the same key, accepted as a fallback for cloud platforms that forbid dots or lowercase env vars.
-
-### 3. Start the server
-
+2. **Configure your `.env` File**
 ```bash
+# Tell JSONExpress to use Postgres instead of JSON files
+jex.adapter=@json-express/adapter-postgres
+jex.adapter-postgres.connectionString=postgres://user:pass@remote-host/db
+
+# Tell JSONExpress to use Redis for background tasks and rate limits
+jex.queue=@json-express/queue-bullmq
+jex.kv=@json-express/kv-redis
+jex.kv-redis.connectionString=redis://remote-host:6379
+```
+
+3. **Migrate and Run**
+```bash
+npx json-express migrate
 npx json-express
-# Server started on http://localhost:3000
-# Auth routes: POST /auth/register, /auth/login, /auth/refresh, /auth/logout, …
 ```
 
-`plugin-identity` registers five schemas (users, roles, refreshTokens, emailVerificationTokens, passwordResetTokens) and mounts the `/auth/*` route group automatically.
+**That's it.** JSONExpress automatically scanned your `products.ts` and `carts.ts` models, generated the SQL `CREATE TABLE` statements, and mapped your `ctx.kvStore` and `ctx.queue` commands to your Redis cluster. 
 
-### 4. Register, login, and make an authenticated request
-
-**Register:**
-
-```bash
-curl -X POST http://localhost:3000/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"alice@example.com","password":"securepassword"}'
-# {"accessToken":"eyJ...","refreshToken":"eyJ...","user":{"id":"1","email":"alice@example.com","role":"user"}}
-```
-
-**Login:**
-
-```bash
-curl -X POST http://localhost:3000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"alice@example.com","password":"securepassword"}'
-# {"accessToken":"eyJ...","refreshToken":"eyJ...","user":{...}}
-```
-
-**Authenticated request:**
-
-```bash
-curl http://localhost:3000/posts \
-  -H "Authorization: Bearer eyJ..."
-```
-
-Routes with `access: { read: 'public' }` work without a token. Routes with `create: 'admin'` or `update: 'owner'` require a valid JWT — `middleware-auth` validates it automatically.
+You built a production E-Commerce backend in minutes.
 
 ---
 
 ## What's Next
 
-- [Presets](/guide/presets) — bundle a stack into a single npm package
-- [Schemas & Models](/guide/schemas) — field types, relations, hooks, and access control in depth
-- [Database Adapters](/guide/adapters) — swap to `adapter-json` for file persistence
-- [Architecture](/guide/architecture) — understand the kernel, IoC container, and plugin lifecycle
-- [Identity & Auth](/guide/identity) — refresh token rotation, JWKS, email verification, and more
+- [Zero-Config JSON Mode](/guide/json-mode) — Deep dive into how inference works.
+- [Database Adapters](/guide/adapters) — Learn how to configure robust database connections.
+- [Identity & Auth](/guide/identity) — Add user registration and JWT authentication in one command.
+- [Deploying to Production](/guide/deployment) — Step-by-step guides for Docker and Railway.

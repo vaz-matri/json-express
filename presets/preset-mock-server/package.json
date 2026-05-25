@@ -1,0 +1,15 @@
+{
+    "name": "@json-express/preset-mock-server",
+    "version": "1.0.0",
+    "description": "The ultimate zero-config dependency preset for building mock servers with fake data generation.",
+    "private": true,
+    "main": "index.js",
+    "dependencies": {
+        "@json-express/core": "workspace:*",
+        "@json-express/boot": "workspace:*",
+        "@json-express/adapter-json": "workspace:*",
+        "@json-express/seeder-faker": "workspace:*",
+        "@json-express/api-rest": "workspace:*",
+        "@json-express/transport-express": "workspace:*"
+    }
+}
