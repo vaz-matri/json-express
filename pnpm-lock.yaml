@@ -727,6 +727,27 @@ importers:
         specifier: workspace:*
         version: link:../../packages/queue-memory
 
+  presets/preset-mock-server:
+    dependencies:
+      '@json-express/adapter-json':
+        specifier: workspace:*
+        version: link:../../packages/adapter-json
+      '@json-express/api-rest':
+        specifier: workspace:*
+        version: link:../../packages/api-rest
+      '@json-express/boot':
+        specifier: workspace:*
+        version: link:../boot
+      '@json-express/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@json-express/seeder-faker':
+        specifier: workspace:*
+        version: link:../../packages/seeder-faker
+      '@json-express/transport-express':
+        specifier: workspace:*
+        version: link:../../packages/transport-express
+
 packages:
 
   '@algolia/abtesting@1.18.1':

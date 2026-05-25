@@ -68,6 +68,7 @@ export default defineConfig({
       { text: 'Docs', link: '/guide/getting-started' },
       { text: 'Packages', link: '/packages/core' },
       { text: 'Blog', link: '/blog' },
+      { text: 'Growth & SEO', link: '/seo' },
       // {
       //   text: 'Learn',
       //   items: [
@@ -90,42 +91,23 @@ export default defineConfig({
     ],
 
     sidebar: {
-      // '/blog/tutorials/': [
-      //   {
-      //     text: 'Framework Tutorials',
-      //     items: [
-      //       { text: 'Overview', link: '/blog/tutorials/' }
-      //     ]
-      //   }
-      // ],
-      //
-      // '/blog/releases/': [
-      //   {
-      //     text: 'Releases & Updates',
-      //     items: [
-      //       { text: 'Overview', link: '/blog/releases/' }
-      //     ]
-      //   }
-      // ],
-      //
-      // '/blog/engineering/': [
-      //   {
-      //     text: 'Engineering',
-      //     items: [
-      //       { text: 'Overview', link: '/blog/engineering/' }
-      //     ]
-      //   }
-      // ],
-      //
-      // '/blog/news/': [
-      //   {
-      //     text: 'Tech News & Reviews',
-      //     items: [
-      //       { text: 'Overview', link: '/blog/news/' }
-      //     ]
-      //   }
-      // ],
-
+      '/blog/': [
+        {
+          text: 'Technical Blog',
+          items: [
+            { text: 'The Evolution to Agent-First', link: '/blog/the-evolution-to-agent-first' },
+            { text: 'Why I Built JSONExpress', link: '/blog/why-i-built-jsonexpress' }
+          ]
+        }
+      ],
+      '/seo/': [
+        {
+          text: 'Growth & SEO',
+          items: [
+            { text: 'SEO Migration Journey', link: '/seo/seo-migration-journey' }
+          ]
+        }
+      ],
       '/': [
         {
           text: 'Introduction',
