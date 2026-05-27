@@ -1,7 +1,6 @@
 ---
 title: "Why I Built JSONExpress: The Problem with json-server in 2026"
 description: "json-server was a revelation. But it hasn't kept pace with how developers build today. Here's the gap I kept hitting — and why I built JSONExpress to fill it."
-date: 2026-05-01
 ---
 
 # Why I Built JSONExpress: The Problem with json-server in 2026

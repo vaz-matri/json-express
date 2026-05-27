@@ -93,6 +93,12 @@ export default defineConfig({
     sidebar: {
       '/blog/': [
         {
+          text: 'AI & Developer Tools',
+          items: [
+            { text: 'Building with AI Agents', link: '/blog/ai/building-with-ai-agents' }
+          ]
+        },
+        {
           text: 'Technical Blog',
           items: [
             { text: 'The Evolution to Agent-First', link: '/blog/the-evolution-to-agent-first' },
@@ -104,6 +110,7 @@ export default defineConfig({
         {
           text: 'Growth & SEO',
           items: [
+            { text: 'My SEO Setup Journey', link: '/seo/my-seo-setup' },
             { text: 'SEO Migration Journey', link: '/seo/seo-migration-journey' }
           ]
         }

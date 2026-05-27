@@ -2,7 +2,6 @@
 title: How I fixed duplicate content SEO drops when migrating to a www subdomain
 description: A deep dive into fixing VitePress canonical tags, 301 redirects, and Google Search Console indexing errors after moving to a www subdomain.
 author: vaz
-date: 2026-05-26
 category: SEO
 ---
 
