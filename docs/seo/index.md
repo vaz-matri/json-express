@@ -9,4 +9,5 @@ Documenting the journey of growing JSONExpress.
 
 ## Posts
 
-- [How I fixed duplicate content SEO drops when migrating to a www subdomain](/seo/seo-migration-journey) — May 2026
+- [My SEO Setup Journey for JSONExpress](/seo/my-seo-setup)
+- [How I fixed duplicate content SEO drops when migrating to a www subdomain](/seo/seo-migration-journey)
