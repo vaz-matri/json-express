@@ -23,6 +23,9 @@ my-app/
 ```
 
 1. `npm i @json-express/boot` → `npx json-express` → full CRUD server on :3000 with docs at `/docs`.
+   (Prefer `npx jex init` when starting from scratch — it also scaffolds `AGENTS.md`.
+   If the app has no `AGENTS.md`, create one now stating the no-app-code rule, the
+   decision ladder, and where package docs live — copy the shape `jex init` produces.)
 2. Every JSON file in `data/` becomes a collection with generated REST endpoints.
 3. Every `models/<name>.ts` refines one collection: fields, validation, hooks, access
    rules, custom endpoints. `defineRoutes` (fieldless) mounts pure endpoints (`/search`,

@@ -9,9 +9,53 @@ const PACKAGE_JSON_TEMPLATE = (name: string) => `{
     "serve": "json-express"
   },
   "dependencies": {
-    "@json-express/boot": "*"
+    "@json-express/boot": "^2"
   }
 }
+`;
+
+const AGENTS_MD_TEMPLATE = `# AGENTS.md — how to work on this app
+
+This is a **JSON Express** app (the agent-first backend framework). The one rule that
+overrides everything: **never write application code**. No index file, no imports of
+\`JsonExpressKernel\`, no wiring, no Express/Fastify code. The server comes from the
+\`json-express\` bin (\`npm run serve\`).
+
+## The only surfaces you may change
+
+| Surface | What goes there |
+|---|---|
+| \`data/<collection>.json\` | Structure — records; CRUD endpoints are generated per file |
+| \`models/<collection>.ts\` | Behavior — \`defineModel\` / \`defineRoutes\`: fields, validation, hooks, access rules, custom endpoints |
+| \`.env\` | Configuration — \`jex.*\` keys (case-insensitive); keys are package-scoped |
+| \`package.json\` deps | Capabilities — install \`@json-express/*\` packages; discovery is automatic |
+
+## The decision ladder (first match wins)
+
+\`data/\` → \`models/\` → install a package → author the missing package and upstream it.
+Never solve any requirement with an app-level code file — that option does not exist.
+
+## Where the docs live
+
+- Each installed package documents itself: \`node_modules/@json-express/<pkg>/llms.txt\`
+  (its \`jex.*\` keys and what it unlocks in \`models/\`).
+- Full guide (workflow, ecosystem index, plugin authoring):
+  \`node_modules/@json-express/core/skills/json-express/SKILL.md\`
+- The running server self-describes: \`GET /\` (collections) and \`GET /docs/json\` (routes).
+
+## Commands
+
+\`\`\`
+npm run serve                  # start the server
+npx json-express --seed        # start + seed empty collections (needs a seeder-* package)
+npx jex export <collection>    # generate a typed model from existing JSON data
+npx jex migrate                # run DB migrations for the active adapter
+\`\`\`
+`;
+
+const CLAUDE_MD_TEMPLATE = `# CLAUDE.md
+
+@AGENTS.md
 `;
 
 const ENV_TEMPLATE = `# JSON Express configuration
@@ -59,6 +103,20 @@ export function runInit(cwd: string, name?: string) {
     if (!existsSync(envPath)) {
         writeFileSync(envPath, ENV_TEMPLATE, 'utf8');
         console.log(`✅ Created .env`);
+    }
+
+    // Agent entry point: AI coding agents read AGENTS.md (and Claude Code reads
+    // CLAUDE.md, which imports it) — this is how a fresh app teaches an agent the
+    // no-app-code rules before it writes anything.
+    const agentsPath = join(targetDir, 'AGENTS.md');
+    if (!existsSync(agentsPath)) {
+        writeFileSync(agentsPath, AGENTS_MD_TEMPLATE, 'utf8');
+        console.log(`✅ Created AGENTS.md (agent instructions)`);
+    }
+    const claudePath = join(targetDir, 'CLAUDE.md');
+    if (!existsSync(claudePath)) {
+        writeFileSync(claudePath, CLAUDE_MD_TEMPLATE, 'utf8');
+        console.log(`✅ Created CLAUDE.md (imports AGENTS.md)`);
     }
 
     console.log('\nNext steps:');
