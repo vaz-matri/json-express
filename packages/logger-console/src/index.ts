@@ -52,3 +52,5 @@ export class ConsoleLogger implements ILogger {
         return `[${level}]${prefix} ${message}${ctxString}`;
     }
 }
+
+export default ConsoleLogger;

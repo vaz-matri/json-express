@@ -233,3 +233,5 @@ export class ValidationMiddleware implements IMiddleware {
         return next();
     }
 }
+
+export default ValidationMiddleware;

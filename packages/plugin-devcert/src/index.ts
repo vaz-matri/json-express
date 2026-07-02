@@ -40,3 +40,5 @@ export class DevcertPlugin implements IPlugin {
         }
     }
 }
+
+export default DevcertPlugin;

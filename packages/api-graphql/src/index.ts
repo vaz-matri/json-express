@@ -628,3 +628,5 @@ function runValidation(validator: ParsableSchema | undefined, input: any, typeNa
     return parsed.data ?? input;
 }
 
+
+export default GraphQLApiGenerator;

@@ -78,3 +78,5 @@ export class KvRedis implements IKvStore {
         this.client.disconnect();
     }
 }
+
+export default KvRedis;

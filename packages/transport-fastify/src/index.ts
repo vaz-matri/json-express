@@ -115,3 +115,5 @@ export class FastifyTransport implements ITransport {
         return this.fastify.close();
     }
 }
+
+export default FastifyTransport;

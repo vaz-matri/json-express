@@ -51,3 +51,5 @@ export class EnvConfigProvider implements IConfigProvider {
         return this.config;
     }
 }
+
+export default EnvConfigProvider;

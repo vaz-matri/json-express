@@ -9,7 +9,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'npm run serve',
-    url: 'http://localhost:3000/posts',
+    url: 'http://localhost:3000/',
     reuseExistingServer: true,
   },
 });

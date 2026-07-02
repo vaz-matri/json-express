@@ -2,7 +2,7 @@
   "name": "@json-express/preset-identity",
   "version": "2.0.0",
   "description": "Drop-in identity stack for JSON Express — plugin-identity + middleware-auth bundled with sensible local defaults (email-console, kv-memory, queue-memory).",
-  "main": "README.md",
+  "main": "package.json",
   "dependencies": {
     "@json-express/plugin-identity": "workspace:*",
     "@json-express/middleware-auth": "workspace:*",

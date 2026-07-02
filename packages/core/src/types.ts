@@ -114,6 +114,15 @@ export interface ITransport {
  */
 export interface IApiGenerator {
     setSchemas?(schemas: ModelSchema[]): void;
+
+    /**
+     * Receive the same runtime context the kernel hands to the database adapter
+     * (`db`, optional `email`/`kvStore`/`queue`, `logger`). Generators that mount
+     * custom endpoints pass it as the handler's third argument so models can reach
+     * registered providers without touching the IoC container.
+     */
+    setHookContext?(ctx: HookContext): void;
+
     generate(collections: string[]): RouteDefinition[] | Promise<RouteDefinition[]>;
 }
 

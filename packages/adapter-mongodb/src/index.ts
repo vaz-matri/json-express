@@ -1,18 +1,21 @@
 import { MongoClient, ObjectId, Db, MongoServerError } from 'mongodb';
-import type { 
-    IDatabaseAdapter, 
-    ILogger, 
-    HookContext, 
-    ModelSchema, 
+import type {
+    IDatabaseAdapter,
+    IConfigProvider,
+    ILogger,
+    HookContext,
+    ModelSchema,
     QueryOptions,
     TypeDefinition
 } from '@json-express/core';
 import { UniqueConstraintError } from '@json-express/core';
 
 export interface AdapterMongoConfig {
-    connectionString: string;
+    /** Direct override; when omitted, read from jex.adapter-mongodb.connectionstring */
+    connectionString?: string;
     logger: ILogger;
     dbName?: string;
+    configProvider?: IConfigProvider;
 }
 
 /**
@@ -27,8 +30,16 @@ export class AdapterMongo implements IDatabaseAdapter {
     private hookContext?: HookContext;
 
     constructor(config: AdapterMongoConfig) {
-        this.client = new MongoClient(config.connectionString);
-        this.dbName = config.dbName;
+        const connectionString = config.connectionString
+            ?? config.configProvider?.get<string>('adapter-mongodb.connectionstring');
+        if (!connectionString) {
+            throw new Error(
+                '@json-express/adapter-mongodb: no connection string configured. ' +
+                'Set jex.adapter-mongodb.connectionstring in .env (or pass { connectionString } directly).'
+            );
+        }
+        this.client = new MongoClient(connectionString);
+        this.dbName = config.dbName ?? config.configProvider?.get<string>('adapter-mongodb.dbname');
         this.logger = config.logger.child({ component: 'DB-Mongo' });
     }
 
@@ -224,3 +235,5 @@ export class AdapterMongo implements IDatabaseAdapter {
         return this.mapFromMongo(result);
     }
 }
+
+export default AdapterMongo;

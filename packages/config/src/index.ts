@@ -77,3 +77,5 @@ export class AdvancedConfigProvider implements IConfigProvider {
         setNestedValue(this.config, key, value);
     }
 }
+
+export default AdvancedConfigProvider;

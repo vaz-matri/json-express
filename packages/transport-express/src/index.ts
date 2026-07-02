@@ -140,3 +140,5 @@ export class ExpressTransport implements ITransport {
         });
     }
 }
+
+export default ExpressTransport;

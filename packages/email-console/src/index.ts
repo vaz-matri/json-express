@@ -40,3 +40,5 @@ export class ConsoleEmailProvider implements IEmailProvider {
         return true;
     }
 }
+
+export default ConsoleEmailProvider;

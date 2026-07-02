@@ -57,3 +57,5 @@ export class MemoryKvStore implements IKvStore {
         }
     }
 }
+
+export default MemoryKvStore;

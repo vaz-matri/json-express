@@ -269,3 +269,5 @@ export class LightDocProvider implements IDocProvider {
         `;
     }
 }
+
+export default LightDocProvider;

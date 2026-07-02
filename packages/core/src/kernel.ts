@@ -160,18 +160,23 @@ export class JsonExpressKernel {
             throw new Error("❌ Missing core plugins! Ensure Database, ApiGenerator, and Transport are registered.");
         }
 
-        // 2.5 Hand the database adapter the runtime context for model hooks
+        // 2.5 Compose the runtime context once; hand it to the database adapter
+        // (model hooks) and the API generator (custom endpoint handlers) alike.
+        const email = this.container.hasRegistration('emailProvider')
+            ? this.container.resolve<IEmailProvider>('emailProvider')
+            : undefined;
+        const kvStore = this.container.hasRegistration('kvStore')
+            ? this.container.resolve<IKvStore>('kvStore')
+            : undefined;
+        const queue = this.container.hasRegistration('queue')
+            ? this.container.resolve<IQueueAdapter>('queue')
+            : undefined;
+        const hookContext = { db, email, kvStore, queue, logger };
         if (typeof db.setHookContext === 'function') {
-            const email = this.container.hasRegistration('emailProvider')
-                ? this.container.resolve<IEmailProvider>('emailProvider')
-                : undefined;
-            const kvStore = this.container.hasRegistration('kvStore')
-                ? this.container.resolve<IKvStore>('kvStore')
-                : undefined;
-            const queue = this.container.hasRegistration('queue')
-                ? this.container.resolve<IQueueAdapter>('queue')
-                : undefined;
-            db.setHookContext({ db, email, kvStore, queue, logger });
+            db.setHookContext(hookContext);
+        }
+        if (typeof apiGenerator.setHookContext === 'function') {
+            apiGenerator.setHookContext(hookContext);
         }
 
         // 3. Ask the API Generator to create abstract route definitions
@@ -231,6 +236,25 @@ export class JsonExpressKernel {
             }
         } catch (e) {
             // Silently skip if no docProvider is registered
+        }
+
+        // 5.2 Welcome route — only when nothing else claims GET / (user routes win).
+        // Gives the server a self-describing index and a 2xx root for health probes
+        // and tooling that polls the base URL for readiness.
+        if (!this.routes.some(r => r.method.toUpperCase() === 'GET' && r.path === '/')) {
+            const docsMounted = this.container.hasRegistration('docProvider');
+            this.registerRoute({
+                method: 'GET',
+                path: '/',
+                handler: async () => ({
+                    statusCode: 200,
+                    body: {
+                        framework: 'json-express',
+                        collections,
+                        ...(docsMounted ? { docs: configProvider.get<string>('docs.path', '/docs') } : {})
+                    }
+                })
+            });
         }
 
         console.log(`🟢 Starting server on port ${port}...`);

@@ -3,11 +3,12 @@ import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { eq, and } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 
-import type { 
-    IDatabaseAdapter, 
-    ILogger, 
-    HookContext, 
-    ModelSchema, 
+import type {
+    IDatabaseAdapter,
+    IConfigProvider,
+    ILogger,
+    HookContext,
+    ModelSchema,
     QueryOptions,
     TypeDefinition
 } from '@json-express/core';
@@ -26,8 +27,21 @@ export class AdapterPostgres implements IDatabaseAdapter {
     private tables: Record<string, any> = {};
     private hookContext?: HookContext;
 
-    constructor({ connectionString, logger }: { connectionString: string; logger: ILogger }) {
-        this.pool = new pg.Pool({ connectionString });
+    constructor({ connectionString, logger, configProvider }: {
+        /** Direct override; when omitted, read from jex.adapter-postgres.connectionString */
+        connectionString?: string;
+        logger: ILogger;
+        configProvider?: IConfigProvider;
+    }) {
+        const resolved = connectionString
+            ?? configProvider?.get<string>('adapter-postgres.connectionstring');
+        if (!resolved) {
+            throw new Error(
+                '@json-express/adapter-postgres: no connection string configured. ' +
+                'Set jex.adapter-postgres.connectionString in .env (or pass { connectionString } directly).'
+            );
+        }
+        this.pool = new pg.Pool({ connectionString: resolved });
         this.db = drizzle(this.pool);
         this.logger = logger.child({ component: 'DB-Postgres' });
     }
@@ -223,3 +237,5 @@ export class AdapterPostgres implements IDatabaseAdapter {
         return result[0];
     }
 }
+
+export default AdapterPostgres;

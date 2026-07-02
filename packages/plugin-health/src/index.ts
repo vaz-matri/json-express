@@ -67,3 +67,5 @@ export class HealthPlugin implements IPlugin {
         }
     }
 }
+
+export default HealthPlugin;

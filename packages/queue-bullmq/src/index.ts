@@ -117,3 +117,5 @@ export class QueueBullmq implements IQueueAdapter {
         this.connection.disconnect();
     }
 }
+
+export default QueueBullmq;

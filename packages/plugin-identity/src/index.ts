@@ -331,3 +331,5 @@ export class IdentityPlugin implements IPlugin {
         this.adminPassword = password;
     }
 }
+
+export default IdentityPlugin;

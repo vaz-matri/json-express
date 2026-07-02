@@ -324,3 +324,5 @@ export class SwaggerDocProvider implements IDocProvider {
         return schema;
     }
 }
+
+export default SwaggerDocProvider;

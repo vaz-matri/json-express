@@ -12,7 +12,8 @@ import type {
     ILogger,
     ModelSchema,
     QueryOptions,
-    AccessRule
+    AccessRule,
+    HookContext
 } from '@json-express/core';
 import {
     evaluateAccess,
@@ -41,6 +42,7 @@ export class RestApiGenerator implements IApiGenerator {
     private logger: ILogger;
     private collections: string[] = [];
     private schemas: ModelSchema[] = [];
+    private hookContext?: HookContext;
 
     constructor({ database, configProvider, logger }: {
         database: IDatabaseAdapter;
@@ -55,6 +57,10 @@ export class RestApiGenerator implements IApiGenerator {
     public setSchemas(schemas: ModelSchema[]) {
         this.logger.info(`Received ${schemas.length} schemas for endpoint parsing`);
         this.schemas = schemas;
+    }
+
+    public setHookContext(ctx: HookContext) {
+        this.hookContext = ctx;
     }
 
     private enrichRoute(
@@ -107,8 +113,10 @@ export class RestApiGenerator implements IApiGenerator {
                 json: (body: any) => { responseBody = body; }
             };
 
-            const ctx = { db: this.db };
-            
+            // Same context the kernel hands to db hooks; falls back to db-only
+            // when boot didn't call setHookContext (e.g. direct unit-test wiring).
+            const ctx = this.hookContext ?? { db: this.db };
+
             try {
                 const result = await handler(req, resHelper as any, ctx);
                 // If they return the strict object declarative style:
@@ -404,3 +412,5 @@ export class RestApiGenerator implements IApiGenerator {
         return routes;
     }
 }
+
+export default RestApiGenerator;

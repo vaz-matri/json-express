@@ -7,7 +7,7 @@
     "build": "pnpm -r run build",
     "dev": "pnpm -r --parallel run dev",
     "test": "vitest run --exclude \"e2e/**\" --exclude \"examples/**\"",
-    "e2e": "pnpm --filter './e2e/**' test",
+    "e2e": "pnpm --workspace-concurrency=1 --filter './e2e/**' test",
     "publish:all": "pnpm -r publish --access public",
     "docs:dev": "pnpm --filter @json-express/docs run dev",
     "docs:build": "pnpm --filter @json-express/docs run build",

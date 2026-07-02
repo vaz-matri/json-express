@@ -88,3 +88,5 @@ export class PinoLogger implements ILogger {
         return new PinoLogger({ _instance: this.logger.child(context) } as any);
     }
 }
+
+export default PinoLogger;

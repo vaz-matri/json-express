@@ -244,3 +244,5 @@ export class FakerSeeder implements ISeeder {
         }
     }
 }
+
+export default FakerSeeder;

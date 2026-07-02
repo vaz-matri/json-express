@@ -9,4 +9,5 @@ export * from './auth';
 export * from './testing/adapter-compliance';
 export * from './testing/transport-compliance';
 export { startServer } from './runner';
+export { discoverPluginsRecursively, loadPluginInstance, matchesCategory, selectPluginExport } from './discovery';
 export { runPresetInit } from './preset-init';
