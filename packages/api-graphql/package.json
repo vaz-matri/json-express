@@ -19,12 +19,12 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "@json-express/core": "workspace:*",
     "graphql": "^16.8.1"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.4",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "@json-express/core": "workspace:^"
   },
   "files": [
     "dist"
@@ -44,5 +44,8 @@
     "graphql-api",
     "graphql-server",
     "sdl"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

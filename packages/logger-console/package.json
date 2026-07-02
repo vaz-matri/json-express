@@ -23,9 +23,6 @@
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
-  "dependencies": {
-    "@json-express/core": "workspace:*"
-  },
   "files": [
     "dist"
   ],
@@ -43,5 +40,11 @@
     "logging",
     "console-logger",
     "zero-dependency"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  },
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

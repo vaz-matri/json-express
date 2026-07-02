@@ -384,31 +384,29 @@ importers:
         version: link:../../packages/queue-bullmq
 
   packages/adapter-json:
-    dependencies:
+    devDependencies:
       '@json-express/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
 
   packages/adapter-memory:
-    dependencies:
+    devDependencies:
       '@json-express/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
 
   packages/adapter-mongodb:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       mongodb:
         specifier: ^6.5.0
         version: 6.21.0
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/adapter-postgres:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       drizzle-orm:
         specifier: ^0.30.10
         version: 0.30.10(@types/pg@8.20.0)(pg@8.21.0)
@@ -419,6 +417,9 @@ importers:
         specifier: ^1.0.1
         version: 1.2.1
     devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
       '@types/pg':
         specifier: ^8.11.5
         version: 8.20.0
@@ -428,13 +429,13 @@ importers:
 
   packages/api-graphql:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       graphql:
         specifier: ^16.8.1
         version: 16.13.2
     devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
       '@types/jsonwebtoken':
         specifier: ^9.0.4
         version: 9.0.10
@@ -444,12 +445,13 @@ importers:
 
   packages/api-rest:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/cli:
     dependencies:
@@ -469,9 +471,6 @@ importers:
 
   packages/config:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       jiti:
         specifier: ^1.21.6
         version: 1.21.7
@@ -479,18 +478,22 @@ importers:
         specifier: ^4.1.0
         version: 4.1.1
     devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
 
   packages/config-env:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       dotenv:
         specifier: ^16.4.5
         version: 16.6.1
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/core:
     dependencies:
@@ -512,98 +515,99 @@ importers:
         version: 9.0.10
 
   packages/docs-light:
-    dependencies:
+    devDependencies:
       '@json-express/core':
         specifier: workspace:^
         version: link:../core
 
   packages/docs-swagger:
-    dependencies:
+    devDependencies:
       '@json-express/core':
         specifier: workspace:^
         version: link:../core
 
   packages/email-console:
-    dependencies:
+    devDependencies:
       '@json-express/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
 
   packages/kv-memory:
-    dependencies:
+    devDependencies:
       '@json-express/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
 
   packages/kv-redis:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       ioredis:
         specifier: ^5.3.2
         version: 5.10.1
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/logger-console:
-    dependencies:
+    devDependencies:
       '@json-express/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
 
   packages/logger-pino:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:^
-        version: link:../core
       pino:
         specifier: ^9.5.0
         version: 9.14.0
       pino-pretty:
         specifier: ^11.3.0
         version: 11.3.0
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/middleware-auth:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.3
     devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
       '@types/jsonwebtoken':
         specifier: ^9.0.4
         version: 9.0.10
 
   packages/middleware-validation:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       zod:
         specifier: ^3.23.8
         version: 3.25.76
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/plugin-devcert:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       devcert:
         specifier: ^1.2.2
         version: 1.2.3
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/plugin-health:
-    dependencies:
+    devDependencies:
       '@json-express/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
 
   packages/plugin-identity:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../middleware-auth
@@ -617,6 +621,9 @@ importers:
       '@json-express/adapter-memory':
         specifier: workspace:*
         version: link:../adapter-memory
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
       '@json-express/kv-memory':
         specifier: workspace:*
         version: link:../kv-memory
@@ -632,20 +639,21 @@ importers:
 
   packages/queue-bullmq:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       bullmq:
         specifier: ^5.7.0
         version: 5.77.0
       ioredis:
         specifier: ^5.3.2
         version: 5.10.1
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/queue-memory:
-    dependencies:
+    devDependencies:
       '@json-express/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
 
   packages/seeder-faker:
@@ -653,31 +661,33 @@ importers:
       '@faker-js/faker':
         specifier: ^8.4.1
         version: 8.4.1
+    devDependencies:
       '@json-express/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
 
   packages/transport-express:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       express:
         specifier: 5.1.0
         version: 5.1.0
     devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.25
 
   packages/transport-fastify:
     dependencies:
-      '@json-express/core':
-        specifier: workspace:*
-        version: link:../core
       fastify:
         specifier: ^5.3.3
         version: 5.8.4
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   presets/boot:
     dependencies:

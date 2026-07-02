@@ -1,82 +1,82 @@
 [
   {
-    "name": "beatae quibusdam",
-    "wizardId": "fe0b6c8d-e173-4381-9d57-2208451dc8a0",
-    "rarity": "maxime saepe texo cum",
-    "potencyLevel": 3,
-    "bottled": true,
-    "id": "b9e7874b-c971-4320-bc48-a7c8f4e4bfd2"
-  },
-  {
-    "name": "ceno colligo architecto",
-    "wizardId": "6b2cc946-944c-4dd0-a0cd-b89642c24d4f",
-    "rarity": "callide eveniet",
-    "potencyLevel": 3,
-    "bottled": true,
-    "id": "4d901b73-095f-4da2-a8c1-e99b7e851167"
-  },
-  {
-    "name": "architecto torqueo animus",
-    "wizardId": "7b16bf1f-6b9f-4708-b089-88bc9733fc5c",
-    "rarity": "aurum caste facere",
-    "potencyLevel": 6,
-    "bottled": true,
-    "id": "c3b17f97-02cc-40a2-bd66-152117bc9e4f"
-  },
-  {
-    "name": "crepusculum distinctio",
-    "wizardId": "8df4ad0a-34fb-49d8-9ff4-fdef4f35040b",
-    "rarity": "attonbitus distinctio",
-    "potencyLevel": 2,
-    "bottled": true,
-    "id": "0fc733e0-6e79-4a51-b1c5-b58ce2ae2785"
-  },
-  {
-    "name": "conculco urbs arbustum",
-    "wizardId": "a5de57cd-c3d5-42ce-a64c-8446014610e6",
-    "rarity": "cerno baiulus crastinus",
-    "potencyLevel": 4,
-    "bottled": true,
-    "id": "90a743ff-b22b-4b67-8139-01f0bd64796b"
-  },
-  {
-    "name": "via callide comitatus",
-    "wizardId": "6b2cc946-944c-4dd0-a0cd-b89642c24d4f",
-    "rarity": "vulgo volutabrum thalassinus",
-    "potencyLevel": 3,
-    "bottled": true,
-    "id": "33749a33-108c-4884-9c71-d01350c84276"
-  },
-  {
-    "name": "cotidie enim",
-    "wizardId": "a3e4001c-6e74-4830-9cca-8c58b2a34390",
-    "rarity": "sopor tabella voco",
+    "name": "commodo caterva terror",
+    "wizardId": "673b4f8b-44c9-4c1a-bdc5-90a40c1ae5f7",
+    "rarity": "rerum cupressus",
     "potencyLevel": 8,
     "bottled": true,
-    "id": "1313f032-2f0b-4dbc-a661-699489fc6a6a"
+    "id": "d1c83b3a-303c-4623-b282-2db64e8eed30"
   },
   {
-    "name": "subnecto curatio",
-    "wizardId": "e5cdf95c-ec94-487f-b1bd-5cfe10c7ffd4",
-    "rarity": "creber deludo crinis vapulus",
-    "potencyLevel": 3,
+    "name": "timor amplexus depulso",
+    "wizardId": "f8de7bb9-c962-4e4e-b9ae-96a5340eb5a4",
+    "rarity": "succurro dicta",
+    "potencyLevel": 6,
     "bottled": true,
-    "id": "de1d5269-d895-48c1-9103-46f914fee767"
+    "id": "8b0ea208-0e99-4ad2-8950-dbcd4ac5152f"
   },
   {
-    "name": "cui calco creator eum",
-    "wizardId": "a3e4001c-6e74-4830-9cca-8c58b2a34390",
-    "rarity": "thema amissio appositus claro",
+    "name": "acceptus summa comprehendo",
+    "wizardId": "a792a334-36f2-4ed9-a6b9-4d0bb8abb8b8",
+    "rarity": "summopere cohaero aegre",
     "potencyLevel": 7,
     "bottled": true,
-    "id": "a82b57be-d692-406a-ab62-17a63fd8fcc0"
+    "id": "9dfb8dd4-d606-4042-8345-f81053ebcff8"
   },
   {
-    "name": "vestigium cribro tredecim",
-    "wizardId": "8df4ad0a-34fb-49d8-9ff4-fdef4f35040b",
-    "rarity": "aqua deduco",
+    "name": "solitudo ancilla quidem",
+    "wizardId": "02d93897-3520-4689-8fbc-ad864e99c27f",
+    "rarity": "nostrum bis",
+    "potencyLevel": 1,
+    "bottled": true,
+    "id": "946fb5f6-18c6-4757-86ca-8658d5814777"
+  },
+  {
+    "name": "ulciscor aetas adsidue",
+    "wizardId": "764d7dc2-4dc3-4660-b45b-3c8968c7d4f1",
+    "rarity": "canto perspiciatis natus",
+    "potencyLevel": 6,
+    "bottled": true,
+    "id": "fcc1bc75-7c94-4e9a-b17e-7fcd1080e82b"
+  },
+  {
+    "name": "expedita creator",
+    "wizardId": "771bce9f-dc43-4ed8-9a73-02247f708810",
+    "rarity": "adeptio vinculum",
+    "potencyLevel": 3,
+    "bottled": true,
+    "id": "dd068e9c-80b3-45e7-9460-212b47d5a3d0"
+  },
+  {
+    "name": "aeternus a",
+    "wizardId": "92d57ccc-cc1f-426d-9f28-9f71fe12a279",
+    "rarity": "acerbitas vulnus cuppedia vito",
+    "potencyLevel": 1,
+    "bottled": true,
+    "id": "5b9c48a5-c3ef-4cc0-85ba-7909022778bb"
+  },
+  {
+    "name": "iusto fugit villa",
+    "wizardId": "92d57ccc-cc1f-426d-9f28-9f71fe12a279",
+    "rarity": "adicio similique deludo",
+    "potencyLevel": 1,
+    "bottled": true,
+    "id": "1ffda1ac-a053-4d62-9411-3a3eac35ae36"
+  },
+  {
+    "name": "tamquam alienus caute tenetur",
+    "wizardId": "9298ef43-bf9f-4406-b092-1bc126c61590",
+    "rarity": "arto comburo suspendo",
     "potencyLevel": 9,
     "bottled": true,
-    "id": "2987cdd2-d0c9-4cb3-aa29-39cdf334ad74"
+    "id": "e7dcd149-27c9-41a2-8a2a-1cc76579839b"
+  },
+  {
+    "name": "provident tersus crudelis",
+    "wizardId": "02d93897-3520-4689-8fbc-ad864e99c27f",
+    "rarity": "demulceo amitto aegrus statim",
+    "potencyLevel": 8,
+    "bottled": true,
+    "id": "db60be6e-933d-4862-8447-3e837b595f1d"
   }
 ]

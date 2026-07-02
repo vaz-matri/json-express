@@ -21,10 +21,11 @@
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  },
   "dependencies": {
-    "devcert": "^1.2.2",
-    "@json-express/core": "workspace:*"
+    "devcert": "^1.2.2"
   },
   "keywords": [
     "json-express",
@@ -41,5 +42,8 @@
     "ssl",
     "localhost-ssl",
     "devcert"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

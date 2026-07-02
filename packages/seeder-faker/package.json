@@ -18,10 +18,11 @@
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  },
   "dependencies": {
-    "@faker-js/faker": "^8.4.1",
-    "@json-express/core": "workspace:*"
+    "@faker-js/faker": "^8.4.1"
   },
   "files": [
     "dist"
@@ -42,5 +43,8 @@
     "mock-data",
     "test-data",
     "faker-js"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

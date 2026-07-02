@@ -21,9 +21,8 @@
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
-  "devDependencies": {},
-  "dependencies": {
-    "@json-express/core": "workspace:*"
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
   },
   "keywords": [
     "json-express",
@@ -40,5 +39,8 @@
     "file-database",
     "git-backed-cms",
     "persistent"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

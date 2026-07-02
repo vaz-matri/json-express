@@ -19,7 +19,6 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "@json-express/core": "workspace:*",
     "ioredis": "^5.3.2"
   },
   "files": [
@@ -30,5 +29,11 @@
     "redis",
     "kv-store",
     "cache"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  },
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

@@ -22,12 +22,13 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "peerDependencies": {
-    "@json-express/core": "workspace:*"
+    "@json-express/core": "workspace:^"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  },
   "dependencies": {
-    "fastify": "^5.3.3",
-    "@json-express/core": "workspace:*"
+    "fastify": "^5.3.3"
   },
   "keywords": [
     "json-express",

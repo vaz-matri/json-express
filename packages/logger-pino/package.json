@@ -48,5 +48,8 @@
     "structured-logging",
     "json-logging",
     "production-logger"
-  ]
+  ],
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

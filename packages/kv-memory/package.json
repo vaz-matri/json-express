@@ -18,10 +18,9 @@
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
-  "dependencies": {
-    "@json-express/core": "workspace:*"
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
   },
-  "devDependencies": {},
   "files": [
     "dist"
   ],
@@ -40,5 +39,8 @@
     "kv-store",
     "ttl",
     "in-memory-cache"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

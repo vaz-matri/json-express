@@ -18,9 +18,8 @@
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
-  "dependencies": {},
   "peerDependencies": {
-    "@json-express/core": "workspace:*"
+    "@json-express/core": "workspace:^"
   },
   "keywords": [
     "json-express",
@@ -37,5 +36,8 @@
     "kubernetes",
     "liveness-probe",
     "readiness-probe"
-  ]
+  ],
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

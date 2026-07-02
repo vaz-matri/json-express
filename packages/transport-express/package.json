@@ -19,11 +19,11 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "@json-express/core": "workspace:*",
     "express": "5.1.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21"
+    "@types/express": "^4.17.21",
+    "@json-express/core": "workspace:^"
   },
   "files": [
     "dist"
@@ -43,5 +43,8 @@
     "express",
     "http-server",
     "transport"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }
