@@ -1,9 +1,11 @@
 import Redis from 'ioredis';
-import type { IKvStore, KvSetOptions, ILogger } from '@json-express/core';
+import type { IKvStore, KvSetOptions, IConfigProvider, ILogger } from '@json-express/core';
 
 export interface KvRedisConfig {
-    connectionString: string;
+    /** Direct override; when omitted, read from jex.kv-redis.connectionstring */
+    connectionString?: string;
     logger: ILogger;
+    configProvider?: IConfigProvider;
 }
 
 /**
@@ -15,7 +17,17 @@ export class KvRedis implements IKvStore {
     private logger: ILogger;
 
     constructor(config: KvRedisConfig) {
-        this.client = new Redis(config.connectionString);
+        const connectionString = config.connectionString
+            ?? config.configProvider?.get<string>('kv-redis.connectionstring');
+        if (!connectionString) {
+            // Fail loud: letting ioredis default to localhost:6379 silently sends
+            // production traffic to the wrong Redis.
+            throw new Error(
+                '@json-express/kv-redis: no connection string configured. ' +
+                'Set jex.kv-redis.connectionstring in .env (or pass { connectionString } directly).'
+            );
+        }
+        this.client = new Redis(connectionString);
         this.logger = config.logger.child({ component: 'KV-Redis' });
 
         this.client.on('error', (err) => {
@@ -48,7 +60,10 @@ export class KvRedis implements IKvStore {
             }
             this.logger.debug(`Set key [${key}]`, { ttlMs: options?.ttlMs });
         } catch (error: any) {
+            // Rethrow: callers (e.g. identity token issuance) must not believe a
+            // failed write succeeded.
             this.logger.error(`Failed to set key [${key}]`, { error: error.message });
+            throw error;
         }
     }
 
@@ -58,6 +73,7 @@ export class KvRedis implements IKvStore {
             this.logger.debug(`Deleted key [${key}]`);
         } catch (error: any) {
             this.logger.error(`Failed to delete key [${key}]`, { error: error.message });
+            throw error;
         }
     }
 

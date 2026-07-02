@@ -1,13 +1,18 @@
-# AI Context for @json-express/adapter-memory
+# @json-express/adapter-memory — AI Context
 
-An in-memory database adapter for rapid prototyping.
+Default in-memory database adapter (part of `@json-express/boot`). Data lives in RAM; restarts reset to the contents of `data/*.json`.
 
-## Setup
-```typescript
-import { AdapterMemory } from '@json-express/adapter-memory';
-kernel.registerAdapter(new AdapterMemory());
+## Install — that is the whole integration
 ```
+npm i @json-express/adapter-memory
+```
+Discovery is automatic. **Never import, instantiate, or register this package in code.** If more than one `adapter-*` is installed, activate with `jex.adapter=@json-express/adapter-memory` in `.env`.
 
-## AI Instruction
-- Data is lost on restart. Do not use for production.
-- Use `adapter-json` or Postgres if persistence is needed.
+## Configuration (.env)
+No package-specific keys.
+
+## What it unlocks
+- Full CRUD for every collection in `data/` and every model in `models/`.
+- Relation expansion: `GET /albums?_expand=artist` resolves `relation` fields defined in models.
+- Unique-constraint enforcement from `types.string({ unique: true })` fields.
+- Ideal for tests and prototyping; swap to `adapter-json` (file persistence) or `adapter-postgres`/`adapter-mongodb` (real DBs) without touching data or models.

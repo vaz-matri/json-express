@@ -1,13 +1,18 @@
-# AI Context for @json-express/kv-memory
+# @json-express/kv-memory — AI Context
 
-An ephemeral, in-memory key-value store with TTL support.
+In-process key-value store with TTL support. The development-grade `kv-*` choice.
 
-## Setup
-```typescript
-import { KvMemory } from '@json-express/kv-memory';
-kernel.registerKvStore(new KvMemory());
+## Install — that is the whole integration
 ```
+npm i @json-express/kv-memory
+```
+Discovery is automatic. **Never import or register it.**
 
-## AI Instruction
-- Data is lost on restart. Do not use for long-term storage.
-- Typically used by `plugin-identity` for storing short-lived password reset tokens or rate-limit counters.
+## Configuration (.env — case-insensitive)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.kv.purgeIntervalMs` | `30000` | Expired-entry sweep interval (0 disables) |
+
+## What it unlocks
+- `ctx.kvStore.get/set/delete` in model hooks and custom endpoints; `set(key, value, { ttlMs })` for expiring entries (OTPs, rate-limit counters, temp tokens).
+- Satisfies `plugin-identity`'s required KV dependency in development. Swap to `kv-redis` for production — same surface.

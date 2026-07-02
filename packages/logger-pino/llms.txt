@@ -1,12 +1,16 @@
-# AI Context for @json-express/logger-pino
+# @json-express/logger-pino — AI Context
 
-A high-performance structured logger for JSONExpress using Pino.
+Production logger built on pino: leveled JSON logs, pretty dev output, stdout or file destinations. Same automatic `traceId` correlation as the default logger.
 
-## Setup
-```typescript
-import { LoggerPino } from '@json-express/logger-pino';
-kernel.registerLogger(new LoggerPino());
+## Install — that is the whole integration
 ```
+npm i @json-express/logger-pino
+```
+Discovery is automatic; with logger-console also installed choose `jex.logger=@json-express/logger-pino`. **Never import pino or this package in application logic.**
 
-## AI Instruction
-- Use this instead of `console.log` for production applications. It logs in newline-delimited JSON.
+## Configuration (.env — case-insensitive)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.log.level` | `info` | pino level (`debug`, `info`, `warn`, `error`) |
+| `jex.log.path` | `./logs` | `stdout` / `stderr` for 12-factor streams; a directory (writes `app.log`) or a `.log` file path for file mode |
+| `jex.log.pretty` | true in development | Human-readable colorized output (stdout/stderr mode) |

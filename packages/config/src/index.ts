@@ -3,7 +3,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 import createJiti from 'jiti';
 import { fileURLToPath } from 'url';
-import { IConfigProvider, deepMerge, getNestedValue, setNestedValue } from '@json-express/core';
+import { IConfigProvider, deepMerge, getNestedValue, setNestedValue, normalizeConfigKeys } from '@json-express/core';
 
 // ✅ Initialize Jiti v2
 const jiti = createJiti(typeof __filename !== 'undefined' ? __filename : fileURLToPath(import.meta.url));
@@ -37,7 +37,9 @@ export class AdvancedConfigProvider implements IConfigProvider {
 
         const baseConfig = await loadConfig(baseName);
         const modeConfig = await loadConfig(`${baseName}.${env}`);
-        const mergedConfig = deepMerge(baseConfig, modeConfig, envConfigOverrides);
+        // Lowercase-normalize so user-written camelCase file keys share one key
+        // space with the (already lowercased) env-derived config.
+        const mergedConfig = normalizeConfigKeys(deepMerge(baseConfig, modeConfig, envConfigOverrides));
 
         return new AdvancedConfigProvider(mergedConfig);
     }

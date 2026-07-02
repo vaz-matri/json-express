@@ -24,7 +24,8 @@
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "files": [
-    "dist"
+    "dist",
+    "llms.txt"
   ],
   "keywords": [
     "json-express",

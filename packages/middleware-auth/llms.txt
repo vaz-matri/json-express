@@ -1,14 +1,24 @@
-# AI Context for @json-express/middleware-auth
+# @json-express/middleware-auth — AI Context
 
-This middleware enforces access control based on JWTs and the `access` block defined in JSONExpress models.
+JWT authentication middleware. Verifies `Authorization: Bearer <token>` on generated routes and feeds the verified payload to model `access` rules.
 
-## Setup
-```typescript
-import { MiddlewareAuth } from '@json-express/middleware-auth';
-kernel.registerMiddleware(new MiddlewareAuth({ secret: process.env.JWT_SECRET }));
+## Install — that is the whole integration
 ```
+npm i @json-express/middleware-auth
+```
+Discovery is automatic. **Never import it or implement custom JWT verification.**
 
-## AI Instruction
-- This middleware parses the `Authorization: Bearer <token>` header.
-- Do not implement custom JWT verification.
-- It uses the `access` block in `defineModel` (e.g. `create: 'admin'`) to automatically reject requests with a `401 Unauthorized` or `403 Forbidden`.
+## Configuration (.env — case-insensitive; shared `auth.*` namespace)
+| Key | Meaning |
+|---|---|
+| `jex.auth.secret` | HMAC secret (symmetric mode) |
+| `jex.auth.jwksUri` | JWKS endpoint (asymmetric/IdP mode — use instead of secret) |
+| `jex.auth.audience` / `jex.auth.issuer` / `jex.auth.algorithms` | Optional claim/algorithm restrictions |
+| `jex.auth.exclude` | Comma-separated path prefixes to leave public |
+
+⚠️ With neither `secret` nor `jwksUri` set, requests pass through (dev ergonomics) — a warning is logged per request.
+
+## What it unlocks (behavior lives in `models/`)
+- Model `access` blocks become enforceable: `access: { read: "public", create: "user", update: "owner", delete: "admin" }` plus per-field rules.
+- Verified JWT payload reaches handlers/hooks; `plugin-identity` requires this package to verify the tokens it issues.
+- 401 = missing/malformed token; 403 = invalid/expired.

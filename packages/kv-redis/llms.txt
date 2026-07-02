@@ -1,16 +1,18 @@
-# AI Context for @json-express/kv-redis
+# @json-express/kv-redis — AI Context
 
-The official Redis-backed ephemeral key-value adapter for JSONExpress.
+Redis-backed key-value store with TTL support. The production `kv-*` choice.
 
-## Setup
-```typescript
-import { KvRedis } from '@json-express/kv-redis';
-kernel.registerKvStore(new KvRedis({ connectionString: process.env.REDIS_URL, logger: kernel.logger }));
+## Install — that is the whole integration
 ```
+npm i @json-express/kv-redis
+```
+Discovery is automatic; with kv-memory also installed choose `jex.kv=@json-express/kv-redis`. **Never import this or instantiate ioredis in application logic.**
 
-## AI Instruction
-- Do not instantiate `ioredis` directly in application logic for caching/rate-limiting.
-- Inject `KvRedis` into the kernel at boot.
-- Use `kernel.kv.set(key, value, { ttlMs?: number })` to write.
-- Use `kernel.kv.get(key)` to read.
-- Use `kernel.kv.delete(key)` to remove.
+## Configuration (.env — case-insensitive)
+| Key | Required | Meaning |
+|---|---|---|
+| `jex.kv-redis.connectionString` | yes — boot fails loudly without it | Redis URI, e.g. `redis://user:pass@host:6379` |
+
+## What it unlocks
+- `ctx.kvStore.get/set/delete` in model hooks and custom endpoints; `{ ttlMs }` maps to Redis PX expiry. Failed writes throw — callers see real errors.
+- Production backing for `plugin-identity` refresh/verify/reset tokens.

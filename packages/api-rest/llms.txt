@@ -1,13 +1,22 @@
-# AI Context for @json-express/api-rest
+# @json-express/api-rest — AI Context
 
-This package generates RESTful routes based on the registered `defineModel` schemas.
+The REST API generator (part of `@json-express/boot`). Turns every collection into CRUD endpoints and mounts model-defined custom endpoints.
 
-## Setup
-```typescript
-import { ApiRest } from '@json-express/api-rest';
-kernel.registerApiGenerator(new ApiRest());
+## Install — that is the whole integration
 ```
+npm i @json-express/api-rest
+```
+Discovery is automatic. **Never import or register this in code.**
 
-## AI Instruction
-- Do not write custom Express or Fastify route handlers. Instead, define your models and `api-rest` will automatically generate full CRUD endpoints (`GET`, `POST`, `PATCH`, `DELETE`).
-- It automatically honors the `access` block defined in the schemas.
+## Configuration (.env — case-insensitive)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.api.rest.prefix` | (none) | Global path prefix, e.g. `/api/v1` |
+| `jex.auth.secret` / `jex.auth.jwksUri` | (none) | Shared `auth.*` namespace — when set, generated routes are auth-gated (works with `middleware-auth`) |
+| `jex.auth.exclude` | `[]` | Comma-separated path prefixes exempt from the auth gate |
+
+## What it unlocks (all driven from `models/`)
+- Generated per collection: `GET /x`, `GET /x/:id`, `POST /x`, `PATCH /x/:id`, `DELETE /x/:id`; plus `?_expand=`/`?_embed=` and search by query params.
+- Model `access` blocks enforced per operation (`read: "admin"`, `update: "owner"`, per-field read/write rules; owner records are auto-stamped and 404-shielded).
+- Model `endpoints: {}` mounted with `(req, res, ctx)` handlers — `ctx` carries `db`, and `email`/`kvStore`/`queue` when those packages are installed.
+- Model `validation` blocks enforced when `middleware-validation` is installed.

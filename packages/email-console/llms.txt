@@ -1,12 +1,19 @@
-# AI Context for @json-express/email-console
+# @json-express/email-console — AI Context
 
-A development email provider that logs outgoing emails to the console instead of sending them via SMTP.
+Development email provider: "sends" email by logging it to the console in a readable block (tokens/links are grep-able in server output).
 
-## Setup
-```typescript
-import { EmailConsole } from '@json-express/email-console';
-kernel.registerEmailProvider(new EmailConsole());
+## Install — that is the whole integration
 ```
+npm i @json-express/email-console
+```
+Discovery is automatic. **Never import or register it.**
 
-## AI Instruction
-- Useful for capturing password reset links or verification emails during local development.
+## Configuration (.env)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.email.from` | `no-reply@localhost` | Default From address |
+
+## What it unlocks
+- `ctx.email.send({ to, subject, text | html })` inside model hooks and custom endpoints.
+- Enables `plugin-identity`'s email verification and password-reset flows in development.
+- Swap for a real SMTP/provider package in production — same `ctx.email` surface.

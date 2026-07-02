@@ -1,15 +1,19 @@
-# AI Context for @json-express/adapter-postgres
+# @json-express/adapter-postgres — AI Context
 
-The official Postgres database adapter for JSONExpress.
+PostgreSQL database adapter (drizzle-orm underneath). IDs are generated as UUIDv7.
 
-## Setup
-```typescript
-import { AdapterPostgres } from '@json-express/adapter-postgres';
-kernel.registerDatabaseAdapter(new AdapterPostgres({ connectionString: process.env.DATABASE_URL, logger: kernel.logger }));
+## Install — that is the whole integration
 ```
+npm i @json-express/adapter-postgres
+```
+Discovery is automatic. **Never import this, instantiate `pg`, or use drizzle-kit in application logic.**
 
-## AI Instruction
-- Do not use `drizzle-kit` for schema migrations. JSONExpress schemas are defined dynamically via `defineModel`.
-- Instruct the user to run `npx jex migrate` to synchronize their Postgres database with the active models.
-- The adapter uses `uuidv7` for auto-generated IDs, not integers.
-- Supports both field-level `primaryKey()` and table-level `primaryKeys: [...]`.
+## Configuration (.env — keys are case-insensitive)
+| Key | Required | Meaning |
+|---|---|---|
+| `jex.adapter-postgres.connectionString` | yes — boot fails loudly without it | Postgres connection URI |
+
+## What it unlocks
+- Full CRUD for all collections/models against Postgres.
+- `npx jex migrate` creates tables from model fields (`CREATE TABLE IF NOT EXISTS`, PK/unique/NOT NULL/defaults from field options).
+- Unique violations surface as HTTP 400 with the offending field name.

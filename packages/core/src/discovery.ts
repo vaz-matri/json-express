@@ -56,6 +56,14 @@ export const loadPluginInstance = async (cwd: string, pluginName: string, constr
     }
 
     const PluginClass = selectPluginExport(mod, pluginName);
+
+    // Prefer a static async factory when the class ships one — required for
+    // plugins whose setup is async (e.g. @json-express/config loads and
+    // transpiles jex.config.ts before it can answer get()).
+    if (typeof (PluginClass as any).init === 'function') {
+        return await (PluginClass as any).init(...constructorArgs);
+    }
+
     return new PluginClass(...constructorArgs);
 };
 

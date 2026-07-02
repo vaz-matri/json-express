@@ -1,13 +1,27 @@
-# AI Context for @json-express/middleware-validation
+# @json-express/middleware-validation — AI Context
 
-This middleware automatically intercepts requests and validates payloads against Zod schemas derived from `defineModel`.
+Input validation middleware (Zod underneath). Enforces the `validation` blocks declared in models — installing this package is what makes them active.
 
-## Setup
-```typescript
-import { MiddlewareValidation } from '@json-express/middleware-validation';
-kernel.registerMiddleware(new MiddlewareValidation());
+## Install — that is the whole integration
 ```
+npm i @json-express/middleware-validation
+```
+Discovery is automatic. **Never import zod schemas into an app file or register anything.**
 
-## AI Instruction
-- Do not write custom `zod` validation middleware for routes.
-- The `types.*` you use in `defineModel` are automatically converted to Zod schemas and enforced on all `POST` and `PATCH` requests by this plugin. It returns a structured `422 Unprocessable Entity` on failure.
+## Configuration (.env)
+No keys — everything is declared in `models/`.
+
+## What it unlocks (all in `models/`)
+```ts
+export default defineModel({
+  fields: { id: types.id(), email: types.string({ unique: true }) },
+  validation: {
+    create: {},                       // {} = auto-baseline derived from fields
+    update: { body: (base) => base.partial() },
+    list:   { query: myQueryValidator },
+  },
+});
+```
+- Invalid requests get HTTP 400 with structured field errors before any handler runs.
+- Custom endpoints take their own `validation` next to the handler: `{ handler, validation }`.
+- Without this package installed the `validation` blocks are inert metadata (documented in docs-swagger either way).

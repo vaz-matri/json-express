@@ -1,26 +1,25 @@
-# AI Context for @json-express/plugin-identity
+# @json-express/plugin-identity — AI Context
 
-Adds JWT authentication, registration, and password resets to JSONExpress.
+A complete drop-in identity stack: signup, login, JWT issuance + refresh, email verification, password change/reset. Mounts everything under `/auth/*` and contributes `users`/`roles` collections automatically.
 
-## Registration
-Do not attempt to write custom middleware for auth. Use the preset:
-```typescript
-import { presetIdentity } from '@json-express/preset-identity';
-kernel.register(presetIdentity({ secret: process.env.JWT_SECRET }));
+## Install
 ```
-
-## Models
-Use the `access` block to protect resources:
-```typescript
-export default defineModel({
-  // ...fields
-  access: {
-    read: 'public', // No token required
-    create: 'user', // Requires any valid JWT
-    update: 'owner' // Requires the JWT to match the document's ownerId
-  }
-});
+npm i @json-express/plugin-identity @json-express/middleware-auth @json-express/kv-memory
 ```
+(or just `npm i @json-express/preset-identity` for the whole stack). Requires `middleware-auth` (verifies issued tokens) and a `kv-*` store (refresh/verify/reset tokens); an `email-*` package is optional — verification/reset emails mount only when present. Boot fails with a clear message if a required peer is missing. **Never import it or hand-roll auth endpoints in models.**
 
-## AI Instruction
-Never try to hash passwords manually using bcrypt in model hooks. This plugin automatically hooks into the `users` model and hashes passwords using Argon2id.
+## Configuration (.env — case-insensitive; shared `auth.*` namespace)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.auth.secret` | required (shared with middleware-auth) | JWT signing secret |
+| `jex.auth.tokenTtl` / `refreshTtl` / `verifyTtl` / `resetTtl` | sensible defaults | Token lifetimes |
+| `jex.auth.allowRegistration` | `true` | Disable public signup |
+| `jex.auth.defaultRole` | `user` | Role stamped on signup |
+| `jex.auth.requireVerifiedEmail` | `false` | Block login until email verified |
+| `jex.auth.minPasswordLength` | `8` | Password policy |
+| `jex.auth.email.from` / `appName` / `verifyUrl` / `resetUrl` | localhost defaults | Outbound email shaping |
+
+## What it unlocks
+- Endpoints: `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/password/change`, `/auth/password/reset(-request)`, `/auth/verify(-resend)`, `GET /auth/me`.
+- `users` collection with argon2id password hashing, `passwordHash` never readable/patchable via CRUD, admin-gated user management, `tokenVersion` mass session invalidation.
+- Its role checks power model `access` blocks (`create: "admin"`, `update: "owner"`).

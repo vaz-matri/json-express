@@ -1,12 +1,16 @@
-# AI Context for @json-express/logger-console
+# @json-express/logger-console — AI Context
 
-A simple development logger.
+Zero-dependency default logger (part of `@json-express/boot`). Structured single-line output with automatic per-request `traceId` correlation.
 
-## Setup
-```typescript
-import { LoggerConsole } from '@json-express/logger-console';
-kernel.registerLogger(new LoggerConsole());
+## Install — that is the whole integration
 ```
+npm i @json-express/logger-console
+```
+Discovery is automatic. **Never import or register it.**
 
-## AI Instruction
-- Avoid using this in production; use `logger-pino` instead for structured JSON logging.
+## Configuration
+No `jex.*` keys. Diagnostic env var: `JEX_DEBUG_CONTEXT=1` warns when a log line lost its request context.
+
+## What it unlocks
+- Every request/DB/middleware log line carries the same `traceId` (AsyncLocalStorage) — grep one id to see a request end-to-end.
+- Swap to `logger-pino` for JSON logs, levels, and file output — no other change.

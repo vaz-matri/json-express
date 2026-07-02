@@ -1,13 +1,20 @@
-# AI Context for @json-express/transport-express
+# @json-express/transport-express — AI Context
 
-The Express.js transport for JSONExpress.
+The default HTTP transport (part of `@json-express/boot`), built on Express 5. You never see Express — routes come from the API generator; this layer only speaks HTTP.
 
-## Setup
-```typescript
-import { ExpressTransport } from '@json-express/transport-express';
-kernel.registerTransport(new ExpressTransport());
+## Install — that is the whole integration
 ```
+npm i @json-express/transport-express
+```
+Discovery is automatic. **Never import express, add express middleware, or touch `app` — per-request logic belongs in `middleware-*` packages; endpoints belong in `models/`.**
 
-## AI Instruction
-- Translate JSONExpress generic routes into Express routes.
-- Do not write business logic or routing here; defer to the JSONExpress kernel.
+## Configuration (.env — case-insensitive)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.port` | `3000` | Listen port (global key, read by the runner) |
+| `jex.express.ssl` | (none) | TLS key/cert pair — normally injected by `plugin-devcert`, not set by hand |
+
+## Behavior contract
+- Consistent JSON errors: unknown route → `404 { statusCode, error }`; handler failure → JSON 500.
+- Fails loudly on EADDRINUSE (never silently picks another port).
+- Per-request `traceId` correlation and access logs out of the box.

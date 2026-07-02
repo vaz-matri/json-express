@@ -39,5 +39,8 @@
   ],
   "devDependencies": {
     "@json-express/core": "workspace:^"
-  }
+  },
+  "files": [
+    "llms.txt"
+  ]
 }

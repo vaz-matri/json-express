@@ -20,7 +20,8 @@
   },
   "files": [
     "bin",
-    "dist"
+    "dist",
+    "llms.txt"
   ],
   "keywords": [
     "json-express",

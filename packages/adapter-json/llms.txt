@@ -1,13 +1,17 @@
-# AI Context for @json-express/adapter-json
+# @json-express/adapter-json — AI Context
 
-This is the default file-system persistence adapter for JSONExpress. It provides atomic writes to `.json` files.
+File-persisted database adapter: collections live in `data/<collection>.json` and every mutation is written back atomically (debounced, tmp-file + rename).
 
-## Setup
-```typescript
-import { AdapterJson } from '@json-express/adapter-json';
-kernel.registerAdapter(new AdapterJson({ dir: './data' }));
+## Install — that is the whole integration
 ```
+npm i @json-express/adapter-json
+```
+Discovery is automatic. **Never import, instantiate, or register this package in code.** Activate among multiple adapters with `jex.adapter=@json-express/adapter-json`.
 
-## AI Instruction
-- Do not attempt to use transactions. `adapter-json` uses debounced atomic file replacement, so transactions do not exist.
-- When generating seed data, write directly to the `data/*.json` files.
+## Configuration (.env)
+No package-specific keys. Data location is fixed: `./data/*.json`.
+
+## What it unlocks
+- Everything adapter-memory does (CRUD, `?_expand=` relations, unique constraints), PLUS persistence across restarts.
+- New collections created at runtime get their own `data/<name>.json`.
+- The zero-infrastructure choice for demos and mock servers (see `@json-express/preset-mock-server`).

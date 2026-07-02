@@ -22,7 +22,8 @@
     "mongodb": "^6.5.0"
   },
   "files": [
-    "dist"
+    "dist",
+    "llms.txt"
   ],
   "keywords": [
     "json-express",

@@ -29,7 +29,8 @@
     "@json-express/core": "workspace:^"
   },
   "files": [
-    "dist"
+    "dist",
+    "llms.txt"
   ],
   "keywords": [
     "json-express",

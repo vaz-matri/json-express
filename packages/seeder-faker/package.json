@@ -25,7 +25,8 @@
     "@faker-js/faker": "^8.4.1"
   },
   "files": [
-    "dist"
+    "dist",
+    "llms.txt"
   ],
   "keywords": [
     "json-express",

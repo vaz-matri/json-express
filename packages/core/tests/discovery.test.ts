@@ -54,6 +54,17 @@ describe('selectPluginExport — resolution ladder', () => {
     it('throws when nothing constructable is exported', () => {
         expect(() => selectPluginExport({ notAFunction: 42 }, 'empty-pkg')).toThrow(/empty-pkg/);
     });
+
+    it('selected classes with a static init factory are honored by the loader contract', () => {
+        // loadPluginInstance prefers `static init(...)` over `new` — the shape
+        // @json-express/config uses for its async file loading.
+        class Facto {
+            static async init(cwd: string) { return new Facto(cwd); }
+            constructor(public cwd: string) { }
+        }
+        expect(selectPluginExport({ default: Facto }, 'x')).toBe(Facto);
+        expect(typeof (Facto as any).init).toBe('function');
+    });
 });
 
 describe('discoverPluginsRecursively — transitive crawling', () => {

@@ -1,13 +1,18 @@
-# AI Context for @json-express/plugin-devcert
+# @json-express/plugin-devcert — AI Context
 
-Automatically provisions local SSL certificates for HTTPS during development.
+Local HTTPS for development: generates a locally-trusted certificate (via devcert) at boot and hands it to the transport. Production-safe: no-ops when `NODE_ENV=production`.
 
-## Setup
-```typescript
-import { PluginDevcert } from '@json-express/plugin-devcert';
-kernel.register(new PluginDevcert());
+## Install — that is the whole integration
 ```
+npm i @json-express/plugin-devcert
+```
+Discovery is automatic; installing it opts you into HTTPS. **Never import it or manage certificates in code.**
 
-## AI Instruction
-- This intercepts the Transport server start and binds it to HTTPS.
-- Do not attempt to use this in production; it is for local development only.
+## Configuration (.env)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.https` | `true` (when installed) | Set `false` to stay on HTTP without uninstalling |
+
+## Notes
+- First run may prompt for sudo/keychain access (certificate trust installation).
+- Currently wires the **Express transport** (`transport-fastify` has its own `jex.transport.fastify.ssl.*` keys).

@@ -12,6 +12,16 @@ const readLogLines = () =>
 
 const waitForFlush = () => new Promise((r) => setTimeout(r, 250));
 
+// Pino's file transport runs in a worker thread whose (first) flush latency is
+// unbounded — a fixed sleep is a race. Poll until the expected lines appear.
+const waitUntil = async (predicate: () => boolean, timeoutMs = 5000) => {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+        try { if (predicate()) return; } catch { /* torn write mid-read — retry */ }
+        await new Promise((r) => setTimeout(r, 100));
+    }
+};
+
 test.describe('Logger Pino — log file shape', () => {
     test.describe.configure({ mode: 'serial' });
 
@@ -57,7 +67,7 @@ test.describe('Logger Pino — traceId correlation across components', () => {
     test('GET /albums emits Pino lines stamped with one shared traceId', async ({ request }) => {
         const res = await request.get('/albums');
         expect(res.ok()).toBeTruthy();
-        await waitForFlush();
+        await waitUntil(() => linesSinceBaseline().some((l) => l.traceId));
 
         const traced = linesSinceBaseline().filter((l) => l.traceId);
         expect(traced.length).toBeGreaterThan(0);
@@ -78,7 +88,7 @@ test.describe('Logger Pino — traceId correlation across components', () => {
         const b = await request.get('/albums');
         expect(a.ok()).toBeTruthy();
         expect(b.ok()).toBeTruthy();
-        await waitForFlush();
+        await waitUntil(() => new Set(linesSinceBaseline().filter((l) => l.traceId).map((l) => l.traceId)).size >= 2);
 
         const traced = linesSinceBaseline().filter((l) => l.traceId);
         const traceIds = new Set(traced.map((l) => l.traceId));
@@ -124,7 +134,7 @@ test.describe('Logger Pino — CRUD continues to work under the swapped logger',
         const before = readLogLines().length;
         const del = await request.delete(`/albums/${albumId}`);
         expect(del.status()).toBe(200);
-        await waitForFlush();
+        await waitUntil(() => readLogLines().slice(before).some((l) => l.traceId));
 
         const fresh = readLogLines().slice(before).filter((l) => l.traceId);
         expect(fresh.length).toBeGreaterThan(0);

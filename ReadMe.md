@@ -4,12 +4,13 @@
   <img src="docs/public/logo-long-dark.svg" alt="JSONExpress">
 </picture>
 
-Skip the backend bottleneck and go from prototype to MVP launch faster.
-**JSONExpress v2.0** is an infrastructure-agnostic Node.js framework. Drop JSON files to get instant REST & GraphQL APIs. When you outgrow the prototype? Swap any layer of the stack (like Postgres or Fastify) without changing your code.
+The **agent-first** backend framework. Skip the backend bottleneck and go from prototype to MVP launch faster.
+**JSONExpress v2.0** is an infrastructure-agnostic Node.js framework built for the way software gets written now — by AI agents and the humans directing them. There is no application code to generate or review: the entire surface is declarative. Drop JSON files to get instant REST & GraphQL APIs, define behavior in models, and swap any layer of the stack (like Postgres or Fastify) by installing a package. Every package ships agent-facing docs (`llms.txt` + skills), so your AI assistant already knows how to use it — and how to extend it.
 
 visit [jsonexpress.com](https://jsonexpress.com)
 
 ## ✨ Features
+- **Agent-First by Design** - No wiring code means a small, safe action space for AI agents: everything is expressed through `data/` (structure), `models/` (behavior), and `.env` (configuration). Package conventions are strict and machine-checkable (anchored names, single interfaces, compliance test suites), so agents can even author new plugins reliably. Every package ships `llms.txt` and skills that teach agents its capabilities.
 - **Schema-Driven Engine** - Define strongly-typed data models using `defineModel` for the ultimate Code-First experience. Use the ergonomic Zod-style fluent API (e.g. `types.string().required()`) or pure JSON. Drop TypeScript files into `/models` and JSONExpress transpiles them at runtime with zero-config via `jiti`!
 - **Data & Logic Separation** - Strictly separates your definition schemas (`/models/albums.ts`) from your permanent disk storage (`/data/albums.json`).
 - **REST Joins** - The Memory database automatically resolves relationships natively! Use `?_expand=artistId` directly in HTTP requests to join objects securely.

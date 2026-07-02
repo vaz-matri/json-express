@@ -1,13 +1,20 @@
-# AI Context for @json-express/transport-fastify
+# @json-express/transport-fastify — AI Context
 
-A high-performance HTTP server transport for JSONExpress using Fastify.
+High-throughput HTTP transport on Fastify 5. Drop-in replacement for transport-express — same routes, same JSON error contract.
 
-## Setup
-```typescript
-import { FastifyTransport } from '@json-express/transport-fastify';
-kernel.registerTransport(new FastifyTransport());
+## Install — that is the whole integration
 ```
+npm i @json-express/transport-fastify
+```
+Discovery is automatic; with transport-express also installed choose `jex.transport=@json-express/transport-fastify`. **Never import fastify or register fastify plugins — per-request logic belongs in `middleware-*` packages.**
 
-## AI Instruction
-- Do not try to add Express-specific middleware (`app.use`) to the kernel when using this transport.
-- Always use `@json-express/core` middleware which is transport-agnostic.
+## Configuration (.env — case-insensitive)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.port` | `3000` | Listen port (global key, read by the runner) |
+| `jex.transport.fastify.logger` | `false` | Enable Fastify's internal logger |
+| `jex.transport.fastify.ssl.key` / `.cert` | (none) | TLS in PEM strings |
+
+## Behavior contract
+- Consistent JSON errors (404/500 shape identical to transport-express); fails loudly on EADDRINUSE.
+- Binds 0.0.0.0 (container-friendly); per-request `traceId` correlation.
