@@ -13,6 +13,7 @@ Discovery is automatic; if `api-rest` is also installed choose with `jex.api=@js
 |---|---|---|
 | `jex.api.graphql.endpoint` | `/graphql` | Mount path (POST executes queries) |
 | `jex.api.graphql.graphiql` | enabled in development | Serve the GraphiQL IDE on GET |
+| `jex.api.graphql.assetsBaseUrl` | `https://unpkg.com` | Mirror base for GraphiQL/React assets (airgapped deployments) |
 | `jex.auth.secret` / `jex.auth.jwksUri` (+ `audience`, `issuer`, `algorithms`) | (none) | Shared `auth.*` namespace — bearer tokens are verified and exposed to resolvers/access rules |
 
 ## What it unlocks (all driven from `models/`)

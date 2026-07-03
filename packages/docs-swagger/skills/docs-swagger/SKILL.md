@@ -15,7 +15,7 @@ OpenAPI/Swagger consumers; spec export for client generation.
 1. `npm i @json-express/docs-swagger`; `jex.docs=@json-express/docs-swagger` if docs-light is also installed.
 2. Swagger UI at `jex.docs.path` (default `/docs`); spec at `<path>/json`.
 3. With middleware-validation installed, request-body schemas in the spec come from model `validation` blocks.
-4. Note: UI assets load from unpkg CDN — needs internet access.
+4. UI assets load from unpkg by default; airgapped deployments set `jex.docs.swagger.assetsBaseUrl` to an internal mirror.
 
 ## Verify
 `GET /docs` renders Swagger UI listing every generated route.

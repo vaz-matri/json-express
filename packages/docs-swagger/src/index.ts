@@ -235,15 +235,21 @@ export class SwaggerDocProvider implements IDocProvider {
     }
 
     public renderDocumentation(routes: RouteDefinition[], path: string, req: JsonRequest): string {
+        // Configurable (jex.docs.swagger.assetsBaseUrl) so airgapped deployments
+        // can point at an internal mirror instead of unpkg.
+        const assetsBase = (this.configProvider?.get<string>(
+            'docs.swagger.assetsBaseUrl',
+            'https://unpkg.com/swagger-ui-dist@5.11.0'
+        ) ?? 'https://unpkg.com/swagger-ui-dist@5.11.0').replace(/\/$/, '');
         return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>${this.renderTitle()}</title>
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css">
-    <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5.11.0/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5.11.0/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" type="text/css" href="${assetsBase}/swagger-ui.css">
+    <link rel="icon" type="image/png" href="${assetsBase}/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="${assetsBase}/favicon-16x16.png" sizes="16x16" />
     <style>
         html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
         *, *:before, *:after { box-sizing: inherit; }
@@ -254,8 +260,8 @@ export class SwaggerDocProvider implements IDocProvider {
 </head>
 <body>
     <div id="swagger-ui"></div>
-    <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js" charset="UTF-8"></script>
-    <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
+    <script src="${assetsBase}/swagger-ui-bundle.js" charset="UTF-8"></script>
+    <script src="${assetsBase}/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
     <script>
     window.onload = function() {
         const ui = SwaggerUIBundle({
