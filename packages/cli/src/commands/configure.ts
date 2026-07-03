@@ -1,24 +1,24 @@
 import { existsSync, readFileSync, writeFileSync, appendFileSync } from 'fs';
 import { join } from 'path';
 import prompts from 'prompts';
+import { discoverPluginsRecursively, matchesCategory } from '@json-express/core';
 
 interface PluginCategory {
     key: string;
     label: string;
-    substring: string;
 }
 
 const CATEGORIES: PluginCategory[] = [
-    { key: 'config',    label: 'Configuration provider', substring: 'config-' },
-    { key: 'adapter',   label: 'Database adapter',       substring: 'adapter-' },
-    { key: 'api',       label: 'API generator',          substring: 'api-' },
-    { key: 'transport', label: 'HTTP transport',         substring: 'transport-' },
-    { key: 'logger',    label: 'Logger',                 substring: 'logger-' },
-    { key: 'docs',      label: 'Documentation provider', substring: 'docs-' },
-    { key: 'id',        label: 'ID generator',           substring: 'id-' },
-    { key: 'email',     label: 'Email provider',         substring: 'email-' },
-    { key: 'kv',        label: 'KV store',               substring: 'kv-' },
-    { key: 'queue',     label: 'Task queue',             substring: 'queue-' },
+    { key: 'config',    label: 'Configuration provider' },
+    { key: 'adapter',   label: 'Database adapter' },
+    { key: 'api',       label: 'API generator' },
+    { key: 'transport', label: 'HTTP transport' },
+    { key: 'logger',    label: 'Logger' },
+    { key: 'docs',      label: 'Documentation provider' },
+    { key: 'id',        label: 'ID generator' },
+    { key: 'email',     label: 'Email provider' },
+    { key: 'kv',        label: 'KV store' },
+    { key: 'queue',     label: 'Task queue' },
 ];
 
 function setEnvKey(envPath: string, key: string, value: string) {
@@ -46,9 +46,9 @@ export async function runConfigure(cwd: string) {
         process.exit(1);
     }
 
-    const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
-    const installedDeps = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies })
-        .filter(dep => dep.startsWith('@json-express/') || dep.includes('json-express-'));
+    // Same recursive discovery the runner uses — preset-bundled plugins
+    // (e.g. everything inside @json-express/boot) show up in the wizard too.
+    const installedDeps = discoverPluginsRecursively(cwd);
 
     if (installedDeps.length === 0) {
         console.error(`❌ No JSON Express plugins found in package.json dependencies.`);
@@ -61,7 +61,7 @@ export async function runConfigure(cwd: string) {
     let skippedCount = 0;
 
     for (const category of CATEGORIES) {
-        const available = installedDeps.filter(d => d.includes(category.substring));
+        const available = installedDeps.filter(d => matchesCategory(d, category.key));
         if (available.length === 0) continue;
 
         if (available.length === 1) {
@@ -88,7 +88,7 @@ export async function runConfigure(cwd: string) {
     }
 
     if (savedCount === 0) {
-        console.log(`\nNothing to resolve — every installed category has exactly one plugin (${skippedCount} category${skippedCount === 1 ? '' : 'ies'} auto-selected).`);
+        console.log(`\nNothing to resolve — every installed category has exactly one plugin (${skippedCount} categor${skippedCount === 1 ? 'y' : 'ies'} auto-selected).`);
         return;
     }
 
