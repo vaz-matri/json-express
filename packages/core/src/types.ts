@@ -78,6 +78,9 @@ export interface IDatabaseAdapter {
      * Optional method for adapters that need explicit schema migration (e.g. SQL databases).
      */
     migrate?(): Promise<void>;
+
+    /** Optional graceful teardown (close pools/clients) — the kernel calls this during shutdown. */
+    shutdown?(): Promise<void>;
 }
 
 /**
@@ -267,6 +270,8 @@ export interface IEmailProvider {
     send(message: EmailMessage): Promise<void>;
     /** Optional health check, mirrors `IDatabaseAdapter.isHealthy`. */
     isHealthy?(): Promise<boolean>;
+    /** Optional graceful teardown — the kernel calls this during shutdown. */
+    shutdown?(): Promise<void>;
 }
 
 /**
@@ -287,6 +292,8 @@ export interface IKvStore {
     delete(key: string): Promise<void>;
     /** Optional health check */
     isHealthy?(): Promise<boolean>;
+    /** Optional graceful teardown — the kernel calls this during shutdown. */
+    shutdown?(): Promise<void>;
 }
 
 /**
@@ -308,4 +315,7 @@ export interface IQueueAdapter {
 
     /** Registers a worker to process jobs off the queue */
     registerWorker(queueName: string, handler: (job: { name: string, payload: any }) => Promise<void>): void;
+
+    /** Optional graceful teardown (close workers/connections) — the kernel calls this during shutdown. */
+    shutdown?(): Promise<void>;
 }

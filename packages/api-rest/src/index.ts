@@ -288,7 +288,12 @@ export class RestApiGenerator implements IApiGenerator {
                         if (e && e.name === 'UniqueConstraintError') {
                             return { statusCode: 400, body: { error: e.message } };
                         }
-                        return notFound(collection, id);
+                        // Only missing records become 404 — infrastructure failures
+                        // must surface as 500, not masquerade as not-found.
+                        if (/not found/i.test(e?.message ?? '')) {
+                            return notFound(collection, id);
+                        }
+                        throw e;
                     }
                 }
             }, updateRule, schema ? { schema, op: 'update' } : undefined));

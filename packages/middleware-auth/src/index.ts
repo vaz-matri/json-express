@@ -5,11 +5,16 @@ export class AuthMiddleware implements IMiddleware {
     public readonly name = 'auth';
     private verifier: JwtVerifier | null = null;
     private excludePaths: string[] = [];
+    private required = false;
     private logger: ILogger;
 
     constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
         this.logger = logger.child({ component: 'Auth' });
         if (!configProvider) return;
+
+        // Strict mode: refuse to serve unauthenticated traffic when auth is
+        // expected but not (or mis-)configured — instead of the dev-friendly bypass.
+        this.required = configProvider.get<boolean>('auth.required', false) === true;
 
         const secret = configProvider.get<string | undefined>('auth.secret', undefined);
         const jwksUri = configProvider.get<string | undefined>('auth.jwksUri', undefined);
@@ -40,8 +45,16 @@ export class AuthMiddleware implements IMiddleware {
         delete req.headers['x-user-payload'];
         delete req.headers['X-User-Payload'];
 
-        // 1. If no verifier is configured, bypass authentication entirely
+        // 1. No verifier configured: bypass in dev ergonomics mode, hard-fail in
+        //    strict mode (jex.auth.required=true) — agents/operators can't miss a 503.
         if (!this.verifier) {
+            if (this.required) {
+                this.logger.error('auth.required=true but no verifier is configured (set jex.auth.secret or jex.auth.jwksUri). Refusing request.');
+                return {
+                    statusCode: 503,
+                    body: { error: 'Authentication is required but not configured (jex.auth.secret / jex.auth.jwksUri missing).' }
+                };
+            }
             this.logger.warn('Auth not configured (neither auth.secret nor auth.jwksUri). Authentication bypassed.');
             return next();
         }

@@ -296,6 +296,21 @@ export class JsonExpressKernel {
             // Silently ignore if transport isn't resolved
         }
 
+        // Tear down provider connections AFTER the transport stops, so in-flight
+        // requests never observe half-closed backends. Duck-typed: only providers
+        // exposing shutdown(). Failures are logged, never abort the teardown.
+        for (const key of ['queue', 'kvStore', 'emailProvider', 'database'] as const) {
+            if (!this.container.hasRegistration(key)) continue;
+            const provider = this.container.resolve<any>(key);
+            if (typeof provider?.shutdown !== 'function') continue;
+            try {
+                console.log(`🔌 Shutting down provider: ${key}...`);
+                await provider.shutdown();
+            } catch (e: any) {
+                console.error(`⚠️  Provider '${key}' failed to shut down cleanly:`, e?.message ?? e);
+            }
+        }
+
         console.log('🛑 Kernel shutdown complete.');
     }
 }

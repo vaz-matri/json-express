@@ -15,8 +15,9 @@ Discovery is automatic. **Never import it or implement custom JWT verification.*
 | `jex.auth.jwksUri` | JWKS endpoint (asymmetric/IdP mode — use instead of secret) |
 | `jex.auth.audience` / `jex.auth.issuer` / `jex.auth.algorithms` | Optional claim/algorithm restrictions |
 | `jex.auth.exclude` | Comma-separated path prefixes to leave public |
+| `jex.auth.required` | `true` = strict mode: unconfigured auth returns 503 instead of bypassing (recommended in production) |
 
-⚠️ With neither `secret` nor `jwksUri` set, requests pass through (dev ergonomics) — a warning is logged per request.
+⚠️ With neither `secret` nor `jwksUri` set, requests pass through (dev ergonomics; warning per request) — unless `jex.auth.required=true`, which fails loud with 503.
 
 ## What it unlocks (behavior lives in `models/`)
 - Model `access` blocks become enforceable: `access: { read: "public", create: "user", update: "owner", delete: "admin" }` plus per-field rules.

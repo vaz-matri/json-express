@@ -19,16 +19,9 @@ export class ExpressTransport implements ITransport {
 
         // Built-in middleware for parsing JSON requests
         this.app.use(express.json());
-
-        // --- Consistent JSON error convention across all transports ---
-        // 500 — unhandled errors from route handlers
-        this.app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-            const statusCode = err.statusCode || err.status || 500;
-            res.status(statusCode).json({
-                statusCode,
-                error: err.message || 'Internal Server Error'
-            });
-        });
+        // NOTE: the JSON error handler is registered in start() — Express only
+        // routes errors to handlers registered AFTER the throwing route, so
+        // registering it here (before any route) would make it dead code.
     }
 
     public registerRoute(route: RouteDefinition): void {
@@ -91,6 +84,18 @@ export class ExpressTransport implements ITransport {
                 });
             });
 
+            // --- Consistent JSON error convention across all transports ---
+            // 500 — unhandled route/middleware errors (incl. body-parse failures).
+            // Must be the very last app.use() so every route registered before
+            // start() can reach it.
+            this.app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+                const statusCode = err.statusCode || err.status || 500;
+                res.status(statusCode).json({
+                    statusCode,
+                    error: err.message || 'Internal Server Error'
+                });
+            });
+
             const ssl = this.config?.get<{ key: Buffer | string; cert: Buffer | string }>('express.ssl');
             const protocol = ssl && ssl.key && ssl.cert ? 'https' : 'http';
 
@@ -134,6 +139,8 @@ export class ExpressTransport implements ITransport {
                     this.server = null;
                     resolve();
                 });
+                // Keep-alive sockets would otherwise stall close() indefinitely.
+                this.server.closeAllConnections?.();
             } else {
                 resolve();
             }

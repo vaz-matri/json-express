@@ -7,7 +7,7 @@
     { "path": "./packages/adapter-memory" },
     { "path": "./packages/api-rest" },
     { "path": "./packages/cli" },
-    { "path": "./packages/config" },
+    { "path": "./packages/config-file" },
     { "path": "./packages/config-env" },
     { "path": "./packages/docs-light" },
     { "path": "./packages/docs-swagger" },

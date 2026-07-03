@@ -15,4 +15,4 @@ Discovery is automatic; installing it opts you into HTTPS. **Never import it or 
 
 ## Notes
 - First run may prompt for sudo/keychain access (certificate trust installation).
-- Currently wires the **Express transport** (`transport-fastify` has its own `jex.transport.fastify.ssl.*` keys).
+- Works with both transports: injects `express.ssl` AND `transport.fastify.ssl.*` at boot.

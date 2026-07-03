@@ -28,9 +28,13 @@ export class DevcertPlugin implements IPlugin {
             const ssl = await devcert.certificateFor('localhost', { skipCertutilInstall: false });
             
             // 4. Inject credentials back into the Configuration State safely!
+            //    Both transports read different keys — feed both so devcert works
+            //    regardless of which transport is active.
             if (typeof configProvider.set === 'function') {
                 configProvider.set('express.ssl', ssl);
-                logger.info('Successfully bound trusted SSL certificates to the Express Transport.');
+                configProvider.set('transport.fastify.ssl.key', ssl.key.toString());
+                configProvider.set('transport.fastify.ssl.cert', ssl.cert.toString());
+                logger.info('Successfully bound trusted SSL certificates to the active transport.');
             } else {
                 logger.warn('Could not inject SSL certs. ConfigProvider does not support dynamic .set() method.');
             }

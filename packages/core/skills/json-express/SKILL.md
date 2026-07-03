@@ -33,8 +33,12 @@ my-app/
 4. Swap any layer by installing a package — discovery is automatic from package.json.
    Multiple plugins in one category? Set `jex.<category>=<package-name>` in `.env`.
 
-Config: namespace `jex`, `.`/`__` nest, keys are stored lowercase — always read/write
-lowercase key paths (`jex.adapter-postgres.connectionstring`).
+Config: namespace `jex`, `.`/`__` nest, keys are **case-insensitive** end to end
+(`jex.auth.tokenTtl` ≡ `jex.auth.tokenttl`). Keys are **package-scoped** — each package's
+`llms.txt` documents its own. Sanctioned shared namespaces (the only cross-package keys):
+`jex.port`, `jex.auth.*` (consumed by middleware-auth, api-rest, api-graphql,
+plugin-identity — one auth config, enforced everywhere), and `jex.docs.*`. A new package
+must never squat on another package's namespace.
 
 ## The decision ladder — where does this requirement go?
 
@@ -93,7 +97,7 @@ flags. Config never carries behavior.
 | `api-` | `IApiGenerator` | `api-rest`, `api-graphql` |
 | `logger-` | `ILogger` | `logger-console`, `logger-pino` |
 | `docs-` | `IDocProvider` | `docs-light`, `docs-swagger` |
-| `config-` | `IConfigProvider` | `config-env` (.env), `config` (jex.config.ts/yml) |
+| `config-` | `IConfigProvider` | `config-env` (.env), `config-file` (jex.config.ts/yml) |
 | `middleware-` | `IMiddleware` (per-request) | `middleware-auth` (JWT), `middleware-validation` (Zod from model `validation` blocks) |
 | `plugin-` | `IPlugin` (boot-time) | `plugin-health` (/health,/info), `plugin-devcert` (local HTTPS), `plugin-identity` (full /auth/* stack) |
 | `kv-` | `IKvStore` | `kv-memory`, `kv-redis` |

@@ -469,7 +469,17 @@ importers:
         specifier: ^2.4.9
         version: 2.4.9
 
-  packages/config:
+  packages/config-env:
+    dependencies:
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.6.1
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
+
+  packages/config-file:
     dependencies:
       jiti:
         specifier: ^1.21.6
@@ -484,16 +494,6 @@ importers:
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
-
-  packages/config-env:
-    dependencies:
-      dotenv:
-        specifier: ^16.4.5
-        version: 16.6.1
-    devDependencies:
-      '@json-express/core':
-        specifier: workspace:^
-        version: link:../core
 
   packages/core:
     dependencies:
