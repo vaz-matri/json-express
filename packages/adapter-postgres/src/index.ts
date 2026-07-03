@@ -73,6 +73,10 @@ export class AdapterPostgres implements IDatabaseAdapter {
         }
     }
 
+    public async shutdown(): Promise<void> {
+        await this.pool.end();
+    }
+
     private getTable(collection: string) {
         const table = this.tables[collection];
         if (!table) throw new Error(`Collection '${collection}' not found in Drizzle schemas.`);

@@ -64,6 +64,10 @@ export class AdapterMongo implements IDatabaseAdapter {
         }
     }
 
+    public async shutdown(): Promise<void> {
+        await this.client.close();
+    }
+
     private parseId(id: string): ObjectId | string {
         if (ObjectId.isValid(id) && (String(new ObjectId(id)) === id)) {
             return new ObjectId(id);

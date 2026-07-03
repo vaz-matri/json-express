@@ -75,6 +75,9 @@ importers:
       '@json-express/boot':
         specifier: workspace:*
         version: link:../../presets/boot
+      '@json-express/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
 
   e2e/api-graphql:
     dependencies:
