@@ -8,7 +8,8 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "llms.txt"
+    "llms.txt",
+    "skills"
   ],
   "exports": {
     ".": {

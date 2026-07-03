@@ -48,8 +48,10 @@ describe.each(packageDirs.map(d => [d]))('loader contract: %s', (dir) => {
         expect(readFileSync(entry, 'utf8')).toMatch(/export default /);
     });
 
-    it('ships AI-facing docs (llms.txt in files)', () => {
+    it('ships AI-facing docs (llms.txt + skills in files)', () => {
         expect(existsSync(join(PACKAGES_DIR, dir, 'llms.txt'))).toBe(true);
         expect(pkg.files).toContain('llms.txt');
+        expect(existsSync(join(PACKAGES_DIR, dir, 'skills')), 'every package ships a skills/ folder').toBe(true);
+        expect(pkg.files).toContain('skills');
     });
 });

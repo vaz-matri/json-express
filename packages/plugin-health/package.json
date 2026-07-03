@@ -41,6 +41,7 @@
     "@json-express/core": "workspace:^"
   },
   "files": [
-    "llms.txt"
+    "llms.txt",
+    "skills"
   ]
 }

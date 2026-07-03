@@ -41,7 +41,8 @@
   },
   "files": [
     "dist",
-    "llms.txt"
+    "llms.txt",
+    "skills"
   ],
   "keywords": [
     "json-express",
