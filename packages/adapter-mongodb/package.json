@@ -11,22 +11,30 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "@json-express/core": "workspace:*",
     "mongodb": "^6.5.0"
   },
   "files": [
-    "dist"
+    "dist",
+    "llms.txt",
+    "skills"
   ],
   "keywords": [
     "json-express",
     "mongodb",
     "database-adapter"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  },
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

@@ -35,6 +35,7 @@ import {
     createJwtVerifier,
     getFieldRule,
     stripDeniedWriteFields,
+    sanitizeFilter,
 } from '@json-express/core';
 
 interface ResolverContext {
@@ -101,17 +102,19 @@ interface ParsableSchema {
     safeParse(input: unknown): { success: boolean; data?: any; error?: { format(): any } };
 }
 
-const GRAPHIQL_HTML = `<!DOCTYPE html>
+// Assets base is configurable (jex.api.graphql.assetsBaseUrl) so airgapped
+// deployments can point at an internal npm mirror instead of unpkg.
+const graphiqlHtml = (assetsBase: string) => `<!DOCTYPE html>
 <html>
   <head>
     <title>GraphiQL</title>
-    <link rel="stylesheet" href="https://unpkg.com/graphiql@3/graphiql.min.css" />
+    <link rel="stylesheet" href="${assetsBase}/graphiql@3/graphiql.min.css" />
   </head>
   <body style="margin:0;height:100vh">
     <div id="graphiql" style="height:100%"></div>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/graphiql@3/graphiql.min.js"></script>
+    <script src="${assetsBase}/react@18/umd/react.production.min.js"></script>
+    <script src="${assetsBase}/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="${assetsBase}/graphiql@3/graphiql.min.js"></script>
     <script>
       const root = ReactDOM.createRoot(document.getElementById('graphiql'));
       root.render(React.createElement(GraphiQL, {
@@ -386,7 +389,9 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 resolve: async (_: any, args: any, ctx: ResolverContext) => {
                     const user = enforceAccess(readRule, ctx, typeName, 'read');
                     const { limit, offset, where } = args ?? {};
-                    const filter: Record<string, any> = { ...(where ?? {}) };
+                    // Strip operator/nested keys before the filter reaches any adapter — the
+                    // same choke point api-rest uses. Owner clause is stamped after (trusted).
+                    const filter: Record<string, any> = sanitizeFilter(where as Record<string, unknown>);
                     if (needsOwnerCheck(readRule)) {
                         // Owner clause overwrites any client-supplied value to prevent spoofing.
                         filter[ownerField] = resolveUserId(user);
@@ -596,7 +601,9 @@ export class GraphQLApiGenerator implements IApiGenerator {
                     statusCode: 200,
                     // transport-express checks Content-Type === 'text/html' to use res.send() vs res.json()
                     headers: { 'Content-Type': 'text/html' },
-                    body: GRAPHIQL_HTML,
+                    body: graphiqlHtml(
+                        (this.config?.get<string>('api.graphql.assetsBaseUrl', 'https://unpkg.com') ?? 'https://unpkg.com').replace(/\/$/, '')
+                    ),
                 }),
             });
         }
@@ -628,3 +635,5 @@ function runValidation(validator: ParsableSchema | undefined, input: any, typeNa
     return parsed.data ?? input;
 }
 
+
+export default GraphQLApiGenerator;

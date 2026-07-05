@@ -200,3 +200,5 @@ export class MemoryDatabaseAdapter implements IDatabaseAdapter {
         return true;
     }
 }
+
+export default MemoryDatabaseAdapter;

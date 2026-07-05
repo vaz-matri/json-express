@@ -1,12 +1,20 @@
-# AI Context for @json-express/docs-light
+# @json-express/docs-light — AI Context
 
-A lightweight, plain HTML alternative to Swagger for API documentation.
+Zero-dependency API documentation (part of `@json-express/boot`). Mounts a readable HTML doc page and a JSON manifest of every route.
 
-## Setup
-```typescript
-import { DocsLight } from '@json-express/docs-light';
-kernel.registerDocProvider(new DocsLight({ path: '/' }));
+## Install — that is the whole integration
 ```
+npm i @json-express/docs-light
+```
+Discovery is automatic. **Never import or register it.**
 
-## AI Instruction
-- Useful for edge environments where serving a massive Swagger UI is not feasible.
+## Configuration (.env — case-insensitive)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.docs.enabled` | `true` | Set `false` to stop mounting docs routes (hide the API schema in production without uninstalling) |
+| `jex.docs.path` | `/docs` | Mount path (JSON manifest at `<path>/json`) |
+| `jex.docs.baseUrl` | request-derived | Hardcoded base URL override for reverse-proxy setups |
+
+## What it unlocks
+- `GET /docs` — human-readable route listing; `GET /docs/json` — machine-readable manifest (agents: fetch this to learn the running API surface).
+- Swap to `@json-express/docs-swagger` for OpenAPI/Swagger UI without any other change.

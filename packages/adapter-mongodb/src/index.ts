@@ -1,18 +1,21 @@
 import { MongoClient, ObjectId, Db, MongoServerError } from 'mongodb';
-import type { 
-    IDatabaseAdapter, 
-    ILogger, 
-    HookContext, 
-    ModelSchema, 
+import type {
+    IDatabaseAdapter,
+    IConfigProvider,
+    ILogger,
+    HookContext,
+    ModelSchema,
     QueryOptions,
     TypeDefinition
 } from '@json-express/core';
-import { UniqueConstraintError } from '@json-express/core';
+import { UniqueConstraintError, sanitizeFilter } from '@json-express/core';
 
 export interface AdapterMongoConfig {
-    connectionString: string;
+    /** Direct override; when omitted, read from jex.adapter-mongodb.connectionstring */
+    connectionString?: string;
     logger: ILogger;
     dbName?: string;
+    configProvider?: IConfigProvider;
 }
 
 /**
@@ -27,8 +30,16 @@ export class AdapterMongo implements IDatabaseAdapter {
     private hookContext?: HookContext;
 
     constructor(config: AdapterMongoConfig) {
-        this.client = new MongoClient(config.connectionString);
-        this.dbName = config.dbName;
+        const connectionString = config.connectionString
+            ?? config.configProvider?.get<string>('adapter-mongodb.connectionstring');
+        if (!connectionString) {
+            throw new Error(
+                '@json-express/adapter-mongodb: no connection string configured. ' +
+                'Set jex.adapter-mongodb.connectionstring in .env (or pass { connectionString } directly).'
+            );
+        }
+        this.client = new MongoClient(connectionString);
+        this.dbName = config.dbName ?? config.configProvider?.get<string>('adapter-mongodb.dbname');
         this.logger = config.logger.child({ component: 'DB-Mongo' });
     }
 
@@ -51,6 +62,10 @@ export class AdapterMongo implements IDatabaseAdapter {
         } catch {
             return false;
         }
+    }
+
+    public async shutdown(): Promise<void> {
+        await this.client.close();
     }
 
     private parseId(id: string): ObjectId | string {
@@ -141,7 +156,10 @@ export class AdapterMongo implements IDatabaseAdapter {
 
     public async search(collection: string, query: Record<string, any>, options?: QueryOptions): Promise<any[]> {
         const col = this.db.collection(collection);
-        const mongoQuery = { ...query };
+        // Defense in depth: strip operator/nested keys ($ne, $where, dotted paths) before
+        // building the Mongo query. The API layer is the primary choke point, but a direct
+        // db.search() from a model hook must not be able to smuggle operators into find().
+        const mongoQuery: Record<string, any> = sanitizeFilter(query as Record<string, unknown>);
         // If they search by id
         if (mongoQuery.id !== undefined) {
             mongoQuery._id = this.parseId(mongoQuery.id);
@@ -224,3 +242,5 @@ export class AdapterMongo implements IDatabaseAdapter {
         return this.mapFromMongo(result);
     }
 }
+
+export default AdapterMongo;

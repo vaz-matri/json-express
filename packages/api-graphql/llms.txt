@@ -1,13 +1,22 @@
-# AI Context for @json-express/api-graphql
+# @json-express/api-graphql — AI Context
 
-This package generates a GraphQL schema and endpoint based on the registered `defineModel` schemas.
+GraphQL API generator — replaces REST with a GraphQL schema generated from your models.
 
-## Setup
-```typescript
-import { ApiGraphql } from '@json-express/api-graphql';
-kernel.registerApiGenerator(new ApiGraphql({ path: '/graphql' }));
+## Install — that is the whole integration
 ```
+npm i @json-express/api-graphql
+```
+Discovery is automatic; if `api-rest` is also installed choose with `jex.api=@json-express/api-graphql`. **Never import or register this in code.**
 
-## AI Instruction
-- Do not write a custom Apollo Server or GraphQL schema manually. `api-graphql` dynamically derives the types, queries, and mutations directly from the JSONExpress models.
-- It mounts a GraphQL playground by default.
+## Configuration (.env — case-insensitive)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.api.graphql.endpoint` | `/graphql` | Mount path (POST executes queries) |
+| `jex.api.graphql.graphiql` | enabled in development | Serve the GraphiQL IDE on GET |
+| `jex.api.graphql.assetsBaseUrl` | `https://unpkg.com` | Mirror base for GraphiQL/React assets (airgapped deployments) |
+| `jex.auth.secret` / `jex.auth.jwksUri` (+ `audience`, `issuer`, `algorithms`) | (none) | Shared `auth.*` namespace — bearer tokens are verified and exposed to resolvers/access rules |
+
+## What it unlocks (all driven from `models/`)
+- Queries (`albums`, `album(id)`), mutations (`createAlbum`, …) generated per collection from model fields.
+- Model `access` blocks enforced inside resolvers; errors map to structured GraphQL errors (NOT_FOUND, FORBIDDEN, …).
+- Custom GraphQL extensions declared in models — never hand-written SDL files.

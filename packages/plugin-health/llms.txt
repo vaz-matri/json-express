@@ -1,12 +1,16 @@
-# AI Context for @json-express/plugin-health
+# @json-express/plugin-health — AI Context
 
-Adds a `/health` endpoint that checks the status of the database and other registered services.
+Operational endpoints: liveness/readiness and runtime info.
 
-## Setup
-```typescript
-import { PluginHealth } from '@json-express/plugin-health';
-kernel.register(new PluginHealth());
+## Install — that is the whole integration
 ```
+npm i @json-express/plugin-health
+```
+Discovery is automatic. **Never import or register it.**
 
-## AI Instruction
-- Automatically pings the `isHealthy()` method of the active database adapter, KV store, and email provider.
+## Configuration (.env)
+No keys.
+
+## What it unlocks
+- `GET /health` → `200 { status: "UP", database: "connected" }` or `503` when the active adapter's health check fails. Point load balancers and orchestrators here.
+- `GET /info` → environment, uptime, node version, memory usage.

@@ -4,11 +4,12 @@
     "version": "1.0.0",
     "description": "E2E tests for the Postgres adapter",
     "scripts": {
-        "serve": "json-express",
+        "serve": "jex migrate && json-express",
         "test": "playwright test"
     },
     "dependencies": {
         "@json-express/boot": "workspace:*",
-        "@json-express/adapter-postgres": "workspace:*"
+        "@json-express/adapter-postgres": "workspace:*",
+        "@json-express/cli": "workspace:*"
     }
 }

@@ -29,9 +29,13 @@ export function deepMerge(...objects: any[]): any {
 
 /**
  * Retrieves a nested value from an object using dot notation.
+ * Key segments are case-insensitive: the config store is lowercase-normalized
+ * (env parsing lowercases; file configs are normalized via `normalizeConfigKeys`),
+ * so lookups lowercase each segment too. `get('auth.jwksUri')` and
+ * `get('auth.jwksuri')` are the same key.
  */
 export function getNestedValue(obj: any, path: string, defaultValue?: any): any {
-    const keys = path.split('.')
+    const keys = path.toLowerCase().split('.')
     let current = obj
     for (const key of keys) {
         if (current === undefined || current === null) return defaultValue
@@ -43,9 +47,10 @@ export function getNestedValue(obj: any, path: string, defaultValue?: any): any 
 /**
  * Sets a nested value inside an object using dot notation.
  * Mutates the original object. Creates missing intermediate objects.
+ * Segments are lowercased to match the store's normalization.
  */
 export function setNestedValue(obj: any, path: string, value: any): void {
-    const keys = path.split('.')
+    const keys = path.toLowerCase().split('.')
     let current = obj
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i]
@@ -55,6 +60,22 @@ export function setNestedValue(obj: any, path: string, value: any): void {
         current = current[key]
     }
     current[keys[keys.length - 1]] = value
+}
+
+/**
+ * Recursively lowercases every key of a config object. File-based providers
+ * (jex.config.ts / .yml / .json) run their merged config through this so that
+ * user-written camelCase keys land in the same lowercase key space the env
+ * parser produces — one key space, case-insensitive everywhere.
+ * Values (including leaf strings and arrays) are untouched.
+ */
+export function normalizeConfigKeys<T = Record<string, any>>(obj: any): T {
+    if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) return obj as T
+    const out: Record<string, any> = {}
+    for (const [key, value] of Object.entries(obj)) {
+        out[key.toLowerCase()] = normalizeConfigKeys(value)
+    }
+    return out as T
 }
 
 /**

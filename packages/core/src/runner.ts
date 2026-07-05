@@ -1,9 +1,7 @@
-import { readFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { createRequire } from 'module';
-import { pathToFileURL } from 'url';
 import { JsonExpressKernel } from './kernel';
 import { loadSchemasAndData } from './schema-loader';
+import { discoverPluginsRecursively, loadPluginInstance, matchesCategory } from './discovery';
+import { FatalBootError } from './errors';
 import type { IConfigProvider } from './types';
 
 const fatal = (lines: string[]): never => {
@@ -11,24 +9,22 @@ const fatal = (lines: string[]): never => {
     process.exit(1);
 };
 
-const loadPluginInstance = async (cwd: string, pluginName: string, constructorArgs: any[] = []) => {
-    let mod: any;
-    try {
-        const localRequire = createRequire(join(cwd, 'package.json'));
-        const resolvedPath = localRequire.resolve(pluginName);
-        mod = await import(pathToFileURL(resolvedPath).href);
-    } catch (e) {
-        mod = await import(pluginName);
+// Format a boot veto (from any component's construction, onRegister, or capability check)
+// in the standard fatal-with-remedy style, release anything already opened, then exit.
+// One path for every FatalBootError. `kernel` is passed once it exists so a veto raised
+// AFTER providers connect (e.g. during boot) shuts them down cleanly instead of exiting
+// on open handles.
+const fatalBoot = async (e: FatalBootError, kernel?: JsonExpressKernel): Promise<never> => {
+    console.error(`❌ ${e.message}`);
+    console.error(`   ${e.remedy}`);
+    if (kernel) {
+        try {
+            await kernel.shutdown();
+        } catch {
+            // Best-effort cleanup — never let a shutdown hiccup mask the original veto.
+        }
     }
-
-    const exports = Object.values(mod);
-    const PluginClass = exports.find(v => typeof v === 'function') as any;
-
-    if (!PluginClass) {
-        throw new Error(`No constructable export found in plugin ${pluginName}`);
-    }
-
-    return new PluginClass(...constructorArgs);
+    process.exit(1);
 };
 
 const resolveActive = (
@@ -61,46 +57,6 @@ const resolveActive = (
     return null;
 };
 
-const discoverPluginsRecursively = (cwd: string): string[] => {
-    const visited = new Set<string>();
-    const allDiscovered = new Set<string>();
-
-    const crawl = (pkgDir: string) => {
-        const pkgPath = join(pkgDir, 'package.json');
-        if (!existsSync(pkgPath)) return;
-
-        const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
-        const deps = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies })
-            .filter(dep => dep.startsWith('@json-express/') || dep.includes('json-express-'));
-
-        for (const dep of deps) {
-            if (visited.has(dep)) continue;
-            visited.add(dep);
-            allDiscovered.add(dep);
-
-            try {
-                // Resolve where this plugin actually lives in node_modules
-                const req = createRequire(join(pkgDir, 'package.json'));
-                const resolvedEntry = req.resolve(dep);
-
-                // Walk up the tree to find this plugin's package.json directory
-                let currentDir = dirname(resolvedEntry);
-                while (currentDir !== '/' && !existsSync(join(currentDir, 'package.json'))) {
-                    currentDir = dirname(currentDir);
-                }
-
-                // Recursively crawl its dependencies
-                crawl(currentDir);
-            } catch (e) {
-                // Silently ignore if a package fails to resolve
-            }
-        }
-    };
-
-    crawl(cwd);
-    return Array.from(allDiscovered);
-};
-
 export const startServer = async () => {
     const cwd = process.cwd();
 
@@ -109,7 +65,7 @@ export const startServer = async () => {
 
     // 2. Discover and instantiate the Config Provider FIRST so jex.* values
     //    can drive plugin selection in subsequent steps.
-    const availableConfigs = installedDeps.filter(d => d.includes('config-'));
+    const availableConfigs = installedDeps.filter(d => matchesCategory(d, 'config'));
     if (availableConfigs.length === 0) {
         fatal([
             `❌ No '@json-express/config-*' plugin installed.`,
@@ -121,7 +77,9 @@ export const startServer = async () => {
     if (availableConfigs.length === 1) {
         configPluginName = availableConfigs[0];
     } else {
-        const envPick = process.env['jex.config'] || process.env['jex_config'] || process.env['jex__config'];
+        // Raw env lookup (the config provider isn't constructed yet). No dotted
+        // form here — env var names with dots aren't settable in POSIX shells.
+        const envPick = process.env['jex__config'] || process.env['jex_config'] || process.env['JEX__CONFIG'];
         if (envPick && availableConfigs.includes(envPick)) {
             configPluginName = envPick;
         } else {
@@ -135,18 +93,18 @@ export const startServer = async () => {
     const configProvider = await loadPluginInstance(cwd, configPluginName, [cwd]) as IConfigProvider;
 
     // 3. Bucket the rest of the discovered plugins by category prefix
-    const availableTransports = installedDeps.filter(d => d.includes('transport-'));
-    const availableAdapters = installedDeps.filter(d => d.includes('adapter-'));
-    const availableApis = installedDeps.filter(d => d.includes('api-'));
-    const availableMiddlewares = installedDeps.filter(d => d.includes('middleware-'));
-    const availableSeeders = installedDeps.filter(d => d.includes('seeder-'));
-    const availableLoggers = installedDeps.filter(d => d.includes('logger-'));
-    const availableDocs = installedDeps.filter(d => d.includes('docs-'));
-    const availableIds = installedDeps.filter(d => d.includes('id-'));
-    const availableEmails = installedDeps.filter(d => d.includes('email-'));
-    const availableKvStores = installedDeps.filter(d => d.includes('kv-'));
-    const availableQueues = installedDeps.filter(d => d.includes('queue-'));
-    const availablePlugins = installedDeps.filter(d => d.includes('plugin-'));
+    const availableTransports = installedDeps.filter(d => matchesCategory(d, 'transport'));
+    const availableAdapters = installedDeps.filter(d => matchesCategory(d, 'adapter'));
+    const availableApis = installedDeps.filter(d => matchesCategory(d, 'api'));
+    const availableMiddlewares = installedDeps.filter(d => matchesCategory(d, 'middleware'));
+    const availableSeeders = installedDeps.filter(d => matchesCategory(d, 'seeder'));
+    const availableLoggers = installedDeps.filter(d => matchesCategory(d, 'logger'));
+    const availableDocs = installedDeps.filter(d => matchesCategory(d, 'docs'));
+    const availableIds = installedDeps.filter(d => matchesCategory(d, 'id'));
+    const availableEmails = installedDeps.filter(d => matchesCategory(d, 'email'));
+    const availableKvStores = installedDeps.filter(d => matchesCategory(d, 'kv'));
+    const availableQueues = installedDeps.filter(d => matchesCategory(d, 'queue'));
+    const availablePlugins = installedDeps.filter(d => matchesCategory(d, 'plugin'));
 
     const isAppendSeed = process.argv.includes('--seed-append');
     const isSmartSeed = process.argv.includes('--seed');
@@ -201,6 +159,9 @@ export const startServer = async () => {
             registeredMiddlewares.push(mw);
             console.log(`🔌 Registered middleware: ${mwName}`);
         } catch (e: any) {
+            // A construction-time boot veto (e.g. auth fail-closed) must halt, not be
+            // swallowed into booting without the component.
+            if (e instanceof FatalBootError) await fatalBoot(e, kernel);
             console.error(`❌ Failed to load middleware ${mwName}:`, e?.message || e);
         }
     }
@@ -274,6 +235,8 @@ export const startServer = async () => {
             registeredPlugins.push(plugin);
             console.log(`🔌 Registered lifecycle plugin: ${pluginName}`);
         } catch (e: any) {
+            // A construction-time boot veto must halt, not be swallowed.
+            if (e instanceof FatalBootError) await fatalBoot(e, kernel);
             console.error(`❌ Failed to load plugin ${pluginName}:`, e?.message || e);
         }
     }
@@ -358,5 +321,11 @@ export const startServer = async () => {
     process.on('SIGINT', handleShutdown);
     process.on('SIGTERM', handleShutdown);
 
-    await kernel.boot(collections, port, { enable: isSmartSeed || isAppendSeed, force: isAppendSeed });
+    try {
+        await kernel.boot(collections, port, { enable: isSmartSeed || isAppendSeed, force: isAppendSeed });
+    } catch (e) {
+        // A plugin vetoed boot with a remedy — print it, shut down cleanly, and exit.
+        if (e instanceof FatalBootError) await fatalBoot(e, kernel);
+        throw e;
+    }
 };

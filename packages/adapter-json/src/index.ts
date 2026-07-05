@@ -322,3 +322,5 @@ export class JsonFileDatabaseAdapter implements IDatabaseAdapter {
         }
     }
 }
+
+export default JsonFileDatabaseAdapter;

@@ -3,15 +3,16 @@ import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { eq, and } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 
-import type { 
-    IDatabaseAdapter, 
-    ILogger, 
-    HookContext, 
-    ModelSchema, 
+import type {
+    IDatabaseAdapter,
+    IConfigProvider,
+    ILogger,
+    HookContext,
+    ModelSchema,
     QueryOptions,
     TypeDefinition
 } from '@json-express/core';
-import { UniqueConstraintError } from '@json-express/core';
+import { UniqueConstraintError, sanitizeFilter } from '@json-express/core';
 import { translateSchemaToDrizzle } from './schema-translator';
 
 /**
@@ -26,8 +27,21 @@ export class AdapterPostgres implements IDatabaseAdapter {
     private tables: Record<string, any> = {};
     private hookContext?: HookContext;
 
-    constructor({ connectionString, logger }: { connectionString: string; logger: ILogger }) {
-        this.pool = new pg.Pool({ connectionString });
+    constructor({ connectionString, logger, configProvider }: {
+        /** Direct override; when omitted, read from jex.adapter-postgres.connectionString */
+        connectionString?: string;
+        logger: ILogger;
+        configProvider?: IConfigProvider;
+    }) {
+        const resolved = connectionString
+            ?? configProvider?.get<string>('adapter-postgres.connectionstring');
+        if (!resolved) {
+            throw new Error(
+                '@json-express/adapter-postgres: no connection string configured. ' +
+                'Set jex.adapter-postgres.connectionString in .env (or pass { connectionString } directly).'
+            );
+        }
+        this.pool = new pg.Pool({ connectionString: resolved });
         this.db = drizzle(this.pool);
         this.logger = logger.child({ component: 'DB-Postgres' });
     }
@@ -57,6 +71,10 @@ export class AdapterPostgres implements IDatabaseAdapter {
         } catch {
             return false;
         }
+    }
+
+    public async shutdown(): Promise<void> {
+        await this.pool.end();
     }
 
     private getTable(collection: string) {
@@ -145,8 +163,15 @@ export class AdapterPostgres implements IDatabaseAdapter {
     public async search(collection: string, query: Record<string, any>, options?: QueryOptions): Promise<any[]> {
         const table = this.getTable(collection);
         let q = this.db.select().from(table);
-        
-        const conditions = Object.entries(query).map(([key, val]) => eq(table[key], val));
+
+        // Defense in depth: the API layer already sanitizes client filters, but a direct
+        // db.search() from a model hook could pass anything. Strip operator/nested keys,
+        // then allow-list to real columns so an unknown key can't produce eq(undefined, …)
+        // (a 500 / cheap DoS) or reach an unintended identifier.
+        const safe = sanitizeFilter(query as Record<string, unknown>);
+        const conditions = Object.entries(safe)
+            .filter(([key]) => (table as Record<string, unknown>)[key] !== undefined)
+            .map(([key, val]) => eq((table as Record<string, any>)[key], val));
         if (conditions.length > 0) {
             const result = await q.where(and(...conditions));
             this.logger.info(`Search in '${collection}'`, { count: result.length });
@@ -223,3 +248,5 @@ export class AdapterPostgres implements IDatabaseAdapter {
         return result[0];
     }
 }
+
+export default AdapterPostgres;

@@ -7,26 +7,30 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "llms.txt",
+    "skills"
   ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "peerDependencies": {
-    "@json-express/core": "workspace:*"
+    "@json-express/core": "workspace:^"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  },
   "dependencies": {
-    "fastify": "^5.3.3",
-    "@json-express/core": "workspace:*"
+    "fastify": "^5.3.3"
   },
   "keywords": [
     "json-express",

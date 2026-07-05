@@ -1,12 +1,20 @@
-# AI Context for @json-express/docs-swagger
+# @json-express/docs-swagger — AI Context
 
-Automatically generates an OpenAPI 3.0 spec and mounts a Swagger UI.
+OpenAPI 3 documentation provider: serves Swagger UI and a generated OpenAPI spec.
 
-## Setup
-```typescript
-import { DocsSwagger } from '@json-express/docs-swagger';
-kernel.registerDocProvider(new DocsSwagger({ path: '/docs' }));
+## Install — that is the whole integration
 ```
+npm i @json-express/docs-swagger
+```
+Discovery is automatic; with docs-light also installed choose `jex.docs=@json-express/docs-swagger`. **Never import or register it.**
 
-## AI Instruction
-- Do not manually write a `swagger.json`. This plugin automatically derives the OpenAPI spec from the `defineModel` schemas registered in the kernel.
+## Configuration (.env — case-insensitive)
+| Key | Default | Meaning |
+|---|---|---|
+| `jex.docs.enabled` | `true` | Set `false` to stop mounting docs routes (hide the API schema in production without uninstalling) |
+| `jex.docs.path` | `/docs` | Mount path (spec at `<path>/json`) |
+| `jex.docs.baseUrl` | request-derived | `servers[0].url` override for reverse-proxy setups |
+
+## What it unlocks
+- `GET /docs` — Swagger UI (note: UI assets load from unpkg CDN — needs internet).
+- `GET /docs/json` — full OpenAPI spec; request-body schemas are enriched from model `validation` blocks when `middleware-validation` is installed (agents: fetch this to learn the API).

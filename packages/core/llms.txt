@@ -1,34 +1,31 @@
-# AI Context for @json-express/core
+# @json-express/core — AI Context
 
-This is the central kernel of JSONExpress. It handles dependency injection (via Awilix), schema parsing, and the boot lifecycle.
+The kernel and runtime of JSON Express, the **agent-first** backend framework. Installing core (usually via `@json-express/boot`) gives you the `json-express` bin — a full server with **zero application code**.
 
-## Agent Instructions
-- **Do NOT instantiate singletons**: Always register plugins, adapters, and transports into the kernel. 
-- **Error Handling**: Throw `JsonExpressError` (exported from `@json-express/core`) instead of generic Error objects, so the transports can properly format HTTP statuses.
-- **Model Definition**: Use `defineModel` for schemas.
+## The one rule
+Users and agents NEVER write wiring code: no index file, no `JsonExpressKernel` imports, no manual registration. The entire surface is:
+- `data/<collection>.json` — structure (records; CRUD is generated)
+- `models/<collection>.ts` — behavior (`defineModel` / `defineRoutes`: fields, validation, hooks, access rules, custom endpoints)
+- `.env` — configuration (`jex.*`, case-insensitive; keys are package-scoped — each package's llms.txt documents its own)
 
-Example `models/users.ts`:
+## The decision ladder (first match wins)
+`data/` → `models/` → install a package → author the missing package and upstream it.
+Full guide with anti-cramming rules and the authoring contract: `skills/json-express/SKILL.md` in this package.
+
+## Model definition (the only code users write)
 ```typescript
 import { defineModel, types } from '@json-express/core';
 
 export default defineModel({
-  name: 'users',
-  fields: {
-    id: types.id(),
-    email: types.email({ unique: true })
-  }
+  fields: { id: types.id(), email: types.string({ unique: true }) },
+  access: { read: 'public', create: 'user', update: 'owner' },
+  hooks: { afterCreate: async (record, ctx) => { await ctx.email?.send({ /* … */ }); } },
 });
 ```
 
-## Testing Custom Adapters
-If you are writing a custom database adapter, you MUST verify it against the universal compliance suite exported by core:
-```typescript
-import { runAdapterComplianceTests } from '@json-express/core';
-import { MyCustomAdapter } from './index';
-
-test('complies with IDatabaseAdapter', async () => {
-    await runAdapterComplianceTests(async () => {
-        return new MyCustomAdapter();
-    });
-});
-```
+## For plugin AUTHORS only (not app users)
+- Implement exactly one interface from `types.ts`; packages import only core; communicate via container probing / route metadata / `kernel.context`.
+- Constructor: single options object `{ configProvider, logger, idGenerator?, database? }`; async setup → `static async init(...)`.
+- Default-export the class; include `"./package.json"` in exports; core in peerDependencies.
+- Throw `JsonExpressError` subclasses (never generic Error) so transports map HTTP statuses.
+- Adapters/transports MUST pass `runAdapterComplianceTests` / `runTransportComplianceTests` from core.

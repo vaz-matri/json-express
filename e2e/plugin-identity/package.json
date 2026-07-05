@@ -13,6 +13,7 @@
         "@json-express/email-console": "workspace:*",
         "@json-express/kv-memory": "workspace:*",
         "@json-express/queue-memory": "workspace:*",
+        "@json-express/middleware-ratelimit": "workspace:*",
         "@json-express/plugin-identity": "workspace:*"
     }
 }

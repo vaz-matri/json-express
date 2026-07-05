@@ -1,15 +1,20 @@
-# AI Context for @json-express/adapter-mongodb
+# @json-express/adapter-mongodb — AI Context
 
-The official MongoDB database adapter for JSONExpress.
+MongoDB database adapter. Maps `_id` ↔ `id` automatically — application data always uses `id`.
 
-## Setup
-```typescript
-import { AdapterMongo } from '@json-express/adapter-mongodb';
-kernel.registerDatabaseAdapter(new AdapterMongo({ connectionString: process.env.MONGO_URI, dbName: 'my_db', logger: kernel.logger }));
+## Install — that is the whole integration
 ```
+npm i @json-express/adapter-mongodb
+```
+Discovery is automatic. **Never import, instantiate this, or configure the `mongodb` driver in application logic.**
 
-## AI Instruction
-- Do not configure Mongoose or raw `mongodb` connections in application logic.
-- Inject this adapter into the kernel. It implements `IDatabaseAdapter`.
-- The adapter automatically translates between JSONExpress `id` strings and MongoDB `_id` `ObjectId`s.
-- Instruct the user to run `npx jex migrate` to synchronize their MongoDB indexes (for fields marked `unique` or `primaryKey`).
+## Configuration (.env — keys are case-insensitive)
+| Key | Required | Meaning |
+|---|---|---|
+| `jex.adapter-mongodb.connectionString` | yes — boot fails loudly without it | Mongo connection URI |
+| `jex.adapter-mongodb.dbName` | no | Database name (defaults to the URI database) |
+
+## What it unlocks
+- Full CRUD for all collections/models against MongoDB.
+- `npx jex migrate` builds indexes from model fields: `unique: true` and `primaryKey` options become Mongo indexes; composite `primaryKeys` become compound unique indexes.
+- Duplicate-key errors surface as HTTP 400 with the offending field name.

@@ -1,12 +1,21 @@
-# AI Context for @json-express/seeder-faker
+# @json-express/seeder-faker — AI Context
 
-Populates the database with realistic fake data during local development.
+Fake-data seeder built on @faker-js/faker. Fills collections with realistic data derived from model field types — relation-aware (parents seeded before children, FKs wired).
 
-## Setup
-```typescript
-import { SeederFaker } from '@json-express/seeder-faker';
-kernel.registerSeeder(new SeederFaker());
+## Install
 ```
+npm i @json-express/seeder-faker
+```
+Discovery is automatic; seeding runs only when the server starts with a flag:
+```
+npx json-express --seed          # seed empty collections
+npx json-express --seed-append   # force-append another batch
+```
+**Never import it or write seed scripts.**
 
-## AI Instruction
-- Do not manually write loops to insert data. This seeder automatically reads the `defineModel` schemas and generates data that matches the field types using Faker.js.
+## Configuration (.env / jex.config — case-insensitive)
+`jex.faker.collections.<name>.*` — per-collection overrides (count, explicit generator hints); collections listed here are created even without a data file or model.
+
+## What it unlocks
+- Zero-config demo data: field names/types drive realistic values (emails, names, dates).
+- Foundation of `@json-express/preset-mock-server`.

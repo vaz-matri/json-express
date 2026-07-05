@@ -13,8 +13,10 @@ program
 
 program
     .command('init [name]')
-    .description('Scaffold a new JSON Express project (writes package.json pointing to @json-express/boot)')
-    .action((name?: string) => runInit(process.cwd(), name));
+    .description('Scaffold a new JSON Express app — interactive (preset or manual/custom); no application code is ever generated')
+    .option('-y, --yes', 'skip prompts and scaffold the default stack (@json-express/boot)')
+    .option('-p, --preset <preset>', 'skip prompts and scaffold a named preset: boot | identity | ecommerce')
+    .action((name: string | undefined, opts: { yes?: boolean; preset?: string }) => runInit(process.cwd(), name, opts));
 
 program
     .command('configure')

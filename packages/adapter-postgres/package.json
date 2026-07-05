@@ -11,29 +11,35 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "@json-express/core": "workspace:*",
     "drizzle-orm": "^0.30.10",
     "pg": "^8.11.5",
     "uuidv7": "^1.0.1"
   },
   "devDependencies": {
     "@types/pg": "^8.11.5",
-    "drizzle-kit": "^0.20.17"
+    "drizzle-kit": "^0.20.17",
+    "@json-express/core": "workspace:^"
   },
   "files": [
-    "dist"
+    "dist",
+    "llms.txt",
+    "skills"
   ],
   "keywords": [
     "json-express",
     "postgres",
     "drizzle",
     "database-adapter"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

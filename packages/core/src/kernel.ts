@@ -13,10 +13,12 @@ import type {
     IIdGenerator,
     IEmailProvider,
     IKvStore,
-    IQueueAdapter
+    IQueueAdapter,
+    CapabilityRequirement
 } from './types';
 import { randomUUID } from 'crypto';
 import { composeMiddlewares } from './pipeline';
+import { FatalBootError } from './errors';
 
 class DefaultIdGenerator implements IIdGenerator {
     generate(): string {
@@ -99,8 +101,17 @@ export class JsonExpressKernel {
     // --- ROUTE REGISTRATION ---
 
     public registerRoute(route: RouteDefinition) {
-        if (route.middlewares && route.middlewares.length > 0) {
-            const assignedMiddlewares = route.middlewares.map(name => {
+        // Global middlewares (e.g. rate limiting) run on EVERY route, ordered first so they
+        // can't be bypassed by a route that doesn't name them. Merge them ahead of any
+        // per-route middlewares, de-duplicated.
+        const globalNames = [...this.middlewares.entries()]
+            .filter(([, mw]) => mw.global)
+            .map(([name]) => name);
+        const effectiveNames = [...globalNames, ...(route.middlewares ?? [])]
+            .filter((name, i, arr) => arr.indexOf(name) === i);
+
+        if (effectiveNames.length > 0) {
+            const assignedMiddlewares = effectiveNames.map(name => {
                 const mw = this.middlewares.get(name);
                 if (!mw) {
                     throw new Error(`❌ Middleware '${name}' is required by route ${route.path} but was not registered.`);
@@ -108,12 +119,45 @@ export class JsonExpressKernel {
                 return mw;
             });
             route.handler = composeMiddlewares(route.handler, assignedMiddlewares);
+            route.middlewares = effectiveNames;
         }
 
         this.routes.push(route);
 
         const transport = this.container.resolve<ITransport>('transport');
         transport.registerRoute(route);
+    }
+
+    // --- CAPABILITY VALIDATION ---
+
+    /**
+     * Match every declared `requires` against the union of all `provides` across
+     * registered plugins and middlewares. A hard requirement with no provider aborts
+     * boot via FatalBootError so a security-load-bearing dependency (e.g. identity →
+     * rate limiting) can never be silently missing.
+     */
+    private validateCapabilities() {
+        const declarers: Array<{ name: string; provides?: string[]; requires?: CapabilityRequirement[] }> = [
+            ...this.plugins,
+            ...this.middlewares.values(),
+        ];
+
+        const provided = new Set<string>();
+        for (const d of declarers) {
+            for (const cap of d.provides ?? []) provided.add(cap);
+        }
+
+        for (const d of declarers) {
+            for (const req of d.requires ?? []) {
+                if (!provided.has(req.capability)) {
+                    throw new FatalBootError(
+                        `'${d.name}' requires the '${req.capability}' capability, but no installed package provides it.`,
+                        `${req.reason} Install a package that provides '${req.capability}' ` +
+                        `(e.g. @json-express/middleware-${req.capability}).`
+                    );
+                }
+            }
+        }
     }
 
     // --- THE BOOT SEQUENCE ---
@@ -151,6 +195,11 @@ export class JsonExpressKernel {
             }
         }
 
+        // 1.6 Validate declared capability requirements. Runs after ALL onRegister so
+        // load order can't cause a false negative. Unmet hard requirements are a
+        // FatalBootError (the runner formats + exits) — never a silent boot.
+        this.validateCapabilities();
+
         // 2. Resolve the registered plugins from the container
         const db = this.container.resolve<IDatabaseAdapter>('database');
         const apiGenerator = this.container.resolve<IApiGenerator>('apiGenerator');
@@ -160,18 +209,30 @@ export class JsonExpressKernel {
             throw new Error("❌ Missing core plugins! Ensure Database, ApiGenerator, and Transport are registered.");
         }
 
-        // 2.5 Hand the database adapter the runtime context for model hooks
+        // 2.5 Compose the runtime context once; hand it to the database adapter
+        // (model hooks) and the API generator (custom endpoint handlers) alike.
+        const email = this.container.hasRegistration('emailProvider')
+            ? this.container.resolve<IEmailProvider>('emailProvider')
+            : undefined;
+        const kvStore = this.container.hasRegistration('kvStore')
+            ? this.container.resolve<IKvStore>('kvStore')
+            : undefined;
+        const queue = this.container.hasRegistration('queue')
+            ? this.container.resolve<IQueueAdapter>('queue')
+            : undefined;
+        const hookContext = { db, email, kvStore, queue, logger };
         if (typeof db.setHookContext === 'function') {
-            const email = this.container.hasRegistration('emailProvider')
-                ? this.container.resolve<IEmailProvider>('emailProvider')
-                : undefined;
-            const kvStore = this.container.hasRegistration('kvStore')
-                ? this.container.resolve<IKvStore>('kvStore')
-                : undefined;
-            const queue = this.container.hasRegistration('queue')
-                ? this.container.resolve<IQueueAdapter>('queue')
-                : undefined;
-            db.setHookContext({ db, email, kvStore, queue, logger });
+            db.setHookContext(hookContext);
+        }
+        if (typeof apiGenerator.setHookContext === 'function') {
+            apiGenerator.setHookContext(hookContext);
+        }
+        // Hand the same context to any middleware that opts in — lets a middleware pick up
+        // shared providers (e.g. rate limiting reaching for kvStore) before routes compose.
+        for (const mw of this.middlewares.values()) {
+            if (typeof mw.setHookContext === 'function') {
+                mw.setHookContext(hookContext);
+            }
         }
 
         // 3. Ask the API Generator to create abstract route definitions
@@ -200,7 +261,12 @@ export class JsonExpressKernel {
         // 5.1 If a DocProvider is present, register the "Self-Documenting" routes
         try {
             const docProvider = this.container.resolve<IDocProvider>('docProvider');
-            if (docProvider) {
+            // Docs mount by default when a provider is installed, but can be turned off with
+            // jex.docs.enabled=false — so a production deploy can hide its API schema without
+            // uninstalling the docs package.
+            const docsEnabled = configProvider.get<unknown>('docs.enabled', true);
+            const docsOff = docsEnabled === false || docsEnabled === 'false';
+            if (docProvider && !docsOff) {
                 // Read the path from config (defaulting to /docs)
                 const rawDocsPath = configProvider.get<string>('docs.path', '/docs');
                 // Ensure no trailing slash
@@ -231,6 +297,25 @@ export class JsonExpressKernel {
             }
         } catch (e) {
             // Silently skip if no docProvider is registered
+        }
+
+        // 5.2 Welcome route — only when nothing else claims GET / (user routes win).
+        // Gives the server a self-describing index and a 2xx root for health probes
+        // and tooling that polls the base URL for readiness.
+        if (!this.routes.some(r => r.method.toUpperCase() === 'GET' && r.path === '/')) {
+            const docsMounted = this.container.hasRegistration('docProvider');
+            this.registerRoute({
+                method: 'GET',
+                path: '/',
+                handler: async () => ({
+                    statusCode: 200,
+                    body: {
+                        framework: 'json-express',
+                        collections,
+                        ...(docsMounted ? { docs: configProvider.get<string>('docs.path', '/docs') } : {})
+                    }
+                })
+            });
         }
 
         console.log(`🟢 Starting server on port ${port}...`);
@@ -270,6 +355,21 @@ export class JsonExpressKernel {
             await transport.stop();
         } catch (e) {
             // Silently ignore if transport isn't resolved
+        }
+
+        // Tear down provider connections AFTER the transport stops, so in-flight
+        // requests never observe half-closed backends. Duck-typed: only providers
+        // exposing shutdown(). Failures are logged, never abort the teardown.
+        for (const key of ['queue', 'kvStore', 'emailProvider', 'database'] as const) {
+            if (!this.container.hasRegistration(key)) continue;
+            const provider = this.container.resolve<any>(key);
+            if (typeof provider?.shutdown !== 'function') continue;
+            try {
+                console.log(`🔌 Shutting down provider: ${key}...`);
+                await provider.shutdown();
+            } catch (e: any) {
+                console.error(`⚠️  Provider '${key}' failed to shut down cleanly:`, e?.message ?? e);
+            }
         }
 
         console.log('🛑 Kernel shutdown complete.');

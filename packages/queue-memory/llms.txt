@@ -1,13 +1,17 @@
-# AI Context for @json-express/queue-memory
+# @json-express/queue-memory — AI Context
 
-An in-memory background task queue.
+In-process task queue for development: immediate or delayed one-shot jobs, no external services. (No cron — install queue-bullmq for repeatable jobs.)
 
-## Setup
-```typescript
-import { QueueMemory } from '@json-express/queue-memory';
-kernel.registerQueueAdapter(new QueueMemory());
+## Install — that is the whole integration
 ```
+npm i @json-express/queue-memory
+```
+Discovery is automatic. **Never import or register it.**
 
-## AI Instruction
-- Jobs are executed in the same Node.js process and lost if the server crashes.
-- Do not use for mission-critical jobs in production; use a Redis-based adapter instead.
+## Configuration (.env)
+No keys.
+
+## What it unlocks
+- `ctx.queue.enqueue(queueName, jobName, payload, { delay? })` inside model hooks and custom endpoints — offload slow work (emails, webhooks) out of the request path.
+- Plugins register workers for named queues; job failures are logged, never crash the server.
+- Swap to `queue-bullmq` in production — same `ctx.queue` surface.

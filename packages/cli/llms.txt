@@ -1,8 +1,20 @@
-# AI Context for @json-express/cli
+# @json-express/cli — AI Context
 
-The command-line interface for JSONExpress.
+Optional scaffolding & developer tooling (bin: `jex`). **Never required to run a server** — the `json-express` bin ships from `@json-express/core`.
 
-## AI Instruction
-- You can generate boilerplate files using the CLI.
-- Example: `npx jex generate model users`
-- Do not modify the CLI package unless explicitly requested.
+## Commands
+```
+npx jex init [name]        # interactive: preset (boot|identity|ecommerce) or manual (default|custom per-layer picks)
+npx jex init -y            # non-interactive: default stack; --preset <name> for a named preset
+                           # scaffolds package.json, .env (with required-key hints), data/, models/, AGENTS.md + CLAUDE.md — no code files
+npx jex configure          # interactive plugin selection per category, persisted to .env
+npx jex export <collection># generate a typed models/<collection>.ts from existing JSON data
+npx jex migrate            # run the active adapter's migrations (Postgres tables, Mongo indexes)
+```
+
+## Configuration (.env)
+No `jex.*` keys of its own.
+
+## Notes for agents
+- Scaffolded apps contain NO application code — do not add an index file to them.
+- In scripts/CI use `-y` or `--preset <name>` — prompts require a TTY.

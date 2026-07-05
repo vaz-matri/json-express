@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildNestedConfigFromEnv, deepMerge, getNestedValue } from '../src/config';
+import { buildNestedConfigFromEnv, deepMerge, getNestedValue, normalizeConfigKeys } from '../src/config';
 
 describe('Config Utilities', () => {
 
@@ -71,6 +71,30 @@ describe('Config Utilities', () => {
 
             expect(getNestedValue(config, 'transport.express.port')).toBe(4000);
             expect(getNestedValue(config, 'transport.fastify.port', 3000)).toBe(3000); // Fallback
+        });
+
+        it('is case-insensitive against the lowercase-normalized store', () => {
+            // Regression for the auth fail-open: `jex.auth.jwksUri` in .env is stored
+            // lowercased; a camelCase lookup must still hit it.
+            const config = buildNestedConfigFromEnv({ 'jex.auth.jwksUri': 'https://issuer/jwks' });
+            expect(getNestedValue(config, 'auth.jwksUri')).toBe('https://issuer/jwks');
+            expect(getNestedValue(config, 'auth.jwksuri')).toBe('https://issuer/jwks');
+            expect(getNestedValue(config, 'AUTH.JWKSURI')).toBe('https://issuer/jwks');
+        });
+    });
+
+    describe('normalizeConfigKeys', () => {
+        it('lowercases keys recursively, leaving values and arrays untouched', () => {
+            const fileConfig = {
+                auth: { jwksUri: 'https://issuer/jwks', tokenTtl: '15m', algorithms: ['RS256'] },
+                docs: { baseUrl: 'https://API.example.com' },
+            };
+            const normalized = normalizeConfigKeys(fileConfig);
+            expect(getNestedValue(normalized, 'auth.jwksUri')).toBe('https://issuer/jwks');
+            expect(getNestedValue(normalized, 'auth.tokenttl')).toBe('15m');
+            expect(getNestedValue(normalized, 'auth.algorithms')).toEqual(['RS256']);
+            // Values keep their case — only keys normalize
+            expect(getNestedValue(normalized, 'docs.baseurl')).toBe('https://API.example.com');
         });
     });
 });

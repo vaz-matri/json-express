@@ -12,7 +12,8 @@ import type {
     ILogger,
     ModelSchema,
     QueryOptions,
-    AccessRule
+    AccessRule,
+    HookContext
 } from '@json-express/core';
 import {
     evaluateAccess,
@@ -22,6 +23,9 @@ import {
     ownsRecord,
     stripDeniedReadFields,
     stripDeniedWriteFields,
+    sanitizeFilter,
+    shouldMaskErrors,
+    GENERIC_ERROR_MESSAGE,
 } from '@json-express/core';
 
 function denyResponse(verdict: { code: 'UNAUTHENTICATED' | 'FORBIDDEN'; reason: string }): JsonResponse {
@@ -41,6 +45,7 @@ export class RestApiGenerator implements IApiGenerator {
     private logger: ILogger;
     private collections: string[] = [];
     private schemas: ModelSchema[] = [];
+    private hookContext?: HookContext;
 
     constructor({ database, configProvider, logger }: {
         database: IDatabaseAdapter;
@@ -55,6 +60,10 @@ export class RestApiGenerator implements IApiGenerator {
     public setSchemas(schemas: ModelSchema[]) {
         this.logger.info(`Received ${schemas.length} schemas for endpoint parsing`);
         this.schemas = schemas;
+    }
+
+    public setHookContext(ctx: HookContext) {
+        this.hookContext = ctx;
     }
 
     private enrichRoute(
@@ -107,8 +116,10 @@ export class RestApiGenerator implements IApiGenerator {
                 json: (body: any) => { responseBody = body; }
             };
 
-            const ctx = { db: this.db };
-            
+            // Same context the kernel hands to db hooks; falls back to db-only
+            // when boot didn't call setHookContext (e.g. direct unit-test wiring).
+            const ctx = this.hookContext ?? { db: this.db };
+
             try {
                 const result = await handler(req, resHelper as any, ctx);
                 // If they return the strict object declarative style:
@@ -118,8 +129,10 @@ export class RestApiGenerator implements IApiGenerator {
                 // If they used the Express-like mutator helpers res.send():
                 return { statusCode, body: responseBody };
             } catch (error: any) {
-                this.logger.error(`Error in custom endpoint`, { error: error.message });
-                return { statusCode: 500, body: { error: error.message } };
+                this.logger.error(`Error in custom endpoint`, { error: error.message, stack: error.stack });
+                // Mask internal detail from the client in production (jex.mode); dev stays verbose.
+                const message = shouldMaskErrors(this.config) ? GENERIC_ERROR_MESSAGE : error.message;
+                return { statusCode: 500, body: { error: message } };
             }
         };
     }
@@ -160,8 +173,12 @@ export class RestApiGenerator implements IApiGenerator {
                     const verdict = evaluateAccess(readRule, req.headers['x-user-payload']);
                     if (!verdict.allowed) return denyResponse(verdict);
 
-                    // Parse QueryOptions cleanly
-                    const { _expand, _embed, ...cleanQuery } = req.query;
+                    // Parse QueryOptions cleanly. sanitizeFilter strips operator/nested
+                    // keys ($ne, $where, dotted paths) so client query params can only ever
+                    // be flat equality filters — the choke point that keeps NoSQL injection
+                    // from reaching any adapter (the owner clause is stamped AFTER, trusted).
+                    const { _expand, _embed, ...rawQuery } = req.query;
+                    const cleanQuery = sanitizeFilter(rawQuery as Record<string, unknown>);
                     const options: QueryOptions = {
                         expand: _expand ? String(_expand).split(',').map(s => s.trim()) : undefined,
                         embed: _embed ? String(_embed).split(',').map(s => s.trim()) : undefined
@@ -280,7 +297,12 @@ export class RestApiGenerator implements IApiGenerator {
                         if (e && e.name === 'UniqueConstraintError') {
                             return { statusCode: 400, body: { error: e.message } };
                         }
-                        return notFound(collection, id);
+                        // Only missing records become 404 — infrastructure failures
+                        // must surface as 500, not masquerade as not-found.
+                        if (/not found/i.test(e?.message ?? '')) {
+                            return notFound(collection, id);
+                        }
+                        throw e;
                     }
                 }
             }, updateRule, schema ? { schema, op: 'update' } : undefined));
@@ -404,3 +426,5 @@ export class RestApiGenerator implements IApiGenerator {
         return routes;
     }
 }
+
+export default RestApiGenerator;

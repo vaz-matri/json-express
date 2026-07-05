@@ -1,10 +1,12 @@
 import { Queue, Worker, JobsOptions } from 'bullmq';
 import Redis from 'ioredis';
-import type { IQueueAdapter, JobOptions, ILogger } from '@json-express/core';
+import type { IQueueAdapter, JobOptions, IConfigProvider, ILogger } from '@json-express/core';
 
 export interface QueueBullmqConfig {
-    connectionString: string;
+    /** Direct override; when omitted, read from jex.queue-bullmq.connectionstring */
+    connectionString?: string;
     logger: ILogger;
+    configProvider?: IConfigProvider;
 }
 
 /**
@@ -18,9 +20,19 @@ export class QueueBullmq implements IQueueAdapter {
     private workers: Worker[] = [];
 
     constructor(config: QueueBullmqConfig) {
+        const connectionString = config.connectionString
+            ?? config.configProvider?.get<string>('queue-bullmq.connectionstring');
+        if (!connectionString) {
+            // Fail loud: letting ioredis default to localhost:6379 silently sends
+            // production jobs to the wrong Redis.
+            throw new Error(
+                '@json-express/queue-bullmq: no connection string configured. ' +
+                'Set jex.queue-bullmq.connectionstring in .env (or pass { connectionString } directly).'
+            );
+        }
         // BullMQ uses ioredis internally. We pass the connection to both Queues and Workers.
         // maxRetriesPerRequest must be null for BullMQ
-        this.connection = new Redis(config.connectionString, {
+        this.connection = new Redis(connectionString, {
             maxRetriesPerRequest: null
         });
         
@@ -117,3 +129,5 @@ export class QueueBullmq implements IQueueAdapter {
         this.connection.disconnect();
     }
 }
+
+export default QueueBullmq;

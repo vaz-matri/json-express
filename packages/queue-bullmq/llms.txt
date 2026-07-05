@@ -1,15 +1,18 @@
-# AI Context for @json-express/queue-bullmq
+# @json-express/queue-bullmq — AI Context
 
-The official BullMQ-backed distributed task queue adapter for JSONExpress.
+Distributed task queue on BullMQ + Redis: durable jobs, delays, cron repeats, worker processes.
 
-## Setup
-```typescript
-import { QueueBullmq } from '@json-express/queue-bullmq';
-kernel.registerQueueAdapter(new QueueBullmq({ connectionString: process.env.REDIS_URL, logger: kernel.logger }));
+## Install — that is the whole integration
 ```
+npm i @json-express/queue-bullmq
+```
+Discovery is automatic; with queue-memory also installed choose `jex.queue=@json-express/queue-bullmq`. **Never import BullMQ or configure Redis in application logic.**
 
-## AI Instruction
-- Do not instantiate `bullmq` or configure `ioredis` directly in application logic.
-- Register `QueueBullmq` into the kernel at boot.
-- Use `kernel.queue.enqueue(queueName, jobName, payload, options)` to add jobs.
-- The `options` parameter supports `{ delay: number }` and `{ cron: string }`. These map to BullMQ seamlessly behind the scenes.
+## Configuration (.env — case-insensitive)
+| Key | Required | Meaning |
+|---|---|---|
+| `jex.queue-bullmq.connectionString` | yes — boot fails loudly without it | Redis URI |
+
+## What it unlocks
+- `ctx.queue.enqueue(queueName, jobName, payload, { delay?, cron? })` in model hooks and custom endpoints — `cron` creates repeatable jobs.
+- Jobs survive restarts; workers auto-log failures with job context.

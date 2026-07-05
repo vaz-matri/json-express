@@ -46,10 +46,14 @@ export class HealthPlugin implements IPlugin {
                 path: '/info',
                 handler: async (req: JsonRequest): Promise<JsonResponse> => {
                     const memoryUsage = process.memoryUsage();
+                    // NODE_ENV lives in the container (registered by kernel.boot),
+                    // not in the jex.* config namespace.
+                    let environment = 'development';
+                    try { environment = kernel.container.resolve<string>('NODE_ENV'); } catch { /* pre-boot */ }
                     return {
                         statusCode: 200,
                         body: {
-                            environment: configProvider.get('NODE_ENV', 'development'),
+                            environment,
                             uptimeSeconds: process.uptime(),
                             timestamp: new Date().toISOString(),
                             system: {
@@ -67,3 +71,5 @@ export class HealthPlugin implements IPlugin {
         }
     }
 }
+
+export default HealthPlugin;

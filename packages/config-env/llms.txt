@@ -1,13 +1,15 @@
-# AI Context for @json-express/config-env
+# @json-express/config-env — AI Context
 
-Provides `.env` file parsing for the JSONExpress IoC container.
+The default configuration provider (part of `@json-express/boot`). Reads `.env` files and process env into the `jex.*` config tree.
 
-## Setup
-```typescript
-import { ConfigEnv } from '@json-express/config-env';
-kernel.registerConfigProvider(new ConfigEnv());
+## Install — that is the whole integration
 ```
+npm i @json-express/config-env
+```
+Discovery is automatic. **Never import or instantiate it.**
 
-## AI Instruction
-- Use this instead of `dotenv` directly.
-- The kernel injects this provider into all plugins so they can resolve their secrets dynamically.
+## How configuration works (this package defines the rules)
+- Namespace: `jex.` or `jex__` prefix; `.` or `__` nests; single `_` is a word separator. Keys are case-insensitive.
+- Cascade (highest wins): process env → `.env.<mode>.local` / `.env.local` → `.env.<mode>` → `.env`.
+- Config keys are **package-scoped**: installing a package brings its keys (documented in that package's llms.txt). Shared namespaces: `jex.port`, `jex.auth.*`, `jex.docs.*`.
+- Config never carries behavior — behavior lives in `models/`.

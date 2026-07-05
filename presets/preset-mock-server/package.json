@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "The ultimate zero-config dependency preset for building mock servers with fake data generation.",
     "private": true,
-    "main": "index.js",
+    "main": "package.json",
     "dependencies": {
         "@json-express/core": "workspace:*",
         "@json-express/boot": "workspace:*",

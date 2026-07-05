@@ -11,21 +11,24 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "@json-express/core": "workspace:*",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.4"
+    "@types/jsonwebtoken": "^9.0.4",
+    "@json-express/core": "workspace:^"
   },
   "files": [
-    "dist"
+    "dist",
+    "llms.txt",
+    "skills"
   ],
   "keywords": [
     "json-express",
@@ -43,5 +46,8 @@
     "jwks",
     "auth0",
     "bearer-token"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

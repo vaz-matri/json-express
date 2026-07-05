@@ -56,3 +56,5 @@ export class MemoryQueueAdapter implements IQueueAdapter {
         this.handlers.set(queueName, handler);
     }
 }
+
+export default MemoryQueueAdapter;

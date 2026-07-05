@@ -11,19 +11,23 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
     "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
   },
   "dependencies": {
-    "@json-express/core": "workspace:*",
     "zod": "^3.23.8"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  },
   "files": [
-    "dist"
+    "dist",
+    "llms.txt",
+    "skills"
   ],
   "keywords": [
     "json-express",
@@ -40,5 +44,8 @@
     "validation",
     "request-validation",
     "schema-validation"
-  ]
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  }
 }

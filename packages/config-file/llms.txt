@@ -1,0 +1,14 @@
+# @json-express/config-file — AI Context
+
+Advanced configuration provider: `jex.config.{ts,js,json,yml,yaml}` files with per-mode overlays (`jex.config.production.ts`), replacing/augmenting `.env`.
+
+## Install — that is the whole integration
+```
+npm i @json-express/config-file
+```
+Discovery is automatic; with both config providers installed choose via env: `jex_config=@json-express/config-file`. **Never import or instantiate it.**
+
+## Usage (files, not code — the config file is data)
+- `jex.config.ts` default-exports an object (or a `({ env }) => object` function): `{ port: 4000, adapter: "@json-express/adapter-postgres", "adapter-postgres": { connectionString: "..." } }`.
+- Mode file `jex.config.<NODE_ENV>.*` deep-merges over the base. Keys are case-insensitive.
+- Framework configuration ONLY (which plugins, ports, connection strings) — never behavior, validation, or handlers. Those live in `models/`.

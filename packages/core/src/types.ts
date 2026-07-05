@@ -16,6 +16,7 @@ export interface JsonRequest {
     protocol?: string;    // 'http' | 'https'
     hostname?: string;    // e.g. 'localhost' or 'my-app.com'
     originalUrl?: string; // full URI including any prefix
+    ip?: string;          // client socket address (transports populate; used for rate limiting)
 }
 
 export interface JsonResponse {
@@ -78,6 +79,9 @@ export interface IDatabaseAdapter {
      * Optional method for adapters that need explicit schema migration (e.g. SQL databases).
      */
     migrate?(): Promise<void>;
+
+    /** Optional graceful teardown (close pools/clients) — the kernel calls this during shutdown. */
+    shutdown?(): Promise<void>;
 }
 
 /**
@@ -114,6 +118,15 @@ export interface ITransport {
  */
 export interface IApiGenerator {
     setSchemas?(schemas: ModelSchema[]): void;
+
+    /**
+     * Receive the same runtime context the kernel hands to the database adapter
+     * (`db`, optional `email`/`kvStore`/`queue`, `logger`). Generators that mount
+     * custom endpoints pass it as the handler's third argument so models can reach
+     * registered providers without touching the IoC container.
+     */
+    setHookContext?(ctx: HookContext): void;
+
     generate(collections: string[]): RouteDefinition[] | Promise<RouteDefinition[]>;
 }
 
@@ -131,6 +144,22 @@ export interface IMiddleware {
     name: string;
     setSchemas?(schemas: ModelSchema[]): void;
     handle(req: JsonRequest, next: () => Promise<JsonResponse>): Promise<JsonResponse>;
+    /**
+     * When true, the kernel applies this middleware to EVERY route (ordered before
+     * per-route middlewares), so it cannot be escaped by a route that doesn't name it.
+     * Use for cross-cutting concerns that must be unconditional — e.g. rate limiting.
+     */
+    global?: boolean;
+    /**
+     * Optional: receive the composed runtime context at boot (same object handed to db
+     * hooks), so a middleware can pick up shared providers like `kvStore`. Called once
+     * during boot, before routes are composed.
+     */
+    setHookContext?(ctx: HookContext): void;
+    /** Capability tags this middleware satisfies (e.g. `['ratelimit']`). See `CapabilityRequirement`. */
+    provides?: string[];
+    /** Hard capabilities this middleware needs present at boot. See `CapabilityRequirement`. */
+    requires?: CapabilityRequirement[];
 }
 
 /**
@@ -147,6 +176,34 @@ export interface IConfigProvider {
      * Mutates the active configuration dynamically at runtime.
      */
     set<T>(key: string, value: T): void;
+
+    /**
+     * Contribute fail-closed defaults at the LOWEST precedence — any real user value
+     * (system env, .env, jex.config) always wins. A plugin calls this in `onRegister`
+     * to supply a safe baseline (e.g. `auth.required` in production).
+     *
+     * SECURITY RULE: a registered default may only make the system MORE restrictive
+     * (booleans, limits, policies). It must NEVER fabricate a secret, key, or credential
+     * — anything whose safety depends on being unguessable. A missing secure value is a
+     * `FatalBootError` (fail closed), never an invented default.
+     *
+     * Optional so older/minimal providers still satisfy the interface; callers use
+     * optional chaining.
+     */
+    registerDefaults?(namespace: string, defaults: Record<string, unknown>): void;
+}
+
+/**
+ * A hard, security-load-bearing dependency one package declares on a capability another
+ * package provides — validated at boot (see `provides`). Use ONLY for requirements that
+ * must fail loud when unmet (e.g. identity requiring rate limiting). Soft/optional
+ * integration still uses container probing with a silent fallback.
+ */
+export interface CapabilityRequirement {
+    /** Capability tag, e.g. 'ratelimit'. Matched against the union of all `provides`. */
+    capability: string;
+    /** Why it's required — surfaced in the boot-veto remedy so an agent knows the fix. */
+    reason: string;
 }
 
 /**
@@ -181,6 +238,10 @@ export interface IPlugin {
      * collision (the plugin's contribution is silently skipped with a warning).
      */
     provideSchemas?(): ModelSchema[];
+    /** Capability tags this plugin satisfies (e.g. `['ratelimit']`). See `CapabilityRequirement`. */
+    provides?: string[];
+    /** Hard capabilities this plugin needs present at boot; unmet → `FatalBootError`. See `CapabilityRequirement`. */
+    requires?: CapabilityRequirement[];
     onRegister?(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
     onBoot(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
     onReady?(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
@@ -258,6 +319,8 @@ export interface IEmailProvider {
     send(message: EmailMessage): Promise<void>;
     /** Optional health check, mirrors `IDatabaseAdapter.isHealthy`. */
     isHealthy?(): Promise<boolean>;
+    /** Optional graceful teardown — the kernel calls this during shutdown. */
+    shutdown?(): Promise<void>;
 }
 
 /**
@@ -278,6 +341,8 @@ export interface IKvStore {
     delete(key: string): Promise<void>;
     /** Optional health check */
     isHealthy?(): Promise<boolean>;
+    /** Optional graceful teardown — the kernel calls this during shutdown. */
+    shutdown?(): Promise<void>;
 }
 
 /**
@@ -299,4 +364,7 @@ export interface IQueueAdapter {
 
     /** Registers a worker to process jobs off the queue */
     registerWorker(queueName: string, handler: (job: { name: string, payload: any }) => Promise<void>): void;
+
+    /** Optional graceful teardown (close workers/connections) — the kernel calls this during shutdown. */
+    shutdown?(): Promise<void>;
 }
