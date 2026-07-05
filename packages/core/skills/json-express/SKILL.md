@@ -70,6 +70,20 @@ packages need none); each package documents its keys in its own skill/`llms.txt`
 (`jex.adapter=...`), point at infrastructure (connection strings), toggle documented
 flags. Config never carries behavior.
 
+**Security defaults you must set explicitly (they fail toward openness unless you act):**
+- **Mass assignment:** CRUD writes accept every body field by default. Any field a client
+  must not set (`role`, `emailVerified`, `passwordHash`, balances, ownership) needs a
+  field-level write rule in the model — `access: { fields: { role: { create: false, update: false } } }`.
+  A field with no rule is writable, so `POST /users {"role":"admin"}` succeeds until you lock it.
+- **Auth:** with `middleware-auth` installed, production (`jex.mode=production`) defaults
+  `auth.required=true` and refuses to boot without a verifier — set `jex.auth.secret`/`jwksUri`,
+  or `jex.auth.required=false` for a deliberately public API.
+- **Rate limiting:** install `@json-express/middleware-ratelimit` for any internet-facing app;
+  `plugin-identity` hard-requires it. It throttles every route once installed.
+- **In production**, 5xx bodies are masked (`jex.errors.verbose` to override), baseline security
+  headers are sent (`jex.security.headers=false` to opt out), and docs can be hidden with
+  `jex.docs.enabled=false`.
+
 **Triggers that mean "this is a package, not a model hook":**
 - It talks to **external infrastructure** (S3, Stripe, SMS, LDAP…): that's a provider
   behind a core interface, never inline SDK calls inside a model hook.

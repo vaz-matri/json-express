@@ -18,5 +18,6 @@ Discovery is automatic. **Never import or register this in code.**
 ## What it unlocks (all driven from `models/`)
 - Generated per collection: `GET /x`, `GET /x/:id`, `POST /x`, `PATCH /x/:id`, `DELETE /x/:id`; plus `?_expand=`/`?_embed=` and search by query params.
 - Model `access` blocks enforced per operation (`read: "admin"`, `update: "owner"`, per-field read/write rules; owner records are auto-stamped and 404-shielded).
+- ⚠️ **Mass assignment**: CRUD writes accept every body field by default. Sensitive fields (`role`, `emailVerified`, `passwordHash`, …) MUST be locked with a field-level write rule — `access.fields.role = { create: false, update: false }` — or a client can set them (`POST /users {"role":"admin"}`). A field with no rule is writable. See the skill.
 - Model `endpoints: {}` mounted with `(req, res, ctx)` handlers — `ctx` carries `db`, and `email`/`kvStore`/`queue` when those packages are installed.
 - Model `validation` blocks enforced when `middleware-validation` is installed.
