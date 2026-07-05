@@ -71,6 +71,13 @@ function parseDurationMs(value: string | undefined, fallback: number): number {
 
 export class IdentityPlugin implements IPlugin {
     public readonly name = 'identity';
+    // Hard requirement: login / register / password-reset endpoints must be rate limited to
+    // resist credential brute-force. Validated at boot — an identity app with no rate limiter
+    // installed refuses to start (see @json-express/middleware-ratelimit).
+    public readonly requires = [{
+        capability: 'ratelimit',
+        reason: 'login, register, and password-reset endpoints must be rate limited to resist credential brute-force.',
+    }];
     private logger: ILogger;
     private adminPassword: string | null = null;
 

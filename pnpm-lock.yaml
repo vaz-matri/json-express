@@ -210,6 +210,9 @@ importers:
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../../packages/middleware-auth
+      '@json-express/middleware-ratelimit':
+        specifier: workspace:*
+        version: link:../../packages/middleware-ratelimit
       '@json-express/plugin-identity':
         specifier: workspace:*
         version: link:../../packages/plugin-identity
@@ -244,6 +247,15 @@ importers:
       zod:
         specifier: ^3.22.4
         version: 3.25.76
+
+  e2e/security-ratelimit:
+    dependencies:
+      '@json-express/boot':
+        specifier: workspace:*
+        version: link:../../presets/boot
+      '@json-express/middleware-ratelimit':
+        specifier: workspace:*
+        version: link:../../packages/middleware-ratelimit
 
   e2e/seeder-faker:
     dependencies:
@@ -352,6 +364,9 @@ importers:
       '@json-express/middleware-auth':
         specifier: workspace:*
         version: link:../../packages/middleware-auth
+      '@json-express/middleware-ratelimit':
+        specifier: workspace:*
+        version: link:../../packages/middleware-ratelimit
       '@json-express/plugin-identity':
         specifier: workspace:*
         version: link:../../packages/plugin-identity
@@ -585,6 +600,12 @@ importers:
       '@types/jsonwebtoken':
         specifier: ^9.0.4
         version: 9.0.10
+
+  packages/middleware-ratelimit:
+    devDependencies:
+      '@json-express/core':
+        specifier: workspace:^
+        version: link:../core
 
   packages/middleware-validation:
     dependencies:

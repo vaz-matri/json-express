@@ -16,6 +16,7 @@ export interface JsonRequest {
     protocol?: string;    // 'http' | 'https'
     hostname?: string;    // e.g. 'localhost' or 'my-app.com'
     originalUrl?: string; // full URI including any prefix
+    ip?: string;          // client socket address (transports populate; used for rate limiting)
 }
 
 export interface JsonResponse {
@@ -143,6 +144,18 @@ export interface IMiddleware {
     name: string;
     setSchemas?(schemas: ModelSchema[]): void;
     handle(req: JsonRequest, next: () => Promise<JsonResponse>): Promise<JsonResponse>;
+    /**
+     * When true, the kernel applies this middleware to EVERY route (ordered before
+     * per-route middlewares), so it cannot be escaped by a route that doesn't name it.
+     * Use for cross-cutting concerns that must be unconditional — e.g. rate limiting.
+     */
+    global?: boolean;
+    /**
+     * Optional: receive the composed runtime context at boot (same object handed to db
+     * hooks), so a middleware can pick up shared providers like `kvStore`. Called once
+     * during boot, before routes are composed.
+     */
+    setHookContext?(ctx: HookContext): void;
     /** Capability tags this middleware satisfies (e.g. `['ratelimit']`). See `CapabilityRequirement`. */
     provides?: string[];
     /** Hard capabilities this middleware needs present at boot. See `CapabilityRequirement`. */

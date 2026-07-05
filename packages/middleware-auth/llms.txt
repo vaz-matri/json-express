@@ -15,9 +15,9 @@ Discovery is automatic. **Never import it or implement custom JWT verification.*
 | `jex.auth.jwksUri` | JWKS endpoint (asymmetric/IdP mode — use instead of secret) |
 | `jex.auth.audience` / `jex.auth.issuer` / `jex.auth.algorithms` | Optional claim/algorithm restrictions |
 | `jex.auth.exclude` | Comma-separated path prefixes to leave public |
-| `jex.auth.required` | `true` = strict mode: unconfigured auth returns 503 instead of bypassing (recommended in production) |
+| `jex.auth.required` | `true` = strict: refuse to boot if no verifier is configured. **Defaults to `true` when `jex.mode=production`** (which itself defaults from `NODE_ENV`) |
 
-⚠️ With neither `secret` nor `jwksUri` set, requests pass through (dev ergonomics; warning per request) — unless `jex.auth.required=true`, which fails loud with 503.
+⚠️ **Production fails closed.** In production (`jex.mode=production`) `auth.required` defaults to `true`, so an app with neither `secret` nor `jwksUri` set **refuses to boot** with a remedy naming the exact env vars — it never silently ships an open API. To run a deliberately public production API, set `jex.auth.required=false`. In development, unconfigured auth passes requests through (dev ergonomics; warning per request).
 
 ## What it unlocks (behavior lives in `models/`)
 - Model `access` blocks become enforceable: `access: { read: "public", create: "user", update: "owner", delete: "admin" }` plus per-field rules.

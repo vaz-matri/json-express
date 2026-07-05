@@ -68,6 +68,7 @@ export class FastifyTransport implements ITransport {
                 protocol: request.protocol,
                 hostname: request.hostname,
                 originalUrl: request.raw.url,
+                ip: request.ip ?? request.socket?.remoteAddress,
             };
 
             const jsonResponse = await RequestContext.run({ traceId, startTime }, () =>

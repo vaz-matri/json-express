@@ -1,0 +1,13 @@
+{
+    "name": "example-security-ratelimit",
+    "private": true,
+    "version": "1.0.0",
+    "description": "E2E: global rate limiting throttles traffic with 429",
+    "scripts": {
+        "serve": "json-express"
+    },
+    "dependencies": {
+        "@json-express/boot": "workspace:*",
+        "@json-express/middleware-ratelimit": "workspace:*"
+    }
+}

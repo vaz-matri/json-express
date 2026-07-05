@@ -42,6 +42,7 @@ export class ExpressTransport implements ITransport {
                 protocol: req.protocol,
                 hostname: req.hostname,
                 originalUrl: req.originalUrl,
+                ip: req.ip ?? req.socket?.remoteAddress,
             };
 
             try {

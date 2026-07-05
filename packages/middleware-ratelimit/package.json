@@ -1,0 +1,45 @@
+{
+  "name": "@json-express/middleware-ratelimit",
+  "version": "1.0.0",
+  "description": "Global rate-limiting middleware for JSON Express — fixed-window per-client throttling with a shared KV backend",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts --clean --dts --format esm --format cjs",
+    "dev": "tsdown src/index.ts --watch --dts --format esm --format cjs"
+  },
+  "devDependencies": {
+    "@json-express/core": "workspace:^"
+  },
+  "files": [
+    "dist",
+    "llms.txt",
+    "skills"
+  ],
+  "keywords": [
+    "json-express",
+    "jsonexpress",
+    "rate-limit",
+    "rate-limiting",
+    "throttle",
+    "brute-force",
+    "middleware",
+    "security",
+    "backend-framework",
+    "typescript",
+    "nodejs"
+  ],
+  "peerDependencies": {
+    "@json-express/core": "workspace:^"
+  }
+}

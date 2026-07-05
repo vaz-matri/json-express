@@ -1,0 +1,28 @@
+# @json-express/middleware-ratelimit — AI Context
+
+Global rate limiting. Throttles every request per client using a fixed time window, rejecting excess traffic with `429 Too Many Requests` before any route handler runs. Resists brute-force (login, token, reset endpoints) and volumetric abuse.
+
+## Install — that is the whole integration
+```
+npm i @json-express/middleware-ratelimit
+```
+Discovery is automatic and it applies to **every route** (it is a global middleware, ordered before auth). **Never import it or hand-roll throttling in a model.** `@json-express/plugin-identity` declares a hard requirement on it — an identity app refuses to boot without a rate limiter installed.
+
+## Configuration (.env — case-insensitive; `ratelimit.*` namespace, lowercase keys)
+| Key | Meaning | Default |
+|---|---|---|
+| `jex.ratelimit.window` | Window length in milliseconds | `60000` |
+| `jex.ratelimit.max` | Max requests per client per window | `100` |
+| `jex.ratelimit.trustproxy` | Trust `X-Forwarded-For` for the client IP | `false` |
+| `jex.ratelimit.exclude` | Comma-separated path prefixes to skip (e.g. `/health`) | (none) |
+
+⚠️ **`trustproxy` is off by default.** Enable it ONLY when the app is actually behind a trusted proxy/load balancer — `X-Forwarded-For` is client-spoofable, so trusting it on a directly-exposed server lets an attacker forge a new identity per request and evade the limit. Off = keys on the real socket address.
+
+## State backend (automatic)
+- With `@json-express/kv-redis` (or any `IKvStore`) installed, counts live in the shared store — correct across multiple instances.
+- With no KV store, counts are tracked in-process and bound a **single instance only**; the middleware warns loudly at boot. Install `@json-express/kv-redis` for any multi-replica deployment.
+
+## What it unlocks
+- Every endpoint (REST CRUD, custom endpoints, GraphQL, docs) is throttled with no per-route wiring.
+- Responses carry `X-RateLimit-Limit` / `X-RateLimit-Remaining` / `X-RateLimit-Reset`; a 429 also sends `Retry-After`.
+- Satisfies the `ratelimit` capability that `plugin-identity` requires.

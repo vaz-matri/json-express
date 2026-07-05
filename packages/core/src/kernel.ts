@@ -101,8 +101,17 @@ export class JsonExpressKernel {
     // --- ROUTE REGISTRATION ---
 
     public registerRoute(route: RouteDefinition) {
-        if (route.middlewares && route.middlewares.length > 0) {
-            const assignedMiddlewares = route.middlewares.map(name => {
+        // Global middlewares (e.g. rate limiting) run on EVERY route, ordered first so they
+        // can't be bypassed by a route that doesn't name them. Merge them ahead of any
+        // per-route middlewares, de-duplicated.
+        const globalNames = [...this.middlewares.entries()]
+            .filter(([, mw]) => mw.global)
+            .map(([name]) => name);
+        const effectiveNames = [...globalNames, ...(route.middlewares ?? [])]
+            .filter((name, i, arr) => arr.indexOf(name) === i);
+
+        if (effectiveNames.length > 0) {
+            const assignedMiddlewares = effectiveNames.map(name => {
                 const mw = this.middlewares.get(name);
                 if (!mw) {
                     throw new Error(`❌ Middleware '${name}' is required by route ${route.path} but was not registered.`);
@@ -110,6 +119,7 @@ export class JsonExpressKernel {
                 return mw;
             });
             route.handler = composeMiddlewares(route.handler, assignedMiddlewares);
+            route.middlewares = effectiveNames;
         }
 
         this.routes.push(route);
@@ -216,6 +226,13 @@ export class JsonExpressKernel {
         }
         if (typeof apiGenerator.setHookContext === 'function') {
             apiGenerator.setHookContext(hookContext);
+        }
+        // Hand the same context to any middleware that opts in — lets a middleware pick up
+        // shared providers (e.g. rate limiting reaching for kvStore) before routes compose.
+        for (const mw of this.middlewares.values()) {
+            if (typeof mw.setHookContext === 'function') {
+                mw.setHookContext(hookContext);
+            }
         }
 
         // 3. Ask the API Generator to create abstract route definitions
