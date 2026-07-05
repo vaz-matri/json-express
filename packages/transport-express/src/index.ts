@@ -4,18 +4,37 @@ import type { Server as HttpsServer } from 'https';
 import https from 'https';
 import { randomUUID } from 'crypto';
 import type { ITransport, RouteDefinition, JsonRequest, IConfigProvider, ILogger } from '@json-express/core';
-import { RequestContext } from '@json-express/core';
+import {
+    RequestContext,
+    GENERIC_ERROR_MESSAGE,
+    shouldMaskErrors,
+    securityHeadersEnabled,
+    buildSecurityHeaders,
+} from '@json-express/core';
 
 export class ExpressTransport implements ITransport {
     private app: Application;
     private server: HttpServer | HttpsServer | null = null;
     private config?: IConfigProvider;
     private logger: ILogger;
+    private maskErrors: boolean;
 
     constructor({ configProvider, logger }: { configProvider?: IConfigProvider, logger: ILogger }) {
         this.app = express();
         this.config = configProvider;
         this.logger = logger.child({ component: 'Express' });
+        this.maskErrors = shouldMaskErrors(configProvider);
+
+        // Baseline response security headers (opt out with jex.security.headers=false),
+        // set before any route so every response — including docs — carries them.
+        if (securityHeadersEnabled(configProvider)) {
+            const ssl = configProvider?.get<{ key?: unknown; cert?: unknown }>('express.ssl');
+            const headers = buildSecurityHeaders({ https: !!(ssl && ssl.key && ssl.cert) });
+            this.app.use((_req: Request, res: Response, next: NextFunction) => {
+                for (const [k, v] of Object.entries(headers)) res.setHeader(k, v);
+                next();
+            });
+        }
 
         // Built-in middleware for parsing JSON requests
         this.app.use(express.json());
@@ -69,6 +88,9 @@ export class ExpressTransport implements ITransport {
                     res.status(statusCode).json(jsonResponse.body);
                 }
             } catch (error: any) {
+                // Tag with the request's traceId so the error handler can correlate a
+                // masked client response with the full server-side log entry.
+                if (error && typeof error === 'object') error.traceId = traceId;
                 // Pass error to the centralized error middleware
                 next(error);
             }
@@ -91,10 +113,24 @@ export class ExpressTransport implements ITransport {
             // start() can reach it.
             this.app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
                 const statusCode = err.statusCode || err.status || 500;
-                res.status(statusCode).json({
+
+                // Log the full detail server-side for every server error, always.
+                if (statusCode >= 500) {
+                    this.logger.error('Unhandled server error', {
+                        error: err?.message, stack: err?.stack, traceId: err?.traceId,
+                    });
+                }
+
+                // Mask internal 5xx detail from the client in production; 4xx messages are
+                // client-facing by design and kept. A traceId lets the caller report the
+                // incident without exposing internals.
+                const mask = this.maskErrors && statusCode >= 500;
+                const body: Record<string, any> = {
                     statusCode,
-                    error: err.message || 'Internal Server Error'
-                });
+                    error: mask ? GENERIC_ERROR_MESSAGE : (err.message || GENERIC_ERROR_MESSAGE),
+                };
+                if (mask && err?.traceId) body.traceId = err.traceId;
+                res.status(statusCode).json(body);
             });
 
             const ssl = this.config?.get<{ key: Buffer | string; cert: Buffer | string }>('express.ssl');

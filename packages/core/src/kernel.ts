@@ -261,7 +261,12 @@ export class JsonExpressKernel {
         // 5.1 If a DocProvider is present, register the "Self-Documenting" routes
         try {
             const docProvider = this.container.resolve<IDocProvider>('docProvider');
-            if (docProvider) {
+            // Docs mount by default when a provider is installed, but can be turned off with
+            // jex.docs.enabled=false — so a production deploy can hide its API schema without
+            // uninstalling the docs package.
+            const docsEnabled = configProvider.get<unknown>('docs.enabled', true);
+            const docsOff = docsEnabled === false || docsEnabled === 'false';
+            if (docProvider && !docsOff) {
                 // Read the path from config (defaulting to /docs)
                 const rawDocsPath = configProvider.get<string>('docs.path', '/docs');
                 // Ensure no trailing slash

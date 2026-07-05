@@ -13,8 +13,12 @@ Discovery is automatic. **Never import express, add express middleware, or touch
 |---|---|---|
 | `jex.port` | `3000` | Listen port (global key, read by the runner) |
 | `jex.express.ssl` | (none) | TLS key/cert pair — normally injected by `plugin-devcert`, not set by hand |
+| `jex.security.headers` | `true` | Baseline response headers (nosniff, frameguard, referrer-policy; HSTS on https). Set `false` to opt out. |
+| `jex.errors.verbose` | (mode) | Override 5xx masking. Defaults to masked when `jex.mode=production`, verbose otherwise. |
 
 ## Behavior contract
 - Consistent JSON errors: unknown route → `404 { statusCode, error }`; handler failure → JSON 500.
+- **Production masks 5xx**: in `jex.mode=production` a 500 returns `{ error: "Internal Server Error", traceId }`; the full detail is logged server-side. Dev shows the real message. Override with `jex.errors.verbose`.
+- Every response carries baseline security headers unless `jex.security.headers=false`.
 - Fails loudly on EADDRINUSE (never silently picks another port).
 - Per-request `traceId` correlation and access logs out of the box.

@@ -2,16 +2,24 @@ import Fastify from 'fastify';
 import { randomUUID } from 'crypto';
 import type { FastifyBaseLogger, FastifyTypeProviderDefault, RawServerBase, FastifyError, FastifyRequest, FastifyReply } from 'fastify';
 import type { ITransport, RouteDefinition, JsonRequest, IConfigProvider, ILogger } from '@json-express/core';
-import { RequestContext } from '@json-express/core';
+import {
+    RequestContext,
+    GENERIC_ERROR_MESSAGE,
+    shouldMaskErrors,
+    securityHeadersEnabled,
+    buildSecurityHeaders,
+} from '@json-express/core';
 
 export class FastifyTransport implements ITransport {
     private fastify: ReturnType<typeof Fastify>;
     private config?: IConfigProvider;
     private logger: ILogger;
+    private maskErrors: boolean;
 
     constructor({ configProvider, logger }: { configProvider?: IConfigProvider, logger: ILogger }) {
         this.config = configProvider;
         this.logger = logger.child({ component: 'Fastify' });
+        this.maskErrors = shouldMaskErrors(configProvider);
 
         const enableLogger = this.config?.get<boolean>('transport.fastify.logger', false) ?? false;
 
@@ -27,18 +35,37 @@ export class FastifyTransport implements ITransport {
             this.fastify = Fastify({ logger: enableLogger });
         }
 
+        // Assign a per-request traceId (so the error handler can correlate) and set baseline
+        // response security headers (opt out with jex.security.headers=false).
+        const emitHeaders = securityHeadersEnabled(configProvider);
+        const securityHeaders = buildSecurityHeaders({ https: !!(sslKey && sslCert) });
+        this.fastify.addHook('onRequest', (request: FastifyRequest, reply: FastifyReply, done: () => void) => {
+            (request as any).traceId = randomUUID();
+            if (emitHeaders) reply.headers(securityHeaders);
+            done();
+        });
+
         // --- Consistent JSON error convention across all transports ---
         // NOTE: Fastify is kept in permissive (schema-less) mode.
         //       If @json-express/middleware-validation is installed, Zod handles
         //       all body/query validation before the handler is reached.
 
         // 500 — unhandled errors from route handlers
-        this.fastify.setErrorHandler((error: FastifyError, _request: FastifyRequest, reply: FastifyReply) => {
+        this.fastify.setErrorHandler((error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
             const statusCode = (error.statusCode ?? 500) as number;
-            reply.code(statusCode).send({
+            const traceId = (request as any).traceId;
+
+            if (statusCode >= 500) {
+                this.logger.error('Unhandled server error', { error: error.message, stack: error.stack, traceId });
+            }
+
+            const mask = this.maskErrors && statusCode >= 500;
+            const body: Record<string, any> = {
                 statusCode,
-                error: error.message || 'Internal Server Error',
-            });
+                error: mask ? GENERIC_ERROR_MESSAGE : (error.message || GENERIC_ERROR_MESSAGE),
+            };
+            if (mask && traceId) body.traceId = traceId;
+            reply.code(statusCode).send(body);
         });
 
         // 404 — no matching route
@@ -54,7 +81,7 @@ export class FastifyTransport implements ITransport {
         const method = route.method.toLowerCase() as 'get' | 'post' | 'patch' | 'delete';
 
         this.fastify[method](route.path, async (request: FastifyRequest, reply: FastifyReply) => {
-            const traceId = randomUUID();
+            const traceId = (request as any).traceId ?? randomUUID();
             const startTime = Date.now();
 
             const jsonRequest: JsonRequest = {

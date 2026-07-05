@@ -14,7 +14,11 @@ Discovery is automatic; with transport-express also installed choose `jex.transp
 | `jex.port` | `3000` | Listen port (global key, read by the runner) |
 | `jex.transport.fastify.logger` | `false` | Enable Fastify's internal logger |
 | `jex.transport.fastify.ssl.key` / `.cert` | (none) | TLS in PEM strings |
+| `jex.security.headers` | `true` | Baseline response headers (nosniff, frameguard, referrer-policy; HSTS on https). Set `false` to opt out. |
+| `jex.errors.verbose` | (mode) | Override 5xx masking. Defaults to masked when `jex.mode=production`, verbose otherwise. |
 
 ## Behavior contract
 - Consistent JSON errors (404/500 shape identical to transport-express); fails loudly on EADDRINUSE.
+- **Production masks 5xx** (`jex.mode=production`): 500 → `{ error: "Internal Server Error", traceId }`, full detail logged server-side. Override with `jex.errors.verbose`.
+- Baseline security headers on every response unless `jex.security.headers=false`.
 - Binds 0.0.0.0 (container-friendly); per-request `traceId` correlation.

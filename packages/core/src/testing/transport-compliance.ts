@@ -119,6 +119,37 @@ export async function runTransportComplianceTests(
             await t.stop();
         }
 
+        // Contract 4: responses carry baseline security headers, and a handler that throws
+        // surfaces as a well-formed JSON 500 (never a naked stack / HTML error page). Masking
+        // of the message is config-gated and covered per-transport; here we only assert shape.
+        {
+            const port = await pickFreePort();
+            const t = make();
+            t.registerRoute({
+                method: 'GET', path: '/__ok',
+                handler: async () => ({ statusCode: 200, body: { ok: true } }),
+            });
+            t.registerRoute({
+                method: 'GET', path: '/__boom',
+                handler: async () => { throw new Error('kaboom-detail'); },
+            });
+            await t.start(port);
+
+            const okRes = await fetch(`http://127.0.0.1:${port}/__ok`);
+            assert(
+                okRes.headers.get('x-content-type-options') === 'nosniff',
+                `${name} must set the X-Content-Type-Options: nosniff security header.`
+            );
+
+            const boomRes = await fetch(`http://127.0.0.1:${port}/__boom`);
+            assert(boomRes.status === 500, `${name} must return 500 when a handler throws; got ${boomRes.status}.`);
+            const body: any = await boomRes.json().catch(() => null);
+            assert(
+                body && typeof body.error === 'string',
+                `${name} 500 responses must be JSON with a string 'error' field.`
+            );
+        }
+
         console.log(`✅ ${name} passed all transport compliance checks.`);
     } finally {
         while (cleanups.length) {

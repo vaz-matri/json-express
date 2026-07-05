@@ -11,6 +11,7 @@ Discovery is automatic. **Never import or register it.**
 ## Configuration (.env — case-insensitive)
 | Key | Default | Meaning |
 |---|---|---|
+| `jex.docs.enabled` | `true` | Set `false` to stop mounting docs routes (hide the API schema in production without uninstalling) |
 | `jex.docs.path` | `/docs` | Mount path (JSON manifest at `<path>/json`) |
 | `jex.docs.baseUrl` | request-derived | Hardcoded base URL override for reverse-proxy setups |
 

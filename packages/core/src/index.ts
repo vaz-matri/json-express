@@ -5,6 +5,7 @@ export * from './pipeline';
 export * from './request-context';
 export * from './errors';
 export * from './filter';
+export * from './security';
 export * from './schema';
 export * from './auth';
 export * from './testing/adapter-compliance';

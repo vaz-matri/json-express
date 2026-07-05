@@ -24,6 +24,8 @@ import {
     stripDeniedReadFields,
     stripDeniedWriteFields,
     sanitizeFilter,
+    shouldMaskErrors,
+    GENERIC_ERROR_MESSAGE,
 } from '@json-express/core';
 
 function denyResponse(verdict: { code: 'UNAUTHENTICATED' | 'FORBIDDEN'; reason: string }): JsonResponse {
@@ -127,8 +129,10 @@ export class RestApiGenerator implements IApiGenerator {
                 // If they used the Express-like mutator helpers res.send():
                 return { statusCode, body: responseBody };
             } catch (error: any) {
-                this.logger.error(`Error in custom endpoint`, { error: error.message });
-                return { statusCode: 500, body: { error: error.message } };
+                this.logger.error(`Error in custom endpoint`, { error: error.message, stack: error.stack });
+                // Mask internal detail from the client in production (jex.mode); dev stays verbose.
+                const message = shouldMaskErrors(this.config) ? GENERIC_ERROR_MESSAGE : error.message;
+                return { statusCode: 500, body: { error: message } };
             }
         };
     }
