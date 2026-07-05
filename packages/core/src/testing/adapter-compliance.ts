@@ -59,6 +59,22 @@ export async function runAdapterComplianceTests(
         }
         assert(updateThrewUniqueError, 'Adapter MUST throw UniqueConstraintError when updating a record to violate a unique constraint');
 
+        // Test 4: Operator-injection resistance (NoSQL injection).
+        // A nested operator value like `{ $ne: ... }` must NEVER be honored as a query
+        // operator — doing so lets a client exfiltrate rows a plain equality filter would
+        // never match. With test1 and test2 present, an honored `$ne: test1` would return
+        // exactly the OTHER row (non-empty, test1 excluded). A safe adapter instead either
+        // strips the operator (→ matches all, test1 included) or treats it as a literal
+        // value (→ matches none). So a non-empty result that excludes test1 is the tell.
+        const injected = await db.search(
+            'compliance_users',
+            { email: { $ne: 'test1@example.com' } } as any
+        );
+        assert(
+            injected.length === 0 || injected.some((r: any) => r.email === 'test1@example.com'),
+            'Adapter MUST NOT honor operator objects ($ne/$gt/$where) in search filters — NoSQL injection risk. Route client filters through sanitizeFilter.'
+        );
+
         console.log('✅ Adapter passed all compliance tests!');
     } finally {
         if (teardownAdapter && db!) {

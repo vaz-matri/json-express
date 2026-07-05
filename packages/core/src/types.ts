@@ -143,6 +143,10 @@ export interface IMiddleware {
     name: string;
     setSchemas?(schemas: ModelSchema[]): void;
     handle(req: JsonRequest, next: () => Promise<JsonResponse>): Promise<JsonResponse>;
+    /** Capability tags this middleware satisfies (e.g. `['ratelimit']`). See `CapabilityRequirement`. */
+    provides?: string[];
+    /** Hard capabilities this middleware needs present at boot. See `CapabilityRequirement`. */
+    requires?: CapabilityRequirement[];
 }
 
 /**
@@ -159,6 +163,34 @@ export interface IConfigProvider {
      * Mutates the active configuration dynamically at runtime.
      */
     set<T>(key: string, value: T): void;
+
+    /**
+     * Contribute fail-closed defaults at the LOWEST precedence — any real user value
+     * (system env, .env, jex.config) always wins. A plugin calls this in `onRegister`
+     * to supply a safe baseline (e.g. `auth.required` in production).
+     *
+     * SECURITY RULE: a registered default may only make the system MORE restrictive
+     * (booleans, limits, policies). It must NEVER fabricate a secret, key, or credential
+     * — anything whose safety depends on being unguessable. A missing secure value is a
+     * `FatalBootError` (fail closed), never an invented default.
+     *
+     * Optional so older/minimal providers still satisfy the interface; callers use
+     * optional chaining.
+     */
+    registerDefaults?(namespace: string, defaults: Record<string, unknown>): void;
+}
+
+/**
+ * A hard, security-load-bearing dependency one package declares on a capability another
+ * package provides — validated at boot (see `provides`). Use ONLY for requirements that
+ * must fail loud when unmet (e.g. identity requiring rate limiting). Soft/optional
+ * integration still uses container probing with a silent fallback.
+ */
+export interface CapabilityRequirement {
+    /** Capability tag, e.g. 'ratelimit'. Matched against the union of all `provides`. */
+    capability: string;
+    /** Why it's required — surfaced in the boot-veto remedy so an agent knows the fix. */
+    reason: string;
 }
 
 /**
@@ -193,6 +225,10 @@ export interface IPlugin {
      * collision (the plugin's contribution is silently skipped with a warning).
      */
     provideSchemas?(): ModelSchema[];
+    /** Capability tags this plugin satisfies (e.g. `['ratelimit']`). See `CapabilityRequirement`. */
+    provides?: string[];
+    /** Hard capabilities this plugin needs present at boot; unmet → `FatalBootError`. See `CapabilityRequirement`. */
+    requires?: CapabilityRequirement[];
     onRegister?(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
     onBoot(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;
     onReady?(kernel: JsonExpressKernel, configProvider: IConfigProvider): Promise<void>;

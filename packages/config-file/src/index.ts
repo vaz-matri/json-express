@@ -10,11 +10,15 @@ const jiti = createJiti(typeof __filename !== 'undefined' ? __filename : fileURL
 
 export class AdvancedConfigProvider implements IConfigProvider {
     private config: Record<string, any> = {};
+    // Plugin-contributed fail-closed defaults — lowest precedence, below `config`.
+    private defaults: Record<string, any> = {};
 
     // ✅ Make the constructor initialization async (or use a load() method)
     // Since constructors can't be async, the standard pattern is a static async factory method.
-    private constructor(config: Record<string, any>) {
+    private constructor(config: Record<string, any>, env: string = process.env.NODE_ENV || 'development') {
         this.config = config;
+        // `mode` defaults FROM NODE_ENV (see EnvConfigProvider); explicit jex.mode wins.
+        this.registerDefaults('', { mode: env });
     }
 
     public static async init(
@@ -41,7 +45,7 @@ export class AdvancedConfigProvider implements IConfigProvider {
         // space with the (already lowercased) env-derived config.
         const mergedConfig = normalizeConfigKeys(deepMerge(baseConfig, modeConfig, envConfigOverrides));
 
-        return new AdvancedConfigProvider(mergedConfig);
+        return new AdvancedConfigProvider(mergedConfig, env);
     }
 
     private static async parseFile(filePath: string, ext: string, env: string): Promise<any> {
@@ -68,7 +72,11 @@ export class AdvancedConfigProvider implements IConfigProvider {
     }
 
     public get<T>(key: string, defaultValue?: T): T {
-        return getNestedValue(this.config, key, defaultValue);
+        const fromConfig = getNestedValue(this.config, key, undefined);
+        if (fromConfig !== undefined) return fromConfig;
+        const fromDefaults = getNestedValue(this.defaults, key, undefined);
+        if (fromDefaults !== undefined) return fromDefaults;
+        return defaultValue as T;
     }
 
     public has(key: string): boolean {
@@ -77,6 +85,12 @@ export class AdvancedConfigProvider implements IConfigProvider {
 
     public set<T>(key: string, value: T): void {
         setNestedValue(this.config, key, value);
+    }
+
+    public registerDefaults(namespace: string, defaults: Record<string, unknown>): void {
+        for (const [key, value] of Object.entries(defaults)) {
+            setNestedValue(this.defaults, namespace ? `${namespace}.${key}` : key, value);
+        }
     }
 }
 

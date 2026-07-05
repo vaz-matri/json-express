@@ -1,10 +1,29 @@
 import { JsonExpressKernel } from './kernel';
 import { loadSchemasAndData } from './schema-loader';
 import { discoverPluginsRecursively, loadPluginInstance, matchesCategory } from './discovery';
+import { FatalBootError } from './errors';
 import type { IConfigProvider } from './types';
 
 const fatal = (lines: string[]): never => {
     for (const l of lines) console.error(l);
+    process.exit(1);
+};
+
+// Format a boot veto (from any component's construction, onRegister, or capability check)
+// in the standard fatal-with-remedy style, release anything already opened, then exit.
+// One path for every FatalBootError. `kernel` is passed once it exists so a veto raised
+// AFTER providers connect (e.g. during boot) shuts them down cleanly instead of exiting
+// on open handles.
+const fatalBoot = async (e: FatalBootError, kernel?: JsonExpressKernel): Promise<never> => {
+    console.error(`❌ ${e.message}`);
+    console.error(`   ${e.remedy}`);
+    if (kernel) {
+        try {
+            await kernel.shutdown();
+        } catch {
+            // Best-effort cleanup — never let a shutdown hiccup mask the original veto.
+        }
+    }
     process.exit(1);
 };
 
@@ -140,6 +159,9 @@ export const startServer = async () => {
             registeredMiddlewares.push(mw);
             console.log(`🔌 Registered middleware: ${mwName}`);
         } catch (e: any) {
+            // A construction-time boot veto (e.g. auth fail-closed) must halt, not be
+            // swallowed into booting without the component.
+            if (e instanceof FatalBootError) await fatalBoot(e, kernel);
             console.error(`❌ Failed to load middleware ${mwName}:`, e?.message || e);
         }
     }
@@ -213,6 +235,8 @@ export const startServer = async () => {
             registeredPlugins.push(plugin);
             console.log(`🔌 Registered lifecycle plugin: ${pluginName}`);
         } catch (e: any) {
+            // A construction-time boot veto must halt, not be swallowed.
+            if (e instanceof FatalBootError) await fatalBoot(e, kernel);
             console.error(`❌ Failed to load plugin ${pluginName}:`, e?.message || e);
         }
     }
@@ -297,5 +321,11 @@ export const startServer = async () => {
     process.on('SIGINT', handleShutdown);
     process.on('SIGTERM', handleShutdown);
 
-    await kernel.boot(collections, port, { enable: isSmartSeed || isAppendSeed, force: isAppendSeed });
+    try {
+        await kernel.boot(collections, port, { enable: isSmartSeed || isAppendSeed, force: isAppendSeed });
+    } catch (e) {
+        // A plugin vetoed boot with a remedy — print it, shut down cleanly, and exit.
+        if (e instanceof FatalBootError) await fatalBoot(e, kernel);
+        throw e;
+    }
 };

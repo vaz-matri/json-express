@@ -13,10 +13,12 @@ import type {
     IIdGenerator,
     IEmailProvider,
     IKvStore,
-    IQueueAdapter
+    IQueueAdapter,
+    CapabilityRequirement
 } from './types';
 import { randomUUID } from 'crypto';
 import { composeMiddlewares } from './pipeline';
+import { FatalBootError } from './errors';
 
 class DefaultIdGenerator implements IIdGenerator {
     generate(): string {
@@ -116,6 +118,38 @@ export class JsonExpressKernel {
         transport.registerRoute(route);
     }
 
+    // --- CAPABILITY VALIDATION ---
+
+    /**
+     * Match every declared `requires` against the union of all `provides` across
+     * registered plugins and middlewares. A hard requirement with no provider aborts
+     * boot via FatalBootError so a security-load-bearing dependency (e.g. identity →
+     * rate limiting) can never be silently missing.
+     */
+    private validateCapabilities() {
+        const declarers: Array<{ name: string; provides?: string[]; requires?: CapabilityRequirement[] }> = [
+            ...this.plugins,
+            ...this.middlewares.values(),
+        ];
+
+        const provided = new Set<string>();
+        for (const d of declarers) {
+            for (const cap of d.provides ?? []) provided.add(cap);
+        }
+
+        for (const d of declarers) {
+            for (const req of d.requires ?? []) {
+                if (!provided.has(req.capability)) {
+                    throw new FatalBootError(
+                        `'${d.name}' requires the '${req.capability}' capability, but no installed package provides it.`,
+                        `${req.reason} Install a package that provides '${req.capability}' ` +
+                        `(e.g. @json-express/middleware-${req.capability}).`
+                    );
+                }
+            }
+        }
+    }
+
     // --- THE BOOT SEQUENCE ---
 
     public async boot(collections: Array<string>, port: number = 3000, seedOptions?: { enable?: boolean, force?: boolean }) {
@@ -150,6 +184,11 @@ export class JsonExpressKernel {
                 await plugin.onRegister(this, configProvider);
             }
         }
+
+        // 1.6 Validate declared capability requirements. Runs after ALL onRegister so
+        // load order can't cause a false negative. Unmet hard requirements are a
+        // FatalBootError (the runner formats + exits) — never a silent boot.
+        this.validateCapabilities();
 
         // 2. Resolve the registered plugins from the container
         const db = this.container.resolve<IDatabaseAdapter>('database');

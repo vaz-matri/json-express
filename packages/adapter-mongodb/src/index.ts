@@ -8,7 +8,7 @@ import type {
     QueryOptions,
     TypeDefinition
 } from '@json-express/core';
-import { UniqueConstraintError } from '@json-express/core';
+import { UniqueConstraintError, sanitizeFilter } from '@json-express/core';
 
 export interface AdapterMongoConfig {
     /** Direct override; when omitted, read from jex.adapter-mongodb.connectionstring */
@@ -156,7 +156,10 @@ export class AdapterMongo implements IDatabaseAdapter {
 
     public async search(collection: string, query: Record<string, any>, options?: QueryOptions): Promise<any[]> {
         const col = this.db.collection(collection);
-        const mongoQuery = { ...query };
+        // Defense in depth: strip operator/nested keys ($ne, $where, dotted paths) before
+        // building the Mongo query. The API layer is the primary choke point, but a direct
+        // db.search() from a model hook must not be able to smuggle operators into find().
+        const mongoQuery: Record<string, any> = sanitizeFilter(query as Record<string, unknown>);
         // If they search by id
         if (mongoQuery.id !== undefined) {
             mongoQuery._id = this.parseId(mongoQuery.id);

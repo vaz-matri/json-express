@@ -35,6 +35,7 @@ import {
     createJwtVerifier,
     getFieldRule,
     stripDeniedWriteFields,
+    sanitizeFilter,
 } from '@json-express/core';
 
 interface ResolverContext {
@@ -388,7 +389,9 @@ export class GraphQLApiGenerator implements IApiGenerator {
                 resolve: async (_: any, args: any, ctx: ResolverContext) => {
                     const user = enforceAccess(readRule, ctx, typeName, 'read');
                     const { limit, offset, where } = args ?? {};
-                    const filter: Record<string, any> = { ...(where ?? {}) };
+                    // Strip operator/nested keys before the filter reaches any adapter — the
+                    // same choke point api-rest uses. Owner clause is stamped after (trusted).
+                    const filter: Record<string, any> = sanitizeFilter(where as Record<string, unknown>);
                     if (needsOwnerCheck(readRule)) {
                         // Owner clause overwrites any client-supplied value to prevent spoofing.
                         filter[ownerField] = resolveUserId(user);

@@ -23,6 +23,7 @@ import {
     ownsRecord,
     stripDeniedReadFields,
     stripDeniedWriteFields,
+    sanitizeFilter,
 } from '@json-express/core';
 
 function denyResponse(verdict: { code: 'UNAUTHENTICATED' | 'FORBIDDEN'; reason: string }): JsonResponse {
@@ -168,8 +169,12 @@ export class RestApiGenerator implements IApiGenerator {
                     const verdict = evaluateAccess(readRule, req.headers['x-user-payload']);
                     if (!verdict.allowed) return denyResponse(verdict);
 
-                    // Parse QueryOptions cleanly
-                    const { _expand, _embed, ...cleanQuery } = req.query;
+                    // Parse QueryOptions cleanly. sanitizeFilter strips operator/nested
+                    // keys ($ne, $where, dotted paths) so client query params can only ever
+                    // be flat equality filters — the choke point that keeps NoSQL injection
+                    // from reaching any adapter (the owner clause is stamped AFTER, trusted).
+                    const { _expand, _embed, ...rawQuery } = req.query;
+                    const cleanQuery = sanitizeFilter(rawQuery as Record<string, unknown>);
                     const options: QueryOptions = {
                         expand: _expand ? String(_expand).split(',').map(s => s.trim()) : undefined,
                         embed: _embed ? String(_embed).split(',').map(s => s.trim()) : undefined

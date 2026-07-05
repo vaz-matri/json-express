@@ -12,7 +12,7 @@ import type {
     QueryOptions,
     TypeDefinition
 } from '@json-express/core';
-import { UniqueConstraintError } from '@json-express/core';
+import { UniqueConstraintError, sanitizeFilter } from '@json-express/core';
 import { translateSchemaToDrizzle } from './schema-translator';
 
 /**
@@ -163,8 +163,15 @@ export class AdapterPostgres implements IDatabaseAdapter {
     public async search(collection: string, query: Record<string, any>, options?: QueryOptions): Promise<any[]> {
         const table = this.getTable(collection);
         let q = this.db.select().from(table);
-        
-        const conditions = Object.entries(query).map(([key, val]) => eq(table[key], val));
+
+        // Defense in depth: the API layer already sanitizes client filters, but a direct
+        // db.search() from a model hook could pass anything. Strip operator/nested keys,
+        // then allow-list to real columns so an unknown key can't produce eq(undefined, …)
+        // (a 500 / cheap DoS) or reach an unintended identifier.
+        const safe = sanitizeFilter(query as Record<string, unknown>);
+        const conditions = Object.entries(safe)
+            .filter(([key]) => (table as Record<string, unknown>)[key] !== undefined)
+            .map(([key, val]) => eq((table as Record<string, any>)[key], val));
         if (conditions.length > 0) {
             const result = await q.where(and(...conditions));
             this.logger.info(`Search in '${collection}'`, { count: result.length });

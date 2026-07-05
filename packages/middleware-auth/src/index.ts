@@ -1,5 +1,5 @@
 import type { IMiddleware, JsonRequest, JsonResponse, IConfigProvider, ILogger, JwtVerifier } from '@json-express/core';
-import { createJwtVerifier } from '@json-express/core';
+import { createJwtVerifier, FatalBootError } from '@json-express/core';
 
 export class AuthMiddleware implements IMiddleware {
     public readonly name = 'auth';
@@ -11,6 +11,13 @@ export class AuthMiddleware implements IMiddleware {
     constructor({ configProvider, logger }: { configProvider?: IConfigProvider; logger: ILogger }) {
         this.logger = logger.child({ component: 'Auth' });
         if (!configProvider) return;
+
+        // Production fails closed: default auth.required=true in production so an app can't
+        // silently ship an open API. This is a fail-closed DEFAULT (safe to tighten) — never
+        // a fabricated secret — so a real user value always wins, and a public production API
+        // opts out explicitly with jex.auth.required=false. Registered before the read below.
+        const isProduction = configProvider.get<string>('mode', 'development') === 'production';
+        configProvider.registerDefaults?.('auth', { required: isProduction });
 
         // Strict mode: refuse to serve unauthenticated traffic when auth is
         // expected but not (or mis-)configured — instead of the dev-friendly bypass.
@@ -27,6 +34,29 @@ export class AuthMiddleware implements IMiddleware {
 
         if (hasSecret || hasJwks) {
             this.verifier = createJwtVerifier({ secret, jwksUri, audience, issuer, algorithms });
+        }
+
+        // Boot-time fail-closed: auth is required but there is no way to verify a token.
+        // Veto boot with the exact remedy rather than starting a server that would 503 every
+        // request (or, worse in production, quietly accept none). Fail loud, at boot — the
+        // runner logs this and shuts down cleanly. Name the concrete env vars an operator
+        // must set (both the .env dotted form and the uppercase JEX__ form for PaaS).
+        if (this.required && !this.verifier) {
+            const requiredNote = isProduction
+                ? 'auth.required defaults to true in production, so this check is strict by default.'
+                : 'auth.required is set to true.';
+            throw new FatalBootError(
+                'Authentication is required but no token verifier is configured. ' +
+                `${requiredNote} Set a signing secret (HS256) or a JWKS URI (asymmetric) — neither is present.`,
+                [
+                    'Fix by setting ONE of the following (in .env, or the environment), then restart:',
+                    '     jex.auth.secret=<your-hs256-signing-secret>       # symmetric HS256',
+                    '     jex.auth.jwksuri=https://issuer/.well-known/jwks.json   # asymmetric JWKS',
+                    '   PaaS uppercase equivalents: JEX__AUTH__SECRET / JEX__AUTH__JWKSURI',
+                    '   Or, to intentionally run a PUBLIC API with no authentication, set:',
+                    '     jex.auth.required=false   (JEX__AUTH__REQUIRED=false)',
+                ].join('\n'),
+            );
         }
 
         // Extract and format exclude paths (handles either array or comma-separated string)
